@@ -42,6 +42,7 @@
       #cartModal>.modalbox>.actions{padding:0 26px 26px!important;margin-top:15px!important}
       #cartModal .wide{min-height:47px!important;border-radius:13px!important;background:linear-gradient(135deg,#e12c91,#c41f7d)!important;box-shadow:0 9px 22px rgba(215,43,145,.18)!important}
 
+      #checkoutModal{z-index:100010!important}
       #checkoutModal .modalbox{width:min(680px,calc(100vw - 28px))!important}
       #checkoutModal .pepCheckoutHead{padding:26px 30px 20px!important;background:linear-gradient(135deg,#fff0f8,#fff 60%,#f5efff)!important;border-bottom:1px solid #f0dce9!important}
       #checkoutModal .pepCheckoutKicker{font-size:10px!important;font-weight:950!important;letter-spacing:.16em!important;color:#d7288d!important;margin-bottom:7px!important}
@@ -144,11 +145,47 @@
     }catch(e){console.warn('PEPMOSA site notice',e)}
   }
 
-  function enhanceCheckout(){const modal=$('checkoutModal'),box=modal?.querySelector('.modalbox');if(!modal||!box||box.dataset.pepCheckout==='1')return;const msg=box.querySelector('#checkoutMsg'),grid=box.querySelector('.formGrid'),actions=box.querySelector('.actions');if(!grid)return;const head=document.createElement('div');head.className='pepCheckoutHead';head.innerHTML='<div class="pepCheckoutKicker">PEPMOSA • CHECKOUT</div><h2>Complete Your Order</h2><p>Please review your details carefully before submitting your order.</p>';const body=document.createElement('div');body.className='pepCheckoutBody';const info=document.createElement('div');info.className='pepCheckoutInfo';info.innerHTML='<div class="pepCheckoutIcon">✓</div><div><b>Your cart is ready</b><span>Enter your contact and delivery details below.</span></div>';box.innerHTML='';box.appendChild(head);box.appendChild(body);body.appendChild(info);if(msg)body.appendChild(msg);body.appendChild(grid);if(actions)body.appendChild(actions);box.dataset.pepCheckout='1'}
+  function enhanceCheckout(){
+    const modal=$('checkoutModal'),box=modal?.querySelector('.modalbox');
+    if(!modal||!box||box.dataset.pepCheckout==='1')return;
+    const msg=box.querySelector('#checkoutMsg'),grid=box.querySelector('.formGrid'),actions=box.querySelector('.actions');
+    if(!grid)return;
+    const head=document.createElement('div');head.className='pepCheckoutHead';head.innerHTML='<div class="pepCheckoutKicker">PEPMOSA • CHECKOUT</div><h2>Complete Your Order</h2><p>Please review your details carefully before submitting your order.</p>';
+    const body=document.createElement('div');body.className='pepCheckoutBody';
+    const info=document.createElement('div');info.className='pepCheckoutInfo';info.innerHTML='<div class="pepCheckoutIcon">✓</div><div><b>Your cart is ready</b><span>Enter your contact and delivery details below.</span></div>';
+    box.innerHTML='';box.appendChild(head);box.appendChild(body);body.appendChild(info);if(msg)body.appendChild(msg);body.appendChild(grid);if(actions)body.appendChild(actions);box.dataset.pepCheckout='1';
+  }
+
+  function ensureCheckoutFlow(){
+    const cartModal=$('cartModal'),checkoutModal=$('checkoutModal');
+    if(!cartModal||!checkoutModal)return;
+    const checkoutBtn=cartModal.querySelector('.wide');
+    if(checkoutBtn&&!checkoutBtn.dataset.pepCheckoutBound){
+      checkoutBtn.dataset.pepCheckoutBound='1';
+      checkoutBtn.addEventListener('click',function(e){
+        e.preventDefault();e.stopPropagation();
+        let c=[];try{c=JSON.parse(localStorage.pepmosaCart||'[]')}catch(err){}
+        if(!Array.isArray(c)||!c.length){alert('Cart is empty.');return;}
+        cartModal.classList.remove('show');
+        checkoutModal.classList.add('show');
+        checkoutModal.style.display='flex';
+        enhanceCheckout();
+      });
+    }
+    const submit=checkoutModal.querySelector('#checkoutModalSubmit')||checkoutModal.querySelector('.actions .btn.primary');
+    if(submit&&!submit.dataset.pepSubmitBound){
+      submit.dataset.pepSubmitBound='1';
+      submit.addEventListener('click',function(e){
+        e.preventDefault();
+        if(typeof window.placeOrder==='function')window.placeOrder();
+      });
+    }
+  }
+
   function enhanceFee(){const modal=$('pepFeeModal'),box=modal?.querySelector('.pepFeeBox');if(!modal||!box)return;let gb=null;try{if(typeof currentGB!=='undefined')gb=currentGB}catch(e){}if(!gb)return;const qr=gb.admin_fee_qr_url,fee=gb.admin_fee,sum=box.querySelector('#pepFeeGb');if(sum){sum.classList.add('pepGBSummary');sum.innerHTML='<div><div class="label">GROUP BUY</div><div class="name">'+esc(gb.customer_facing_name||gb.gb_number)+'</div></div><div><div class="label">ADMIN FEE</div><div class="fee">'+peso(fee)+'</div></div>'}const q=box.querySelector('.pepQrWrap');if(q)q.innerHTML=qr?'<div class="pepQrTitle">SCAN TO PAY ADMIN FEE</div><img class="pepQrImage" src="'+esc(qr)+'" alt="Admin Fee QR Code">':'<div class="pepQrTitle">ADMIN FEE PAYMENT</div><div class="pepQrMissing">QR code is not available yet. Please contact admin.</div>'}
 
   function watch(){
-    styles();ensureSiteNoticeUI();repairProducts();enhanceCheckout();enhanceFee();
+    styles();ensureSiteNoticeUI();repairProducts();enhanceCheckout();enhanceFee();ensureCheckoutFlow();
     if(typeof window.renderProducts==='function'&&!window.renderProducts.__pepCompact){const wrapped=function(){compactRender()};wrapped.__pepCompact=true;window.renderProducts=wrapped;try{compactRender()}catch(e){}}
     if(!noticeShown&&S())loadSiteNotice();setTimeout(watch,900);
   }

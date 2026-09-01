@@ -1,4 +1,4 @@
-/* PEPMOSA storefront hotfix: avoid ambiguous Supabase product relationships + premium payment UI */
+/* PEPMOSA storefront hotfix: avoid ambiguous Supabase product relationships + premium payment UI + cart repair */
 (function(){
   'use strict';
   const $=id=>document.getElementById(id);
@@ -73,12 +73,35 @@
         if(vRes.error)throw vRes.error;
         variants=vRes.data||[];
       }
-      const byProduct={};variants.forEach(v=>{(byProduct[v.product_id]??=[]).push(v)});
+      let mins=[];
+      const mRes=await s.from('gb_minimum_quantities').select('variant_id,minimum_qty').eq('gb_number',gb.gb_number);
+      if(!mRes.error)mins=mRes.data||[];
+      const minByVariant={};mins.forEach(m=>{minByVariant[m.variant_id]=Math.max(1,Number(m.minimum_qty||1))});
+      const byProduct={};variants.forEach(v=>{v.minimum_qty=minByVariant[v.variant_id]||1;(byProduct[v.product_id]??=[]).push(v)});
       const merged=(pRes.data||[]).map(p=>({...p,product_variants:byProduct[p.product_id]||[]})).filter(p=>p.product_variants.length);
       try{products=merged}catch(e){window.products=merged}
+      window.__pepProducts=merged;
       loadedKey=key;
       if(typeof renderProducts==='function')renderProducts();
     }catch(e){console.error('PEPMOSA product loader',e)}
+  }
+
+  function repairCart(){
+    if(typeof addToCart!=='function')return;
+    if(window.__pepCartRepairInstalled)return;
+    const originalAdd=addToCart;
+    window.__pepCartRepairInstalled=true;
+    window.__pepOriginalAddToCart=originalAdd;
+    window.addToCart=function(pid,vid){
+      try{
+        if(window.__pepProducts&&window.__pepProducts.length){products=window.__pepProducts;}
+      }catch(e){}
+      try{
+        const saved=JSON.parse(localStorage.pepmosaCart||'[]');
+        if(Array.isArray(saved)&&saved.length)cart=saved;
+      }catch(e){}
+      return originalAdd(pid,vid);
+    };
   }
 
   function enhanceCheckout(){
@@ -107,6 +130,6 @@
     if(q){q.innerHTML=qr?'<div class="pepQrTitle">SCAN TO PAY ADMIN FEE</div><img class="pepQrImage" src="'+esc(qr)+'" alt="Admin Fee QR Code">':'<div class="pepQrTitle">ADMIN FEE PAYMENT</div><div class="pepQrMissing">QR code is not available yet. Please contact admin.</div>'}
   }
 
-  function watch(){styles();repairProducts();enhanceCheckout();enhanceFee();setTimeout(watch,700)}
+  function watch(){styles();repairProducts();repairCart();enhanceCheckout();enhanceFee();setTimeout(watch,700)}
   watch();
 })();

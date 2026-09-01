@@ -1,6 +1,6 @@
 window.PEPMOSA_CONFIG = {
   SUPABASE_URL: "https://pnetzdggtlbuhuxdzzak.supabase.co",
-  SUPABASE_ANON_KEY: "sb_publishable_f-UnzjqozjjeB-KIIml-A_i9zFvQ2U"
+  SUPABASE_ANON_KEY: "sb_publishable_f-FUnzjqozjjeB-KIIml-A_i9zFvQ2U"
 };
 
 (function(){

@@ -48,7 +48,25 @@ const TRACKING_STATUSES=["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING"
 function $(id){return document.getElementById(id)}function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}function peso(v){return "₱"+Number(v||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2})}function showMessage(m,t=""){$("globalMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`;window.scrollTo({top:0,behavior:"smooth"});setTimeout(()=>$("globalMsg").innerHTML="",5000)}function showLoginMessage(m,t="error"){$("loginMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`}function previewFile(i,p){const f=$(i).files[0];if(!f)return;$(p).src=URL.createObjectURL(f);$(p).style.display="block"}
 function openTab(b){const target=b.dataset.panel;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(target)?.classList.add("active");if(target==="vialTrackerPanel")loadVialTracker()}
 async function login(){const email=$("loginEmail").value.trim(),password=$("loginPassword").value;if(!email||!password)return showLoginMessage("Email and password are required.");try{if(typeof sb==="undefined"||!sb?.auth)throw new Error("Supabase is not initialized. Please refresh the page and try again.");const{data,error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;await verifyAdmin(data.user)}catch(e){console.error(e);showLoginMessage(e.message||"Login failed.")}}
-async function verifyAdmin(user){if(!user)return showLoginMessage("No authenticated user found.");const{data:profile,error}=await sb.from("profiles").select("email,is_admin").eq("id",user.id).maybeSingle();if(error)throw error;if(!profile||!profile.is_admin){await sb.auth.signOut();return showLoginMessage("This account does not have administrator access.")}$("loginScreen").style.display="none";$("adminApp").style.display="block";$("signedInAs").textContent="Signed in as "+user.email;await loadEverything()}
+const ADMIN_EMAILS=["groupbuypepmosa@gmail.com"];
+async function verifyAdmin(user){
+  if(!user)return showLoginMessage("No authenticated user found.");
+  const email=String(user.email||"").trim().toLowerCase();
+  let allowed=ADMIN_EMAILS.includes(email);
+  if(!allowed){
+    const{data:profile,error}=await sb.from("profiles").select("email,is_admin").eq("id",user.id).maybeSingle();
+    if(error)throw error;
+    allowed=!!profile?.is_admin;
+  }
+  if(!allowed){
+    await sb.auth.signOut();
+    return showLoginMessage("This account does not have administrator access.");
+  }
+  $("loginScreen").style.display="none";
+  $("adminApp").style.display="block";
+  $("signedInAs").textContent="Signed in as "+user.email;
+  await loadEverything();
+}
 async function logout(){await sb.auth.signOut();$("adminApp").style.display="none";$("loginScreen").style.display="flex";$("loginPassword").value="";showLoginMessage("You have been logged out.","success")}
 async function checkExistingSession(){try{const{data,error}=await sb.auth.getSession();if(error)throw error;if(data.session)await verifyAdmin(data.session.user)}catch(e){console.error(e)}}
 async function loadEverything(){try{await loadGroupBuys();await Promise.all([loadCategories(),loadProducts(),loadFees(),loadOrders()]);$("vialTrackerGB").innerHTML=`<option value="">All Group Buys</option>`+groupBuys.map(g=>`<option value="${esc(g.gb_number)}">${esc(g.gb_number)} — ${esc(g.customer_facing_name||"")}</option>`).join("");if($("variantEditorRows")&&!$("variantEditorRows").children.length)resetVariantEditor()}catch(e){console.error(e);showMessage(e.message||"Unable to load admin data.","error")}}

@@ -11,17 +11,10 @@ function initSupabase() {
     throw new Error("Add your Supabase URL and anon key in config.js.");
   }
 
-  sb = window.supabase.createClient(c.SUPABASE_URL, c.SUPABASE_ANON_KEY);
-
-  if ((window.location.pathname || '').toLowerCase().endsWith('admin.html')) {
-    const originalGetSession = sb.auth.getSession.bind(sb.auth);
-    sb.auth.getSession = async function () {
-      await new Promise(resolve => setTimeout(resolve, 750));
-      return originalGetSession();
-    };
+  if (!sb) {
+    sb = window.supabase.createClient(c.SUPABASE_URL, c.SUPABASE_ANON_KEY);
+    window.sb = sb;
   }
-
-  window.sb = sb;
 
   if ((window.location.pathname || '/').toLowerCase().endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
     if (!document.querySelector('script[data-pepmosa-storefront-hotfix]')) {
@@ -53,8 +46,9 @@ function initSupabase() {
 async function requireAdmin() {
   if (!sb) initSupabase();
 
-  const { data: { user } } = await sb.auth.getUser();
+  const { data: { user }, error: userError } = await sb.auth.getUser();
 
+  if (userError) throw userError;
   if (!user) {
     throw new Error("Please log in.");
   }
@@ -63,9 +57,10 @@ async function requireAdmin() {
     .from("profiles")
     .select("is_admin,email")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
-  if (error || !profile?.is_admin) {
+  if (error) throw error;
+  if (!profile?.is_admin) {
     throw new Error("Admin access required.");
   }
 

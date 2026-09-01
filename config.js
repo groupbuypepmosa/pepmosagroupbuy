@@ -8,7 +8,7 @@ window.PEPMOSA_CONFIG = {
   function loadOnce(file){
     if(!file || document.querySelector('script[data-pepmosa-stable="'+file+'"]')) return;
     const s=document.createElement('script');
-    s.src=file+'?v=20260901-stable4';
+    s.src=file+'?v=20260901-stable5';
     s.dataset.pepmosaStable=file;
     document.body.appendChild(s);
   }
@@ -17,10 +17,10 @@ window.PEPMOSA_CONFIG = {
     const isAdmin=path.endsWith('/admin.html')||path.endsWith('admin.html');
     const isStorefront=path==='/'||path.endsWith('/index.html')||path.endsWith('index.html');
     if(isAdmin){
-      // Admin's inline bootstrap checks the session immediately while the HTML is still parsing.
-      // Load the repair layer synchronously so the legacy loader is replaced before that check runs.
+      // The legacy admin bootstrap checks the session immediately during parsing.
+      // Load the stable repair layer before that check so the old schema calls never run.
       if(!document.querySelector('script[data-pepmosa-stable="admin-repair.js"]')){
-        document.write('<script src="admin-repair.js?v=20260901-stable4" data-pepmosa-stable="admin-repair.js"><\\/script>');
+        document.write('<script src="admin-repair.js?v=20260901-stable5" data-pepmosa-stable="admin-repair.js"></'+'script>');
       }
     }
     if(isStorefront) loadOnce('storefront-repair.js');

@@ -21,6 +21,22 @@ function initSupabase() {
     c.SUPABASE_ANON_KEY
   );
 
+  // The legacy admin page calls getSession immediately while its inline
+  // bootstrap is still parsing. Hold that one call until admin-repair.js
+  // has replaced the old schema-dependent loaders.
+  if ((window.location.pathname || '').toLowerCase().endsWith('admin.html')) {
+    const originalGetSession = sb.auth.getSession.bind(sb.auth);
+    sb.auth.getSession = async function () {
+      if (!window.__pepAdminStableReady) {
+        const deadline = Date.now() + 5000;
+        while (!window.__pepAdminStableReady && Date.now() < deadline) {
+          await new Promise(resolve => setTimeout(resolve, 25));
+        }
+      }
+      return originalGetSession();
+    };
+  }
+
   // Expose the client on window as well. Some admin helpers use
   // window.sb explicitly, while page scripts use the global `sb` binding.
   // Keeping both references in sync prevents false "Supabase is not

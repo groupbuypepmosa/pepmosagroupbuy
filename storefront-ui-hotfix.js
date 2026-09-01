@@ -9,7 +9,6 @@
   function styles(){
     if($('pepPremiumModalStyles'))return;
     const s=document.createElement('style');s.id='pepPremiumModalStyles';s.textContent=`
-      /* Kill the old green admin-fee styling */
       #pepFeeModal .pepGBSummary .fee{color:#d7288d!important}
       #pepFeeModal .pepFeeBox{width:min(620px,calc(100vw - 28px));padding:0!important;overflow:hidden;border:1px solid #f0d5e5!important;border-radius:26px!important;background:#fff!important;box-shadow:0 30px 90px rgba(88,38,76,.24)!important}
       #pepFeeModal .pepFeeHeader{padding:27px 30px 22px!important;background:linear-gradient(135deg,#fff0f8 0%,#fff 58%,#f5efff 100%)!important;border-bottom:1px solid #f0dce9!important;position:relative!important}
@@ -54,18 +53,17 @@
   async function repairProducts(){
     const s=window.sb||window.__sb;
     if(!s)return;
-    const gb=window.currentGB;
+    let gb=null;
+    try{if(typeof currentGB!=='undefined')gb=currentGB}catch(e){}
     if(!gb||!gb.gb_number)return;
     const key=gb.gb_number;
-    if(loadedKey===key && Array.isArray(window.products) && window.products.length)return;
+    let existing=[];try{if(typeof products!=='undefined'&&Array.isArray(products))existing=products}catch(e){}
+    if(loadedKey===key&&existing.length)return;
     try{
       const catRes=await s.from('gb_categories').select('category_name').eq('gb_number',gb.gb_number);
       if(catRes.error)throw catRes.error;
       const cats=(catRes.data||[]).map(x=>x.category_name).filter(Boolean);
-      if(!cats.length){window.products=[];if(typeof window.renderProducts==='function')window.renderProducts();loadedKey=key;return;}
-
-      /* IMPORTANT: do not embed products -> product_variants. The database currently exposes
-         more than one relationship between those tables, so Supabase rejects the nested select. */
+      if(!cats.length){try{products=[]}catch(e){};if(typeof renderProducts==='function')renderProducts();loadedKey=key;return;}
       const pRes=await s.from('products').select('product_id,product_name,category,description,image_url,active').eq('active',true).in('category',cats).order('product_name');
       if(pRes.error)throw pRes.error;
       const ids=(pRes.data||[]).map(p=>p.product_id);
@@ -76,16 +74,16 @@
         variants=vRes.data||[];
       }
       const byProduct={};variants.forEach(v=>{(byProduct[v.product_id]??=[]).push(v)});
-      window.products=(pRes.data||[]).map(p=>({...p,product_variants:byProduct[p.product_id]||[]})).filter(p=>p.product_variants.length);
+      const merged=(pRes.data||[]).map(p=>({...p,product_variants:byProduct[p.product_id]||[]})).filter(p=>p.product_variants.length);
+      try{products=merged}catch(e){window.products=merged}
       loadedKey=key;
-      if(typeof window.renderProducts==='function')window.renderProducts();
+      if(typeof renderProducts==='function')renderProducts();
     }catch(e){console.error('PEPMOSA product loader',e)}
   }
 
   function enhanceCheckout(){
     const modal=$('checkoutModal'),box=modal?.querySelector('.modalbox');
     if(!modal||!box||box.dataset.pepCheckout==='1')return;
-    const h2=box.querySelector('h2');
     const msg=box.querySelector('#checkoutMsg');
     const grid=box.querySelector('.formGrid');
     const actions=box.querySelector('.actions');
@@ -100,22 +98,15 @@
   function enhanceFee(){
     const modal=$('pepFeeModal'),box=modal?.querySelector('.pepFeeBox');
     if(!modal||!box)return;
-    const gb=window.currentGB;
+    let gb=null;try{if(typeof currentGB!=='undefined')gb=currentGB}catch(e){}
     if(!gb)return;
-    const qr=gb.admin_fee_qr_url;
-    const fee=gb.admin_fee;
-    let sum=box.querySelector('#pepFeeGb');
+    const qr=gb.admin_fee_qr_url,fee=gb.admin_fee;
+    const sum=box.querySelector('#pepFeeGb');
     if(sum){sum.classList.add('pepGBSummary');sum.innerHTML='<div><div class="label">GROUP BUY</div><div class="name">'+esc(gb.customer_facing_name||gb.gb_number)+'</div></div><div><div class="label">ADMIN FEE</div><div class="fee">'+peso(fee)+'</div></div>'}
-    let q=box.querySelector('.pepQrWrap');
+    const q=box.querySelector('.pepQrWrap');
     if(q){q.innerHTML=qr?'<div class="pepQrTitle">SCAN TO PAY ADMIN FEE</div><img class="pepQrImage" src="'+esc(qr)+'" alt="Admin Fee QR Code">':'<div class="pepQrTitle">ADMIN FEE PAYMENT</div><div class="pepQrMissing">QR code is not available yet. Please contact admin.</div>'}
   }
 
-  function watch(){
-    styles();
-    repairProducts();
-    enhanceCheckout();
-    enhanceFee();
-    setTimeout(watch,700);
-  }
+  function watch(){styles();repairProducts();enhanceCheckout();enhanceFee();setTimeout(watch,700)}
   watch();
 })();

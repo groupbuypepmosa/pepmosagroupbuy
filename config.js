@@ -1,20 +1,20 @@
 window.PEPMOSA_CONFIG = {
   SUPABASE_URL: "https://pnetzdggtlbuhuxdzzak.supabase.co",
-  SUPABASE_ANON_KEY: "sb_publishable_f-FUnzjqozjjeB-KIIml-A_i9zFvQ2U"
+  SUPABASE_ANON_KEY: "sb_publishable_f-UnzjqozjjeB-KIIml-A_i9zFvQ2U"
 };
 
 (function(){
   'use strict';
   function loadOnce(file){
     if(!file || document.querySelector('script[data-pepmosa-stable="'+file+'"]')) return;
-    const s=document.createElement('script');s.src=file+'?v=20260901-stable11';s.dataset.pepmosaStable=file;document.body.appendChild(s);
+    const s=document.createElement('script');s.src=file+'?v=20260901-stable12';s.dataset.pepmosaStable=file;document.body.appendChild(s);
   }
   function boot(){
     const path=(window.location.pathname||'').toLowerCase();
     const isAdmin=path.endsWith('/admin.html')||path.endsWith('admin.html');
     const isStorefront=path==='/'||path.endsWith('/index.html')||path.endsWith('index.html');
     if(isAdmin){
-      if(!document.querySelector('script[data-pepmosa-stable="admin-repair.js"]'))document.write('<script src="admin-repair.js?v=20260901-stable11" data-pepmosa-stable="admin-repair.js"></'+'script>');
+      if(!document.querySelector('script[data-pepmosa-stable="admin-repair.js"]'))document.write('<script src="admin-repair.js?v=20260901-stable12" data-pepmosa-stable="admin-repair.js"></'+'script>');
       loadOnce('admin-gb-categories.js');
     }
     if(isStorefront){
@@ -23,6 +23,7 @@ window.PEPMOSA_CONFIG = {
       loadOnce('storefront-ui-hotfix.js');
       loadOnce('checkout-polish.js');
       loadOnce('shipping-rates.js');
+      loadOnce('checkout-hotfix.js');
     }
   }
   boot();

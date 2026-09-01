@@ -5,7 +5,7 @@ window.PEPMOSA_CONFIG = {
 
 (function(){
   'use strict';
-  const VERSION = '20260901-stable14';
+  const VERSION = '20260901-stable15';
 
   function loadOnce(file){
     if(!file || document.querySelector('script[data-pepmosa-stable="'+file+'"]')) return;
@@ -33,20 +33,18 @@ window.PEPMOSA_CONFIG = {
     }
 
     if(isStorefront){
-      /* IMPORTANT: index.html defines currentGB, products and cart in its inline script.
-         Do not load storefront repair layers until that initialization has completed. */
+      /* All existing functional repair layers stay intact. The final UI layer
+         runs last and is visual-only, so later edits cannot reset the design. */
       loadOnce('storefront-repair.js');
       loadOnce('fee-modal-repair.js');
       loadOnce('storefront-ui-hotfix.js');
       loadOnce('checkout-polish.js');
       loadOnce('shipping-rates.js');
       loadOnce('checkout-hotfix.js');
+      loadOnce('index-ui-final.js');
     }
   }
 
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',boot,{once:true});
-  }else{
-    boot();
-  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
 })();

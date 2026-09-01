@@ -16,7 +16,7 @@ window.PEPMOSA_CONFIG = {
   function loadFix(file) {
     if (!file || document.querySelector('script[data-pepmosa-fix="'+file+'"]')) return;
     const s = document.createElement("script");
-    s.src = file + "?v=20260901-4";
+    s.src = file + "?v=20260901-5";
     s.dataset.pepmosaFix = file;
     document.body.appendChild(s);
   }
@@ -34,7 +34,10 @@ window.PEPMOSA_CONFIG = {
     const path = (window.location.pathname || "").toLowerCase();
     const isAdmin = path.endsWith("/admin.html") || path.endsWith("admin.html");
     const isStorefront = path === "/" || path.endsWith("/index.html") || path.endsWith("index.html");
-    if (isAdmin) loadFix("admin-fix.js");
+    if (isAdmin) {
+      loadFix("admin-fix.js");
+      setTimeout(() => loadFix("admin-hotfix.js"), 150);
+    }
     if (isStorefront) {
       loadFix("storefront-fix.js");
       setTimeout(() => loadFix("email-verification-fix.js"), 500);
@@ -57,8 +60,6 @@ window.PEPMOSA_CONFIG = {
               if (typeof window.showMessage === "function") window.showMessage(`Cannot delete "${categoryName}" because products are still using it.`, "error");
               return;
             }
-            const { error: settingsError } = await S.from("gb_category_settings").delete().eq("category_name", categoryName);
-            if (settingsError && !String(settingsError.message || "").toLowerCase().includes("does not exist")) throw settingsError;
             const { error } = await S.from("categories").delete().eq("category_name", categoryName);
             if (error) throw error;
             if (typeof window.loadCategories === "function") await window.loadCategories();

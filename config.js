@@ -5,7 +5,7 @@ window.PEPMOSA_CONFIG = {
 
 (function(){
   'use strict';
-  const VERSION = '20260901-stable13';
+  const VERSION = '20260901-stable14';
 
   function loadOnce(file){
     if(!file || document.querySelector('script[data-pepmosa-stable="'+file+'"]')) return;
@@ -23,12 +23,18 @@ window.PEPMOSA_CONFIG = {
 
     if(isAdmin){
       if(!document.querySelector('script[data-pepmosa-stable="admin-repair.js"]')){
-        document.write('<script src="admin-repair.js?v='+VERSION+'" data-pepmosa-stable="admin-repair.js"></'+'script>');
+        const s=document.createElement('script');
+        s.src='admin-repair.js?v='+VERSION;
+        s.dataset.pepmosaStable='admin-repair.js';
+        s.async=false;
+        document.body.appendChild(s);
       }
       loadOnce('admin-gb-categories.js');
     }
 
     if(isStorefront){
+      /* IMPORTANT: index.html defines currentGB, products and cart in its inline script.
+         Do not load storefront repair layers until that initialization has completed. */
       loadOnce('storefront-repair.js');
       loadOnce('fee-modal-repair.js');
       loadOnce('storefront-ui-hotfix.js');
@@ -38,5 +44,9 @@ window.PEPMOSA_CONFIG = {
     }
   }
 
-  boot();
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',boot,{once:true});
+  }else{
+    boot();
+  }
 })();

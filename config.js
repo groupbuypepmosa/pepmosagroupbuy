@@ -5,7 +5,7 @@ window.PEPMOSA_CONFIG = {
 
 (function(){
   'use strict';
-  const VERSION = '20260902-checkout-clean2';
+  const VERSION = '20260902-returning-customer1';
   function loadOnce(file){
     if(!file || document.querySelector('script[data-pepmosa-stable="'+file+'"]')) return;
     const s=document.createElement('script');

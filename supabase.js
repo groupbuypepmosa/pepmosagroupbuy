@@ -38,6 +38,18 @@ function initSupabase() {
   // initialized" errors after the client has already been created.
   window.sb = sb;
 
+  // Customer storefront polish/repair layer. It is loaded here because the
+  // legacy index page already loads supabase.js and this guarantees the
+  // product-card, minimum-quantity, popup and Site Notice fixes are present.
+  if ((window.location.pathname || '/').toLowerCase().endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
+    if (!document.querySelector('script[data-pepmosa-storefront-hotfix]')) {
+      const script = document.createElement('script');
+      script.src = 'storefront-ui-hotfix.js?v=20260901-2';
+      script.dataset.pepmosaStorefrontHotfix = '1';
+      document.head.appendChild(script);
+    }
+  }
+
   return sb;
 }
 

@@ -1,6 +1,7 @@
 window.PEPMOSA_CONFIG = {
-  SUPABASE_URL: "https://xvpphoxeewctqvzlhoet.supabase.co",
-  SUPABASE_ANON_KEY: "sb_publishable_dM5TQfRrXsvhczxCG4ruuA_TIELkkkq"
+  // NEW PEPMOSA Supabase project
+  SUPABASE_URL: "https://pnetzdggtlbuhuxdzzak.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_f-FUnzjqozjjeB-KIIml-A_i9zFvQ2U"
 };
 
 (function () {
@@ -17,7 +18,7 @@ window.PEPMOSA_CONFIG = {
   function loadFix(file) {
     if (!file || document.querySelector('script[data-pepmosa-fix="'+file+'"]')) return;
     const s = document.createElement("script");
-    s.src = file + "?v=20260901-2";
+    s.src = file + "?v=20260901-3";
     s.dataset.pepmosaFix = file;
     document.body.appendChild(s);
   }
@@ -44,7 +45,6 @@ window.PEPMOSA_CONFIG = {
     }
   });
 
-  // Safe category DELETE enhancement.
   document.addEventListener("DOMContentLoaded", function () {
     let attempts = 0;
     const timer = setInterval(function () {

@@ -1,5 +1,4 @@
 window.PEPMOSA_CONFIG = {
-  // NEW PEPMOSA Supabase project
   SUPABASE_URL: "https://pnetzdggtlbuhuxdzzak.supabase.co",
   SUPABASE_ANON_KEY: "sb_publishable_f-FUnzjqozjjeB-KIIml-A_i9zFvQ2U"
 };
@@ -14,15 +13,13 @@ window.PEPMOSA_CONFIG = {
     } catch (e) { console.error(e); }
     return true;
   }
-
   function loadFix(file) {
     if (!file || document.querySelector('script[data-pepmosa-fix="'+file+'"]')) return;
     const s = document.createElement("script");
-    s.src = file + "?v=20260901-3";
+    s.src = file + "?v=20260901-4";
     s.dataset.pepmosaFix = file;
     document.body.appendChild(s);
   }
-
   document.addEventListener("DOMContentLoaded", function () {
     let attempts = 0;
     const timer = setInterval(function () {
@@ -34,7 +31,6 @@ window.PEPMOSA_CONFIG = {
       }
       if (attempts >= 300) clearInterval(timer);
     }, 100);
-
     const path = (window.location.pathname || "").toLowerCase();
     const isAdmin = path.endsWith("/admin.html") || path.endsWith("admin.html");
     const isStorefront = path === "/" || path.endsWith("/index.html") || path.endsWith("index.html");
@@ -44,7 +40,6 @@ window.PEPMOSA_CONFIG = {
       setTimeout(() => loadFix("email-verification-fix.js"), 500);
     }
   });
-
   document.addEventListener("DOMContentLoaded", function () {
     let attempts = 0;
     const timer = setInterval(function () {

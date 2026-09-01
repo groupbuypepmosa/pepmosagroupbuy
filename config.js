@@ -5,7 +5,7 @@ window.PEPMOSA_CONFIG = {
 
 (function(){
   'use strict';
-  const VERSION = '20260902-clean1';
+  const VERSION = '20260902-checkout-clean2';
   function loadOnce(file){
     if(!file || document.querySelector('script[data-pepmosa-stable="'+file+'"]')) return;
     const s=document.createElement('script');
@@ -29,12 +29,9 @@ window.PEPMOSA_CONFIG = {
       loadOnce('admin-gb-categories.js');
     }
     if(isStorefront){
-      /* Core storefront logic only. One UI layer below handles the visual theme and checkout compatibility. */
+      /* Keep the storefront to two maintained layers only: access/verification + checkout/store UI. */
       loadOnce('storefront-repair.js');
-      loadOnce('fee-modal-repair.js');
       loadOnce('checkout-polish.js');
-      loadOnce('checkout-hotfix.js');
-      loadOnce('pepmosa-ui.js');
     }
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});

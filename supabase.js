@@ -33,13 +33,11 @@ function initSupabase() {
 
     if (!document.querySelector('script[data-pepmosa-checkout-polish]')) {
       const checkoutScript = document.createElement('script');
-      checkoutScript.src = 'checkout-polish.js?v=20260901-clean';
+      checkoutScript.src = 'checkout-polish.js?v=20260901-fix2';
       checkoutScript.dataset.pepmosaCheckoutPolish = '1';
       document.head.appendChild(checkoutScript);
     }
 
-    // The legacy inline loader can briefly display its old relationship error
-    // before the clean product loader finishes. Remove that stale message.
     setTimeout(() => {
       const status = document.getElementById('gbStatus');
       if (status && status.classList.contains('error') && /relationship|product_variants|products/i.test(status.textContent || '')) {

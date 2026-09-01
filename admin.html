@@ -21,7 +21,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 </head>
 <body>
 <header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a><nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a><a href="coa.html">COA</a></nav></header>
-<section id="loginScreen" class="loginScreen"><div class="loginBox"><div class="loginLogo"><span>PEPMOSA</span></div><div class="loginSubtitle">Administrator Login</div><div id="loginMsg"></div><div class="field"><label>Email</label><input id="loginEmail" type="email" autocomplete="username" placeholder="Admin email"></div><br><div class="field"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password" onkeydown="if(event.key==='Enter')login()"></div><div class="actions"><button class="btn primary" style="width:100%" onclick="login()">LOGIN</button></div></div></section>
+<section id="loginScreen" class="loginScreen"><div class="loginBox"><div class="loginLogo"><span>PEPMOSA</span></div><div class="loginSubtitle">Administrator Login</div><div id="loginMsg"></div><div class="field"><label>Email</label><input id="loginEmail" type="email" autocomplete="username" placeholder="Admin email"></div><br><div class="field"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password" onkeydown="if(event.key==='Enter')login()"></div><div class="actions"><button class="btn primary" style="width:100%" type="button" onclick="login()">LOGIN</button></div></div></section>
 <main id="adminApp" class="adminPage" style="display:none"><div class="adminHeader"><div class="adminTitle"><div class="eyebrow">PEPMOSA ADMIN</div><h1>Control Panel</h1><p id="signedInAs"></p></div><button class="btn dark" onclick="logout()">LOG OUT</button></div><div id="globalMsg"></div>
 <div class="tabs"><button class="tab active" data-panel="gbPanel" onclick="openTab(this)">GROUP BUY</button><button class="tab" data-panel="categoriesPanel" onclick="openTab(this)">CATEGORIES</button><button class="tab" data-panel="productsPanel" onclick="openTab(this)">PRODUCTS</button><button class="tab" data-panel="feesPanel" onclick="openTab(this)">PAYMENTS</button><button class="tab" data-panel="trackingPanel" onclick="openTab(this)">TRACKING</button><button class="tab" data-panel="vialTrackerPanel" onclick="openTab(this)">VIAL TRACKER</button></div>
 <section id="gbPanel" class="panel active"><div class="card"><h2>Create / Edit Group Buy</h2><input id="editingGBId" type="hidden"><div class="grid"><div class="field"><label>GB Number *</label><input id="gbNumber" placeholder="GB-001"></div><div class="field"><label>Customer-Facing Name</label><input id="gbName" placeholder="September Group Buy"></div><div class="field"><label>Admin Fee</label><input id="gbAdminFee" type="number" min="0" step="0.01" value="0"></div><div class="field"><label>Status *</label><select id="gbStatus"><option value="OPEN">OPEN</option><option value="CLOSED">CLOSED</option><option value="KIT_COMPLETION">KIT COMPLETION</option></select></div></div><hr><h3>Admin Fee QR</h3><div class="fileBox"><input id="adminQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('adminQrFile','adminQrPreview')"><br><br><img id="adminQrPreview" class="qrPreview" style="display:none"></div><br><h3>Final Payment QR</h3><div class="fileBox"><input id="finalQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('finalQrFile','finalQrPreview')"><br><br><img id="finalQrPreview" class="qrPreview" style="display:none"></div><div class="actions"><button class="btn primary" onclick="saveGroupBuy()">SAVE GROUP BUY</button><button class="btn secondary" onclick="clearGBForm()">NEW</button></div></div><div class="card"><h2>Group Buys</h2><div id="gbList">Loading...</div></div></section>
@@ -47,25 +47,53 @@ let categories=[],groupBuys=[],products=[],fees=[],ordersCache=[],orderItemsCach
 const TRACKING_STATUSES=["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING","IN TRANSIT TO THE PHILIPPINES","ARRIVED IN THE PHILIPPINES","RECEIVED AT WAREHOUSE","PACKING & LABELLING","HANDED OVER TO LOCAL COURIER","DELIVERED"];
 function $(id){return document.getElementById(id)}function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}function peso(v){return "₱"+Number(v||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2})}function showMessage(m,t=""){$("globalMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`;window.scrollTo({top:0,behavior:"smooth"});setTimeout(()=>$("globalMsg").innerHTML="",5000)}function showLoginMessage(m,t="error"){$("loginMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`}function previewFile(i,p){const f=$(i).files[0];if(!f)return;$(p).src=URL.createObjectURL(f);$(p).style.display="block"}
 function openTab(b){const target=b.dataset.panel;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(target)?.classList.add("active");if(target==="vialTrackerPanel")loadVialTracker()}
-async function login(){const email=$("loginEmail").value.trim(),password=$("loginPassword").value;if(!email||!password)return showLoginMessage("Email and password are required.");try{if(typeof sb==="undefined"||!sb?.auth)throw new Error("Supabase is not initialized. Please refresh the page and try again.");const{data,error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;await verifyAdmin(data.user)}catch(e){console.error(e);showLoginMessage(e.message||"Login failed.")}}
+function enterAdmin(user){
+  const loginScreen=$("loginScreen"), adminApp=$("adminApp");
+  if(loginScreen) loginScreen.style.display="none";
+  if(adminApp) adminApp.style.display="block";
+  if($("signedInAs")) $("signedInAs").textContent="Signed in as "+(user?.email||"");
+  // Data loading must never block a successful login.
+  Promise.resolve().then(()=>loadEverything()).catch(e=>{
+    console.error("Admin data load error:",e);
+    showMessage(e.message||"Logged in, but some admin data could not be loaded.","error");
+  });
+}
+async function login(){
+  const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
+  if(!email||!password)return showLoginMessage("Email and password are required.");
+  const btn=document.querySelector('#loginScreen button[onclick*="login"]');
+  try{
+    if(btn){btn.disabled=true;btn.textContent="LOGGING IN...";}
+    if(typeof sb==="undefined"||!sb?.auth)throw new Error("Supabase is not initialized. Please refresh the page and try again.");
+    const{data,error}=await sb.auth.signInWithPassword({email,password});
+    if(error)throw error;
+    if(!data?.user)throw new Error("Login succeeded but no user session was returned.");
+    await verifyAdmin(data.user);
+  }catch(e){
+    console.error("Login error:",e);
+    showLoginMessage(e.message||"Login failed.");
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent="LOGIN";}
+  }
+}
 const ADMIN_EMAILS=["groupbuypepmosa@gmail.com"];
 async function verifyAdmin(user){
-  if(!user)return showLoginMessage("No authenticated user found.");
+  if(!user)throw new Error("No authenticated user found.");
   const email=String(user.email||"").trim().toLowerCase();
-  let allowed=ADMIN_EMAILS.includes(email);
-  if(!allowed){
-    const{data:profile,error}=await sb.from("profiles").select("email,is_admin").eq("id",user.id).maybeSingle();
-    if(error)throw error;
-    allowed=!!profile?.is_admin;
+
+  // Primary admin is allowed directly after Supabase authentication.
+  if(ADMIN_EMAILS.includes(email)){
+    enterAdmin(user);
+    return;
   }
-  if(!allowed){
+
+  const{data:profile,error}=await sb.from("profiles").select("email,is_admin").eq("id",user.id).maybeSingle();
+  if(error)throw error;
+  if(!profile?.is_admin){
     await sb.auth.signOut();
-    return showLoginMessage("This account does not have administrator access.");
+    throw new Error("This account does not have administrator access.");
   }
-  $("loginScreen").style.display="none";
-  $("adminApp").style.display="block";
-  $("signedInAs").textContent="Signed in as "+user.email;
-  await loadEverything();
+  enterAdmin(user);
 }
 async function logout(){await sb.auth.signOut();$("adminApp").style.display="none";$("loginScreen").style.display="flex";$("loginPassword").value="";showLoginMessage("You have been logged out.","success")}
 async function checkExistingSession(){try{const{data,error}=await sb.auth.getSession();if(error)throw error;if(data.session)await verifyAdmin(data.session.user)}catch(e){console.error(e)}}
@@ -143,5 +171,10 @@ async function approveCheckoutPayment(orderId){try{const{error}=await sb.from("o
 async function rejectCheckoutPayment(orderId){if(!confirm("Reject this checkout payment?"))return;try{const{error}=await sb.from("orders").update({payment_status:"REJECTED",admin_note:"Payment rejected by admin"}).eq("order_id",orderId);if(error)throw error;await loadOrders();showMessage("Checkout payment rejected.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to reject checkout payment.","error")}}
 async function loadVialTracker(){const gb=$("vialTrackerGB").value;try{let q=sb.from("orders").select("order_id,gb_number,email,created_at").order("created_at",{ascending:true});if(gb)q=q.eq("gb_number",gb);const{data:orders,error:oe}=await q;if(oe)throw oe;const ids=(orders||[]).map(o=>o.order_id);if(!ids.length){vialTrackerRows=[];return renderVialTracker()}const{data:items,error:ie}=await sb.from("order_items").select("order_id,product_id,variant_id,product_name,strength,qty").in("order_id",ids);if(ie)throw ie;const map=new Map();for(const item of items||[]){const key=[item.product_id||item.product_name,item.variant_id||item.strength||""].join("::");if(!map.has(key))map.set(key,{product_id:item.product_id||"",product_name:item.product_name||"",variant_id:item.variant_id||"",strength:item.strength||"",qty:0,orderCount:0,emails:new Set()});const row=map.get(key);row.qty+=Number(item.qty||0);row.orderCount++;const o=orders.find(x=>x.order_id===item.order_id);if(o?.email)row.emails.add(o.email.toLowerCase())}const min=new Map();if(gb){const{data:settings,error:se}=await sb.from("gb_category_settings").select("category_name,minimum_qty").eq("gb_number",gb);if(!se)for(const x of settings||[])min.set(x.category_name,Number(x.minimum_qty||1));const{data:legacy,error:le}=await sb.from("gb_minimum_quantities").select("product_id,variant_id,minimum_qty").eq("gb_number",gb);if(!le)for(const x of legacy||[])min.set(`${x.product_id}::${x.variant_id}`,Number(x.minimum_qty||1))}const{data:pd,error:pe}=await sb.from("products").select("product_id,category");if(pe)throw pe;const pc=new Map((pd||[]).map(p=>[p.product_id,p.category||""]));vialTrackerRows=[...map.values()].map(r=>{const category=pc.get(r.product_id)||"",minimum=min.get(`${r.product_id}::${r.variant_id}`)??min.get(category)??1;return{...r,category,minimum,remaining:Math.max(minimum-r.qty,0),complete:r.qty>=minimum}});renderVialTracker()}catch(e){console.error(e);$("vialTrackerResults").innerHTML=`<div class="notice error">${esc(e.message||"Unable to load vial tracker.")}</div>`}}
 function renderVialTracker(){const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase(),rows=vialTrackerRows.filter(r=>(r.product_name+" "+r.strength+" "+r.variant_id+" "+r.category).toLowerCase().includes(q));if(!rows.length)return $("vialTrackerResults").innerHTML=`<div class="empty">No ordered products found.</div>`;$("vialTrackerResults").innerHTML=`<div class="notice"><b>Total ordered units:</b> ${rows.reduce((a,r)=>a+r.qty,0)} &nbsp;•&nbsp; <b>Product/variant rows:</b> ${rows.length}</div><div style="overflow:auto"><table class="trackerTable"><thead><tr><th>Product</th><th>Variant</th><th>Category</th><th>Ordered</th><th>Orders</th><th>Customers</th><th>Minimum</th><th>Status</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r.product_name)}</b><div class="small">${esc(r.product_id)}</div></td><td>${esc(r.strength||"—")}<div class="small">${esc(r.variant_id||"—")}</div></td><td>${esc(r.category||"—")}</td><td><b>${r.qty}</b></td><td>${r.orderCount}</td><td>${r.emails.size}</td><td>${r.minimum}</td><td>${r.complete?`<span class="badge green">COMPLETE</span>`:`<span class="badge red">KULANG ${r.remaining}</span>`}</td></tr>`).join("")}</tbody></table></div>`}
-document.addEventListener("DOMContentLoaded",()=>{if($("variantEditorRows")&&!$("variantEditorRows").children.length)resetVariantEditor()});checkExistingSession();
+document.addEventListener("DOMContentLoaded",()=>{
+  if($("variantEditorRows")&&!$("variantEditorRows").children.length)resetVariantEditor();
+  const loginButton=document.querySelector('#loginScreen button[onclick*="login"]');
+  if(loginButton) loginButton.addEventListener("click",(e)=>{e.preventDefault();login();});
+});
+checkExistingSession();
 </script></body></html>

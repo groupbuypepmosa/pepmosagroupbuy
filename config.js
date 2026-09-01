@@ -5,7 +5,7 @@ window.PEPMOSA_CONFIG = {
 
 (function(){
   'use strict';
-  const VERSION = '20260902-girly6';
+  const VERSION = '20260902-clean1';
   function loadOnce(file){
     if(!file || document.querySelector('script[data-pepmosa-stable="'+file+'"]')) return;
     const s=document.createElement('script');
@@ -29,18 +29,12 @@ window.PEPMOSA_CONFIG = {
       loadOnce('admin-gb-categories.js');
     }
     if(isStorefront){
+      /* Core storefront logic only. One UI layer below handles the visual theme and checkout compatibility. */
       loadOnce('storefront-repair.js');
       loadOnce('fee-modal-repair.js');
-      loadOnce('storefront-ui-hotfix.js');
       loadOnce('checkout-polish.js');
-      /* Do NOT load shipping-rates.js: shipping must remain a native dropdown. */
       loadOnce('checkout-hotfix.js');
-      loadOnce('index-ui-final.js');
-      loadOnce('final-girly-theme.js');
-      loadOnce('final-girly-fix.js');
-      loadOnce('checkout-ui-authoritative.js');
-      /* Last: keep legacy submit validation compatible with the payment-method UI removal. */
-      loadOnce('checkout-submit-fix.js');
+      loadOnce('pepmosa-ui.js');
     }
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});

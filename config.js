@@ -5,7 +5,7 @@ window.PEPMOSA_CONFIG = {
 
 (function(){
   'use strict';
-  const VERSION = '20260902-girly5';
+  const VERSION = '20260902-girly6';
   function loadOnce(file){
     if(!file || document.querySelector('script[data-pepmosa-stable="'+file+'"]')) return;
     const s=document.createElement('script');
@@ -39,6 +39,8 @@ window.PEPMOSA_CONFIG = {
       loadOnce('final-girly-theme.js');
       loadOnce('final-girly-fix.js');
       loadOnce('checkout-ui-authoritative.js');
+      /* Last: keep legacy submit validation compatible with the payment-method UI removal. */
+      loadOnce('checkout-submit-fix.js');
     }
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});

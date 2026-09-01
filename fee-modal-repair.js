@@ -19,25 +19,19 @@
     #pepFeeModal .pepFeeField{margin-top:13px}.pepFeeField label{font-size:11px;font-weight:950}.pepPaymentHint{font-size:12px;color:#786d77;margin-top:7px;line-height:1.5}
     @media(max-width:560px){#pepFeeModal .pepFeeHeader{padding:22px 20px 18px}#pepFeeModal .pepFeeBody{padding:18px 20px 22px}#pepFeeModal .pepGBSummary{align-items:flex-start;flex-direction:column}.pepGBSummary .fee{font-size:17px}}
   `;document.head.appendChild(s)}
-  async function getOpenGB(){const s=window.sb||window.__sb;if(!s)return null;try{const r=await s.from('group_buys').select('gb_number,customer_facing_name,admin_fee,admin_fee_qr_url').eq('status','OPEN').order('created_at',{ascending:false}).limit(1).maybeSingle();return r.error?null:r.data}catch(e){return null}}
+  async function getOpenGB(){try{if(typeof currentGB!=='undefined'&&currentGB?.status==='OPEN')return currentGB}catch(e){}const s=window.sb||window.__sb;if(!s)return null;try{const r=await s.from('group_buys').select('gb_number,customer_facing_name,admin_fee,admin_fee_qr_url,status').eq('status','OPEN').order('created_at',{ascending:false}).limit(1).maybeSingle();return r.error?null:r.data}catch(e){return null}}
   async function enhance(){
-    const modal=$('pepFeeModal');const box=modal?.querySelector('.pepFeeBox');if(!modal||!box)return;
-    const gb=await getOpenGB();if(!gb||!gb.admin_fee_qr_url)return;
-    if(lastUrl===gb.admin_fee_qr_url&&modal.dataset.pepQrReady==='1')return;
-    lastUrl=gb.admin_fee_qr_url;
-    // Keep the original form and its existing submit handler. Only enhance its presentation.
+    const modal=$('pepFeeModal');const box=modal?.querySelector('.pepFeeBox');if(!modal||!box)return;const gb=await getOpenGB();if(!gb)return;
+    if(lastUrl===gb.admin_fee_qr_url&&modal.dataset.pepQrReady==='1')return;lastUrl=gb.admin_fee_qr_url||'';
     if(!box.querySelector('.pepFeeHeader')){
-      const oldH=box.querySelector('h2');
-      const oldGB=box.querySelector('#pepFeeGb');
-      const oldActions=box.querySelector('.pepFeeActions');
+      const oldGB=box.querySelector('#pepFeeGb'),oldActions=box.querySelector('.pepFeeActions'),oldChildren=[...box.children];
       const header=document.createElement('div');header.className='pepFeeHeader';header.innerHTML=`<button class="pepFeeClose" type="button" aria-label="Close">×</button><div class="pepFeeHeaderKicker">GROUP BUY ACCESS</div><h2>Join this Group Buy</h2><p>Pay the admin fee below, then upload your payment proof for approval.</p>`;
       const body=document.createElement('div');body.className='pepFeeBody';
       if(oldGB){oldGB.className='pepGBSummary';oldGB.innerHTML=`<div><div class="label">GROUP BUY</div><div class="name">${esc(gb.customer_facing_name||gb.gb_number)}</div></div><div><div class="label">ADMIN FEE</div><div class="fee">${peso(gb.admin_fee)}</div></div>`;body.appendChild(oldGB)}
-      const qr=document.createElement('div');qr.className='pepQrWrap';qr.innerHTML=`<div class="pepQrTitle">SCAN TO PAY ADMIN FEE</div><img class="pepQrImage" src="${esc(gb.admin_fee_qr_url)}" alt="Admin Fee QR Code">`;body.appendChild(qr);
-      const children=[...box.children];children.forEach(ch=>{if(ch!==oldGB&&ch!==oldActions&&ch!==oldH)body.appendChild(ch)});if(oldActions)body.appendChild(oldActions);
+      const qr=document.createElement('div');qr.className='pepQrWrap';qr.innerHTML=gb.admin_fee_qr_url?`<div class="pepQrTitle">SCAN TO PAY ADMIN FEE</div><img class="pepQrImage" src="${esc(gb.admin_fee_qr_url)}" alt="Admin Fee QR Code">`:`<div class="pepQrTitle">ADMIN FEE PAYMENT</div><div class="pepQrMissing">Admin fee QR code is not available yet. Please contact admin.</div>`;body.appendChild(qr);
+      oldChildren.forEach(ch=>{if(ch!==oldGB&&ch!==oldActions)body.appendChild(ch)});if(oldActions)body.appendChild(oldActions);
       box.innerHTML='';box.appendChild(header);box.appendChild(body);modal.dataset.pepQrReady='1';header.querySelector('.pepFeeClose').onclick=()=>modal.classList.remove('open');
     }
   }
-  function watch(){injectStyles();enhance();setTimeout(watch,1000)}
-  watch();
+  function watch(){injectStyles();enhance();setTimeout(watch,1000)}watch();
 })();

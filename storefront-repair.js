@@ -9,6 +9,14 @@
   let gb=null,products=[],minimums=[],categoryMinimums=[],feePayment=null,verifiedEmail=localStorage.getItem('pepmosa_verified_email')||'',lastFeeStatus=null,noticeLoaded=false;
 
   function styles(){if($('pepStableStoreStyles'))return;const s=document.createElement('style');s.id='pepStableStoreStyles';s.textContent=`
+    #productGrid .pepStoreCard{padding:0!important;overflow:hidden;border-radius:18px!important}
+    #productGrid .pepStoreCard .productImg{height:145px!important;background:#fff7fb!important;display:flex!important;align-items:center!important;justify-content:center!important}
+    #productGrid .pepStoreCard .productImg img{width:100%!important;height:100%!important;object-fit:contain!important}
+    #productGrid .pepStoreBody{padding:13px 14px!important}
+    #productGrid .pepStoreBody h3{font-size:19px!important;margin:0 0 6px!important}
+    #productGrid .pepStoreBottom{margin-top:10px!important;padding-top:10px!important}
+    #productGrid .pepSelectVariant{position:relative;z-index:2!important}
+    @media(max-width:620px){#productGrid{gap:12px!important}#productGrid .pepStoreCard .productImg{height:135px!important}#productGrid .pepStoreBody>.muted{display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important;font-size:13px!important}}
     .pepFeeBtn{border:0;border-radius:14px;padding:13px 20px;font-weight:900;letter-spacing:.02em;cursor:pointer;background:linear-gradient(135deg,#e52b8b,#b93bb6);color:#fff;box-shadow:0 10px 22px rgba(211,43,137,.18)}.pepFeeBtn:hover{transform:translateY(-1px)}.pepFeeBtn.secondary{background:#fff;color:#6b5360;border:1px solid #ead7e3;box-shadow:none}.pepFeeBtn:disabled{opacity:.55;cursor:not-allowed;transform:none}
     .pepFeeModal{position:fixed;inset:0;background:rgba(48,25,40,.62);backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:18px;z-index:99999}.pepFeeModal.open{display:flex}
     .pepFeeBox{width:min(650px,100%);max-height:92vh;overflow:auto;background:linear-gradient(145deg,#fff,#fff9fc 55%,#fff4fa);border:1px solid rgba(235,177,208,.7);border-radius:30px;padding:0;box-shadow:0 28px 100px rgba(55,18,43,.32)}
@@ -71,19 +79,38 @@
         <div class="muted">${esc(p.description||'')}</div>
         <div class="pepStoreBottom">
           <div class="pepStarting"><small>STARTING AT</small><b>${peso(lowest)}</b><span>${variants.length} variant${variants.length===1?'':'s'} available</span></div>
-          <button class="pepFeeBtn pepSelectVariant" type="button" onclick="window.openProductPicker && window.openProductPicker('${esc(p.product_id)}')">CHOOSE VARIANT</button>
+          <button class="pepFeeBtn pepSelectVariant" type="button" data-product-id="${esc(p.product_id)}">CHOOSE VARIANT</button>
         </div>
       </div>
       ${variants.map(v=>{const m=minFor(v.variant_id,p.category);return '<input type="hidden" id="qty-'+esc(v.variant_id)+'" value="'+m+'">';}).join('')}
     </article>`;
   }).join('');
 }
+  document.addEventListener('click',function(e){
+    const btn=e.target.closest('.pepSelectVariant');
+    if(!btn)return;
+    const pid=btn.getAttribute('data-product-id');
+    const product=products.find(p=>String(p.product_id)===String(pid));
+    if(!product)return;
+    if(typeof window.openProductPicker==='function'){
+      window.openProductPicker(pid,product);
+    }
+  });
   window.pepAddToCart=function(pid,vid){if(!feePayment||feePayment.status!=='PAID')return feeAction();if(!verifiedEmail)return openVerify();const p=products.find(x=>x.product_id===pid),v=p?.product_variants?.find(x=>x.variant_id===vid);if(!p||!v)return;const min=minFor(vid,p.category),q=Math.max(min,Number($('pepQty_'+vid)?.value||min));let cart=JSON.parse(localStorage.pepmosaCart||'[]');const old=cart.find(x=>x.variant_id===vid&&x.gb_number===gb.gb_number);if(old)old.qty+=q;else cart.push({gb_number:gb.gb_number,product_id:pid,variant_id:vid,product_name:p.product_name,strength:v.strength,unit_price:Number(v.price),qty:q});localStorage.pepmosaCart=JSON.stringify(cart);if(typeof window.renderCart==='function')window.renderCart();if($('cartCount'))$('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0);info('Added to Cart',`${q} × ${p.product_name} ${v.strength} added to your cart.`)};
   function hookCheckout(){if(typeof window.checkout!=='function'||window.checkout.__pepStableGuard)return;const original=window.checkout;window.checkout=async function(){if(!feePayment||feePayment.status!=='PAID')return feeAction();if(!verifiedEmail)return openVerify();return original()};window.checkout.__pepStableGuard=true}
   function hookPlaceOrder(){if(typeof window.placeOrder!=='function'||window.placeOrder.__pepStableGuard)return;const original=window.placeOrder;window.placeOrder=async function(){if(!feePayment||feePayment.status!=='PAID')return feeAction();if(!verifiedEmail)return openVerify();if($('email'))$('email').value=verifiedEmail;return original()};window.placeOrder.__pepStableGuard=true}
   async function loadNotices(){if(noticeLoaded||!S())return;noticeLoaded=true;try{const r=await S().from('site_notices').select('*').eq('active',true).order('created_at',{ascending:false}).limit(10);if(r.error)throw r.error;const now=Date.now();const n=(r.data||[]).find(x=>(!x.starts_at||new Date(x.starts_at).getTime()<=now)&&(!x.ends_at||new Date(x.ends_at).getTime()>=now));if(!n)return;const key=`pepmosa_site_notice_seen_${n.notice_id}_${n.updated_at}`;if(localStorage.getItem(key))return;showNotice(n,key)}catch(e){console.error('PEPMOSA SITE NOTICE',e)}}
   function showNotice(n,key){if($('pepSiteNoticeModal'))$('pepSiteNoticeModal').remove();const d=document.createElement('div');d.id='pepSiteNoticeModal';d.innerHTML=`<div class="pepSiteNoticeCard type-${esc(n.notice_type||'INFO')}"><button class="pepSiteNoticeClose" aria-label="Close">×</button><div class="pepSiteNoticeKicker">${esc(n.notice_type||'ANNOUNCEMENT')}</div><h2>${esc(n.title)}</h2><div class="pepSiteNoticeMessage">${esc(n.message)}</div><div class="pepSiteNoticeActions"><button id="pepNoticeGotIt" class="pepFeeBtn">${esc(n.button_text||'GOT IT')}</button>${n.button_url?`<a class="pepFeeBtn secondary" href="${esc(n.button_url)}" target="_blank" rel="noopener">LEARN MORE</a>`:''}</div></div>`;document.body.appendChild(d);const close=()=>{localStorage.setItem(key,'1');d.classList.remove('open');setTimeout(()=>d.remove(),180)};d.querySelector('.pepSiteNoticeClose').onclick=close;d.querySelector('#pepNoticeGotIt').onclick=close;d.onclick=e=>{if(e.target===d)close()};requestAnimationFrame(()=>d.classList.add('open'))}
-  async function load(){try{const s=S();if(!s)return;ensureUI();const g=await s.from('group_buys').select('*').eq('status','OPEN').order('created_at',{ascending:false}).limit(1).maybeSingle();if(g.error)throw g.error;gb=g.data;if(!gb){if($('gbStatus'))$('gbStatus').innerHTML='<div class="notice error">No open Group Buy right now.</div>';return}if($('gbStatus'))$('gbStatus').innerHTML=`<b>${esc(gb.customer_facing_name||gb.gb_number)}</b> <span class="status open">OPEN</span>`;const links=await s.from('gb_categories').select('category_name').eq('gb_number',gb.gb_number);if(links.error)throw links.error;const allowed=new Set((links.data||[]).map(x=>x.category_name));const ps=await s.from('products').select('product_id,product_name,category,description,image_url,active,product_variants!product_variants_product_id_fkey(variant_id,strength,price,active)').eq('active',true).order('product_name');if(ps.error)throw ps.error;products=(allowed.size?ps.data.filter(p=>allowed.has(p.category)):ps.data).map(p=>({...p,product_variants:(p.product_variants||[]).filter(v=>v.active!==false)}));const ms=await s.from('gb_minimum_quantities').select('gb_number,product_id,variant_id,minimum_qty').eq('gb_number',gb.gb_number);if(ms.error)throw ms.error;minimums=ms.data||[];const cs=await s.from('gb_category_settings').select('gb_number,category_name,minimum_qty').eq('gb_number',gb.gb_number);if(cs.error){console.warn('PEPMOSA CATEGORY MINIMUMS',cs.error);categoryMinimums=[]}else categoryMinimums=cs.data||[];renderProducts();feePayment=await findFee();lastFeeStatus=feePayment?.status||null;await refreshFeeState(false);hookCheckout();hookPlaceOrder();await loadNotices();await authReturn();}catch(e){console.error('PEPMOSA STOREFRONT STABLE',e);if($('gbStatus'))$('gbStatus').innerHTML='<div class="notice error">Unable to load the current Group Buy. Please refresh and try again.</div>'}}
+  async function load(){try{const s=S();if(!s)return;ensureUI();const g=await s.from('group_buys').select('*').eq('status','OPEN').order('created_at',{ascending:false}).limit(1).maybeSingle();if(g.error)throw g.error;gb=g.data;if(!gb){if($('gbStatus'))$('gbStatus').innerHTML='<div class="notice error">No open Group Buy right now.</div>';return}if($('gbStatus'))$('gbStatus').innerHTML=`<b>${esc(gb.customer_facing_name||gb.gb_number)}</b> <span class="status open">OPEN</span>`;const links=await s.from('gb_categories').select('category_name').eq('gb_number',gb.gb_number);if(links.error)throw links.error;const allowed=new Set((links.data||[]).map(x=>x.category_name));const ps=await s.from('products').select('product_id,product_name,category,description,image_url,active').eq('active',true).order('product_name');if(ps.error)throw ps.error;
+    const baseProducts=allowed.size?ps.data.filter(p=>allowed.has(p.category)):ps.data;
+    const ids=baseProducts.map(p=>p.product_id).filter(Boolean);
+    let allVariants=[];
+    if(ids.length){
+      const vr=await s.from('product_variants').select('variant_id,product_id,strength,price,active').in('product_id',ids);
+      if(vr.error)throw vr.error;
+      allVariants=vr.data||[];
+    }
+    products=baseProducts.map(p=>({...p,product_variants:allVariants.filter(v=>String(v.product_id)===String(p.product_id)&&v.active!==false)}));const ms=await s.from('gb_minimum_quantities').select('gb_number,product_id,variant_id,minimum_qty').eq('gb_number',gb.gb_number);if(ms.error)throw ms.error;minimums=ms.data||[];const cs=await s.from('gb_category_settings').select('gb_number,category_name,minimum_qty').eq('gb_number',gb.gb_number);if(cs.error){console.warn('PEPMOSA CATEGORY MINIMUMS',cs.error);categoryMinimums=[]}else categoryMinimums=cs.data||[];renderProducts();feePayment=await findFee();lastFeeStatus=feePayment?.status||null;await refreshFeeState(false);hookCheckout();hookPlaceOrder();await loadNotices();await authReturn();}catch(e){console.error('PEPMOSA STOREFRONT STABLE',e);if($('gbStatus'))$('gbStatus').innerHTML='<div class="notice error">Unable to load the current Group Buy. Please refresh and try again.</div>'}}
   function boot(){styles();ensureUI();let n=0;const t=setInterval(()=>{if(S()){clearInterval(t);load()}if(++n>100)clearInterval(t)},100);if(S())load()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();

@@ -96,7 +96,17 @@ async function verifyAdmin(user){
   enterAdmin(user);
 }
 async function logout(){await sb.auth.signOut();$("adminApp").style.display="none";$("loginScreen").style.display="flex";$("loginPassword").value="";showLoginMessage("You have been logged out.","success")}
-async function checkExistingSession(){try{const{data,error}=await sb.auth.getSession();if(error)throw error;if(data.session)await verifyAdmin(data.session.user)}catch(e){console.error(e)}}
+async function checkExistingSession(){
+  try{
+    // Always start on the password screen. Do not silently reuse a previous admin session.
+    if(typeof sb==="undefined"||!sb?.auth)return;
+    await sb.auth.signOut();
+    const loginScreen=$("loginScreen"),adminApp=$("adminApp");
+    if(loginScreen)loginScreen.style.display="flex";
+    if(adminApp)adminApp.style.display="none";
+    if($("loginPassword"))$("loginPassword").value="";
+  }catch(e){console.error("Session reset error:",e)}
+}
 async function loadEverything(){try{await loadGroupBuys();await Promise.all([loadCategories(),loadProducts(),loadFees(),loadOrders()]);$("vialTrackerGB").innerHTML=`<option value="">All Group Buys</option>`+groupBuys.map(g=>`<option value="${esc(g.gb_number)}">${esc(g.gb_number)} — ${esc(g.customer_facing_name||"")}</option>`).join("");if($("variantEditorRows")&&!$("variantEditorRows").children.length)resetVariantEditor()}catch(e){console.error(e);showMessage(e.message||"Unable to load admin data.","error")}}
 async function loadGroupBuys(){const{data,error}=await sb.from("group_buys").select("*").order("created_at",{ascending:false});if(error)throw error;groupBuys=data||[];renderGroupBuys();$("minimumGB").innerHTML=`<option value="">Select GB</option>`+groupBuys.map(g=>`<option value="${esc(g.gb_number)}">${esc(g.gb_number)} — ${esc(g.customer_facing_name||"")}</option>`).join("")}
 function gbBadge(s){if(s==="OPEN")return`<span class="badge green">OPEN</span>`;if(s==="KIT_COMPLETION")return`<span class="badge yellow">KIT COMPLETION</span>`;return`<span class="badge gray">CLOSED</span>`}
@@ -112,7 +122,20 @@ async function addCategory(){const n=$("newCategory").value.trim();if(!n)return 
 async function toggleCategory(n,a){const{error}=await sb.from("categories").update({active:a}).eq("category_name",n);if(error)return showMessage(error.message,"error");await loadCategories()}
 async function loadCategoryMinimums(){const gb=$("minimumGB").value;if(!gb)return $("minimumList").innerHTML="Select a Group Buy.";const{data,error}=await sb.from("gb_category_settings").select("*").eq("gb_number",gb);if(error)throw error;const settings=data||[];$("minimumList").innerHTML=categories.filter(c=>c.active).map(c=>{const x=settings.find(s=>s.category_name===c.category_name);return`<div class="categoryLine"><div><b>${esc(c.category_name)}</b><div class="small">Minimum quantity for this GB</div></div><input class="categoryMinimum" data-category="${esc(c.category_name)}" type="number" min="1" value="${x?Number(x.minimum_qty):1}"></div>`}).join("")}
 async function saveCategoryMinimums(){const gb=$("minimumGB").value;if(!gb)return showMessage("Select a Group Buy first.","error");try{for(const i of document.querySelectorAll(".categoryMinimum")){const{error}=await sb.from("gb_category_settings").upsert({gb_number:gb,category_name:i.dataset.category,minimum_qty:Math.max(1,Number(i.value||1))},{onConflict:"gb_number,category_name"});if(error)throw error}showMessage("Category minimums saved.","success")}catch(e){showMessage(e.message,"error")}}
-async function loadProducts(){const{data,error}=await sb.from("products").select("*,product_variants(*)").order("product_name");if(error)throw error;products=data||[];renderProducts()}
+async function loadProducts(){
+  const {data:productData,error:productError}=await sb.from("products").select("*").order("product_name");
+  if(productError)throw productError;
+  const {data:variantData,error:variantError}=await sb.from("product_variants").select("*").order("strength");
+  if(variantError)throw variantError;
+  const variantsByProduct=new Map();
+  for(const v of (variantData||[])){
+    const key=v.product_id;
+    if(!variantsByProduct.has(key))variantsByProduct.set(key,[]);
+    variantsByProduct.get(key).push(v);
+  }
+  products=(productData||[]).map(p=>({...p,product_variants:variantsByProduct.get(p.product_id)||[]}));
+  renderProducts();
+}
 function renderProducts(){const q=($("productSearch").value||"").toLowerCase(),list=products.filter(p=>(p.product_name+" "+(p.category||"")+" "+p.product_id).toLowerCase().includes(q));if(!list.length)return $("productList").innerHTML=`<div class="empty">No products found.</div>`;$("productList").innerHTML=list.map(p=>{const vs=p.product_variants||[],active=vs.filter(v=>v.active).length;return `<div class="item productCompact"><div class="productCompactHead">${p.image_url?`<img class="productThumb" src="${esc(p.image_url)}" alt="${esc(p.product_name)}">`:`<div class="productThumb placeholder">NO IMAGE</div>`}<div class="productMeta"><h3>${esc(p.product_name)}</h3><div class="small">${esc(p.category||"Uncategorized")}</div><div class="productStats"><span class="statChip">${vs.length} variant${vs.length===1?"":"s"}</span><span class="statChip">${active} active</span>${p.description?`<span class="statChip">Has description</span>`:""}</div></div><div class="productCompactActions"><span class="badge ${p.active?"green":"red"}">${p.active?"ACTIVE":"INACTIVE"}</span><button class="btn secondary" onclick="editProduct('${esc(p.product_id)}')">EDIT</button><button class="btn secondary iconBtn" title="Show variants" onclick="toggleProductVariants('${esc(p.product_id)}')">⌄</button><button class="btn ${p.active?"danger":"success"}" onclick="toggleProduct('${esc(p.product_id)}',${!p.active})">${p.active?"DISABLE":"ENABLE"}</button><button class="btn danger" onclick="deleteProduct('${esc(p.product_id)}')">DELETE</button></div></div><div id="variants-${esc(p.product_id)}" class="productVariants">${vs.length?vs.map(v=>`<div class="productVariantCompact"><div><b>${esc(v.strength)}</b></div><b>${peso(v.price)}</b><span class="badge ${v.active?"green":"red"}">${v.active?"ACTIVE":"INACTIVE"}</span></div>`).join(""):`<div class="small">No variants yet.</div>`}<div class="actions"><button class="btn secondary" onclick="addVariant('${esc(p.product_id)}')">+ ADD VARIANT</button></div></div></div>`}).join("")}
 function toggleProductVariants(id){$("variants-"+id)?.classList.toggle("open")}
 let editingProductId=null;

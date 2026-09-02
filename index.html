@@ -1488,86 +1488,50 @@ function updateCart(){
 
 function openCart(){
 
-  $("cartModal")
-    .classList
-    .add("show");
+  $("cartModal").classList.add("show");
 
+  const itemsBox=$("cartItems");
+  const total=cart.reduce((sum,item)=>sum+Number(item.price||item.unit_price||0)*Number(item.qty||0),0);
 
   if(!cart.length){
-
-    $("cartItems").innerHTML =
-
-      '<p class="muted">' +
-
-      'Cart is empty.' +
-
-      '</p>';
-
+    itemsBox.innerHTML=
+      '<div class="pepCartEmpty">'+
+        '<div class="pepCartEmptyIcon">🛍️</div>'+
+        '<b>Your basket is empty</b>'+
+        '<span>Add your favorite PEPMOSA products to get started.</span>'+
+      '</div>';
   }else{
-
-
-    $("cartItems").innerHTML =
-
-      cart
-        .map(
-          (item,index) => `
-
-            <div class="row">
-
-              <span>
-
-                ${esc(item.product_name)}
-
-                —
-
-                ${esc(item.strength)}
-
-                ×
-
-                ${item.qty}
-
-              </span>
-
-
-              <b>
-
-                ${peso(
-                  item.price *
-                  item.qty
-                )}
-
-
-                <button
-                  class="btn secondary"
-                  onclick="removeCart(${index})"
-                >
-                  ×
-                </button>
-
-              </b>
-
-            </div>
-
-          `
-        )
-        .join("");
-
+    itemsBox.innerHTML=
+      '<div class="pepCartList">'+
+      cart.map((item,index)=>{
+        const price=Number(item.price??item.unit_price??0);
+        return '<div class="pepCartItem">'+
+          '<div class="pepCartItemMain">'+
+            '<div class="pepCartItemName">'+esc(item.product_name)+'</div>'+
+            '<div class="pepCartItemMeta">'+esc(item.strength||'')+' • '+peso(price)+' each</div>'+
+          '</div>'+
+          '<div class="pepCartItemSide">'+
+            '<div class="pepCartQty">× '+Number(item.qty||0)+'</div>'+
+            '<b>'+peso(price*Number(item.qty||0))+'</b>'+
+            '<button class="pepCartRemove" type="button" onclick="removeCart('+index+')" aria-label="Remove item">×</button>'+
+          '</div>'+
+        '</div>';
+      }).join("")+
+      '</div>';
   }
 
-
-
-  $("cartTotal").textContent =
-    peso(
-      cart.reduce(
-        (sum,item) =>
-          sum +
-          Number(item.price) *
-          Number(item.qty),
-        0
-      )
-    );
-
+  $("cartTotal").textContent=peso(total);
 }
+
+
+function clearCart(){
+  cart=[];
+  localStorage.removeItem("pepmosaCart");
+  updateCart();
+  if($("cartItems")) openCart();
+}
+
+window.clearCart=clearCart;
 
 
 

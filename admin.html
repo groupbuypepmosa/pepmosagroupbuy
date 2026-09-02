@@ -24,7 +24,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 .ordersClientGrid{display:grid;gap:14px}
 .ordersClientCard{border:1px solid #ead9e5;border-radius:18px;padding:16px;background:linear-gradient(145deg,#fff,#fff8fc);box-shadow:0 8px 24px rgba(150,80,130,.05)}
 .ordersClientHead{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
-.ordersClientName{font-size:18px;font-weight:950}.ordersClientEmail{font-size:12px;color:#786d77;margin-top:3px}
+.ordersClientName{font-size:18px;font-weight:950;display:inline-block;padding:2px 6px;border-radius:8px;transition:.15s ease}.ordersClientName.match{background:#ffe1f0;color:#b12573;box-shadow:0 0 0 2px rgba(215,43,145,.14)}.ordersClientEmail{font-size:12px;color:#786d77;margin-top:3px}
 .ordersClientStats{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.ordersClientStats span{background:#fff0f7;color:#9b3769;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900}
 .ordersProductSummary{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:14px}
 .ordersProductTile{border:1px solid #efdce7;border-radius:12px;padding:11px;background:#fff}.ordersProductTile b{display:block}.ordersProductTile .small{margin-top:3px}
@@ -395,7 +395,7 @@ function renderOrdersCenter(){
   list.innerHTML=filtered.length?
     '<div class="ordersClientGrid">'+filtered.map(r=>
       '<div class="ordersClientCard">'+
-        '<div class="ordersClientHead"><div><div class="ordersClientName">'+esc(r.customer_name)+'</div><div class="ordersClientEmail">'+esc(r.email||"No email")+(r.contact?' • '+esc(r.contact):'')+'</div></div>'+
+        '<div class="ordersClientHead"><div><div class="ordersClientName '+(q&&String(r.customer_name).toLowerCase().includes(q)?'match':'')+'">'+esc(r.customer_name)+'</div><div class="ordersClientEmail">'+esc(r.email||"No email")+(r.contact?' • '+esc(r.contact):'')+'</div></div>'+
         '<div class="ordersClientStats"><span>'+r.orders.length+' ORDER'+(r.orders.length===1?'':'S')+'</span><span>'+r.products.length+' PRODUCT TYPE'+(r.products.length===1?'':'S')+'</span><span>'+peso(r.total)+'</span></div></div>'+
         '<div class="ordersProductSummary">'+r.products.map(p=>
           '<div class="ordersProductTile"><b>'+esc(p.product_name)+'</b><div class="small">'+esc(p.strength||"—")+' • '+peso(p.unit_price)+' each</div><span class="ordersQty">TOTAL QTY: '+Number(p.qty||0)+'</span></div>'

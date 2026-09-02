@@ -32,13 +32,7 @@ a{text-decoration:none;color:inherit}.calcTop{max-width:1280px;margin:auto;paddi
 
   <section class="calcGrid">
     <div class="panel">
-      <div class="field">
-        <label><i>◈</i> Syringe Type</label>
-        <div class="control"><select id="syringe"><option value="100">U-100 Standard (1 mL)</option><option value="40">U-40 (1 mL)</option></select></div>
-        <small>Select the syringe scale you are using.</small>
-      </div>
-      <div class="field">
-        <label><i>♧</i> Vial Amount</label>
+      <div class="field"><label><i>◈</i> Syringe Scale</label><div class="control"><input value="U-100 • 100 units = 1 mL" readonly><span class="suffix">FIXED</span></div><small>This calculator always uses a standard U-100 insulin syringe.</small></div><div class="field"><label><i>♧</i> Vial Amount</label>
         <div class="control"><input id="amount" type="number" min="0" step="any" value="50" inputmode="decimal"><span class="suffix">mg</span></div>
         <small>Total amount of material contained in the vial.</small>
       </div>
@@ -67,7 +61,7 @@ a{text-decoration:none;color:inherit}.calcTop{max-width:1280px;margin:auto;paddi
         <div class="stat"><span>Total Volume</span><b id="mlResult">0.060 mL</b></div>
         <div class="stat"><span>Total Concentration</span><b id="concResult">16.67 mg/mL</b></div>
         <div class="stat"><span>Each Unit</span><b id="eachResult">0.167 mg</b></div>
-        <div class="note"><b>Calculation note</b><span id="noteText">For reference only. The displayed syringe units are a mathematical conversion based on the selected syringe scale and concentration.</span></div>
+        <div class="note"><b>Calculation note</b><span id="noteText">For reference only. The displayed syringe units are a mathematical conversion based on a standard U-100 syringe and concentration.</span></div>
       </div>
     </div>
   </section>
@@ -82,7 +76,7 @@ a{text-decoration:none;color:inherit}.calcTop{max-width:1280px;margin:auto;paddi
 const $=id=>document.getElementById(id);
 function fmt(n,d=2){return Number.isFinite(n)?n.toFixed(d):"—"}
 function calculate(){
- const amount=parseFloat($("amount").value), volume=parseFloat($("volume").value), dose=parseFloat($("dose").value), scale=parseFloat($("syringe").value);
+ const amount=parseFloat($("amount").value), volume=parseFloat($("volume").value), dose=parseFloat($("dose").value), scale=100;
  if(!(amount>0&&volume>0&&dose>0&&scale>0)){
    $("unitResult").textContent="—";$("mlResult").textContent="—";$("concResult").textContent="—";$("eachResult").textContent="—";return;
  }
@@ -96,8 +90,8 @@ function calculate(){
  $("eachResult").textContent=fmt(eachUnit,3)+" mg";
  $("noteText").textContent="For reference only. "+fmt(doseMl,3)+" mL corresponds mathematically to "+fmt(syringeUnits)+" units on the selected U-"+scale+" syringe scale at this concentration.";
 }
-["amount","volume","dose","syringe"].forEach(id=>$(id).addEventListener("input",calculate));
-$("reset").addEventListener("click",()=>{$("syringe").value="100";$("amount").value="50";$("volume").value="3";$("dose").value="1";calculate()});
+["amount","volume","dose"].forEach(id=>$(id).addEventListener("input",calculate));
+$("reset").addEventListener("click",()=>{$("amount").value="50";$("volume").value="3";$("dose").value="1";calculate()});
 calculate();
 </script>
 </body></html>

@@ -115,29 +115,23 @@
 
     await loadVariantLabels([...inventory.keys()]);
 
-    const filtered=getProducts()
-      .map(p=>({
-        ...p,
-        product_variants:(p.product_variants||[])
-          .map(v=>{
-            const rec=inventory.get(String(v.variant_id));
-            return {...v,__remaining:rec?rec.remaining:0,remaining_qty:rec?rec.remaining:0,minimum_qty:1};
-          })
-          .filter(v=>v.active!==false && Number(v.__remaining)>0)
-      }))
-      .filter(p=>(p.product_variants||[]).length>0);
-
-    setProducts(filtered);
+    // Do not replace the storefront product list here. storefront-repair.js owns product loading;
+    // this guard only supplies live remaining quantities so script timing cannot erase products.
 
     renderKitSummary();
     return true;
+  }
+
+  function availableForVariant(v){
+    const rec=inventory.get(String(v?.variant_id));
+    return Math.max(0,Number(rec?.remaining ?? v?.remaining_qty ?? v?.__remaining ?? 0));
   }
 
   function openPicker(pid,override){
     const product=override||getProducts().find(p=>String(p.product_id)===String(pid));
     if(!product) return alert('Product not found.');
 
-    const variants=(product.product_variants||[]).filter(v=>v.active!==false && Number(v.__remaining)>0);
+    const variants=(product.product_variants||[]).filter(v=>v.active!==false && availableForVariant(v)>0);
     if(!variants.length) return alert('This product has no remaining vials available.');
 
     let selected=variants[0];
@@ -156,7 +150,7 @@
       const cart=JSON.parse(localStorage.pepmosaCart||'[]');
       const existing=cart.find(x=>String(x.variant_id)===String(selected.variant_id));
       const already=Number(existing?.qty||0);
-      const live=Math.max(0,Number(selected.__remaining||0)-already);
+      const live=Math.max(0,availableForVariant(selected)-already);
       qty=Math.max(1,Math.min(Math.max(1,live),Number(qty)||1));
 
       modal.innerHTML=
@@ -169,7 +163,7 @@
           '<div class="pepPickerLabel">CHOOSE VARIANT</div>'+
           '<div class="pepVariantChoices">'+variants.map(v=>{
             const inCart=Number((JSON.parse(localStorage.pepmosaCart||'[]').find(x=>String(x.variant_id)===String(v.variant_id)))?.qty||0);
-            const remaining=Math.max(0,Number(v.__remaining||0)-inCart);
+            const remaining=Math.max(0,availableForVariant(v)-inCart);
             return '<button type="button" class="pepVariantChoice '+(String(v.variant_id)===String(selected.variant_id)?'selected':'')+'" data-vid="'+esc(v.variant_id)+'">'+
               '<span><b>'+esc(v.strength)+'</b><small>'+remaining+' vial(s) remaining • minimum 1 vial</small></span><strong>'+money(v.price)+'</strong></button>';
           }).join('')+'</div>'+

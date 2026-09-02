@@ -107,6 +107,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
       <div><div class="eyebrow">PEPMOSA ORDERS</div><h2 style="margin:4px 0">Consolidated Orders by Client</h2><p class="muted" style="margin:0">One client card shows all of their orders and the total quantity of every product ordered.</p></div>
       <button class="btn secondary" type="button" onclick="loadOrdersCenter()">REFRESH</button>
     </div>
+    <div class="actions" style="margin:16px 0 10px"><button class="btn primary" type="button" onclick="openManualOrderModal()">+ ADD LATE / MANUAL ORDER</button></div>
+    <div id="manualOrderNotice" class="notice" style="display:none"></div>
     <div class="orderToolbar" style="margin-top:16px"><input id="ordersClientSearch" class="search" placeholder="Search client, email, product or GB..." oninput="renderOrdersCenter()"></div>
     <div id="ordersClientSummary" class="summaryGrid"></div>
     <div id="ordersClientList">Loading consolidated client orders...</div>
@@ -696,4 +698,71 @@ document.addEventListener("DOMContentLoaded",()=>{
   if(loginButton) loginButton.addEventListener("click",(e)=>{e.preventDefault();login();});
 });
 checkExistingSession();
-</script></body></html>
+</script>
+
+<div id="manualOrderModal" class="editModal">
+  <div class="editModalCard">
+    <div class="itemHead">
+      <div><div class="eyebrow">PEPMOSA ADMIN</div><h2 style="margin:4px 0">Add Late / Manual Order</h2><p class="muted" style="margin:0">Use this even after a Group Buy is closed. Customers cannot access this.</p></div>
+      <button class="btn secondary" type="button" onclick="closeManualOrderModal()">CLOSE</button>
+    </div>
+    <div class="notice warning"><b>ADMIN MANUAL ORDER</b> • This order will be included in Orders Center and Vial Tracker. Add a note so you can immediately identify why it was added late.</div>
+    <div class="grid" style="margin-top:14px">
+      <div class="field"><label>Group Buy *</label><select id="manualOrderGB"></select></div>
+      <div class="field"><label>Payment Status *</label><select id="manualOrderPayment"><option value="PAID">PAID</option><option value="PENDING">PENDING</option><option value="PROOF SUBMITTED">PROOF SUBMITTED</option></select></div>
+      <div class="field"><label>Customer Name *</label><input id="manualOrderName" placeholder="Customer name"></div>
+      <div class="field"><label>Email *</label><input id="manualOrderEmail" type="email" placeholder="customer@email.com"></div>
+      <div class="field"><label>Contact</label><input id="manualOrderContact" placeholder="Telegram / mobile"></div>
+      <div class="field full"><label>Address</label><textarea id="manualOrderAddress" placeholder="Optional shipping address"></textarea></div>
+      <div class="field full"><label>NOTE / REASON FOR MANUAL ORDER *</label><textarea id="manualOrderNote" placeholder="Example: Late order — client messaged admin after GB closed. Paid via..."></textarea></div>
+    </div>
+    <hr>
+    <div class="itemHead"><div><h3 style="margin:0">Products</h3><div class="small">Add one or more products/variants.</div></div><button class="btn secondary" type="button" onclick="addManualOrderLine()">+ ADD PRODUCT</button></div>
+    <div id="manualOrderItems" style="margin-top:10px"></div>
+    <div class="actions"><button class="btn primary" type="button" onclick="saveManualOrder()">SAVE MANUAL ORDER</button><button class="btn secondary" type="button" onclick="closeManualOrderModal()">CANCEL</button></div>
+  </div>
+</div></body>
+
+<script>
+let manualOrderProducts=[];
+async function openManualOrderModal(){
+  const modal=$("manualOrderModal"); if(!modal)return;
+  const {data:gbs,error}=await sb.from("group_buys").select("gb_number,status,created_at").order("created_at",{ascending:false});
+  if(error)return showMessage(error.message,"error");
+  $("manualOrderGB").innerHTML=(gbs||[]).map(g=>'<option value="'+esc(g.gb_number)+'">'+esc(g.gb_number)+' • '+esc(g.status||"")+'</option>').join("");
+  const {data:products,error:pe}=await sb.from("products").select("product_id,product_name,product_variants(variant_id,strength,price,active)").eq("active",true).order("product_name");
+  if(pe)return showMessage(pe.message,"error");
+  manualOrderProducts=products||[];
+  $("manualOrderName").value="";$("manualOrderEmail").value="";$("manualOrderContact").value="";$("manualOrderAddress").value="";$("manualOrderNote").value="";
+  $("manualOrderItems").innerHTML="";
+  addManualOrderLine();
+  modal.classList.add("show");
+}
+function closeManualOrderModal(){$("manualOrderModal")?.classList.remove("show")}
+function addManualOrderLine(){
+  const box=$("manualOrderItems"), id="mo_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+  const options=manualOrderProducts.map(p=>'<option value="'+esc(p.product_id)+'">'+esc(p.product_name)+'</option>').join("");
+  const row=document.createElement("div");row.className="variantEditor";row.dataset.id=id;
+  row.innerHTML='<div class="grid"><div class="field"><label>Product *</label><select class="moProduct"><option value="">Select product</option>'+options+'</select></div><div class="field"><label>Variant / MG *</label><select class="moVariant"><option value="">Select product first</option></select></div><div class="field"><label>Quantity *</label><input class="moQty" type="number" min="1" value="1"></div><div class="field"><label>Price Each</label><input class="moPrice" type="number" min="0" step="0.01" value="0"></div></div><div class="actions"><button class="btn danger" type="button">REMOVE</button></div>';
+  row.querySelector(".moProduct").onchange=e=>{const p=manualOrderProducts.find(x=>String(x.product_id)===String(e.target.value));const vs=(p?.product_variants||[]).filter(v=>v.active!==false);const sel=row.querySelector(".moVariant");sel.innerHTML='<option value="">Select variant</option>'+vs.map(v=>'<option value="'+esc(v.variant_id)+'" data-price="'+Number(v.price||0)+'">'+esc(v.strength||"Variant")+'</option>').join("");};
+  row.querySelector(".moVariant").onchange=e=>{const o=e.target.selectedOptions[0];row.querySelector(".moPrice").value=o?.dataset?.price||0};
+  row.querySelector(".danger").onclick=()=>{row.remove();if(!box.children.length)addManualOrderLine()};
+  box.appendChild(row);
+}
+async function saveManualOrder(){
+  try{
+    const gb=$("manualOrderGB").value,name=$("manualOrderName").value.trim(),email=$("manualOrderEmail").value.trim().toLowerCase(),contact=$("manualOrderContact").value.trim(),address=$("manualOrderAddress").value.trim(),note=$("manualOrderNote").value.trim(),payment=$("manualOrderPayment").value;
+    if(!gb||!name||!email||!note)return showMessage("Group Buy, customer name, email and manual-order note are required.","error");
+    const items=[...$("manualOrderItems").querySelectorAll(".variantEditor")].map(r=>{const productId=r.querySelector(".moProduct").value,variantId=r.querySelector(".moVariant").value,qty=Number(r.querySelector(".moQty").value||0),price=Number(r.querySelector(".moPrice").value||0),p=manualOrderProducts.find(x=>String(x.product_id)===String(productId)),v=(p?.product_variants||[]).find(x=>String(x.variant_id)===String(variantId));return {product_id:productId,variant_id:variantId,qty,unit_price:price,line_total:qty*price,product_name:p?.product_name||"",strength:v?.strength||""}}).filter(x=>x.product_id&&x.variant_id&&x.qty>0);
+    if(!items.length)return showMessage("Add at least one valid product.","error");
+    let customerId=null;const {data:existing,error:ce}=await sb.from("customers").select("customer_id").eq("email",email).maybeSingle();if(ce&&ce.code!=="PGRST116")throw ce;
+    if(existing){customerId=existing.customer_id;const{error}=await sb.from("customers").update({customer_name:name,contact,address}).eq("customer_id",customerId);if(error)throw error}
+    else{const{data,error}=await sb.from("customers").insert({email,customer_name:name,contact,address}).select("customer_id").single();if(error)throw error;customerId=data.customer_id}
+    const orderId="MANUAL-"+Date.now();const total=items.reduce((a,x)=>a+x.line_total,0);
+    const fullNote="MANUAL / LATE ORDER • "+note;
+    const {error:oe}=await sb.from("orders").insert({order_id:orderId,gb_number:gb,customer_id:customerId,email,total,payment_status:payment,shipping_fee:0,admin_note:fullNote,payment_reference:"MANUAL ADMIN ORDER"});if(oe)throw oe;
+    const {error:ie}=await sb.from("order_items").insert(items.map(x=>({order_id:orderId,...x})));if(ie)throw ie;
+    closeManualOrderModal();await loadOrdersCenter();await loadVialTracker();showMessage("Manual order saved successfully. The note is attached to the order.","success");
+  }catch(e){console.error(e);showMessage(e.message||"Unable to save manual order.","error")}
+}
+</script></html>

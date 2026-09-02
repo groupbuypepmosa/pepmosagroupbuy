@@ -448,7 +448,7 @@ async function loadVialTracker(){
     renderVialTracker();
   }catch(e){
     console.error(e);
-    $("vialTrackerResults").innerHTML=\`<div class="notice error">\${esc(e.message||"Unable to load vial tracker.")}</div>\`;
+    $("vialTrackerResults").innerHTML=`<div class="notice error">${esc(e.message||"Unable to load vial tracker.")}</div>`;
   }
 }
 
@@ -459,7 +459,7 @@ function renderVialTracker(){
   );
 
   if(!rows.length){
-    $("vialTrackerResults").innerHTML=\`<div class="empty">No ordered products found.</div>\`;
+    $("vialTrackerResults").innerHTML=`<div class="empty">No ordered products found.</div>`;
     return;
   }
 
@@ -470,12 +470,12 @@ function renderVialTracker(){
   const totalKits=Math.floor(totalUnits/10);
   const loosePieces=totalUnits%10;
 
-  $("vialTrackerResults").innerHTML=\`
+  $("vialTrackerResults").innerHTML=`
     <div class="notice">
-      <b>Total ordered units:</b> \${totalUnits}
-      &nbsp;•&nbsp; <b>Total orders:</b> \${totalOrders}
-      &nbsp;•&nbsp; <b>Total kits:</b> \${totalKits} kit(s)
-      \${loosePieces?\` &nbsp;•&nbsp; <b>Extra pieces:</b> \${loosePieces}\`:""}
+      <b>Total ordered units:</b> ${totalUnits}
+      &nbsp;•&nbsp; <b>Total orders:</b> ${totalOrders}
+      &nbsp;•&nbsp; <b>Total kits:</b> ${totalKits} kit(s)
+      ${loosePieces?` &nbsp;•&nbsp; <b>Extra pieces:</b> ${loosePieces}`:""}
     </div>
     <div style="overflow:auto">
       <table class="trackerTable">
@@ -491,21 +491,21 @@ function renderVialTracker(){
           </tr>
         </thead>
         <tbody>
-          \${rows.map(r=>\`
+          ${rows.map(r=>`
             <tr>
-              <td><b>\${esc(r.product_name)}</b><div class="small">\${esc(r.product_id)}</div></td>
-              <td>\${esc(r.strength||"—")}<div class="small">\${esc(r.variant_id||"—")}</div></td>
-              <td>\${esc(r.category||"—")}</td>
-              <td><b>\${r.qty}</b></td>
-              <td>\${r.totalOrders}</td>
-              <td><b>\${r.totalKits} kit(s)</b>\${r.loosePieces?\`<div class="small">+ \${r.loosePieces} pc(s)</div>\`:""}</td>
-              <td>\${r.emails.size}</td>
+              <td><b>${esc(r.product_name)}</b><div class="small">${esc(r.product_id)}</div></td>
+              <td>${esc(r.strength||"—")}<div class="small">${esc(r.variant_id||"—")}</div></td>
+              <td>${esc(r.category||"—")}</td>
+              <td><b>${r.qty}</b></td>
+              <td>${r.totalOrders}</td>
+              <td><b>${r.totalKits} kit(s)</b>${r.loosePieces?`<div class="small">+ ${r.loosePieces} pc(s)</div>`:""}</td>
+              <td>${r.emails.size}</td>
             </tr>
-          \`).join("")}
+          `).join("")}
         </tbody>
       </table>
     </div>
-  \`;
+  `;
 }
 
 // WAYBILL CENTER — always consolidate all paid orders by buyer/email.

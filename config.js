@@ -7,7 +7,7 @@ window.PEPMOSA_CONFIG = {
    checkout, login, storefront, tracking, or payment logic. */
 (function(){
   'use strict';
-  const VERSION = '20260902-kitcompletion-visible-banner-final';
+  const VERSION = '20260902-kitcompletion-live-fix';
 
   function loadOnce(file){
     if(!file || document.querySelector('script[data-pepmosa-stable="'+file+'"]')) return;

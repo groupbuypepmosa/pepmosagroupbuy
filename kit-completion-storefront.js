@@ -11,7 +11,7 @@
   let patched=false;
 
   const getGB=()=>typeof currentGB!=='undefined' ? currentGB : window.currentGB;
-  const getProducts=()=>typeof products!=='undefined' && Array.isArray(products) ? products : getProducts();
+  const getProducts=()=>typeof products!=='undefined' && Array.isArray(products) ? products : (window.products||[]);
   const setProducts=next=>{ try{ if(typeof products!=='undefined') products=next; }catch(e){} window.products=next; };
 
   function isKitMode(){

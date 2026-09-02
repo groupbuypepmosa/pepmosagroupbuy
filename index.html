@@ -1724,7 +1724,12 @@ function openProductPicker(pid, productOverride){
     };
 
   window.__pepAddSelected =
-    () => {
+    async () => {
+
+      /* HARD ADMIN FEE CHECK for OPEN GB Add to Cart */
+      if(typeof window.pepRequireApprovedFee !== "function" || !await window.pepRequireApprovedFee()){
+        return;
+      }
 
       const minimum =
         Math.max(
@@ -2039,6 +2044,27 @@ function checkout(){
 async function placeOrder(){
 
   try{
+
+    /* HARD ADMIN FEE CHECK — applies to BOTH OPEN GB and KIT COMPLETION.
+       This is intentionally inside the real checkout function, not a wrapper. */
+    if(!currentGB){
+      return alert("No open Group Buy.");
+    }
+    const checkoutEmail = $("email").value.trim().toLowerCase();
+    if(!checkoutEmail){
+      return alert("Enter your email.");
+    }
+    const { data:feeRows, error:feeError } = await sb
+      .from("admin_fee_payments")
+      .select("status")
+      .eq("gb_number", currentGB.gb_number)
+      .ilike("email", checkoutEmail)
+      .eq("status", "PAID")
+      .limit(1);
+    if(feeError) throw feeError;
+    if(!feeRows || !feeRows.length){
+      return alert("ADMIN FEE REQUIRED\n\nYou cannot check out until the Admin Fee for this Group Buy is PAID and approved using this email.");
+    }
 
     // Final cart sync prevents stale in-memory cart data from blocking submitted orders.
     cart = JSON.parse(localStorage.pepmosaCart || "[]");

@@ -18,13 +18,39 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 @media(max-width:900px){.paymentSummary{grid-template-columns:repeat(2,minmax(0,1fr))}.paymentRow{grid-template-columns:1fr 1fr}.paymentActions{justify-content:flex-start}.paymentProof{display:none}}@media(max-width:560px){.paymentSummary{grid-template-columns:1fr}.paymentToolbar{flex-direction:column;align-items:stretch}.paymentRow{grid-template-columns:1fr;padding:13px}.paymentMeta{display:flex;justify-content:space-between;gap:10px}.paymentMeta b{margin:0}.paymentActions{flex-wrap:wrap}}
 
 .trackingShipmentCard{margin-bottom:12px}.trackingQuickMeta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0}.trackingQuickMeta span{padding:9px 10px;border:1px solid #f0dfe8;border-radius:11px;background:#fffafd;font-size:11px;color:#78656f}.trackingQuickMeta b{color:#3b2b34}.trackingOrderList{margin-top:14px;padding:12px;border:1px solid #f0dfe8;border-radius:12px;background:#fffafd}.trackingEditor{margin-top:14px;border-top:1px solid #ead9e5;padding-top:12px}.trackingEditor summary{cursor:pointer;font-weight:900;color:#b62b78;font-size:12px;letter-spacing:.04em}@media(max-width:800px){.trackingQuickMeta{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/***** WAYBILL CENTER — buyer consolidated, print-ready *****/
+.waybillShell{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(360px,.85fr);gap:18px;align-items:start}
+.waybillToolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.waybillToolbar .search{flex:1;min-width:220px;margin:0}
+.waybillSummary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.waybillStat{padding:14px;border:1px solid #ead9e5;border-radius:15px;background:linear-gradient(135deg,#fff,#fff3fa)}
+.waybillStat b{display:block;font-size:22px;color:#c92d82}.waybillStat span{font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#8d6178}
+.buyerWaybillList{display:grid;gap:9px}
+.buyerWaybillRow{border:1px solid #ead9e5;border-radius:16px;padding:13px;background:#fff;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.buyerWaybillRow.selected{border-color:#d72b91;box-shadow:0 8px 24px rgba(215,43,145,.10);background:#fff8fc}
+.buyerWaybillName{font-weight:950;font-size:15px}.buyerWaybillMeta{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px;color:#78656f;font-size:11px}.buyerWaybillMeta span{background:#fff2fa;border-radius:999px;padding:4px 7px}
+.waybillActions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.waybillActions .btn{padding:8px 10px;font-size:10px}
+.waybillPreviewCard{position:sticky;top:16px}
+.printWaybill{background:#fff;border:2px solid #e8c6d8;border-radius:18px;overflow:hidden;color:#2c2330;box-shadow:0 10px 28px rgba(120,50,90,.08)}
+.printWaybillHead{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:18px 20px;background:linear-gradient(135deg,#fff3fa,#fff)}
+.printBrand{font-size:30px;font-weight:950;letter-spacing:.08em;color:#c92d82}.printBrand small{display:block;font-size:9px;color:#9a607a;letter-spacing:.18em;margin-top:3px}
+.printCourier{font-size:20px;font-weight:950;color:#b51f61;text-align:right}.printCourier small{display:block;font-size:10px;color:#77626d;margin-top:3px}
+.printWaybillBody{padding:18px 20px}.waybillToFrom{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:15px}.waybillBlock{border:1px solid #efd9e5;border-radius:12px;padding:12px;background:#fffafd}.waybillLabel{font-size:9px;font-weight:950;letter-spacing:.1em;color:#b3537d;margin-bottom:5px}.waybillBlock b{display:block;font-size:15px;margin-bottom:3px}.waybillBlock div{font-size:11px;line-height:1.5;color:#5e5059}
+.waybillBarcode{border:1px solid #efd9e5;border-radius:12px;padding:12px;margin-bottom:14px;text-align:center;background:repeating-linear-gradient(90deg,#222 0,#222 2px,transparent 2px,transparent 5px);height:72px;position:relative}.waybillBarcode span{position:absolute;left:0;right:0;bottom:-20px;background:#fff;padding:2px;font-size:11px;font-weight:900;letter-spacing:.08em}.waybillBarcodeWrap{padding-bottom:15px}
+.waybillTable{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px}.waybillTable th,.waybillTable td{border:1px solid #efd9e5;padding:7px;text-align:left}.waybillTable th{background:#fff0f7;font-size:9px;text-transform:uppercase;color:#87506a}.waybillFoot{display:flex;justify-content:space-between;gap:12px;padding:13px 20px;background:linear-gradient(135deg,#fff3fa,#ffe7f2);font-size:11px;font-weight:800;color:#9c3d6e}
+.waybillEmpty{padding:36px 20px;text-align:center;border:1px dashed #e3bdd1;border-radius:16px;background:#fffafd;color:#806c77}
+@media(max-width:1050px){.waybillShell{grid-template-columns:1fr}.waybillPreviewCard{position:static}.waybillSummary{grid-template-columns:repeat(3,1fr)}}@media(max-width:650px){.waybillSummary{grid-template-columns:1fr}.waybillToFrom{grid-template-columns:1fr}.buyerWaybillRow{grid-template-columns:1fr}.waybillActions{justify-content:flex-start}}
+@media print{body *{visibility:hidden!important}.printWaybill,.printWaybill *{visibility:visible!important}.printWaybill{position:absolute!important;left:0!important;top:0!important;width:100%!important;border:0!important;box-shadow:none!important}.printWaybillHead{padding-top:12px!important}}
+
 </style>
 </head>
 <body>
 <header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a><nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a><a href="coa.html">COA</a></nav></header>
 <section id="loginScreen" class="loginScreen"><div class="loginBox"><div class="loginLogo"><span>PEPMOSA</span></div><div class="loginSubtitle">Administrator Login</div><div id="loginMsg"></div><div class="field"><label>Email</label><input id="loginEmail" type="email" autocomplete="username" placeholder="Admin email"></div><br><div class="field"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password" onkeydown="if(event.key==='Enter')login()"></div><div class="actions"><button class="btn primary" style="width:100%" type="button" onclick="login()">LOGIN</button></div></div></section>
 <main id="adminApp" class="adminPage" style="display:none"><div class="adminHeader"><div class="adminTitle"><div class="eyebrow">PEPMOSA ADMIN</div><h1>Control Panel</h1><p id="signedInAs"></p></div><button class="btn dark" onclick="logout()">LOG OUT</button></div><div id="globalMsg"></div>
-<div class="tabs"><button class="tab active" data-panel="gbPanel" onclick="openTab(this)">GROUP BUY</button><button class="tab" data-panel="categoriesPanel" onclick="openTab(this)">CATEGORIES</button><button class="tab" data-panel="productsPanel" onclick="openTab(this)">PRODUCTS</button><button class="tab" data-panel="feesPanel" onclick="openTab(this)">PAYMENTS</button><button class="tab" data-panel="trackingPanel" onclick="openTab(this)">TRACKING</button><button class="tab" data-panel="vialTrackerPanel" onclick="openTab(this)">VIAL TRACKER</button></div>
+<div class="tabs"><button class="tab active" data-panel="gbPanel" onclick="openTab(this)">GROUP BUY</button><button class="tab" data-panel="categoriesPanel" onclick="openTab(this)">CATEGORIES</button><button class="tab" data-panel="productsPanel" onclick="openTab(this)">PRODUCTS</button><button class="tab" data-panel="feesPanel" onclick="openTab(this)">PAYMENTS</button><button class="tab" data-panel="trackingPanel" onclick="openTab(this)">TRACKING</button><button class="tab" data-panel="waybillPanel" onclick="openTab(this)">WAYBILL</button><button class="tab" data-panel="vialTrackerPanel" onclick="openTab(this)">VIAL TRACKER</button></div>
 <section id="gbPanel" class="panel active"><div class="card"><h2>Create / Edit Group Buy</h2><input id="editingGBId" type="hidden"><div class="grid"><div class="field"><label>GB Number *</label><input id="gbNumber" placeholder="GB-001"></div><div class="field"><label>Customer-Facing Name</label><input id="gbName" placeholder="September Group Buy"></div><div class="field"><label>Admin Fee</label><input id="gbAdminFee" type="number" min="0" step="0.01" value="0"></div><div class="field"><label>Status *</label><select id="gbStatus"><option value="OPEN">OPEN</option><option value="CLOSED">CLOSED</option><option value="KIT_COMPLETION">KIT COMPLETION</option></select></div></div><hr><h3>Admin Fee QR</h3><div class="fileBox"><input id="adminQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('adminQrFile','adminQrPreview')"><br><br><img id="adminQrPreview" class="qrPreview" style="display:none"></div><br><h3>Final Payment QR</h3><div class="fileBox"><input id="finalQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('finalQrFile','finalQrPreview')"><br><br><img id="finalQrPreview" class="qrPreview" style="display:none"></div><div class="actions"><button class="btn primary" onclick="saveGroupBuy()">SAVE GROUP BUY</button><button class="btn secondary" onclick="clearGBForm()">NEW</button></div></div><div class="card"><h2>Group Buys</h2><div id="gbList">Loading...</div></div></section>
 <section id="categoriesPanel" class="panel"><div class="card"><h2>Categories</h2><div class="grid"><div class="field"><label>New Category</label><input id="newCategory" placeholder="Peptides"></div></div><div class="actions"><button class="btn primary" onclick="addCategory()">ADD CATEGORY</button></div><div id="categoryList"></div></div><div class="card"><h2>GB Category Minimum</h2><p class="muted">Set the minimum once per category for this GB. Every active product/variant inside that category automatically follows this minimum.</p><div class="field"><label>Select Group Buy</label><select id="minimumGB" onchange="loadCategoryMinimums()"><option value="">Select GB</option></select></div><br><div id="minimumList">Select a Group Buy.</div><div class="actions"><button class="btn primary" onclick="saveCategoryMinimums()">SAVE MINIMUMS</button></div></div></section>
 <section id="productsPanel" class="panel"><div class="card"><h2>Add Product</h2><p class="muted">Product and variant IDs are generated automatically.</p><div class="grid"><div class="field"><label>Product Name *</label><input id="productName" placeholder="Tirzepatide"></div><div class="field"><label>Category *</label><select id="productCategory"><option value="">Select category</option></select></div><div class="field"><label>Product Image</label><input id="productImageFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('productImageFile','productImagePreview')"><img id="productImagePreview" class="qrPreview" style="display:none;max-width:140px;max-height:140px"></div><div class="field full"><label>Description</label><textarea id="productDescription"></textarea></div></div><div class="variantEditor"><div class="itemHead"><div><h3 style="margin-bottom:4px">Variants & Prices</h3><div class="small">Add all strengths/variants and their prices here.</div></div><button class="btn secondary" type="button" onclick="addVariantEditorRow()">+ ADD VARIANT</button></div><div id="variantEditorRows"></div></div><div class="actions"><button class="btn primary" onclick="addProduct()">ADD PRODUCT</button></div></div><div class="card"><h2>Products</h2><input id="productSearch" class="search" placeholder="Search product..." oninput="renderProducts()"><div id="productList">Loading...</div></div></section>
@@ -40,15 +66,35 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
   </div>
 </section>
 <section id="trackingPanel" class="panel"><div class="card"><div class="itemHead"><div><h2 style="margin-bottom:4px">Consolidated Tracking</h2><p class="muted" style="margin:0">All customer shipments appear here automatically. No email search needed.</p></div><button class="btn secondary" type="button" onclick="loadTrackingDashboard()">REFRESH</button></div><div id="trackingResults" style="margin-top:16px">Loading tracking…</div></div></section>
+<section id="waybillPanel" class="panel">
+  <div class="card">
+    <div class="itemHead">
+      <div><div class="eyebrow">PEPMOSA SHIPPING</div><h2 style="margin:4px 0">Waybill Center</h2><p class="muted" style="margin:0">All paid orders are automatically consolidated by buyer, even if the customer placed multiple orders. Ready to review and print.</p></div>
+      <button class="btn secondary" type="button" onclick="loadWaybillCenter()">REFRESH</button>
+    </div>
+    <div id="waybillSummary" class="waybillSummary" style="margin-top:16px"></div>
+    <div class="waybillShell">
+      <div>
+        <div class="waybillToolbar"><input id="waybillSearch" class="search" placeholder="Search buyer, email, order, courier..." oninput="renderWaybillCenter()"></div>
+        <div id="waybillBuyerList">Loading ready-to-print waybills...</div>
+      </div>
+      <div class="card waybillPreviewCard" style="margin:0">
+        <div class="itemHead"><div><h3 style="margin:0">Ready-to-Print Waybill</h3><div class="small">Select a buyer to preview the consolidated shipment.</div></div></div>
+        <div id="waybillPreview" style="margin-top:14px"></div>
+        <div class="actions"><button class="btn primary" type="button" onclick="printSelectedWaybill()">PRINT WAYBILL</button></div>
+      </div>
+    </div>
+  </div>
+</section>
 <section id="vialTrackerPanel" class="panel"><div class="card"><h2>Vial / Order Tracker</h2><p class="muted">Consolidated by product + variant. Shows ordered units, order count, customers, and the current GB minimum.</p><div class="grid"><div class="field"><label>Group Buy</label><select id="vialTrackerGB" onchange="loadVialTracker()"><option value="">All Group Buys</option></select></div><div class="field"><label>Search Product / Variant</label><input id="vialTrackerSearch" placeholder="Search..." oninput="renderVialTracker()"></div></div><div id="vialTrackerResults" style="margin-top:18px">Select a Group Buy or use All Group Buys.</div></div></section>
 <div id="productEditModal" class="editModal" onclick="if(event.target===this)closeProductEdit()"><div class="editModalCard"><div class="itemHead"><div><div class="eyebrow">PEPMOSA ADMIN</div><h2>Edit Product</h2><div class="small">Update product details and prices.</div></div><button class="btn secondary" type="button" onclick="closeProductEdit()">CLOSE</button></div><div class="grid" style="margin-top:18px"><div class="field"><label>Product Name *</label><input id="editProductName"></div><div class="field"><label>Category *</label><select id="editProductCategory"></select></div><div class="field full"><label>Description</label><textarea id="editProductDescription"></textarea></div></div><div style="margin-top:18px"><h3 style="margin-bottom:6px">Variants & Prices</h3><div class="small">You can update prices directly here.</div><div id="editProductVariants"></div></div><div class="actions"><button class="btn primary" type="button" onclick="saveProductEdit()">SAVE CHANGES</button><button class="btn secondary" type="button" onclick="closeProductEdit()">CANCEL</button></div></div></div></main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260902-admin-stable"></script><script src="supabase.js?v=20260902-admin-stable"></script><script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260902-waybill-center"></script><script src="supabase.js?v=20260902-waybill-center"></script><script>
 if(typeof initSupabase==="function")initSupabase();else 
 document.addEventListener("DOMContentLoaded",()=>{if(typeof initSupabase==="function")initSupabase()});
-let categories=[],groupBuys=[],products=[],fees=[],ordersCache=[],orderItemsCache=[],currentShipment=null,vialTrackerRows=[];
+let categories=[],groupBuys=[],products=[],fees=[],ordersCache=[],orderItemsCache=[],currentShipment=null,vialTrackerRows=[],waybillRows=[],selectedWaybillBuyer=null;
 const TRACKING_STATUSES=["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING","IN TRANSIT TO THE PHILIPPINES","ARRIVED IN THE PHILIPPINES","RECEIVED AT WAREHOUSE","PACKING & LABELLING","HANDED OVER TO LOCAL COURIER","DELIVERED"];
 function $(id){return document.getElementById(id)}function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}function peso(v){return "₱"+Number(v||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2})}function showMessage(m,t=""){$("globalMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`;window.scrollTo({top:0,behavior:"smooth"});setTimeout(()=>$("globalMsg").innerHTML="",5000)}function showLoginMessage(m,t="error"){$("loginMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`}function previewFile(i,p){const f=$(i).files[0];if(!f)return;$(p).src=URL.createObjectURL(f);$(p).style.display="block"}
-function openTab(b){const target=b.dataset.panel;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(target)?.classList.add("active");if(target==="vialTrackerPanel")loadVialTracker();if(target==="trackingPanel")loadTrackingDashboard()}
+function openTab(b){const target=b.dataset.panel;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(target)?.classList.add("active");if(target==="vialTrackerPanel")loadVialTracker();if(target==="trackingPanel")loadTrackingDashboard();if(target==="waybillPanel")loadWaybillCenter()}
 function enterAdmin(user){
   const loginScreen=$("loginScreen"), adminApp=$("adminApp");
   if(loginScreen) loginScreen.style.display="none";
@@ -196,6 +242,116 @@ async function approveCheckoutPayment(orderId){try{const{error}=await sb.from("o
 async function rejectCheckoutPayment(orderId){if(!confirm("Reject this checkout payment?"))return;try{const{error}=await sb.from("orders").update({payment_status:"REJECTED",admin_note:"Payment rejected by admin"}).eq("order_id",orderId);if(error)throw error;await loadOrders();showMessage("Checkout payment rejected.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to reject checkout payment.","error")}}
 async function loadVialTracker(){const gb=$("vialTrackerGB").value;try{let q=sb.from("orders").select("order_id,gb_number,email,created_at").order("created_at",{ascending:true});if(gb)q=q.eq("gb_number",gb);const{data:orders,error:oe}=await q;if(oe)throw oe;const ids=(orders||[]).map(o=>o.order_id);if(!ids.length){vialTrackerRows=[];return renderVialTracker()}const{data:items,error:ie}=await sb.from("order_items").select("order_id,product_id,variant_id,product_name,strength,qty").in("order_id",ids);if(ie)throw ie;const map=new Map();for(const item of items||[]){const key=[item.product_id||item.product_name,item.variant_id||item.strength||""].join("::");if(!map.has(key))map.set(key,{product_id:item.product_id||"",product_name:item.product_name||"",variant_id:item.variant_id||"",strength:item.strength||"",qty:0,orderCount:0,emails:new Set()});const row=map.get(key);row.qty+=Number(item.qty||0);row.orderCount++;const o=orders.find(x=>x.order_id===item.order_id);if(o?.email)row.emails.add(o.email.toLowerCase())}const min=new Map();if(gb){const{data:settings,error:se}=await sb.from("gb_category_settings").select("category_name,minimum_qty").eq("gb_number",gb);if(!se)for(const x of settings||[])min.set(x.category_name,Number(x.minimum_qty||1));const{data:legacy,error:le}=await sb.from("gb_minimum_quantities").select("product_id,variant_id,minimum_qty").eq("gb_number",gb);if(!le)for(const x of legacy||[])min.set(`${x.product_id}::${x.variant_id}`,Number(x.minimum_qty||1))}const{data:pd,error:pe}=await sb.from("products").select("product_id,category");if(pe)throw pe;const pc=new Map((pd||[]).map(p=>[p.product_id,p.category||""]));vialTrackerRows=[...map.values()].map(r=>{const category=pc.get(r.product_id)||"",minimum=min.get(`${r.product_id}::${r.variant_id}`)??min.get(category)??1;return{...r,category,minimum,remaining:Math.max(minimum-r.qty,0),complete:r.qty>=minimum}});renderVialTracker()}catch(e){console.error(e);$("vialTrackerResults").innerHTML=`<div class="notice error">${esc(e.message||"Unable to load vial tracker.")}</div>`}}
 function renderVialTracker(){const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase(),rows=vialTrackerRows.filter(r=>(r.product_name+" "+r.strength+" "+r.variant_id+" "+r.category).toLowerCase().includes(q));if(!rows.length)return $("vialTrackerResults").innerHTML=`<div class="empty">No ordered products found.</div>`;$("vialTrackerResults").innerHTML=`<div class="notice"><b>Total ordered units:</b> ${rows.reduce((a,r)=>a+r.qty,0)} &nbsp;•&nbsp; <b>Product/variant rows:</b> ${rows.length}</div><div style="overflow:auto"><table class="trackerTable"><thead><tr><th>Product</th><th>Variant</th><th>Category</th><th>Ordered</th><th>Orders</th><th>Customers</th><th>Minimum</th><th>Status</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r.product_name)}</b><div class="small">${esc(r.product_id)}</div></td><td>${esc(r.strength||"—")}<div class="small">${esc(r.variant_id||"—")}</div></td><td>${esc(r.category||"—")}</td><td><b>${r.qty}</b></td><td>${r.orderCount}</td><td>${r.emails.size}</td><td>${r.minimum}</td><td>${r.complete?`<span class="badge green">COMPLETE</span>`:`<span class="badge red">KULANG ${r.remaining}</span>`}</td></tr>`).join("")}</tbody></table></div>`}
+
+
+
+// WAYBILL CENTER — always consolidate all paid orders by buyer/email.
+// This intentionally does not create duplicate shipments: it is a print view grouped by buyer.
+function normEmail(v){return String(v||"").trim().toLowerCase()}
+function isPaidForWaybill(o){return orderIsApproved(o)}
+async function loadWaybillCenter(){
+  const list=$("waybillBuyerList"),preview=$("waybillPreview");
+  if(list)list.innerHTML='<div class="notice">Loading buyers and consolidated orders...</div>';
+  try{
+    const [or,cr,sr]=await Promise.all([
+      sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false}),
+      sb.from("customers").select("customer_id,email,customer_name,contact,address"),
+      sb.from("consolidated_shipments").select("shipment_id,email,courier,tracking_number,waybill_number,status,updated_at").order("updated_at",{ascending:false})
+    ]);
+    if(or.error)throw or.error;
+    if(cr.error)console.warn("Customers load warning:",cr.error);
+    if(sr.error)console.warn("Shipments load warning:",sr.error);
+    const customersByEmail=new Map((cr.data||[]).map(x=>[normEmail(x.email),x]));
+    const shipmentsByEmail=new Map();
+    for(const s of (sr.data||[])){
+      const key=normEmail(s.email);
+      if(!key)continue;
+      if(!shipmentsByEmail.has(key))shipmentsByEmail.set(key,s);
+    }
+    const grouped=new Map();
+    for(const o of (or.data||[])){
+      if(!isPaidForWaybill(o))continue;
+      const key=normEmail(o.email); if(!key)continue;
+      if(!grouped.has(key))grouped.set(key,{email:key,orders:[],items:[],total:0,shipping:0});
+      const g=grouped.get(key);g.orders.push(o);g.items.push(...(o.order_items||[]));g.total+=Number(o.total||0);g.shipping+=Number(o.shipping_fee||0);
+    }
+    waybillRows=[...grouped.values()].map(g=>{
+      const customer=customersByEmail.get(g.email)||{};
+      const latest=g.orders.slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))[0]||{};
+      const shipment=shipmentsByEmail.get(g.email)||{};
+      const merged=new Map();
+      for(const i of g.items){
+        const key=[i.product_name||"Product",i.strength||"",Number(i.unit_price||0)].join("||");
+        const old=merged.get(key)||{product_name:i.product_name||"Product",strength:i.strength||"",qty:0,unit_price:Number(i.unit_price||0),line_total:0};
+        old.qty+=Number(i.qty||0);old.line_total+=Number(i.line_total||0);merged.set(key,old);
+      }
+      return {
+        ...g,
+        customer_name:customer.customer_name||latest.full_name||g.email,
+        contact:customer.contact||latest.contact_number||"",
+        address:customer.address||latest.address||"Address not yet saved",
+        shipping_method:latest.shipping_method||"",
+        courier:shipment.courier||latest.shipping_method||"To be assigned",
+        waybill_number:shipment.waybill_number||shipment.tracking_number||"",
+        tracking_number:shipment.tracking_number||shipment.waybill_number||"",
+        shipment_status:shipment.status||"READY TO PRINT",
+        products:[...merged.values()],
+        payment:"PAID"
+      };
+    }).sort((a,b)=>a.customer_name.localeCompare(b.customer_name));
+    if(!selectedWaybillBuyer || !waybillRows.some(x=>x.email===selectedWaybillBuyer))selectedWaybillBuyer=waybillRows[0]?.email||null;
+    renderWaybillCenter();
+  }catch(e){
+    console.error("Waybill load error:",e);
+    if(list)list.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load waybills.")+'</div>';
+    if(preview)preview.innerHTML="";
+  }
+}
+function renderWaybillCenter(){
+  const q=($("waybillSearch")?.value||"").trim().toLowerCase();
+  const rows=waybillRows.filter(r=>[r.customer_name,r.email,r.contact,r.address,r.courier,r.shipping_method,...r.orders.map(o=>o.order_id),...r.products.map(p=>p.product_name+" "+p.strength)].join(" ").toLowerCase().includes(q));
+  const totalOrders=waybillRows.reduce((a,r)=>a+r.orders.length,0);
+  if($("waybillSummary"))$("waybillSummary").innerHTML=
+    '<div class="waybillStat"><span>Ready to Print</span><b>'+waybillRows.length+'</b></div>'+
+    '<div class="waybillStat"><span>Paid Orders Consolidated</span><b>'+totalOrders+'</b></div>'+
+    '<div class="waybillStat"><span>Total Paid Value</span><b>'+peso(waybillRows.reduce((a,r)=>a+r.total,0))+'</b></div>';
+  if($("waybillBuyerList"))$("waybillBuyerList").innerHTML=rows.length?
+    '<div class="buyerWaybillList">'+rows.map(r=>
+      '<div class="buyerWaybillRow '+(r.email===selectedWaybillBuyer?'selected':'')+'">'+
+      '<div><div class="buyerWaybillName">'+esc(r.customer_name)+'</div><div class="small">'+esc(r.email)+(r.contact?' • '+esc(r.contact):'')+'</div>'+
+      '<div class="buyerWaybillMeta"><span>'+r.orders.length+' order(s)</span><span>'+r.products.length+' item type(s)</span><span>'+esc(r.courier||"Courier pending")+'</span><span>'+esc(r.payment)+'</span></div></div>'+
+      '<div class="waybillActions"><button class="btn secondary" type="button" onclick="selectWaybillBuyer('+JSON.stringify(r.email)+')">VIEW</button><button class="btn primary" type="button" onclick="selectWaybillBuyer('+JSON.stringify(r.email)+');setTimeout(printSelectedWaybill,0)">PRINT</button></div></div>'
+    ).join("")+'</div>':'<div class="waybillEmpty">No paid orders match this search yet.</div>';
+  renderSelectedWaybill();
+}
+function selectWaybillBuyer(email){selectedWaybillBuyer=email;renderWaybillCenter()}
+function getSelectedWaybill(){return waybillRows.find(r=>r.email===selectedWaybillBuyer)||null}
+function renderSelectedWaybill(){
+  const box=$("waybillPreview");if(!box)return;const r=getSelectedWaybill();
+  if(!r){box.innerHTML='<div class="waybillEmpty">Select a buyer to preview the waybill.</div>';return}
+  const date=new Date().toLocaleDateString("en-PH",{year:"numeric",month:"short",day:"numeric"});
+  const barcode=r.waybill_number||("PEP-"+r.orders.map(o=>String(o.order_id).slice(-6)).join("-"));
+  box.innerHTML=
+    '<div id="printWaybillArea" class="printWaybill">'+
+      '<div class="printWaybillHead"><div><div class="printBrand">PEPMOSA<small>PEPTIDES • SUPPLIES • MORE</small></div></div><div class="printCourier">'+esc(r.courier||"COURIER")+'<small>'+esc(r.shipping_method||"Shipping details")+'</small></div></div>'+
+      '<div class="printWaybillBody"><div class="waybillToFrom">'+
+        '<div class="waybillBlock"><div class="waybillLabel">FROM</div><b>PEPMOSA</b><div>PEPMOSA Group Buy<br>Philippines</div></div>'+
+        '<div class="waybillBlock"><div class="waybillLabel">SHIP TO</div><b>'+esc(r.customer_name)+'</b><div>'+esc(r.contact||"Contact not set")+'<br>'+esc(r.address||"Address not set")+'</div></div>'+
+      '</div><div class="waybillBarcodeWrap"><div class="waybillBarcode"><span>'+esc(barcode)+'</span></div></div>'+
+      '<div class="waybillBlock" style="margin-bottom:12px"><div class="waybillLabel">CONSOLIDATED SHIPPING DETAILS</div><div><b>Courier:</b> '+esc(r.courier||"To be assigned")+' &nbsp; • &nbsp; <b>Waybill / Tracking:</b> '+esc(r.waybill_number||"To be assigned")+'<br><b>Orders:</b> '+esc(r.orders.map(o=>o.order_id).join(", "))+'<br><b>Payment:</b> '+esc(r.payment)+' &nbsp; • &nbsp; <b>Consolidated Total:</b> '+peso(r.total)+'</div></div>'+
+      '<table class="waybillTable"><thead><tr><th>Qty</th><th>Product</th><th>Variant</th><th>Price</th><th>Total</th></tr></thead><tbody>'+
+        r.products.map(p=>'<tr><td>'+Number(p.qty||0)+'</td><td>'+esc(p.product_name)+'</td><td>'+esc(p.strength||"—")+'</td><td>'+peso(p.unit_price)+'</td><td>'+peso(p.line_total)+'</td></tr>').join("")+
+      '</tbody></table></div><div class="waybillFoot"><span>Prepared '+esc(date)+' • PEPMOSA GROUP BUY</span><span>Handle with care ♡</span></div></div>';
+}
+function printSelectedWaybill(){
+  const r=getSelectedWaybill();if(!r)return showMessage("Select a buyer first.","error");
+  const area=$("printWaybillArea");if(!area)return showMessage("Waybill preview is not ready yet.","error");
+  const win=window.open("","_blank","width=900,height=1100");
+  if(!win)return showMessage("Please allow pop-ups to print the waybill.","error");
+  win.document.write('<!doctype html><html><head><title>PEPMOSA Waybill - '+esc(r.customer_name)+'</title><style>body{margin:0;padding:18px;font-family:Arial,sans-serif;color:#2c2330}*{box-sizing:border-box}.printWaybill{border:2px solid #e8c6d8;border-radius:18px;overflow:hidden}.printWaybillHead{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:18px 20px;background:linear-gradient(135deg,#fff3fa,#fff)}.printBrand{font-size:30px;font-weight:950;letter-spacing:.08em;color:#c92d82}.printBrand small{display:block;font-size:9px;color:#9a607a;letter-spacing:.18em;margin-top:3px}.printCourier{font-size:20px;font-weight:950;color:#b51f61;text-align:right}.printCourier small{display:block;font-size:10px;color:#77626d;margin-top:3px}.printWaybillBody{padding:18px 20px}.waybillToFrom{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:15px}.waybillBlock{border:1px solid #efd9e5;border-radius:12px;padding:12px;background:#fffafd}.waybillLabel{font-size:9px;font-weight:950;letter-spacing:.1em;color:#b3537d;margin-bottom:5px}.waybillBlock b{font-size:13px}.waybillBlock div{font-size:11px;line-height:1.5;color:#5e5059}.waybillBarcode{border:1px solid #efd9e5;border-radius:12px;padding:12px;margin-bottom:14px;text-align:center;background:repeating-linear-gradient(90deg,#222 0,#222 2px,transparent 2px,transparent 5px);height:72px;position:relative}.waybillBarcode span{position:absolute;left:0;right:0;bottom:-20px;background:#fff;padding:2px;font-size:11px;font-weight:900;letter-spacing:.08em}.waybillBarcodeWrap{padding-bottom:15px}.waybillTable{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px}.waybillTable th,.waybillTable td{border:1px solid #efd9e5;padding:7px;text-align:left}.waybillTable th{background:#fff0f7;font-size:9px;text-transform:uppercase;color:#87506a}.waybillFoot{display:flex;justify-content:space-between;gap:12px;padding:13px 20px;background:linear-gradient(135deg,#fff3fa,#ffe7f2);font-size:11px;font-weight:800;color:#9c3d6e}@media print{body{padding:0}}</style></head><body>'+area.outerHTML+'</body></html>');
+  win.document.close();win.focus();setTimeout(()=>win.print(),350);
+}
+
 
 // Tracking dashboard: one place for every customer, consolidated orders and waybill details.
 let trackingDashboardShipments=[],trackingDashboardOrders=[];

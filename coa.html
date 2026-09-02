@@ -13,8 +13,7 @@ a{text-decoration:none;color:inherit}.top{max-width:1280px;margin:auto;padding:2
 .hero{text-align:center;margin:6px auto 26px}.eyebrow{color:#b22e73;font-size:10px;font-weight:950;letter-spacing:.24em;margin-bottom:8px}.hero h1{font-family:Georgia,serif;font-size:clamp(46px,7vw,78px);line-height:.95;margin:0;color:#2e242d;letter-spacing:-3px}.hero h1 em{font-style:normal;color:var(--pink)}.hero p{max-width:660px;margin:15px auto 0;color:#6f6670;line-height:1.65}
 .library{background:rgba(255,255,255,.82);border:1px solid var(--line);border-radius:30px;padding:20px;box-shadow:0 18px 55px rgba(170,69,122,.10);backdrop-filter:blur(8px)}.libraryHead{padding:4px 7px 17px;border-bottom:1px solid #f1dfe7;margin-bottom:8px}.libraryHead b{display:block;font-size:19px}.libraryHead span{font-size:12px;color:var(--muted)}
 .docGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;padding:8px 2px}.docCard{background:linear-gradient(180deg,#fff,#fff8fb);border:1px solid #f0d7e4;border-radius:24px;overflow:hidden;box-shadow:0 12px 30px rgba(170,69,122,.08);transition:.18s;cursor:pointer}.docCard:hover{transform:translateY(-3px);box-shadow:0 18px 38px rgba(170,69,122,.14)}
-.preview{height:300px;background:linear-gradient(135deg,#fff0f7,#f8e9ff);position:relative;overflow:hidden;border-bottom:1px solid #f0d7e4;display:flex;align-items:center;justify-content:center}.preview img,.preview iframe{width:100%;height:100%;border:0;display:block}.preview img{object-fit:contain;background:#fff}.loading{color:#bd4a81;font-weight:900;font-size:13px;letter-spacing:.08em}.fallback{font-size:56px;color:#cf4d8c}.imageBadge{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.92);border:1px solid #f0d7e4;border-radius:999px;padding:7px 11px;color:#b22e73;font-size:10px;font-weight:950;letter-spacing:.08em;box-shadow:0 6px 18px rgba(170,69,122,.08)}
-.docInfo{padding:14px}.docActions{display:flex;gap:10px}.docBtn{flex:1;border:0;padding:12px 15px;border-radius:14px;background:linear-gradient(135deg,#ee4f9c,#c71b74 55%,#a93ca9);color:#fff;font-weight:950;cursor:pointer;box-shadow:0 10px 22px rgba(207,43,127,.16)}.docBtn:hover{filter:brightness(1.03)}
+.preview{height:430px;background:#fff;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}.preview img,.preview iframe{width:100%;height:100%;border:0;display:block}.preview img{object-fit:contain;background:#fff}.loading{color:#bd4a81;font-weight:900;font-size:13px;letter-spacing:.08em}.fallback{font-size:56px;color:#cf4d8c}.openOverlay{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:linear-gradient(135deg,#ee4f9c,#c71b74 55%,#a93ca9);color:#fff;border-radius:999px;padding:10px 16px;font-size:11px;font-weight:950;letter-spacing:.08em;box-shadow:0 10px 22px rgba(207,43,127,.18);opacity:0;transition:.18s;pointer-events:none}.docCard:hover .openOverlay{opacity:1}
 .empty,.notice{padding:34px 18px;text-align:center;color:#806f7b;border:1px dashed #ecc9da;border-radius:18px;background:#fff9fc}.notice.error{color:#a22d65;background:#fff4f8}.footer{text-align:center;margin-top:18px;color:#cf4d8c;font-family:Georgia,serif;font-size:18px}
 @media(max-width:720px){.top{padding:16px 18px 0}.page{padding:14px 18px 36px}.library{padding:13px;border-radius:22px}.docGrid{grid-template-columns:1fr}.preview{height:360px}.hero h1{letter-spacing:-2px}}
 </style>
@@ -23,7 +22,7 @@ a{text-decoration:none;color:inherit}.top{max-width:1280px;margin:auto;padding:2
 <div class="top"><a class="back" href="index.html">← <span>Back to Shop</span></a></div>
 <main class="page">
 <div class="brand"><img src="pepmosa-logo.png" alt="PEPMOSA"><b>PEPMOSA</b><span>GROUP BUY</span></div>
-<section class="hero"><div class="eyebrow">CERTIFICATES OF ANALYSIS</div><h1>COA <em>Library</em> ✧</h1><p>Your available COA documents are shown as previews below. Tap any preview to open the full document.</p></section>
+<section class="hero"><div class="eyebrow">CERTIFICATES OF ANALYSIS</div><h1>COA <em>Library</em> ✧</h1><p>Tap any document preview to open the full COA.</p></section>
 <section class="library">
 <div class="libraryHead"><b>COA Library</b><span>Preview your documents directly before opening them.</span></div>
 <section id="documents"><div class="empty">Loading COA previews…</div></section>
@@ -31,8 +30,8 @@ a{text-decoration:none;color:inherit}.top{max-width:1280px;margin:auto;padding:2
 <div class="footer">♡ PEPMOSA GROUP BUY ♡</div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js?v=20260903-coa-preview-fix"></script>
-<script src="supabase.js?v=20260903-coa-preview-fix"></script>
+<script src="config.js?v=20260903-coa-clean-preview"></script>
+<script src="supabase.js?v=20260903-coa-clean-preview"></script>
 <script>
 (function(){
  const TYPE='COA';
@@ -62,7 +61,7 @@ a{text-decoration:none;color:inherit}.top{max-width:1280px;margin:auto;padding:2
    if(!data||!data.length){box.innerHTML='<div class="empty">No COA documents uploaded yet.</div>';return;}
    const docs=[];
    for(const d of data){docs.push({...d,url:await getUrl(client,d)});}
-   box.innerHTML='<div class="docGrid">'+docs.map(d=>'<article class="docCard" data-url="'+esc(d.url)+'"><div class="preview">'+previewMarkup(d,d.url)+'<span class="imageBadge">'+(isPdf(d)?'PDF PREVIEW':'COA PREVIEW')+'</span></div><div class="docInfo"><div class="docActions"><button class="docBtn" type="button">VIEW FULL COA →</button></div></div></article>').join('')+'</div>';
+   box.innerHTML='<div class="docGrid">'+docs.map(d=>'<article class="docCard" data-url="'+esc(d.url)+'"><div class="preview">'+previewMarkup(d,d.url)+'<div class="openOverlay">OPEN FULL COA →</div></div></article>').join('')+'</div>';
    box.querySelectorAll('.docCard').forEach(card=>card.addEventListener('click',()=>{const u=card.dataset.url;if(u) window.open(u,'_blank','noopener');}));
   }catch(e){
    console.error(e);

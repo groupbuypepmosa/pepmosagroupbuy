@@ -6,35 +6,31 @@
 <title>PEPMOSA • Track</title>
 <link rel="stylesheet" href="style.css">
 <style>
-:root{--pink:#d92d8a;--pink2:#f06eae;--ink:#382a34;--muted:#806f7b;--line:#efd7e4}
-body{background:
-radial-gradient(circle at 8% 6%,rgba(255,145,198,.20),transparent 24%),
-radial-gradient(circle at 92% 14%,rgba(220,194,255,.22),transparent 28%),
-linear-gradient(135deg,#fff9fc,#fff4f9 52%,#f8f2ff);min-height:100vh}
-.trackHero{margin:12px 0 18px;padding:28px 30px;border:1px solid #f0d8e5;border-radius:28px;background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,239,247,.88));box-shadow:0 20px 60px rgba(170,70,125,.10)}
-.trackHero h1{margin:4px 0 7px;font-size:34px;color:var(--ink)}
-.trackSearch{padding:18px;border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.82);box-shadow:0 18px 48px rgba(150,70,115,.08)}
-.trackSearchRow{display:flex;gap:10px}.trackSearchRow input{flex:1;min-height:52px;border-radius:15px}
+:root{--pink:#cf2b7f;--pink2:#f47bb8;--pink3:#ffd9eb;--ink:#382a34;--muted:#806f7b;--line:#efd7e4;--lav:#f5efff}
+*{box-sizing:border-box}
+body{background:radial-gradient(circle at 7% 8%,rgba(255,145,198,.20),transparent 25%),radial-gradient(circle at 93% 12%,rgba(220,194,255,.22),transparent 29%),linear-gradient(135deg,#fff9fc,#fff3f9 54%,#f7f0ff);min-height:100vh}
+.trackHero{position:relative;overflow:hidden;margin:14px 0 20px;padding:40px 42px;border:1px solid #efcfe0;border-radius:30px;background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(255,235,246,.92) 58%,rgba(248,239,255,.92));box-shadow:0 24px 70px rgba(170,70,125,.12)}
+.trackHero:before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-80px;top:-105px;background:radial-gradient(circle,rgba(244,123,184,.28),rgba(244,123,184,.02) 68%);pointer-events:none}
+.trackHero:after{content:"♡  ✦  ♡";position:absolute;right:42px;bottom:28px;color:#e8b5d2;font-size:38px;letter-spacing:14px;opacity:.7}
+.trackHeroInner{position:relative;z-index:1;max-width:760px}
+.trackKicker{display:flex;align-items:center;gap:8px;color:#b22e73;font-size:11px;font-weight:950;letter-spacing:.20em}
+.trackHero h1{margin:7px 0 9px;font-size:clamp(34px,5vw,52px);line-height:1;color:var(--ink);letter-spacing:-1.6px}
+.trackHero h1 span{color:var(--pink)}
+.trackHero .muted{max-width:640px;font-size:14px;line-height:1.65}
+.trackSearch{position:relative;padding:20px;border:1px solid var(--line);border-radius:26px;background:rgba(255,255,255,.88);box-shadow:0 20px 55px rgba(150,70,115,.10)}
+.trackSearchIntro{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:13px}.trackSearchIntro b{color:var(--ink);font-size:15px}.trackSearchIntro span{font-size:11px;color:#a66182}
+.trackSearchRow{display:flex;gap:10px}.trackSearchRow input{flex:1;min-height:54px;border-radius:16px;border:1px solid #eac5d9;padding:0 17px;font-size:14px;box-shadow:inset 0 1px 0 #fff}.trackSearchRow .btn{min-height:54px;padding:0 24px;border-radius:16px;background:linear-gradient(135deg,var(--pink2),var(--pink));box-shadow:0 12px 25px rgba(207,43,127,.20)}
+.trackPrivacy{margin:10px 3px 0;font-size:11px;color:#8e7280}
 .clientCard{margin-top:18px;overflow:hidden;border:1px solid #edcfe0;border-radius:30px;background:#fff;box-shadow:0 24px 70px rgba(147,54,109,.13)}
-.clientHead{padding:26px 28px 22px;background:linear-gradient(135deg,#fff1f8,#fff 62%,#f8f1ff);border-bottom:1px solid #f2dce8}
-.clientTop{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}
-.clientEmail{font-size:24px;font-weight:950;color:var(--ink);word-break:break-word;margin:6px 0 0}
-.clientLabel{font-size:10px;letter-spacing:.18em;font-weight:950;color:#b42e76}
+.clientHead{padding:25px 28px 21px;background:linear-gradient(135deg,#fff1f8,#fff 62%,#f8f1ff);border-bottom:1px solid #f2dce8}
+.clientTop{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.clientEmail{font-size:23px;font-weight:950;color:var(--ink);word-break:break-word;margin:6px 0 0}.clientLabel{font-size:10px;letter-spacing:.18em;font-weight:950;color:#b42e76}
 .statusPill{display:inline-flex;align-items:center;justify-content:center;padding:10px 15px;border-radius:999px;background:linear-gradient(135deg,var(--pink2),var(--pink));color:#fff;font-size:11px;font-weight:950;letter-spacing:.06em;box-shadow:0 8px 20px rgba(217,45,138,.22);white-space:nowrap}
-.clientBody{padding:24px 28px 28px}
-.progressCard{padding:17px 18px;border:1px solid #f0d8e5;border-radius:20px;background:linear-gradient(135deg,#fffafd,#fff3f8)}
-.progressHead{display:flex;justify-content:space-between;gap:10px;align-items:center}.progressHead b{font-size:15px;color:var(--ink)}.progressHead span{font-size:11px;color:#a13972;font-weight:900}
-.progressBar{height:10px;background:#f0e6ec;border-radius:999px;margin-top:13px;overflow:hidden}.progressFill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#f06eae,#d92d8a)}
-.metaGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
-.metaBox{padding:14px 15px;border:1px solid #efdae5;border-radius:17px;background:#fff}.metaBox small{display:block;color:#ad6b8d;font-weight:950;letter-spacing:.10em;font-size:9px}.metaBox b{display:block;margin-top:6px;color:#46343e;word-break:break-word;font-size:13px}
-.orderSection{margin-top:22px}.sectionTitle{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:11px}.sectionTitle h2{margin:3px 0 0;color:var(--ink);font-size:21px}.sectionTitle p{margin:0;color:var(--muted);font-size:12px}
-.orderCount{padding:7px 11px;border-radius:999px;background:#fff0f7;color:#b72b78;font-size:10px;font-weight:950;white-space:nowrap}
-.productSummary{border:1px solid #efd7e4;border-radius:20px;overflow:hidden;background:#fff}
-.productRow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:15px 17px;border-bottom:1px solid #f4e3eb}.productRow:last-child{border-bottom:0}
-.productName{font-weight:900;color:#44343d;font-size:14px}.productQty{white-space:nowrap;padding:7px 11px;border-radius:999px;background:linear-gradient(135deg,#fff0f7,#ffe6f2);color:#b42b75;font-size:11px;font-weight:950}
-.orderRef,.noteBox{margin-top:14px;padding:14px 16px;border-radius:17px;font-size:12px;line-height:1.55}.orderRef{background:#fff8df;border:1px solid #f0dc8d;color:#705b2c}.noteBox{background:#fff4fa;border:1px solid #efcce0;color:#6b4a5b}
-.refList{margin-top:6px;display:flex;gap:7px;flex-wrap:wrap}.refChip{padding:5px 8px;border-radius:999px;background:#fffdf5;border:1px solid #efdfaa;font-weight:800;font-size:10px}
-@media(max-width:680px){.trackHero{padding:22px 18px;border-radius:22px}.trackHero h1{font-size:28px}.trackSearchRow{flex-direction:column}.clientHead,.clientBody{padding-left:17px;padding-right:17px}.clientTop{flex-direction:column}.clientEmail{font-size:18px}.metaGrid{grid-template-columns:1fr}.sectionTitle{align-items:flex-start;flex-direction:column}.productRow{align-items:flex-start}}
+.clientBody{padding:24px 28px 28px}.progressCard{padding:18px;border:1px solid #f0d8e5;border-radius:20px;background:linear-gradient(135deg,#fffafd,#fff3f8)}.progressHead{display:flex;justify-content:space-between;gap:10px;align-items:center}.progressHead b{font-size:15px;color:var(--ink)}.progressHead span{font-size:11px;color:#a13972;font-weight:900}.progressBar{height:10px;background:#f0e6ec;border-radius:999px;margin-top:13px;overflow:hidden}.progressFill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#f06eae,#d92d8a)}
+.metaGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}.metaBox{padding:14px 15px;border:1px solid #efdae5;border-radius:17px;background:#fff}.metaBox small{display:block;color:#ad6b8d;font-weight:950;letter-spacing:.10em;font-size:9px}.metaBox b{display:block;margin-top:6px;color:#46343e;word-break:break-word;font-size:13px}
+.orderSection{margin-top:23px}.sectionTitle{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:12px}.sectionTitle h2{margin:3px 0 0;color:var(--ink);font-size:22px}.sectionTitle p{margin:0;color:var(--muted);font-size:12px}.orderCount{padding:7px 11px;border-radius:999px;background:#fff0f7;color:#b72b78;font-size:10px;font-weight:950;white-space:nowrap}
+.orderCards{display:grid;gap:10px}.orderCard{border:1px solid #efd7e4;border-radius:18px;background:linear-gradient(135deg,#fff,#fff9fc);overflow:hidden}.orderCardTop{display:flex;justify-content:space-between;gap:12px;padding:13px 15px;background:#fff6fa;border-bottom:1px solid #f3e1eb}.orderCardRef{font-size:11px;font-weight:950;color:#a53171;letter-spacing:.05em}.orderCardStatus{font-size:10px;font-weight:900;color:#76616d}.orderItems{padding:4px 14px}.productRow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:11px 2px;border-bottom:1px solid #f4e3eb}.productRow:last-child{border-bottom:0}.productName{font-weight:900;color:#44343d;font-size:14px}.productQty{white-space:nowrap;padding:6px 10px;border-radius:999px;background:linear-gradient(135deg,#fff0f7,#ffe6f2);color:#b42b75;font-size:10px;font-weight:950}
+.emptyItems{padding:14px 2px;color:#917987;font-size:12px}.noteBox{margin-top:14px;padding:14px 16px;border-radius:17px;font-size:12px;line-height:1.55;background:#fff4fa;border:1px solid #efcce0;color:#6b4a5b}.trackNote{margin-top:18px;padding:13px 15px;border-radius:16px;border:1px solid #efd8e5;background:linear-gradient(90deg,#fff8fc,#fff);color:#896c7b;font-size:11px}
+@media(max-width:680px){.trackHero{padding:29px 20px;border-radius:24px}.trackHero:after{right:20px;font-size:24px;letter-spacing:7px}.trackSearch{padding:15px;border-radius:21px}.trackSearchIntro{align-items:flex-start;flex-direction:column}.trackSearchRow{flex-direction:column}.clientHead,.clientBody{padding-left:17px;padding-right:17px}.clientTop{flex-direction:column}.clientEmail{font-size:18px}.metaGrid{grid-template-columns:1fr}.sectionTitle{align-items:flex-start;flex-direction:column}.productRow{align-items:flex-start}.orderCardTop{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
@@ -43,9 +39,11 @@ linear-gradient(135deg,#fff9fc,#fff4f9 52%,#f8f2ff);min-height:100vh}
 <nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a><a href="coa.html">COA</a></nav>
 </header>
 <main class="wrap">
-<section class="hero trackHero"><div><div class="eyebrow">ORDER TRACKING</div><h1>Track Your Orders</h1><p class="muted">One tracker per client. Enter the email used for your orders to see your complete order summary and current shipment status.</p></div></section>
+<section class="hero trackHero"><div class="trackHeroInner"><div class="trackKicker">♡ PEPMOSA ORDER TRACKING ✦</div><h1>Track Your <span>Orders</span></h1><p class="muted">Enter the same email you used when placing your orders. You'll see all products and quantities under that email, plus your latest shipment status.</p></div></section>
 <section class="trackSearch">
-<div class="trackSearchRow"><input id="email" class="input" placeholder="Enter your email" type="email" onkeydown="if(event.key==='Enter')track()"><button class="btn primary" onclick="track()">TRACK MY ORDERS</button></div>
+<div class="trackSearchIntro"><div><b>Find all your orders in one place</b><div><span>One email = one clean order summary ✦</span></div></div></div>
+<div class="trackSearchRow"><input id="email" class="input" placeholder="Enter the email used for your order" type="email" onkeydown="if(event.key==='Enter')track()"><button class="btn primary" onclick="track()">TRACK MY ORDERS →</button></div>
+<div class="trackPrivacy">♡ Your email is only used to find your order summary and tracking information.</div>
 <div id="out"></div>
 </section>
 </main>
@@ -57,40 +55,52 @@ initSupabase();
 const STATUSES=['ORDER RECEIVED','PAYMENT CONFIRMED','ORDER PROCESSING','IN TRANSIT TO THE PHILIPPINES','ARRIVED IN THE PHILIPPINES','RECEIVED AT WAREHOUSE','PACKING & LABELLING','HANDED OVER TO LOCAL COURIER','DELIVERED'];
 function $(id){return document.getElementById(id)}
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function itemsFor(o,all){const oid=o.id??o.order_id;return all.filter(i=>String(i.order_id??'')===String(oid))}
-function itemLabel(i){return [i.product_name||i.products?.product_name||i.products?.name||'Product',i.strength||i.variant_name||''].filter(Boolean).join(' ').replace(/\s+/g,' ').trim()}
-function itemQty(i){return Number(i.quantity??i.qty??1)||1}
+function itemsFor(o,all){
+ const oid=o.id??o.order_id;
+ const nested=o.order_items||o.items||o.orderItems||o.details||[];
+ if(Array.isArray(nested)&&nested.length)return nested;
+ return all.filter(i=>String(i.order_id??i.order?.order_id??'')===String(oid));
+}
+function itemLabel(i){return [i.product_name||i.products?.product_name||i.product?.product_name||i.products?.name||i.product?.name||'Product',i.strength||i.variant_name||i.product_variants?.strength||i.variant?.strength||''].filter(Boolean).join(' ').replace(/\s+/g,' ').trim()}
+function itemQty(i){return Number(i.quantity??i.qty??i.total_qty??1)||1}
 function noteFor(o){return o.manual_note??o.note??o.notes??o.admin_note??o.late_order_note??''}
+function orderItemsFromPayload(o,all){return itemsFor(o,all)}
 async function track(){
  const email=$('email').value.trim().toLowerCase(),out=$('out');
- if(!email){out.innerHTML='<div class="notice error">Please enter your email.</div>';return}
- out.innerHTML='<div class="notice">Loading your client tracker…</div>';
+ if(!email){out.innerHTML='<div class="notice error">Please enter the email used for your order.</div>';return}
+ out.innerHTML='<div class="notice">✦ Finding all orders under this email…</div>';
  try{
   const r=await sb.rpc('get_customer_tracking',{p_email:email}); if(r.error)throw r.error;
-  const data=r.data||{},orders=data.orders||[],shipments=data.shipments||[],allItems=data.order_items||data.items||[];
+  const data=r.data||{};
+  const orders=Array.isArray(data.orders)?data.orders:(data.orders?.data||[]);
+  const shipments=Array.isArray(data.shipments)?data.shipments:(data.shipments?.data||[]);
+  const allItems=Array.isArray(data.order_items)?data.order_items:(Array.isArray(data.items)?data.items:[]);
   if(!orders.length&&!shipments.length){out.innerHTML='<div class="notice">No orders found for this email.</div>';return}
-  const shipment=shipments.slice().sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0))[0]||{};
-  const status=shipment.status||'ORDER RECEIVED',ci=Math.max(0,STATUSES.indexOf(status));
+  const shipment=shipments.slice().sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0))[0]||{};
+  const status=shipment.status||'ORDER RECEIVED',rawIndex=STATUSES.indexOf(status),ci=Math.max(0,rawIndex<0?0:rawIndex);
   const progress=Math.round(((ci+1)/STATUSES.length)*100);
-  const totals=new Map(),refs=[],notes=[];
-  orders.forEach(o=>{
-    refs.push(o.order_id??o.id??'—');
+  const notes=[];
+  let totalItems=0;
+  const orderCards=orders.map((o,idx)=>{
+    const oid=o.order_id??o.id??('ORDER '+(idx+1));
+    const orderItems=orderItemsFromPayload(o,allItems);
+    const grouped=new Map();
+    orderItems.forEach(i=>{const key=itemLabel(i).toUpperCase();grouped.set(key,(grouped.get(key)||0)+itemQty(i));totalItems+=itemQty(i)});
     const n=noteFor(o);if(n)notes.push(n);
-    itemsFor(o,allItems).forEach(i=>{const key=itemLabel(i).toUpperCase();totals.set(key,(totals.get(key)||0)+itemQty(i))});
-  });
-  const productHtml=[...totals.entries()].map(([name,qty])=>'<div class="productRow"><span class="productName">'+esc(name)+'</span><span class="productQty">QTY '+qty+'</span></div>').join('')||'<div class="productRow"><span class="productName">Order details are being prepared.</span></div>';
-  const refsHtml=refs.map(x=>'<span class="refChip">'+esc(x)+'</span>').join('');
+    const rows=[...grouped.entries()].map(([name,qty])=>'<div class="productRow"><span class="productName">'+esc(name)+'</span><span class="productQty">QTY '+qty+'</span></div>').join('')||'<div class="emptyItems">Order items are not available yet for this order.</div>';
+    return '<div class="orderCard"><div class="orderCardTop"><div><div class="orderCardRef">ORDER # '+esc(oid)+'</div><div class="small">'+esc(o.gb_number||'PEPMOSA GROUP BUY')+'</div></div><div class="orderCardStatus">'+esc(o.payment_status||o.status||'ORDER RECEIVED')+'</div></div><div class="orderItems">'+rows+'</div></div>';
+  }).join('');
   out.innerHTML='<div class="clientCard">'+
-   '<div class="clientHead"><div class="clientTop"><div><div class="clientLabel">PEPMOSA CLIENT TRACKER</div><div class="clientEmail">'+esc(email)+'</div></div><span class="statusPill">'+esc(status)+'</span></div></div>'+
+   '<div class="clientHead"><div class="clientTop"><div><div class="clientLabel">♡ PEPMOSA CLIENT TRACKER</div><div class="clientEmail">'+esc(email)+'</div></div><span class="statusPill">'+esc(status)+'</span></div></div>'+
    '<div class="clientBody">'+
-   '<div class="progressCard"><div class="progressHead"><b>Shipment progress</b><span>STEP '+(ci+1)+' OF '+STATUSES.length+'</span></div><div class="progressBar"><div class="progressFill" style="width:'+progress+'%"></div></div></div>'+
+   '<div class="progressCard"><div class="progressHead"><b>Current shipment status</b><span>STEP '+(ci+1)+' OF '+STATUSES.length+'</span></div><div class="progressBar"><div class="progressFill" style="width:'+progress+'%"></div></div></div>'+
    '<div class="metaGrid"><div class="metaBox"><small>COURIER</small><b>'+esc(shipment.courier||'To be assigned')+'</b></div><div class="metaBox"><small>TRACKING NUMBER</small><b>'+esc(shipment.tracking_number||'To be assigned')+'</b></div><div class="metaBox"><small>WAYBILL NUMBER</small><b>'+esc(shipment.waybill_number||'To be assigned')+'</b></div></div>'+
-   '<div class="orderSection"><div class="sectionTitle"><div><div class="clientLabel">YOUR ORDERS</div><h2>Everything under this email</h2><p>Combined for a cleaner and easier view.</p></div><span class="orderCount">'+orders.length+' ORDER'+(orders.length===1?'':'S')+'</span></div>'+
-   '<div class="productSummary">'+productHtml+'</div>'+
-   '<div class="orderRef"><b>ORDER REFERENCES</b><div class="refList">'+refsHtml+'</div></div>'+
-   (notes.length?'<div class="noteBox"><b>NOTES</b><br>'+notes.map(esc).join('<br>')+'</div>':'')+
+   '<div class="orderSection"><div class="sectionTitle"><div><div class="clientLabel">YOUR ORDERS</div><h2>Everything under this email</h2><p>Each order is shown separately so your products are easy to check.</p></div><span class="orderCount">'+orders.length+' ORDER'+(orders.length===1?'':'S')+(totalItems?' • '+totalItems+' ITEMS':'')+'</span></div>'+
+   '<div class="orderCards">'+orderCards+'</div>'+
+   (notes.length?'<div class="noteBox"><b>♡ ADMIN NOTES</b><br>'+[...new Set(notes)].map(esc).join('<br>')+'</div>':'')+
+   '<div class="trackNote">✦ Shipment updates may take a little time to appear after the admin updates your tracking.</div>'+
    '</div></div></div>';
- }catch(err){console.error(err);out.innerHTML='<div class="notice error">Unable to load tracking. Please try again.</div>'}
+ }catch(err){console.error(err);out.innerHTML='<div class="notice error">Unable to load tracking right now. Please try again.</div>'}
 }
 </script>
 </body></html>

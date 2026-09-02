@@ -58,7 +58,7 @@
   }
 
   async function loadInventory(){
-    if(!window.sb||!window.currentGB) return false;
+    if(!window.sb||!getGB()) return false;
     active=isKitMode();
     if(!active) return false;
 
@@ -100,7 +100,7 @@
         .filter(v=>v.active!==false && Number(v.__remaining)>0);
     }
 
-    window.products=getProducts().filter(p=>(p.product_variants||[]).length);
+    setProducts(getProducts().filter(p=>(p.product_variants||[]).length));
 
     const st=$('gbStatus');
     if(st){

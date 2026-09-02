@@ -92,3 +92,101 @@
   }
   let tries=0;const t=setInterval(()=>{try{hook()}catch(e){console.error(e)}if(++tries>300)clearInterval(t)},100);
 })();
+
+
+/* PEPMOSA isolated GB minimum repair — only touches the GB Category Minimum section. */
+(function(){
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const S = () => window.sb || window.__sb;
+  const esc2 = v => String(v ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  function msg(text,type){
+    if(typeof window.showMessage==='function') window.showMessage(text,type||'success');
+    else alert(text);
+  }
+  async function fetchProductsAndVariants(){
+    const s=S(); if(!s) throw new Error('Supabase is not initialized.');
+    let r=await s.from('products').select('product_id,product_name,category,active,product_variants!product_variants_product_id_fkey(variant_id,strength,active)').eq('active',true).order('product_name');
+    if(!r.error) return r.data||[];
+    const pr=await s.from('products').select('product_id,product_name,category,active').eq('active',true).order('product_name');
+    if(pr.error) throw pr.error;
+    const ids=(pr.data||[]).map(x=>x.product_id);
+    if(!ids.length) return [];
+    const vr=await s.from('product_variants').select('variant_id,product_id,strength,active').in('product_id',ids).eq('active',true);
+    if(vr.error) throw vr.error;
+    const by=new Map();
+    for(const v of vr.data||[]){ if(!by.has(v.product_id)) by.set(v.product_id,[]); by.get(v.product_id).push(v); }
+    return (pr.data||[]).map(p=>({...p,product_variants:by.get(p.product_id)||[]}));
+  }
+  async function allowedCategories(gb){
+    const s=S();
+    const r=await s.from('gb_categories').select('category_name').eq('gb_number',gb);
+    if(r.error) return null;
+    const set=new Set((r.data||[]).map(x=>x.category_name).filter(Boolean));
+    return set.size ? set : null;
+  }
+  async function loadMinimums(){
+    const select=$('minimumGB'), box=$('minimumList');
+    if(!select||!box) return;
+    const gb=String(select.value||'').trim();
+    if(!gb){ box.textContent='Select a Group Buy.'; return; }
+    box.innerHTML='<div class="small">Loading category minimums…</div>';
+    try{
+      const products=await fetchProductsAndVariants();
+      const catsFilter=await allowedCategories(gb);
+      const {data:mins,error}=await S().from('gb_minimum_quantities').select('product_id,variant_id,minimum_qty').eq('gb_number',gb);
+      if(error) throw error;
+      const minMap=new Map((mins||[]).map(x=>[x.product_id+'::'+x.variant_id,Number(x.minimum_qty||1)]));
+      const catMap=new Map();
+      for(const p of products){
+        const cat=String(p.category||'').trim();
+        if(!cat || (catsFilter && !catsFilter.has(cat))) continue;
+        const variants=(p.product_variants||[]).filter(v=>v.active!==false);
+        if(!catMap.has(cat)) catMap.set(cat,[]);
+        for(const v of variants) catMap.get(cat).push({product_id:p.product_id,variant_id:v.variant_id,strength:v.strength||''});
+      }
+      const cats=[...catMap.keys()].sort((a,b)=>a.localeCompare(b));
+      if(!cats.length){ box.innerHTML='<div class="empty">No active product variants found for this Group Buy.</div>'; return; }
+      box.innerHTML=cats.map(cat=>{
+        const vars=catMap.get(cat)||[];
+        const values=vars.map(v=>minMap.get(v.product_id+'::'+v.variant_id)).filter(v=>Number.isFinite(v));
+        const value=values.length?Math.max(1,values[0]):1;
+        return '<div class="categoryLine"><div><b>'+esc2(cat)+'</b><div class="small">'+vars.length+' active variant(s) in this Group Buy</div></div><input class="categoryMinimum" data-category="'+esc2(cat)+'" type="number" min="1" step="1" value="'+value+'"></div>';
+      }).join('');
+    }catch(e){ console.error('GB minimum load error',e); box.innerHTML='<div class="notice error">'+esc2(e.message||'Unable to load category minimums.')+'</div>'; }
+  }
+  async function saveMinimums(){
+    const select=$('minimumGB'); const gb=String(select?.value||'').trim();
+    if(!gb){ msg('Select a Group Buy first.','error'); return; }
+    const inputs=[...document.querySelectorAll('#minimumList .categoryMinimum')];
+    if(!inputs.length){ msg('No category minimums are loaded yet.','error'); return; }
+    try{
+      const products=await fetchProductsAndVariants();
+      const catValues=new Map(inputs.map(i=>[String(i.dataset.category||''),Math.max(1,Math.floor(Number(i.value||1)))]));
+      const rows=[];
+      for(const p of products){
+        const qty=catValues.get(String(p.category||''));
+        if(!qty) continue;
+        for(const v of (p.product_variants||[]).filter(v=>v.active!==false)) rows.push({gb_number:gb,product_id:p.product_id,variant_id:v.variant_id,minimum_qty:qty});
+      }
+      if(!rows.length){ msg('No active variants found to save.','error'); return; }
+      const {error}=await S().from('gb_minimum_quantities').upsert(rows,{onConflict:'gb_number,product_id,variant_id'});
+      if(error) throw error;
+      await loadMinimums();
+      msg('Category minimums saved successfully.','success');
+    }catch(e){ console.error('GB minimum save error',e); msg(e.message||'Unable to save minimums.','error'); }
+  }
+  function hook(){
+    const select=$('minimumGB'); if(!select||!$('minimumList')) return false;
+    if(!select.dataset.pepMinimumHook){
+      select.dataset.pepMinimumHook='1';
+      select.addEventListener('change',loadMinimums);
+      select.addEventListener('input',loadMinimums);
+    }
+    window.loadCategoryMinimums=loadMinimums;
+    window.saveCategoryMinimums=saveMinimums;
+    if(select.value) loadMinimums();
+    return true;
+  }
+  let tries=0; const timer=setInterval(()=>{ if(hook()||++tries>200) clearInterval(timer); },100);
+})();

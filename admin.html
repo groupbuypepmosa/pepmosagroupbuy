@@ -731,9 +731,24 @@ async function openManualOrderModal(){
   const {data:gbs,error}=await sb.from("group_buys").select("gb_number,status,created_at").order("created_at",{ascending:false});
   if(error)return showMessage(error.message,"error");
   $("manualOrderGB").innerHTML=(gbs||[]).map(g=>'<option value="'+esc(g.gb_number)+'">'+esc(g.gb_number)+' • '+esc(g.status||"")+'</option>').join("");
-  const {data:products,error:pe}=await sb.from("products").select("product_id,product_name,product_variants(variant_id,strength,price,active)").eq("active",true).order("product_name");
+  /* Load products and variants separately.
+     This avoids Supabase/PostgREST relationship ambiguity when the database
+     has more than one FK path between products and product_variants. */
+  const [{data:products,error:pe},{data:variants,error:ve}]=await Promise.all([
+    sb.from("products").select("product_id,product_name").eq("active",true).order("product_name"),
+    sb.from("product_variants").select("variant_id,product_id,strength,price,active").eq("active",true).order("strength")
+  ]);
   if(pe)return showMessage(pe.message,"error");
-  manualOrderProducts=products||[];
+  if(ve)return showMessage(ve.message,"error");
+  const variantsByProduct=new Map();
+  for(const variant of (variants||[])){
+    if(!variantsByProduct.has(variant.product_id))variantsByProduct.set(variant.product_id,[]);
+    variantsByProduct.get(variant.product_id).push(variant);
+  }
+  manualOrderProducts=(products||[]).map(product=>({
+    ...product,
+    product_variants:variantsByProduct.get(product.product_id)||[]
+  }));
   $("manualOrderName").value="";$("manualOrderEmail").value="";$("manualOrderContact").value="";$("manualOrderAddress").value="";$("manualOrderNote").value="";
   $("manualOrderItems").innerHTML="";
   addManualOrderLine();

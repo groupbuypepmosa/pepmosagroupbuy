@@ -17,6 +17,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 .paymentCenter{max-width:100%}.paymentHead{margin-bottom:16px}.paymentHead h2{margin:4px 0}.paymentSummary{display:grid;grid-template-columns:repeat(4,minmax(170px,1fr));gap:12px;margin:14px 0 16px}.paySummaryCard{padding:15px;border:1px solid #ecd7e4;border-radius:16px;background:linear-gradient(145deg,#fff,#fff7fb)}.paySummaryLabel{font-size:10px;font-weight:900;letter-spacing:.08em;color:#9a627c;text-transform:uppercase}.paySummaryValue{font-size:22px;font-weight:950;color:#33242d;margin-top:6px}.paySummarySub{font-size:11px;color:#7e6975;margin-top:4px}.paymentToolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px}.paymentToolbar .search{flex:1}.paymentToolbar select{min-height:42px;border:1px solid #e8d4e0;border-radius:12px;padding:0 12px;background:#fff;color:#3a2c34}.paymentSectionTitle{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:950;letter-spacing:.12em;color:#8e526f;margin:18px 0 9px}.paymentSectionTitle:after{content:"";height:1px;background:#eddce6;flex:1}.countChip{font-size:10px;letter-spacing:0;background:#f8e4ef;color:#b12573;border-radius:999px;padding:4px 8px}.checkoutTitle{margin-top:22px}.paymentRows{display:grid;gap:8px}.paymentRow{display:grid;grid-template-columns:minmax(220px,1.3fr) minmax(120px,.8fr) minmax(120px,.75fr) minmax(120px,.75fr) auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid #ead7e2;border-radius:15px;background:#fff}.paymentCustomer{min-width:0}.paymentCustomer b{display:block;color:#332630;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.paymentCustomer small{display:block;color:#86747d;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.paymentMeta{font-size:11px;color:#78656f}.paymentMeta b{display:block;color:#463640;font-size:12px;margin-bottom:3px}.paymentProof{width:48px;height:48px;object-fit:cover;border:1px solid #ead7e2;border-radius:10px;background:#fff}.paymentProofPlaceholder{width:48px;height:48px;display:grid;place-items:center;border:1px dashed #dfbdcf;border-radius:10px;color:#a98797;font-size:9px}.paymentActions{display:flex;gap:6px;justify-content:flex-end;align-items:center}.paymentActions .btn{padding:8px 10px;font-size:10px}.paymentStatus{white-space:nowrap}.emptyPayment{padding:18px;border:1px dashed #ead4df;border-radius:14px;color:#806d77;background:#fffafd}.proofLink{display:flex;align-items:center;gap:7px;color:inherit;text-decoration:none}.paymentRow.rejected{opacity:.78;background:#fff9fa}.paymentRow.pending{border-color:#e8c57f;background:#fffdf7}.paymentRow.approved{border-color:#cce7d8}.productCompact .small{white-space:normal}
 @media(max-width:900px){.paymentSummary{grid-template-columns:repeat(2,minmax(0,1fr))}.paymentRow{grid-template-columns:1fr 1fr}.paymentActions{justify-content:flex-start}.paymentProof{display:none}}@media(max-width:560px){.paymentSummary{grid-template-columns:1fr}.paymentToolbar{flex-direction:column;align-items:stretch}.paymentRow{grid-template-columns:1fr;padding:13px}.paymentMeta{display:flex;justify-content:space-between;gap:10px}.paymentMeta b{margin:0}.paymentActions{flex-wrap:wrap}}
 
+.trackingShipmentCard{margin-bottom:12px}.trackingQuickMeta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0}.trackingQuickMeta span{padding:9px 10px;border:1px solid #f0dfe8;border-radius:11px;background:#fffafd;font-size:11px;color:#78656f}.trackingQuickMeta b{color:#3b2b34}.trackingOrderList{margin-top:14px;padding:12px;border:1px solid #f0dfe8;border-radius:12px;background:#fffafd}.trackingEditor{margin-top:14px;border-top:1px solid #ead9e5;padding-top:12px}.trackingEditor summary{cursor:pointer;font-weight:900;color:#b62b78;font-size:12px;letter-spacing:.04em}@media(max-width:800px){.trackingQuickMeta{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -38,15 +39,99 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
     <div id="checkoutPaymentList">Loading...</div>
   </div>
 </section>
-<section id="trackingPanel" class="panel"><div class="card"><h2>Consolidated Tracking</h2><p class="muted">Tracking is based on customer EMAIL. Individual orders remain visible inside the consolidated shipment.</p><input id="trackingEmail" class="search" placeholder="Customer email..." onkeydown="if(event.key==='Enter')searchTracking()"><div class="actions"><button class="btn primary" onclick="searchTracking()">SEARCH EMAIL</button></div><div id="trackingResults"></div></div></section>
+<section id="trackingPanel" class="panel"><div class="card"><div class="itemHead"><div><h2 style="margin-bottom:4px">Consolidated Tracking</h2><p class="muted" style="margin:0">All customer shipments appear here automatically. No email search needed.</p></div><button class="btn secondary" type="button" onclick="loadTrackingDashboard()">REFRESH</button></div><div id="trackingResults" style="margin-top:16px">Loading tracking…</div></div></section>
 <section id="vialTrackerPanel" class="panel"><div class="card"><h2>Vial / Order Tracker</h2><p class="muted">Consolidated by product + variant. Shows ordered units, order count, customers, and the current GB minimum.</p><div class="grid"><div class="field"><label>Group Buy</label><select id="vialTrackerGB" onchange="loadVialTracker()"><option value="">All Group Buys</option></select></div><div class="field"><label>Search Product / Variant</label><input id="vialTrackerSearch" placeholder="Search..." oninput="renderVialTracker()"></div></div><div id="vialTrackerResults" style="margin-top:18px">Select a Group Buy or use All Group Buys.</div></div></section>
 <div id="productEditModal" class="editModal" onclick="if(event.target===this)closeProductEdit()"><div class="editModalCard"><div class="itemHead"><div><div class="eyebrow">PEPMOSA ADMIN</div><h2>Edit Product</h2><div class="small">Update product details and prices.</div></div><button class="btn secondary" type="button" onclick="closeProductEdit()">CLOSE</button></div><div class="grid" style="margin-top:18px"><div class="field"><label>Product Name *</label><input id="editProductName"></div><div class="field"><label>Category *</label><select id="editProductCategory"></select></div><div class="field full"><label>Description</label><textarea id="editProductDescription"></textarea></div></div><div style="margin-top:18px"><h3 style="margin-bottom:6px">Variants & Prices</h3><div class="small">You can update prices directly here.</div><div id="editProductVariants"></div></div><div class="actions"><button class="btn primary" type="button" onclick="saveProductEdit()">SAVE CHANGES</button><button class="btn secondary" type="button" onclick="closeProductEdit()">CANCEL</button></div></div></div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260902-admin-stable"></script><script src="supabase.js?v=20260902-admin-stable"></script><script>
-if(typeof initSupabase==="function")initSupabase();else document.addEventListener("DOMContentLoaded",()=>{if(typeof initSupabase==="function")initSupabase()});
+if(typeof initSupabase==="function")initSupabase();else 
+// Tracking dashboard: one place for every customer, consolidated orders and waybill details.
+let trackingDashboardShipments=[],trackingDashboardOrders=[];
+async function loadTrackingDashboard(){
+  const box=$("trackingResults"); if(!box)return;
+  box.innerHTML='<div class="notice">Loading consolidated orders and waybills…</div>';
+  try{
+    const [sr,or]=await Promise.all([
+      sb.from("consolidated_shipments").select("*").order("updated_at",{ascending:false}),
+      sb.from("orders").select("order_id,shipment_id,email,gb_number,total,payment_status,created_at").order("created_at",{ascending:false})
+    ]);
+    if(sr.error)throw sr.error;
+    if(or.error)throw or.error;
+    trackingDashboardShipments=sr.data||[];
+    trackingDashboardOrders=or.data||[];
+    renderTrackingDashboard();
+  }catch(e){
+    console.error(e);
+    box.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load tracking.")+'</div>';
+  }
+}
+function trackingOrdersFor(shipmentId){return trackingDashboardOrders.filter(o=>o.shipment_id===shipmentId)}
+function renderTrackingDashboard(){
+  const box=$("trackingResults"); if(!box)return;
+  const assigned=new Set(trackingDashboardOrders.map(o=>o.shipment_id).filter(Boolean));
+  const unassigned=[...new Map(trackingDashboardOrders.filter(o=>!o.shipment_id).map(o=>[String(o.email||"").toLowerCase(),o])).values()].filter(o=>o.email);
+  const shipmentCards=trackingDashboardShipments.map((s,i)=>{
+    const orders=trackingOrdersFor(s.shipment_id),ci=TRACKING_STATUSES.indexOf(s.status),k="trk"+i;
+    return '<div class="item trackingShipmentCard">'+
+      '<div class="itemHead"><div><div class="eyebrow">CONSOLIDATED SHIPMENT</div><h3 style="margin:4px 0">'+esc(s.email)+'</h3><div class="small">Shipment: '+esc(s.shipment_id)+'</div></div>'+
+      '<div><span class="badge green">'+esc(s.status||"ORDER RECEIVED")+'</span></div></div>'+
+      '<div class="trackingQuickMeta">'+
+        '<span><b>Waybill</b><br>'+esc(s.waybill_number||"Not set")+'</span>'+
+        '<span><b>Courier</b><br>'+esc(s.courier||"Not set")+'</span>'+
+        '<span><b>Tracking No.</b><br>'+esc(s.tracking_number||"Not set")+'</span>'+
+        '<span><b>Orders</b><br>'+orders.length+'</span></div>'+
+      '<div class="statusTimeline">'+TRACKING_STATUSES.map((x,n)=>'<div class="statusDot '+(n===ci?'current':n<ci?'done':'')+'">'+esc(x)+'</div>').join('')+'</div>'+
+      '<div class="trackingOrderList"><b>CONSOLIDATED ORDERS</b>'+(
+        orders.length?orders.map(o=>'<div class="orderItem"><b>'+esc(o.order_id)+'</b> • '+esc(o.gb_number||"—")+' <span class="small">'+peso(o.total)+' • '+esc(o.payment_status||"PENDING")+'</span></div>').join(''):'<div class="small">No orders assigned yet.</div>'
+      )+'</div>'+
+      '<details class="trackingEditor"><summary>EDIT TRACKING / WAYBILL</summary><div class="grid" style="margin-top:14px">'+
+        '<div class="field"><label>Status</label><select id="'+k+'-status">'+TRACKING_STATUSES.map(x=>'<option value="'+esc(x)+'" '+(x===s.status?'selected':'')+'>'+esc(x)+'</option>').join('')+'</select></div>'+
+        '<div class="field"><label>Courier</label><select id="'+k+'-courier"><option value="">—</option><option value="J&T" '+(s.courier==="J&T"?'selected':'')+'>J&T</option><option value="Lalamove" '+(s.courier==="Lalamove"?'selected':'')+'>Lalamove</option><option value="Other" '+(s.courier==="Other"?'selected':'')+'>Other</option></select></div>'+
+        '<div class="field"><label>Tracking Number</label><input id="'+k+'-tracking" value="'+esc(s.tracking_number||"")+'"></div>'+
+        '<div class="field"><label>Waybill Number</label><input id="'+k+'-waybill" value="'+esc(s.waybill_number||"")+'" placeholder="Enter waybill"></div>'+
+        '<div class="field full"><label>Notes</label><textarea id="'+k+'-notes">'+esc(s.notes||"")+'</textarea></div>'+
+      '</div><div class="actions"><button class="btn primary" type="button" onclick="updateTrackingShipment(\''+esc(s.shipment_id)+'\',\''+k+'\')">SAVE TRACKING</button></div></details>'+
+    '</div>';
+  }).join("");
+  const unassignedCards=unassigned.map(o=>{
+    const email=String(o.email).toLowerCase();
+    const customerOrders=trackingDashboardOrders.filter(x=>String(x.email||"").toLowerCase()===email&&!x.shipment_id);
+    return '<div class="item"><div class="itemHead"><div><div class="eyebrow">UNCONSOLIDATED CUSTOMER</div><h3 style="margin:4px 0">'+esc(email)+'</h3><div class="small">'+customerOrders.length+' order(s) waiting to be consolidated</div></div><button class="btn primary" type="button" onclick="createTrackingShipment('+JSON.stringify(email)+')">CREATE SHIPMENT</button></div>'+
+      customerOrders.map(x=>'<div class="orderItem"><b>'+esc(x.order_id)+'</b> • '+esc(x.gb_number||"—")+' • '+peso(x.total)+'</div>').join("")+'</div>';
+  }).join("");
+  if(!shipmentCards&&!unassignedCards){box.innerHTML='<div class="empty">No orders or consolidated shipments found yet.</div>';return}
+  box.innerHTML=(shipmentCards||"")+(unassignedCards?'<div class="paymentSectionTitle"><span>ORDERS NOT YET CONSOLIDATED</span></div>'+unassignedCards:"");
+}
+async function createTrackingShipment(email){
+  try{
+    const orders=trackingDashboardOrders.filter(o=>String(o.email||"").toLowerCase()===String(email).toLowerCase()&&!o.shipment_id);
+    if(!orders.length)return showMessage("No unassigned orders found for this customer.","error");
+    const ins=await sb.from("consolidated_shipments").insert({email,status:"ORDER RECEIVED"}).select().single();
+    if(ins.error)throw ins.error;
+    const up=await sb.from("orders").update({shipment_id:ins.data.shipment_id}).in("order_id",orders.map(o=>o.order_id));
+    if(up.error)throw up.error;
+    const hist=await sb.from("shipment_status_history").insert({shipment_id:ins.data.shipment_id,status:"ORDER RECEIVED"});
+    if(hist.error)console.warn(hist.error);
+    showMessage("Consolidated shipment created.","success");
+    await loadTrackingDashboard();
+  }catch(e){console.error(e);showMessage(e.message||"Unable to create shipment.","error")}
+}
+async function updateTrackingShipment(id,k){
+  try{
+    const status=$(k+"-status").value,courier=$(k+"-courier").value||null,tracking_number=$(k+"-tracking").value.trim()||null,waybill_number=$(k+"-waybill").value.trim()||null,notes=$(k+"-notes").value.trim()||null;
+    const old=trackingDashboardShipments.find(s=>s.shipment_id===id)?.status;
+    const r=await sb.from("consolidated_shipments").update({status,courier,tracking_number,waybill_number,notes,delivered_at:status==="DELIVERED"?new Date().toISOString():null,updated_at:new Date().toISOString()}).eq("shipment_id",id);
+    if(r.error)throw r.error;
+    if(old!==status){const u=await sb.auth.getUser();const h=await sb.from("shipment_status_history").insert({shipment_id:id,status,courier,tracking_number,changed_by:u.data?.user?.id||null});if(h.error)console.warn(h.error)}
+    showMessage("Tracking and waybill updated.","success");
+    await loadTrackingDashboard();
+  }catch(e){console.error(e);showMessage(e.message||"Unable to update shipment.","error")}
+}
+
+document.addEventListener("DOMContentLoaded",()=>{if(typeof initSupabase==="function")initSupabase()});
 let categories=[],groupBuys=[],products=[],fees=[],ordersCache=[],orderItemsCache=[],currentShipment=null,vialTrackerRows=[];
 const TRACKING_STATUSES=["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING","IN TRANSIT TO THE PHILIPPINES","ARRIVED IN THE PHILIPPINES","RECEIVED AT WAREHOUSE","PACKING & LABELLING","HANDED OVER TO LOCAL COURIER","DELIVERED"];
 function $(id){return document.getElementById(id)}function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}function peso(v){return "₱"+Number(v||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2})}function showMessage(m,t=""){$("globalMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`;window.scrollTo({top:0,behavior:"smooth"});setTimeout(()=>$("globalMsg").innerHTML="",5000)}function showLoginMessage(m,t="error"){$("loginMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`}function previewFile(i,p){const f=$(i).files[0];if(!f)return;$(p).src=URL.createObjectURL(f);$(p).style.display="block"}
-function openTab(b){const target=b.dataset.panel;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(target)?.classList.add("active");if(target==="vialTrackerPanel")loadVialTracker()}
+function openTab(b){const target=b.dataset.panel;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(target)?.classList.add("active");if(target==="vialTrackerPanel")loadVialTracker();if(target==="trackingPanel")loadTrackingDashboard()}
 function enterAdmin(user){
   const loginScreen=$("loginScreen"), adminApp=$("adminApp");
   if(loginScreen) loginScreen.style.display="none";

@@ -21,43 +21,68 @@
       || String(gb.kit_completion_status||'').toUpperCase()==='OPEN';
   }
 
+  const labels=new Map();
+
   function variantLabel(variantId){
+    const id=String(variantId);
+    if(labels.has(id)) return labels.get(id);
     for(const p of getProducts()){
-      const v=(p.product_variants||[]).find(x=>String(x.variant_id)===String(variantId));
-      if(v) return (p.product_name||'')+(v.strength?' • '+v.strength:'');
+      const v=(p.product_variants||[]).find(x=>String(x.variant_id)===id);
+      if(v){
+        const label=(p.product_name||'')+(v.strength?' • '+v.strength:'');
+        labels.set(id,label);
+        return label;
+      }
     }
-    return String(variantId);
+    return id;
+  }
+
+  async function loadVariantLabels(ids){
+    try{
+      if(!window.sb || !ids.length) return;
+      const r=await window.sb
+        .from('product_variants')
+        .select('variant_id,strength,product_id,products(product_name)')
+        .in('variant_id',ids);
+      if(r.error) throw r.error;
+      for(const v of r.data||[]){
+        const productName=v.products?.product_name||'';
+        const label=(productName?productName+' • ':'')+(v.strength||String(v.variant_id));
+        labels.set(String(v.variant_id),label);
+      }
+    }catch(e){
+      console.warn('Kit Completion label lookup',e);
+    }
   }
 
   function renderKitSummary(){
     if(!active) return;
 
-    /* Keep only one KIT COMPLETION explanation on the storefront. */
-    const duplicate=$('pepKitCompletionCard');
-    if(duplicate) duplicate.style.display='none';
+    /* One clean Kit Completion message only — no duplicate cards. */
+    const oldSummary=$('pepKitRemainingSummary');
+    if(oldSummary) oldSummary.remove();
 
-    let box=$('pepKitRemainingSummary');
-    if(!box){
-      box=document.createElement('section');
-      box.id='pepKitRemainingSummary';
-      box.className='notice';
-      box.style.cssText='margin:0 0 18px;padding:16px 18px;border-radius:18px;line-height:1.55';
-      const grid=$('productGrid');
-      if(grid?.parentNode) grid.parentNode.insertBefore(box,grid);
-    }
+    const status=$('gbStatus');
+    if(!status) return;
 
     const rows=[...inventory.entries()]
       .filter(([,x])=>Number(x.remaining)>0)
-      .map(([id,x])=>'<span style="display:inline-flex;align-items:center;gap:5px;padding:6px 10px;margin:7px 6px 0 0;border-radius:999px;background:#fff;border:1px solid #ead8e3;font-size:12px"><b>'+esc(variantLabel(id))+'</b><span style="color:#c52e7d;font-weight:900">'+Number(x.remaining)+' remaining</span></span>')
-      .join('');
+      .map(([id,x])=>
+        '<span style="display:inline-flex;align-items:center;gap:5px;padding:6px 10px;margin:7px 6px 0 0;border-radius:999px;background:#fff;border:1px solid #ead8e3;font-size:12px">'+
+          '<b>'+esc(variantLabel(id))+'</b>'+
+          '<span style="color:#c52e7d;font-weight:900">'+Number(x.remaining)+' remaining</span>'+
+        '</span>'
+      ).join('');
 
-    box.innerHTML=
+    status.innerHTML=
       '<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:6px">'+
         '<span class="status open">KIT COMPLETION</span>'+
-        '<b>Only the remaining vials needed to complete each 10-vial kit are available.</b>'+
+        '<b>Complete the remaining vials</b>'+
       '</div>'+
-      '<div class="muted">Each <b>mg/variant is tracked separately</b> (for example, 15mg and 30mg). You can order from <b>1 vial up to the exact live remaining quantity</b> for that specific variant. Availability updates when another buyer secures stock, helping prevent double-selling.</div>'+
-      (rows?'<div id="pepKitRemainingRows">'+rows+'</div>':'');
+      '<div class="muted" style="line-height:1.55">'+
+        'Each <b>mg/variant is tracked separately</b> (for example, 15mg and 30mg). Only the exact remaining vials needed to complete that variant’s 10-vial kit are available. You may order from <b>1 vial up to the live remaining quantity</b>.'+
+      '</div>'+
+      (rows?'<div style="margin-top:4px">'+rows+'</div>':'<div class="muted" style="margin-top:8px">No remaining vials are currently available.</div>');
   }
 
   async function loadInventory(){
@@ -88,6 +113,8 @@
       {remaining:Math.max(0,Number(x.remaining_qty||0)),kitSize:Number(x.kit_size||10)}
     ]));
 
+    await loadVariantLabels([...inventory.keys()]);
+
     const filtered=getProducts()
       .map(p=>({
         ...p,
@@ -101,11 +128,6 @@
       .filter(p=>(p.product_variants||[]).length>0);
 
     setProducts(filtered);
-
-    const status=$('gbStatus');
-    if(status){
-      status.innerHTML='<span class="status open">KIT COMPLETION</span> <span class="muted">Only remaining vials are available. Each mg/variant has its own separate 10-vial count.</span>';
-    }
 
     renderKitSummary();
     return true;

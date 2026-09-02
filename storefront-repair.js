@@ -89,13 +89,15 @@
   document.addEventListener('click',function(e){
     const btn=e.target.closest('.pepSelectVariant');
     if(!btn)return;
+    e.preventDefault();
+    e.stopPropagation();
     const pid=btn.getAttribute('data-product-id');
     const product=products.find(p=>String(p.product_id)===String(pid));
-    if(!product)return;
-    if(typeof window.openProductPicker==='function'){
-      window.openProductPicker(pid,product);
+    const picker=window.pepOpenProductPicker || window.openProductPicker;
+    if(product && typeof picker==='function'){
+      picker(pid,product);
     }
-  });
+  },true);
   window.pepAddToCart=function(pid,vid){if(!feePayment||feePayment.status!=='PAID')return feeAction();if(!verifiedEmail)return openVerify();const p=products.find(x=>x.product_id===pid),v=p?.product_variants?.find(x=>x.variant_id===vid);if(!p||!v)return;const min=minFor(vid,p.category),q=Math.max(min,Number($('pepQty_'+vid)?.value||min));let cart=JSON.parse(localStorage.pepmosaCart||'[]');const old=cart.find(x=>x.variant_id===vid&&x.gb_number===gb.gb_number);if(old)old.qty+=q;else cart.push({gb_number:gb.gb_number,product_id:pid,variant_id:vid,product_name:p.product_name,strength:v.strength,unit_price:Number(v.price),qty:q});localStorage.pepmosaCart=JSON.stringify(cart);if(typeof window.renderCart==='function')window.renderCart();if($('cartCount'))$('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0);info('Added to Cart',`${q} × ${p.product_name} ${v.strength} added to your cart.`)};
   function hookCheckout(){if(typeof window.checkout!=='function'||window.checkout.__pepStableGuard)return;const original=window.checkout;window.checkout=async function(){if(!feePayment||feePayment.status!=='PAID')return feeAction();if(!verifiedEmail)return openVerify();return original()};window.checkout.__pepStableGuard=true}
   function hookPlaceOrder(){if(typeof window.placeOrder!=='function'||window.placeOrder.__pepStableGuard)return;const original=window.placeOrder;window.placeOrder=async function(){if(!feePayment||feePayment.status!=='PAID')return feeAction();if(!verifiedEmail)return openVerify();if($('email'))$('email').value=verifiedEmail;return original()};window.placeOrder.__pepStableGuard=true}

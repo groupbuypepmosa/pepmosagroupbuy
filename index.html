@@ -475,6 +475,39 @@ header{
 }
 
 </style>
+
+<style id="pep-inline-picker-style">
+.pepStoreCard{padding:0!important;overflow:hidden;border-radius:24px!important}
+.pepStoreCard .productImg{height:220px!important;margin:0!important;border-radius:0!important;border:0!important}
+.pepStoreBody{padding:16px}
+.pepStoreBottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:13px;border-top:1px dashed #ead8e3}
+.pepStarting small{display:block;font-size:10px;color:#8d7580}
+.pepStarting b{display:block;font-size:15px;color:#3a2933;margin-top:3px}
+.pepSelectVariant{white-space:nowrap}
+.pepProductPicker{position:fixed;inset:0;z-index:100500;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(48,25,40,.64);backdrop-filter:blur(8px)}
+.pepProductPicker.show{display:flex}
+.pepPickerBox{position:relative;width:min(680px,100%);max-height:92vh;overflow:auto;border-radius:28px;background:linear-gradient(145deg,#fff,#fff9fc 58%,#f8efff);border:1px solid #efd5e4;box-shadow:0 30px 100px rgba(55,18,43,.34);padding:28px;box-sizing:border-box}
+.pepPickerClose{position:absolute;right:16px;top:14px;width:38px;height:38px;border-radius:50%;border:1px solid #edd3df;background:#fff;font-size:24px;cursor:pointer;z-index:2}
+.pepPickerHead{display:grid;grid-template-columns:145px 1fr;gap:20px;align-items:center;padding-right:36px}
+.pepPickerImage{height:145px;border-radius:20px;overflow:hidden;background:#fff1f7}
+.pepPickerImage img{width:100%;height:100%;object-fit:cover}
+.pepPickerHead h2{margin:5px 0 8px;font-size:29px}
+.pepPickerLabel{margin:23px 0 10px;font-size:10px;letter-spacing:.12em;font-weight:950;color:#a04b78}
+.pepPickerLabel.small{margin:0 0 4px}
+.pepVariantChoices{display:grid;gap:9px}
+.pepVariantChoice{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;border:1px solid #ead8e3;background:#fff;border-radius:16px;padding:14px 16px;cursor:pointer;color:#35252e}
+.pepVariantChoice span{display:flex;flex-direction:column;gap:3px}
+.pepVariantChoice small{font-size:10px;color:#8b7780}
+.pepVariantChoice.selected{border-color:#d9509b;background:#fff1f7;box-shadow:0 0 0 3px rgba(217,80,155,.08)}
+.pepQuantityRow{margin-top:16px;padding:16px;border-radius:18px;background:#fff;border:1px solid #eedce6;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.pepStepper{display:grid;grid-template-columns:40px 70px 40px}
+.pepStepper button,.pepStepper input{height:42px;border:1px solid #ead5e0;text-align:center}
+.pepStepper button{background:#fff7fb;color:#b3347a;font-size:22px;font-weight:900;cursor:pointer}
+.pepPickerTotal{display:flex;justify-content:space-between;margin-top:16px;padding:16px 2px;border-top:1px solid #efdee7}
+.pepPickerTotal b{font-size:22px;color:#c52e7d}
+.pepPickerAdd{width:100%;min-height:52px;margin-top:8px}
+@media(max-width:620px){.pepProductPicker{align-items:flex-end;padding:8px}.pepPickerBox{padding:22px 18px 20px;border-radius:26px 26px 18px 18px;max-height:94vh}.pepPickerHead{grid-template-columns:95px 1fr;gap:13px}.pepPickerImage{height:95px}.pepPickerHead h2{font-size:23px}.pepQuantityRow{align-items:flex-start;flex-direction:column}.pepStepper{width:100%;grid-template-columns:1fr 72px 1fr}.pepStepper input{width:72px}.pepStoreCard .productImg{height:225px!important}}
+</style>
 </head>
 
 
@@ -1164,17 +1197,13 @@ async function load(){
 function renderProducts(){
 
   const search =
-    (
-      $("search")?.value || ""
-    )
-    .toLowerCase()
-    .trim();
-
+    ($("search")?.value || "")
+      .toLowerCase()
+      .trim();
 
   const filtered =
     products.filter(
       p =>
-
         (
           p.product_name +
           " " +
@@ -1184,172 +1213,88 @@ function renderProducts(){
         .includes(search)
     );
 
-
-
   if(!filtered.length){
 
     $("productGrid").innerHTML =
-
       '<div class="card">' +
-
-        '<div style="' +
-          'text-align:center;' +
-          'padding:35px;' +
-        '">' +
-
-          '<div style="' +
-            'font-size:36px;' +
-            'margin-bottom:10px;' +
-          '">' +
-
-            '🛍️' +
-
-          '</div>' +
-
-
-          '<b>' +
-
-            'No products available yet.' +
-
-          '</b>' +
-
-
+        '<div style="text-align:center;padding:35px">' +
+          '<div style="font-size:36px;margin-bottom:10px">🛍️</div>' +
+          '<b>No products available yet.</b>' +
           '<p class="muted">' +
-
             (
               currentGB
-
-              ?
-
-              'No products are available in the opened Group Buy categories.'
-
-              :
-
-              'There is no open Group Buy at the moment.'
-            )
-
-          +
-
+                ? 'No products are available in the opened Group Buy categories.'
+                : 'There is no open Group Buy at the moment.'
+            ) +
           '</p>' +
-
         '</div>' +
-
       '</div>';
 
     return;
-
   }
 
-
-
   $("productGrid").innerHTML =
-
     filtered
       .map(
         p => {
 
           const variants =
             (p.product_variants || [])
-              .filter(
-                v => v.active
-              );
+              .filter(v => v.active);
 
+          const lowest =
+            variants.length
+              ? Math.min(...variants.map(v => Number(v.price) || 0))
+              : 0;
 
           return `
-
-            <article class="card">
+            <article
+              class="card pepStoreCard"
+              data-product-id="${esc(p.product_id)}"
+            >
 
               <div class="productImg">
-
-                ${
-                  p.image_url
-
-                  ?
-
-                  `<img
-                    src="${esc(p.image_url)}"
-                    alt="${esc(p.product_name)}"
-                  >`
-
-                  :
-
-                  esc(p.product_name)
+                ${p.image_url
+                  ? `<img src="${esc(p.image_url)}" alt="${esc(p.product_name)}">`
+                  : esc(p.product_name)
                 }
-
               </div>
 
+              <div class="pepStoreBody">
+                <h3>${esc(p.product_name)}</h3>
 
-              <h3>
-                ${esc(p.product_name)}
-              </h3>
+                <p class="muted">
+                  ${esc(p.description || "")}
+                </p>
 
+                <div class="pepStoreBottom">
+                  <div class="pepStarting">
+                    <small>Starting at</small>
+                    <b>${peso(lowest)}</b>
+                  </div>
 
-              <p class="muted">
-                ${esc(p.description || "")}
-              </p>
+                  <button
+                    class="btn primary pepSelectVariant"
+                    type="button"
+                    onclick="openProductPicker('${esc(p.product_id)}')"
+                  >
+                    SELECT VARIANT
+                  </button>
+                </div>
+              </div>
 
-
-              ${
-                variants
-                  .map(
-                    v => `
-
-                      <div class="variant">
-
-                        <span style="min-width:75px">
-
-                          <b>
-                            ${esc(v.strength)}
-                          </b>
-
-                          <br>
-
-                          <small>
-                            ${peso(v.price)}
-                          </small>
-
-                        </span>
-
-
-                        <input
-                          class="qty"
-                          type="number"
-                          min="${v.minimum_qty}"
-                          value="${v.minimum_qty}"
-                          id="qty-${esc(v.variant_id)}"
-                        >
-
-
-                        <button
-                          class="btn primary"
-                          onclick="addToCart(
-                            '${esc(p.product_id)}',
-                            '${esc(v.variant_id)}'
-                          )"
-                        >
-                          ADD
-                        </button>
-
-                      </div>
-
-
-                      <div class="minBadge">
-
-                        Minimum:
-                        ${v.minimum_qty}
-                        pc
-
-                      </div>
-
-                    `
-                  )
-                  .join("")
-              }
+              ${variants.map(
+                v => `
+                  <input
+                    type="hidden"
+                    id="qty-${esc(v.variant_id)}"
+                    value="${v.minimum_qty}"
+                  >
+                `
+              ).join("")}
 
             </article>
-
           `;
-
         }
       )
       .join("");
@@ -1357,6 +1302,291 @@ function renderProducts(){
 }
 
 
+/* =========================================================
+   PRODUCT VARIANT PICKER
+   ========================================================= */
+
+function openProductPicker(pid){
+
+  const product =
+    products.find(
+      p => p.product_id === pid
+    );
+
+  if(!product) return;
+
+  const variants =
+    (product.product_variants || [])
+      .filter(v => v.active);
+
+  if(!variants.length) return;
+
+  let selected =
+    variants[0];
+
+  let qty =
+    Math.max(
+      1,
+      Number(selected.minimum_qty || 1)
+    );
+
+  let modal =
+    $("pepProductPicker");
+
+  if(!modal){
+
+    modal =
+      document.createElement("div");
+
+    modal.id =
+      "pepProductPicker";
+
+    modal.className =
+      "pepProductPicker";
+
+    document.body.appendChild(modal);
+
+    modal.addEventListener(
+      "click",
+      e => {
+        if(e.target === modal){
+          modal.classList.remove("show");
+        }
+      }
+    );
+  }
+
+  const render = () => {
+
+    const minimum =
+      Math.max(
+        1,
+        Number(selected.minimum_qty || 1)
+      );
+
+    qty =
+      Math.max(minimum, Number(qty) || minimum);
+
+    modal.innerHTML =
+      `
+        <div class="pepPickerBox">
+
+          <button
+            class="pepPickerClose"
+            type="button"
+            onclick="document.getElementById('pepProductPicker').classList.remove('show')"
+          >
+            ×
+          </button>
+
+          <div class="pepPickerHead">
+
+            <div class="pepPickerImage">
+              ${product.image_url
+                ? `<img src="${esc(product.image_url)}" alt="${esc(product.product_name)}">`
+                : ""
+              }
+            </div>
+
+            <div>
+              <div class="eyebrow">PEPMOSA GROUP BUY</div>
+              <h2>${esc(product.product_name)}</h2>
+              <p class="muted">
+                ${esc(product.description || "Choose your preferred variant and quantity.")}
+              </p>
+            </div>
+
+          </div>
+
+          <div class="pepPickerLabel">
+            CHOOSE VARIANT
+          </div>
+
+          <div class="pepVariantChoices">
+
+            ${variants.map(
+              v => `
+
+                <button
+                  type="button"
+                  class="pepVariantChoice ${v.variant_id === selected.variant_id ? "selected" : ""}"
+                  onclick="window.__pepPickVariant('${esc(pid)}','${esc(v.variant_id)}')"
+                >
+
+                  <span>
+                    <b>${esc(v.strength)}</b>
+                    <small>
+                      Minimum ${Math.max(1, Number(v.minimum_qty || 1))} pc
+                    </small>
+                  </span>
+
+                  <strong>
+                    ${peso(v.price)}
+                  </strong>
+
+                </button>
+
+              `
+            ).join("")}
+
+          </div>
+
+          <div class="pepQuantityRow">
+
+            <div>
+              <div class="pepPickerLabel small">
+                QUANTITY
+              </div>
+
+              <div class="muted">
+                Minimum ${minimum} pc
+              </div>
+            </div>
+
+            <div class="pepStepper">
+
+              <button
+                type="button"
+                onclick="window.__pepChangeQty(-1)"
+              >
+                −
+              </button>
+
+              <input
+                id="pepPickerQty"
+                type="number"
+                min="${minimum}"
+                value="${qty}"
+              >
+
+              <button
+                type="button"
+                onclick="window.__pepChangeQty(1)"
+              >
+                +
+              </button>
+
+            </div>
+
+          </div>
+
+          <div class="pepPickerTotal">
+
+            <span>SUBTOTAL</span>
+
+            <b>
+              ${peso((Number(selected.price) || 0) * qty)}
+            </b>
+
+          </div>
+
+          <button
+            class="btn primary pepPickerAdd"
+            type="button"
+            onclick="window.__pepAddSelected()"
+          >
+            ADD TO CART
+          </button>
+
+        </div>
+      `;
+
+    modal.classList.add("show");
+
+    const qtyInput =
+      $("pepPickerQty");
+
+    qtyInput.addEventListener(
+      "input",
+      () => {
+
+        qty =
+          Math.max(
+            minimum,
+            Number(qtyInput.value) || minimum
+          );
+
+        render();
+      }
+    );
+  };
+
+  window.__pepPickVariant =
+    (productId, variantId) => {
+
+      if(productId !== pid) return;
+
+      selected =
+        variants.find(
+          v => v.variant_id === variantId
+        ) || variants[0];
+
+      qty =
+        Math.max(
+          1,
+          Number(selected.minimum_qty || 1)
+        );
+
+      render();
+    };
+
+  window.__pepChangeQty =
+    delta => {
+
+      const minimum =
+        Math.max(
+          1,
+          Number(selected.minimum_qty || 1)
+        );
+
+      const input =
+        $("pepPickerQty");
+
+      qty =
+        Math.max(
+          minimum,
+          (Number(input?.value) || qty) + delta
+        );
+
+      render();
+    };
+
+  window.__pepAddSelected =
+    () => {
+
+      const minimum =
+        Math.max(
+          1,
+          Number(selected.minimum_qty || 1)
+        );
+
+      const input =
+        $("pepPickerQty");
+
+      qty =
+        Math.max(
+          minimum,
+          Number(input?.value) || qty
+        );
+
+      const hidden =
+        $("qty-" + selected.variant_id);
+
+      if(hidden){
+        hidden.value = qty;
+      }
+
+      addToCart(
+        product.product_id,
+        selected.variant_id
+      );
+
+      modal.classList.remove("show");
+    };
+
+  render();
+
+}
 
 /* =========================================================
    ADD TO CART
@@ -1925,7 +2155,6 @@ load();
 
 <script src="storefront-repair.js"></script>
 <!-- Product picker version: 2026-09-02 -->
-<script src="product-picker.js?v=20260902-2"></script>
 <script src="checkout-polish.js"></script>
 </body>
 </html>

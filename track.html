@@ -55,11 +55,20 @@ initSupabase();
 const STATUSES=['ORDER RECEIVED','PAYMENT CONFIRMED','ORDER PROCESSING','IN TRANSIT TO THE PHILIPPINES','ARRIVED IN THE PHILIPPINES','RECEIVED AT WAREHOUSE','PACKING & LABELLING','HANDED OVER TO LOCAL COURIER','DELIVERED'];
 function $(id){return document.getElementById(id)}
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function asArray(v){
+ if(Array.isArray(v))return v;
+ if(typeof v==='string'){try{const p=JSON.parse(v);return Array.isArray(p)?p:[];}catch{return []}}
+ if(v&&typeof v==='object'){
+   if(Array.isArray(v.data))return v.data;
+   if(Array.isArray(v.items))return v.items;
+ }
+ return [];
+}
 function itemsFor(o,all){
- const oid=o.id??o.order_id;
- const nested=o.order_items||o.items||o.orderItems||o.details||[];
- if(Array.isArray(nested)&&nested.length)return nested;
- return all.filter(i=>String(i.order_id??i.order?.order_id??'')===String(oid));
+ const oid=String(o.id??o.order_id??'');
+ const nested=asArray(o.order_items||o.items||o.orderItems||o.details||[]);
+ if(nested.length)return nested;
+ return asArray(all).filter(i=>String(i.order_id??i.order?.order_id??'')===oid);
 }
 function itemLabel(i){return [i.product_name||i.products?.product_name||i.product?.product_name||i.products?.name||i.product?.name||'Product',i.strength||i.variant_name||i.product_variants?.strength||i.variant?.strength||''].filter(Boolean).join(' ').replace(/\s+/g,' ').trim()}
 function itemQty(i){return Number(i.quantity??i.qty??i.total_qty??1)||1}
@@ -71,10 +80,11 @@ async function track(){
  out.innerHTML='<div class="notice">✦ Finding all orders under this email…</div>';
  try{
   const r=await sb.rpc('get_customer_tracking',{p_email:email}); if(r.error)throw r.error;
-  const data=r.data||{};
-  const orders=Array.isArray(data.orders)?data.orders:(data.orders?.data||[]);
-  const shipments=Array.isArray(data.shipments)?data.shipments:(data.shipments?.data||[]);
-  const allItems=Array.isArray(data.order_items)?data.order_items:(Array.isArray(data.items)?data.items:[]);
+  let data=r.data||{};
+  if(typeof data==='string'){try{data=JSON.parse(data)}catch{data={}}}
+  const orders=asArray(data.orders);
+  const shipments=asArray(data.shipments);
+  const allItems=asArray(data.order_items||data.items);
   if(!orders.length&&!shipments.length){out.innerHTML='<div class="notice">No orders found for this email.</div>';return}
   const shipment=shipments.slice().sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0))[0]||{};
   const status=shipment.status||'ORDER RECEIVED',rawIndex=STATUSES.indexOf(status),ci=Math.max(0,rawIndex<0?0:rawIndex);
@@ -87,7 +97,9 @@ async function track(){
     const grouped=new Map();
     orderItems.forEach(i=>{const key=itemLabel(i).toUpperCase();grouped.set(key,(grouped.get(key)||0)+itemQty(i));totalItems+=itemQty(i)});
     const n=noteFor(o);if(n)notes.push(n);
-    const rows=[...grouped.entries()].map(([name,qty])=>'<div class="productRow"><span class="productName">'+esc(name)+'</span><span class="productQty">QTY '+qty+'</span></div>').join('')||'<div class="emptyItems">Order items are not available yet for this order.</div>';
+    const rows=[...grouped.entries()].map(([name,qty])=>'<div class="productRow"><span class="productName">'+esc(name)+'</span><span class="productQty">QTY '+qty+'</span></div>').join('');
+    const fallbackItems=!rows && allItems.length ? allItems.filter(i=>!i.order_id).map(i=>'<div class="productRow"><span class="productName">'+esc(itemLabel(i).toUpperCase())+'</span><span class="productQty">QTY '+itemQty(i)+'</span></div>').join('') : '';
+    const visibleRows=rows||fallbackItems||'<div class="emptyItems">No products are attached to this order yet.</div>';
     return '<div class="orderCard"><div class="orderCardTop"><div><div class="orderCardRef">ORDER # '+esc(oid)+'</div><div class="small">'+esc(o.gb_number||'PEPMOSA GROUP BUY')+'</div></div><div class="orderCardStatus">'+esc(o.payment_status||o.status||'ORDER RECEIVED')+'</div></div><div class="orderItems">'+rows+'</div></div>';
   }).join('');
   out.innerHTML='<div class="clientCard">'+

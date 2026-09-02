@@ -9,7 +9,7 @@ window.PEPMOSA_CONFIG = {
    overrides can break login and replace newer handlers. */
 (function(){
   'use strict';
-  const VERSION = '20260902-admin-stable';
+  const VERSION = '20260902-storefront-fee-fix';
   function loadOnce(file){
     if(!file || document.querySelector('script[data-pepmosa-stable="'+file+'"]')) return;
     const s=document.createElement('script');

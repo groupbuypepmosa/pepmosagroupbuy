@@ -130,26 +130,31 @@
       });
     }
   },true);
-  window.pepAddToCart=async function(pid,vid){
-    // HARD ACCESS GATE: products cannot enter the cart until the Admin Fee
-    // is approved AND the customer has verified the same paid email.
+  // Shared hard gate used by EVERY cart entry point, including Kit Completion.
+  window.pepRequireApprovedFee=async function(){
     const email=(verifiedEmail||localStorage.getItem('pepmosa_verified_email')||'').trim().toLowerCase();
     if(!email){
       info('Admin Fee Required','Please pay and verify your approved Admin Fee email before adding products to your cart.');
-      return;
+      return false;
     }
     const access=await checkAccessByEmail(email);
-    if(!access||access.status!=='PAID'){
+    if(!access||String(access.status||'').toUpperCase()!=='PAID'){
       verifiedEmail='';
+      feePayment=null;
       localStorage.removeItem('pepmosa_verified_email');
       info('Admin Fee Required','Your Admin Fee is not approved for this email yet. Please complete payment and wait for approval before ordering.');
       await refreshFeeState(false);
-      return;
+      return false;
     }
     verifiedEmail=email;
     feePayment=access;
     localStorage.setItem('pepmosa_verified_email',email);
     localStorage.setItem('pepmosa_customer_email',email);
+    return true;
+  };
+
+  window.pepAddToCart=async function(pid,vid){
+    if(!await window.pepRequireApprovedFee()) return;
     const p=products.find(x=>x.product_id===pid),v=p?.product_variants?.find(x=>x.variant_id===vid);if(!p||!v)return;const min=minFor(vid,p.category);let q=Math.max(min,Number($('pepQty_'+vid)?.value||min));let cart=JSON.parse(localStorage.pepmosaCart||'[]');const old=cart.find(x=>x.variant_id===vid&&x.gb_number===gb.gb_number);if(gb?.status==='KIT_COMPLETION'){const remaining=Number(v.remaining_qty||0),already=Number(old?.qty||0),available=Math.max(0,remaining-already);if(available<1)return info('Sold Out','All remaining vials for this variant are already in your cart or no longer available.');q=Math.min(q,available);if(q<1)return info('Sold Out','No remaining vials are available for this variant.')}if(old)old.qty+=q;else cart.push({gb_number:gb.gb_number,product_id:pid,variant_id:vid,product_name:p.product_name,strength:v.strength,unit_price:Number(v.price),qty:q});localStorage.pepmosaCart=JSON.stringify(cart);if(typeof window.renderCart==='function')window.renderCart();if($('cartCount'))$('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0);info('Added to Cart',q+' × '+p.product_name+' '+v.strength+(gb?.status==='KIT_COMPLETION'?' (limited to available remaining vials)':'')+' added to your cart.')};
   function hookCheckout(){if(typeof window.checkout!=='function'||window.checkout.__pepStableGuard)return;const original=window.checkout;window.checkout=async function(){return original()};window.checkout.__pepStableGuard=true}
   function hookPlaceOrder(){if(typeof window.placeOrder!=='function'||window.placeOrder.__pepStableGuard)return;const original=window.placeOrder;window.placeOrder=async function(){if($('email')&&verifiedEmail)$('email').value=verifiedEmail;return original()};window.placeOrder.__pepStableGuard=true}

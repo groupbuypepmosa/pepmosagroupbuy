@@ -1,4 +1,6 @@
-/* PEPMOSA KIT COMPLETION — single live source of truth per variant. */
+/* PEPMOSA KIT COMPLETION — isolated live per-variant guard.
+   Uses the SAME RPC inventory source as storefront-repair.js so the picker
+   cannot disagree with the product cards. */
 (function(){
   'use strict';
 
@@ -9,12 +11,35 @@
   let inventory=new Map();
   let booted=false;
   let checkoutPatched=false;
+  let cachedGB=null;
 
-  const getGB=()=>window.currentGB||null;
-  const getProducts=()=>Array.isArray(window.products)?window.products:[];
+  function getGB(){
+    try{ if(typeof currentGB!=='undefined' && currentGB) return currentGB; }catch(_){}
+    return window.currentGB||cachedGB||null;
+  }
 
-  function isKitMode(){
-    const gb=getGB();
+  function getProducts(){
+    try{ if(typeof products!=='undefined' && Array.isArray(products)) return products; }catch(_){}
+    return Array.isArray(window.products)?window.products:[];
+  }
+
+  async function ensureGB(){
+    const existing=getGB();
+    if(existing) return existing;
+    if(!window.sb) return null;
+    const r=await window.sb.from('group_buys')
+      .select('*')
+      .in('status',['OPEN','KIT_COMPLETION'])
+      .order('created_at',{ascending:false})
+      .limit(1)
+      .maybeSingle();
+    if(r.error){ console.warn('Kit Completion GB lookup:',r.error); return null; }
+    cachedGB=r.data||null;
+    if(cachedGB) window.currentGB=cachedGB;
+    return cachedGB;
+  }
+
+  function isKitMode(gb=getGB()){
     return !!gb && String(gb.status||'').toUpperCase()==='KIT_COMPLETION';
   }
 
@@ -23,31 +48,22 @@
   }
 
   async function refreshInventory(){
-    const gb=getGB();
-    if(!window.sb || !gb || !isKitMode()) return false;
+    const gb=await ensureGB();
+    if(!window.sb || !gb || !isKitMode(gb)) return false;
 
-    let q=await window.sb.from('kit_inventory')
-      .select('variant_id,remaining_qty')
-      .eq('gb_number',gb.gb_number)
-      .gt('remaining_qty',0);
+    /* IMPORTANT: storefront-repair.js already uses this RPC.
+       Do not read kit_inventory directly here, because that was the source
+       of the false "no remaining vials" mismatch. */
+    const r=await window.sb.rpc('get_kit_completion_inventory',{
+      p_gb_number:gb.gb_number
+    });
 
-    if(q.error){
-      console.error('Kit Completion inventory error:',q.error);
+    if(r.error){
+      console.error('Kit Completion inventory RPC error:',r.error);
       return false;
     }
 
-    /* Initialize only when the table has no rows yet. */
-    if(!(q.data||[]).length){
-      const init=await window.sb.rpc('initialize_kit_completion_inventory',{p_gb_number:gb.gb_number});
-      if(init.error) console.warn('Kit Completion initialize:',init.error);
-      q=await window.sb.from('kit_inventory')
-        .select('variant_id,remaining_qty')
-        .eq('gb_number',gb.gb_number)
-        .gt('remaining_qty',0);
-      if(q.error) return false;
-    }
-
-    inventory=new Map((q.data||[]).map(row=>[
+    inventory=new Map((r.data||[]).map(row=>[
       String(row.variant_id),
       Math.max(0,Number(row.remaining_qty||0))
     ]));
@@ -60,7 +76,8 @@
 
   function renderSummary(){
     const status=$('gbStatus');
-    if(!status || !isKitMode()) return;
+    const gb=getGB();
+    if(!status || !isKitMode(gb)) return;
 
     status.innerHTML=
       '<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:7px">'+
@@ -68,31 +85,70 @@
         '<b>Complete the remaining vials</b>'+
       '</div>'+
       '<div class="muted" style="line-height:1.55">'+
-        'Each <b>mg/variant is tracked separately</b>. Only variants with remaining vials are available, and you may order from <b>1 vial up to the exact live remaining quantity</b>.'+
+        'Each <b>mg/variant is tracked separately</b>. Every variant has its own 10-vial kit count. You can order from <b>1 vial up to the exact live remaining quantity</b> for that specific mg/variant.'+
       '</div>';
   }
 
   function filterStorefront(){
-    if(!isKitMode()) return;
+    const gb=getGB();
+    if(!isKitMode(gb)) return;
     const grid=$('productGrid');
-    if(!grid) return;
+    if(!grid || !inventory.size) return;
 
     for(const card of grid.querySelectorAll('[data-product-id]')){
-      const product=getProducts().find(p=>String(p.product_id)===String(card.dataset.productId));
-      const hasAvailable=!!product && (product.product_variants||[]).some(v=>v.active!==false && availableFor(v.variant_id)>0);
-      card.style.display=hasAvailable?'':'none';
+      const pid=String(card.dataset.productId);
+      const product=getProducts().find(p=>String(p.product_id)===pid);
+      /* storefront-repair.js owns the cards. Only hide a card when we can
+         positively match its variants against the live RPC inventory. */
+      if(product){
+        const hasAvailable=(product.product_variants||[]).some(v=>availableFor(v.variant_id)>0);
+        card.style.display=hasAvailable?'':'none';
+      }
     }
   }
 
-  async function openPicker(productId){
-    const product=getProducts().find(p=>String(p.product_id)===String(productId));
+  async function fetchProduct(productId){
+    if(!window.sb) return null;
+    const p=await window.sb.from('products')
+      .select('product_id,product_name,description,image_url,active')
+      .eq('product_id',productId)
+      .maybeSingle();
+    if(p.error || !p.data) return null;
+
+    const v=await window.sb.from('product_variants')
+      .select('variant_id,product_id,strength,price,active')
+      .eq('product_id',productId)
+      .eq('active',true);
+
+    if(v.error) return null;
+    return {...p.data,product_variants:v.data||[]};
+  }
+
+  async function openPicker(productId, productOverride){
+    /* storefront-repair.js passes the actual product object here.
+       Keep that object first so we do not depend on another script's globals. */
+    let product=productOverride ||
+      getProducts().find(p=>String(p.product_id)===String(productId)) ||
+      null;
+
+    if(!product) product=await fetchProduct(productId);
     if(!product) return alert('Product not found.');
 
-    /* Always refresh here. This prevents stale or mismatched counts from causing a false SOLD OUT alert. */
-    await refreshInventory();
+    const inventoryLoaded=await refreshInventory();
 
-    const variants=(product.product_variants||[])
-      .filter(v=>v.active!==false && availableFor(v.variant_id)>0);
+    let variants=(product.product_variants||[])
+      .filter(v=>v.active!==false)
+      .filter(v=>availableFor(v.variant_id)>0);
+
+    /* If the RPC call itself failed, preserve the already-live remaining_qty
+       attached by storefront-repair.js instead of showing a false sold-out alert. */
+    if(!variants.length && !inventoryLoaded){
+      variants=(product.product_variants||[])
+        .filter(v=>v.active!==false && Number(v.remaining_qty||0)>0);
+      if(variants.length){
+        for(const v of variants) inventory.set(String(v.variant_id),Number(v.remaining_qty||0));
+      }
+    }
 
     if(!variants.length){
       filterStorefront();
@@ -108,7 +164,9 @@
       modal.id='pepProductPicker';
       modal.className='pepProductPicker';
       document.body.appendChild(modal);
-      modal.addEventListener('click',e=>{ if(e.target===modal) modal.classList.remove('show'); });
+      modal.addEventListener('click',e=>{
+        if(e.target===modal) modal.classList.remove('show');
+      });
     }
 
     const cartFor=id=>JSON.parse(localStorage.pepmosaCart||'[]')
@@ -117,7 +175,7 @@
     const render=()=>{
       const inCart=Number(cartFor(selected.variant_id)?.qty||0);
       const live=Math.max(0,availableFor(selected.variant_id)-inCart);
-      qty=Math.max(1,Math.min(live||1,Number(qty)||1));
+      qty=Math.max(1,Math.min(Math.max(1,live),Number(qty)||1));
 
       modal.innerHTML=
         '<div class="pepPickerBox">'+
@@ -139,7 +197,7 @@
             '<div class="pepStepper"><button id="pepMinus" type="button">−</button><input id="pepPickerQty" type="number" min="1" max="'+Math.max(1,live)+'" value="'+qty+'"><button id="pepPlus" type="button">+</button></div>'+
           '</div>'+
           '<div class="pepPickerTotal"><span>SUBTOTAL</span><b>'+money(Number(selected.price||0)*qty)+'</b></div>'+
-          '<button class="btn primary pepPickerAdd" type="button" '+(live<1?'disabled':'')+'>'+ (live<1?'SOLD OUT':'ADD TO CART') +'</button>'+
+          '<button class="btn primary pepPickerAdd" type="button" '+(live<1?'disabled':'')+'>'+(live<1?'SOLD OUT':'ADD TO CART')+'</button>'+
         '</div>';
 
       modal.querySelector('.pepPickerClose').onclick=()=>modal.classList.remove('show');
@@ -150,34 +208,43 @@
         render();
       });
 
-      $('pepMinus').onclick=()=>{ qty=Math.max(1,qty-1); render(); };
-      $('pepPlus').onclick=()=>{ qty=Math.min(Math.max(1,live),qty+1); render(); };
-      $('pepPickerQty').onchange=e=>{ qty=Math.max(1,Math.min(Math.max(1,live),Number(e.target.value)||1)); render(); };
+      $('pepMinus').onclick=()=>{qty=Math.max(1,qty-1);render();};
+      $('pepPlus').onclick=()=>{qty=Math.min(Math.max(1,live),qty+1);render();};
+      $('pepPickerQty').onchange=e=>{
+        qty=Math.max(1,Math.min(Math.max(1,live),Number(e.target.value)||1));
+        render();
+      };
 
       modal.querySelector('.pepPickerAdd').onclick=async()=>{
-        /* One last live check before adding to cart. */
-        await refreshInventory();
-        const fresh=Math.max(0,availableFor(selected.variant_id)-Number(cartFor(selected.variant_id)?.qty||0));
+        /* Final live refresh before cart write. */
+        const ok=await refreshInventory();
+        if(!ok) return alert('Unable to refresh remaining vials. Please try again.');
+
+        const already=Number(cartFor(selected.variant_id)?.qty||0);
+        const fresh=Math.max(0,availableFor(selected.variant_id)-already);
         if(fresh<1) return render();
 
         qty=Math.min(qty,fresh);
         const cart=JSON.parse(localStorage.pepmosaCart||'[]');
         const existing=cart.find(x=>String(x.variant_id)===String(selected.variant_id));
 
-        if(existing) existing.qty=Math.min(fresh+Number(existing.qty||0),Number(existing.qty||0)+qty);
-        else cart.push({
-          gb_number:getGB()?.gb_number||'',
-          product_id:product.product_id,
-          variant_id:selected.variant_id,
-          product_name:product.product_name,
-          strength:selected.strength,
-          unit_price:Number(selected.price||0),
-          price:Number(selected.price||0),
-          qty
-        });
+        if(existing){
+          existing.qty=Math.min(availableFor(selected.variant_id),Number(existing.qty||0)+qty);
+        }else{
+          cart.push({
+            gb_number:getGB()?.gb_number||'',
+            product_id:product.product_id,
+            variant_id:selected.variant_id,
+            product_name:product.product_name,
+            strength:selected.strength,
+            price:Number(selected.price||0),
+            unit_price:Number(selected.price||0),
+            qty
+          });
+        }
 
         localStorage.pepmosaCart=JSON.stringify(cart);
-        window.cart=cart;
+        try{ if(typeof cart!=='undefined') window.cart=cart; }catch(_){}
         if(typeof window.updateCart==='function') window.updateCart();
         modal.classList.remove('show');
         if(typeof window.openCart==='function') window.openCart();
@@ -189,17 +256,25 @@
   }
 
   function patchCheckout(){
-    if(checkoutPatched || typeof window.placeOrder!=='function' || !isKitMode()) return;
+    if(checkoutPatched || typeof window.placeOrder!=='function') return;
+    const gb=getGB();
+    if(!isKitMode(gb)) return;
+
     checkoutPatched=true;
-
     const original=window.placeOrder;
+
     window.placeOrder=async function(){
-      const cart=JSON.parse(localStorage.pepmosaCart||'[]');
-      if(!cart.length) return original();
+      const currentCart=JSON.parse(localStorage.pepmosaCart||'[]');
+      if(!currentCart.length) return original();
 
-      await refreshInventory();
+      const ok=await refreshInventory();
+      if(!ok){
+        const msg=$('checkoutMsg');
+        if(msg){msg.className='notice error';msg.textContent='Unable to verify live Kit Completion availability. Please try again.';}
+        return;
+      }
 
-      for(const item of cart){
+      for(const item of currentCart){
         const live=availableFor(item.variant_id);
         if(Number(item.qty)>live){
           const msg=$('checkoutMsg');
@@ -211,42 +286,41 @@
         }
       }
 
-      /* The existing checkout flow remains in charge of creating the order.
-         This guard only prevents quantities above the live remaining stock. */
       return original();
     };
+
+    window.placeOrder.__pepKitGuard=true;
   }
 
   async function boot(){
     if(booted) return;
 
     for(let i=0;i<150;i++){
-      if(window.sb && getGB()) break;
+      const gb=await ensureGB();
+      if(window.sb && gb) break;
       await new Promise(r=>setTimeout(r,100));
     }
 
-    if(!window.sb || !getGB() || !isKitMode()) return;
+    const gb=await ensureGB();
+    if(!window.sb || !gb || !isKitMode(gb)) return;
 
     booted=true;
     await refreshInventory();
 
-    /* This is the ONLY picker used by the storefront in Kit Completion mode. */
+    /* storefront-repair.js checks these names when CHOOSE VARIANT is clicked. */
     window.openProductPicker=openPicker;
     window.pepOpenProductPicker=openPicker;
 
     patchCheckout();
 
-    const grid=$('productGrid');
-    if(grid && !grid.dataset.pepKitObserver){
-      const observer=new MutationObserver(()=>filterStorefront());
-      observer.observe(grid,{childList:true,subtree:true});
-      grid.dataset.pepKitObserver='1';
-    }
-
-    /* Product loading can finish after this script. Keep the live filter in sync. */
+    /* Keep our picker installed even if another legacy script reassigns it. */
     setInterval(()=>{
-      if(isKitMode()) filterStorefront();
-    },700);
+      const liveGB=getGB();
+      if(!isKitMode(liveGB)) return;
+      if(window.pepOpenProductPicker!==openPicker) window.pepOpenProductPicker=openPicker;
+      if(window.openProductPicker!==openPicker) window.openProductPicker=openPicker;
+      patchCheckout();
+    },500);
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});

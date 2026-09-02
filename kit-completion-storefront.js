@@ -10,8 +10,12 @@
   let active=false;
   let patched=false;
 
+  const getGB=()=>typeof currentGB!=='undefined' ? currentGB : window.currentGB;
+  const getProducts=()=>typeof products!=='undefined' && Array.isArray(products) ? products : getProducts();
+  const setProducts=next=>{ try{ if(typeof products!=='undefined') products=next; }catch(e){} window.products=next; };
+
   function isKitMode(){
-    const gb=window.currentGB;
+    const gb=getGB();
     return !!gb && String(gb.status||'').toUpperCase()==='KIT_COMPLETION';
   }
 
@@ -33,7 +37,7 @@
       .filter(([,x])=>Number(x.remaining)>0)
       .map(([vid,x])=>{
         let label='';
-        for(const p of (window.products||[])){
+        for(const p of getProducts()){
           const v=(p.product_variants||[]).find(z=>String(z.variant_id)===String(vid));
           if(v){label=(p.product_name||'')+' '+(v.strength||'');break;}
         }
@@ -58,7 +62,7 @@
     active=isKitMode();
     if(!active) return false;
 
-    const gbNumber=window.currentGB.gb_number;
+    const gbNumber=getGB().gb_number;
 
     let r=await window.sb.from('kit_inventory')
       .select('variant_id,remaining_qty,kit_size')
@@ -87,7 +91,7 @@
       {remaining:Math.max(0,Number(x.remaining_qty||0)),kitSize:Number(x.kit_size||10)}
     ]));
 
-    for(const p of (window.products||[])){
+    for(const p of getProducts()){
       p.product_variants=(p.product_variants||[])
         .map(v=>{
           const rec=inventory.get(String(v.variant_id));
@@ -96,7 +100,7 @@
         .filter(v=>v.active!==false && Number(v.__remaining)>0);
     }
 
-    window.products=(window.products||[]).filter(p=>(p.product_variants||[]).length);
+    window.products=getProducts().filter(p=>(p.product_variants||[]).length);
 
     const st=$('gbStatus');
     if(st){
@@ -108,7 +112,7 @@
   }
 
   function picker(pid,override){
-    const product=override||(window.products||[]).find(p=>String(p.product_id)===String(pid));
+    const product=override||getProducts().find(p=>String(p.product_id)===String(pid));
     if(!product) return alert('Product not found.');
 
     const variants=(product.product_variants||[])
@@ -181,7 +185,7 @@
         }
 
         const item={
-          gb_number:window.currentGB?.gb_number||'',
+          gb_number:getGB()?.gb_number||'',
           product_id:product.product_id,
           variant_id:selected.variant_id,
           product_name:product.product_name,
@@ -253,7 +257,7 @@
             if(Number(item.qty)>max) throw new Error('Only '+max+' vial(s) remaining for '+item.strength+'.');
 
             const rr=await window.sb.rpc('reserve_kit_units',{
-              p_gb_number:window.currentGB.gb_number,
+              p_gb_number:getGB().gb_number,
               p_variant_id:item.variant_id,
               p_quantity:Number(item.qty),
               p_customer_id:customer.customer_id
@@ -282,7 +286,7 @@
 
   async function boot(){
     for(let i=0;i<100;i++){
-      if(window.sb && window.currentGB && Array.isArray(window.products)){
+      if(window.sb && getGB() && Array.isArray(getProducts())){
         const ok=await loadInventory();
         if(ok){
           if(typeof window.renderProducts==='function') window.renderProducts();

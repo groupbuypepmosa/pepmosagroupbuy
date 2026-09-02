@@ -86,7 +86,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 <header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a><nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a><a href="coa.html">COA</a></nav></header>
 <section id="loginScreen" class="loginScreen"><div class="loginBox"><div class="loginLogo"><span>PEPMOSA</span></div><div class="loginSubtitle">Administrator Login</div><div id="loginMsg"></div><div class="field"><label>Email</label><input id="loginEmail" type="email" autocomplete="username" placeholder="Admin email"></div><br><div class="field"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password" onkeydown="if(event.key==='Enter')login()"></div><div class="actions"><button class="btn primary" style="width:100%" type="button" onclick="login()">LOGIN</button></div></div></section>
 <main id="adminApp" class="adminPage" style="display:none"><div class="adminHeader"><div class="adminTitle"><div class="eyebrow">PEPMOSA ADMIN</div><h1>Control Panel</h1><p id="signedInAs"></p></div><button class="btn dark" onclick="logout()">LOG OUT</button></div><div id="globalMsg"></div>
-<div class="tabs"><button class="tab active" data-panel="gbPanel" onclick="openTab(this)">GROUP BUY</button><button class="tab" data-panel="categoriesPanel" onclick="openTab(this)">CATEGORIES</button><button class="tab" data-panel="productsPanel" onclick="openTab(this)">PRODUCTS</button><button class="tab" data-panel="feesPanel" onclick="openTab(this)">PAYMENTS</button><button class="tab" data-panel="ordersPanel" onclick="openTab(this)">ORDERS</button><button class="tab" data-panel="trackingPanel" onclick="openTab(this)">TRACKING</button><button class="tab" data-panel="waybillPanel" onclick="openTab(this)">WAYBILL</button><button class="tab" data-panel="vialTrackerPanel" onclick="openTab(this)">VIAL TRACKER</button></div>
+<div class="tabs"><button class="tab active" data-panel="gbPanel" onclick="openTab(this)">GROUP BUY</button><button class="tab" data-panel="categoriesPanel" onclick="openTab(this)">CATEGORIES</button><button class="tab" data-panel="productsPanel" onclick="openTab(this)">PRODUCTS</button><button class="tab" data-panel="feesPanel" onclick="openTab(this)">PAYMENTS</button><button class="tab" data-panel="ordersPanel" onclick="openTab(this)">ORDERS</button><button class="tab" data-panel="trackingPanel" onclick="openTab(this)">TRACKING</button><button class="tab" data-panel="waybillPanel" onclick="openTab(this)">WAYBILL</button><button class="tab" data-panel="vialTrackerPanel" onclick="openTab(this)">VIAL TRACKER</button><button class="tab" data-panel="documentsPanel" onclick="openTab(this)">COA & PROTOCOLS</button></div>
 <section id="gbPanel" class="panel active"><div class="card"><h2>Create / Edit Group Buy</h2><input id="editingGBId" type="hidden"><div class="grid"><div class="field"><label>GB Number *</label><input id="gbNumber" placeholder="GB-001"></div><div class="field"><label>Customer-Facing Name</label><input id="gbName" placeholder="September Group Buy"></div><div class="field"><label>Admin Fee</label><input id="gbAdminFee" type="number" min="0" step="0.01" value="0"></div><div class="field"><label>Status *</label><select id="gbStatus"><option value="OPEN">OPEN</option><option value="CLOSED">CLOSED</option><option value="KIT_COMPLETION">KIT COMPLETION</option></select></div></div><hr><h3>Admin Fee QR</h3><div class="fileBox"><input id="adminQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('adminQrFile','adminQrPreview')"><br><br><img id="adminQrPreview" class="qrPreview" style="display:none"></div><br><h3>Final Payment QR</h3><div class="fileBox"><input id="finalQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('finalQrFile','finalQrPreview')"><br><br><img id="finalQrPreview" class="qrPreview" style="display:none"></div><div class="actions"><button class="btn primary" onclick="saveGroupBuy()">SAVE GROUP BUY</button><button class="btn secondary" onclick="clearGBForm()">NEW</button></div></div><div class="card"><h2>Group Buys</h2><div id="gbList">Loading...</div></div></section>
 <section id="categoriesPanel" class="panel"><div class="card"><h2>Categories</h2><div class="grid"><div class="field"><label>New Category</label><input id="newCategory" placeholder="Peptides"></div></div><div class="actions"><button class="btn primary" onclick="addCategory()">ADD CATEGORY</button></div><div id="categoryList"></div></div><div class="card"><h2>GB Category Minimum</h2><p class="muted">Set the minimum once per category for this GB. Every active product/variant inside that category automatically follows this minimum.</p><div class="field"><label>Select Group Buy</label><select id="minimumGB" onchange="loadCategoryMinimums()"><option value="">Select GB</option></select></div><br><div id="minimumList">Select a Group Buy.</div><div class="actions"><button class="btn primary" onclick="saveCategoryMinimums()">SAVE MINIMUMS</button></div></div></section>
 <section id="productsPanel" class="panel"><div class="card"><h2>Add Product</h2><p class="muted">Product and variant IDs are generated automatically.</p><div class="grid"><div class="field"><label>Product Name *</label><input id="productName" placeholder="Tirzepatide"></div><div class="field"><label>Category *</label><select id="productCategory"><option value="">Select category</option></select></div><div class="field"><label>Product Image</label><input id="productImageFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('productImageFile','productImagePreview')"><img id="productImagePreview" class="qrPreview" style="display:none;max-width:140px;max-height:140px"></div><div class="field full"><label>Description</label><textarea id="productDescription"></textarea></div></div><div class="variantEditor"><div class="itemHead"><div><h3 style="margin-bottom:4px">Variants & Prices</h3><div class="small">Add all strengths/variants and their prices here.</div></div><button class="btn secondary" type="button" onclick="addVariantEditorRow()">+ ADD VARIANT</button></div><div id="variantEditorRows"></div></div><div class="actions"><button class="btn primary" onclick="addProduct()">ADD PRODUCT</button></div></div><div class="card"><h2>Products</h2><input id="productSearch" class="search" placeholder="Search product..." oninput="renderProducts()"><div id="productList">Loading...</div></div></section>
@@ -133,15 +133,16 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
     </div>
   </div>
 </section>
-<section id="vialTrackerPanel" class="panel"><div class="card"><h2>Vial / Order Tracker</h2><p class="muted">Consolidated by product + variant. Shows total ordered units, distinct total orders, customers, and total kits (10 pcs = 1 kit).</p><div class="grid"><div class="field"><label>Group Buy</label><select id="vialTrackerGB" onchange="loadVialTracker()"><option value="">All Group Buys</option></select></div><div class="field"><label>Search Product / Variant</label><input id="vialTrackerSearch" placeholder="Search..." oninput="renderVialTracker()"></div></div><div id="vialTrackerResults" style="margin-top:18px">Select a Group Buy or use All Group Buys.</div></div></section>
+<section id="vialTrackerPanel" class="panel"><div class="card"><h2>Vial / Order Tracker</h2><p class="muted">Consolidated by product + variant. 10 vials = 1 kit, with remaining vials needed to complete the next kit.</p><div class="grid"><div class="field"><label>Group Buy</label><select id="vialTrackerGB" onchange="loadVialTracker()"><option value="">All Group Buys</option></select></div><div class="field"><label>Search Product / Variant</label><input id="vialTrackerSearch" placeholder="Search..." oninput="renderVialTracker()"></div></div><div id="vialTrackerResults" style="margin-top:18px">Select a Group Buy or use All Group Buys.</div></div></section>
+<section id="documentsPanel" class="panel"><div class="card"><h2>COA & Protocol Library</h2><p class="muted">Upload files directly from your device. No URL required.</p><div class="grid"><div class="field"><label>Document Type *</label><select id="docType"><option value="COA">COA</option><option value="PROTOCOL">PROTOCOL</option></select></div><div class="field"><label>Title *</label><input id="docTitle"></div><div class="field full"><label>Product / Reference</label><input id="docProduct"></div><div class="field full"><label>Upload File *</label><input id="docFile" type="file" accept=".pdf,image/png,image/jpeg,image/webp"></div></div><div class="actions"><button class="btn primary" type="button" onclick="uploadLibraryDocument()">UPLOAD DOCUMENT</button></div></div><div class="card"><h2>Uploaded Documents</h2><div id="documentAdminList">Loading...</div></div></section>
 <div id="productEditModal" class="editModal" onclick="if(event.target===this)closeProductEdit()"><div class="editModalCard"><div class="itemHead"><div><div class="eyebrow">PEPMOSA ADMIN</div><h2>Edit Product</h2><div class="small">Update product details and prices.</div></div><button class="btn secondary" type="button" onclick="closeProductEdit()">CLOSE</button></div><div class="grid" style="margin-top:18px"><div class="field"><label>Product Name *</label><input id="editProductName"></div><div class="field"><label>Category *</label><select id="editProductCategory"></select></div><div class="field full"><label>Description</label><textarea id="editProductDescription"></textarea></div></div><div style="margin-top:18px"><h3 style="margin-bottom:6px">Variants & Prices</h3><div class="small">You can update prices directly here.</div><div id="editProductVariants"></div></div><div class="actions"><button class="btn primary" type="button" onclick="saveProductEdit()">SAVE CHANGES</button><button class="btn secondary" type="button" onclick="closeProductEdit()">CANCEL</button></div></div></div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260902-waybill-center"></script><script src="supabase.js?v=20260902-waybill-center"></script><script>
 if(typeof initSupabase==="function")initSupabase();else 
 document.addEventListener("DOMContentLoaded",()=>{if(typeof initSupabase==="function")initSupabase()});
-let categories=[],groupBuys=[],products=[],fees=[],ordersCache=[],orderItemsCache=[],customersCache=[],currentShipment=null,vialTrackerRows=[],waybillRows=[],selectedWaybillBuyer=null;
+let categories=[],groupBuys=[],products=[],fees=[],ordersCache=[],orderItemsCache=[],customersCache=[],currentShipment=null,vialTrackerRows=[],waybillRows=[],selectedWaybillBuyer=null,libraryDocuments=[];
 const TRACKING_STATUSES=["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING","IN TRANSIT TO THE PHILIPPINES","ARRIVED IN THE PHILIPPINES","RECEIVED AT WAREHOUSE","PACKING & LABELLING","HANDED OVER TO LOCAL COURIER","DELIVERED"];
 function $(id){return document.getElementById(id)}function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}function peso(v){return "₱"+Number(v||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2})}function showMessage(m,t=""){$("globalMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`;window.scrollTo({top:0,behavior:"smooth"});setTimeout(()=>$("globalMsg").innerHTML="",5000)}function showLoginMessage(m,t="error"){$("loginMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`}function previewFile(i,p){const f=$(i).files[0];if(!f)return;$(p).src=URL.createObjectURL(f);$(p).style.display="block"}
-function openTab(b){const target=b.dataset.panel;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(target)?.classList.add("active");if(target==="vialTrackerPanel")loadVialTracker();if(target==="ordersPanel")loadOrdersCenter();if(target==="trackingPanel")loadTrackingDashboard();if(target==="waybillPanel")loadWaybillCenter()}
+function openTab(b){const target=b.dataset.panel;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(target)?.classList.add("active");if(target==="vialTrackerPanel")loadVialTracker();if(target==="ordersPanel")loadOrdersCenter();if(target==="trackingPanel")loadTrackingDashboard();if(target==="waybillPanel")loadWaybillCenter();if(target==="documentsPanel")loadLibraryDocuments()}
 function enterAdmin(user){
   const loginScreen=$("loginScreen"), adminApp=$("adminApp");
   if(loginScreen) loginScreen.style.display="none";
@@ -443,120 +444,24 @@ async function rejectFeePayment(id){if(!confirm("Reject this Admin Fee payment?"
 async function approveCheckoutPayment(orderId){try{const{error}=await sb.from("orders").update({payment_status:"PAID",admin_note:"Payment approved by admin"}).eq("order_id",orderId);if(error)throw error;await loadOrders();showMessage("Checkout payment approved.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to approve checkout payment.","error")}}
 async function rejectCheckoutPayment(orderId){if(!confirm("Reject this checkout payment?"))return;try{const{error}=await sb.from("orders").update({payment_status:"REJECTED",admin_note:"Payment rejected by admin"}).eq("order_id",orderId);if(error)throw error;await loadOrders();showMessage("Checkout payment rejected.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to reject checkout payment.","error")}}
 async function loadVialTracker(){
-  const gb=$("vialTrackerGB").value;
-  try{
-    let q=sb.from("orders").select("order_id,gb_number,email,created_at").order("created_at",{ascending:true});
-    if(gb)q=q.eq("gb_number",gb);
-    const{data:orders,error:oe}=await q;
-    if(oe)throw oe;
-
-    const ids=(orders||[]).map(o=>o.order_id);
-    if(!ids.length){
-      vialTrackerRows=[];
-      return renderVialTracker();
-    }
-
-    const orderById=new Map((orders||[]).map(o=>[o.order_id,o]));
-    const{data:items,error:ie}=await sb.from("order_items")
-      .select("order_id,product_id,variant_id,product_name,strength,qty")
-      .in("order_id",ids);
-    if(ie)throw ie;
-
-    const map=new Map();
-    for(const item of items||[]){
-      const key=[item.product_id||item.product_name,item.variant_id||item.strength||""].join("::");
-      if(!map.has(key)){
-        map.set(key,{
-          product_id:item.product_id||"",
-          product_name:item.product_name||"",
-          variant_id:item.variant_id||"",
-          strength:item.strength||"",
-          qty:0,
-          orderIds:new Set(),
-          emails:new Set()
-        });
-      }
-      const row=map.get(key);
-      row.qty+=Number(item.qty||0);
-      row.orderIds.add(item.order_id);
-      const o=orderById.get(item.order_id);
-      if(o?.email)row.emails.add(o.email.toLowerCase());
-    }
-
-    const{data:pd,error:pe}=await sb.from("products").select("product_id,category");
-    if(pe)throw pe;
-    const pc=new Map((pd||[]).map(p=>[p.product_id,p.category||""]));
-
-    vialTrackerRows=[...map.values()].map(r=>({
-      ...r,
-      category:pc.get(r.product_id)||"",
-      totalOrders:r.orderIds.size,
-      totalKits:Math.floor(Number(r.qty||0)/10),
-      loosePieces:Number(r.qty||0)%10
-    }));
-
-    renderVialTracker();
-  }catch(e){
-    console.error(e);
-    $("vialTrackerResults").innerHTML=`<div class="notice error">${esc(e.message||"Unable to load vial tracker.")}</div>`;
-  }
+ const gb=$("vialTrackerGB").value;
+ try{
+  let q=sb.from("orders").select("order_id,gb_number").order("created_at",{ascending:true});if(gb)q=q.eq("gb_number",gb);
+  const{data:orders,error:oe}=await q;if(oe)throw oe;const ids=(orders||[]).map(o=>o.order_id);if(!ids.length){vialTrackerRows=[];return renderVialTracker();}
+  const{data:items,error:ie}=await sb.from("order_items").select("product_id,variant_id,product_name,strength,qty").in("order_id",ids);if(ie)throw ie;
+  const map=new Map();for(const item of items||[]){const key=[item.product_id||item.product_name,item.variant_id||item.strength||""].join("::");if(!map.has(key))map.set(key,{product_id:item.product_id||"",product_name:item.product_name||"",variant_id:item.variant_id||"",strength:item.strength||"",qty:0});map.get(key).qty+=Number(item.qty||0);}
+  const{data:pd,error:pe}=await sb.from("products").select("product_id,category");if(pe)throw pe;const pc=new Map((pd||[]).map(p=>[p.product_id,p.category||""]));
+  vialTrackerRows=[...map.values()].map(r=>({...r,category:pc.get(r.product_id)||"",totalKits:Math.floor(Number(r.qty||0)/10),remainingToComplete:(10-(Number(r.qty||0)%10))%10}));renderVialTracker();
+ }catch(e){console.error(e);$("vialTrackerResults").innerHTML='<div class="notice error">'+esc(e.message||"Unable to load vial tracker.")+'</div>';}
 }
-
 function renderVialTracker(){
-  const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase();
-  const rows=vialTrackerRows.filter(r=>
-    (r.product_name+" "+r.strength+" "+r.variant_id+" "+r.category).toLowerCase().includes(q)
-  );
-
-  if(!rows.length){
-    $("vialTrackerResults").innerHTML=`<div class="empty">No ordered products found.</div>`;
-    return;
-  }
-
-  const totalUnits=rows.reduce((a,r)=>a+Number(r.qty||0),0);
-  const allOrderIds=new Set();
-  rows.forEach(r=>r.orderIds.forEach(id=>allOrderIds.add(id)));
-  const totalOrders=allOrderIds.size;
-  const totalKits=Math.floor(totalUnits/10);
-  const loosePieces=totalUnits%10;
-
-  $("vialTrackerResults").innerHTML=`
-    <div class="notice">
-      <b>Total ordered units:</b> ${totalUnits}
-      &nbsp;•&nbsp; <b>Total orders:</b> ${totalOrders}
-      &nbsp;•&nbsp; <b>Total kits:</b> ${totalKits} kit(s)
-      ${loosePieces?` &nbsp;•&nbsp; <b>Extra pieces:</b> ${loosePieces}`:""}
-    </div>
-    <div style="overflow:auto">
-      <table class="trackerTable">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Variant</th>
-            <th>Category</th>
-            <th>Total Ordered</th>
-            <th>Total Orders</th>
-            <th>Total Kits</th>
-            <th>Customers</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map(r=>`
-            <tr>
-              <td><b>${esc(r.product_name)}</b><div class="small">${esc(r.product_id)}</div></td>
-              <td>${esc(r.strength||"—")}<div class="small">${esc(r.variant_id||"—")}</div></td>
-              <td>${esc(r.category||"—")}</td>
-              <td><b>${r.qty}</b></td>
-              <td>${r.totalOrders}</td>
-              <td><b>${r.totalKits} kit(s)</b>${r.loosePieces?`<div class="small">+ ${r.loosePieces} pc(s)</div>`:""}</td>
-              <td>${r.emails.size}</td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    </div>
-  `;
+ const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase();const rows=vialTrackerRows.filter(r=>(r.product_name+" "+r.strength+" "+r.variant_id+" "+r.category).toLowerCase().includes(q));
+ if(!rows.length){$("vialTrackerResults").innerHTML='<div class="empty">No ordered products found.</div>';return;}
+ $("vialTrackerResults").innerHTML='<div style="overflow:auto"><table class="trackerTable"><thead><tr><th>Product</th><th>Variant</th><th>Category</th><th>Total Vials</th><th>Complete Kits</th><th>Remaining to Complete Kit</th></tr></thead><tbody>'+rows.map(r=>'<tr><td><b>'+esc(r.product_name)+'</b></td><td>'+esc(r.strength||"—")+'</td><td>'+esc(r.category||"—")+'</td><td><b>'+r.qty+'</b></td><td><b>'+r.totalKits+' kit(s)</b></td><td><b>'+(r.remainingToComplete===0?"Complete ✓":r.remainingToComplete+" vial(s)")+'</b></td></tr>').join("")+'</tbody></table></div>';
 }
+async function loadLibraryDocuments(){const box=$("documentAdminList");if(box)box.innerHTML='<div class="small">Loading documents…</div>';const{data,error}=await sb.from("library_documents").select("*").order("created_at",{ascending:false});if(error){if(box)box.innerHTML='<div class="notice error">'+esc(error.message)+'</div>';return;}libraryDocuments=data||[];if(box)box.innerHTML=libraryDocuments.length?libraryDocuments.map(d=>'<div class="item"><div class="itemHead"><div><b>'+esc(d.title)+'</b><div class="small">'+esc(d.document_type)+(d.product_name?" • "+esc(d.product_name):"")+'</div></div><div class="actions"><button class="btn danger" onclick="deleteLibraryDocument(\''+esc(d.id)+'\',\''+esc(d.file_path)+'\')">DELETE</button></div></div></div>').join(""):'<div class="empty">No uploaded documents yet.</div>';}
+async function uploadLibraryDocument(){const type=$("docType").value,title=$("docTitle").value.trim(),product=$("docProduct").value.trim(),file=$("docFile").files[0];if(!title||!file)return showMessage("Title and file are required.","error");try{const safe=(crypto.randomUUID?crypto.randomUUID():Date.now())+"-"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");const path=type.toLowerCase()+"/"+safe;const{error:up}=await sb.storage.from("library-documents").upload(path,file,{upsert:false,contentType:file.type});if(up)throw up;const{error:ins}=await sb.from("library_documents").insert({document_type:type,title:title,product_name:product||null,file_path:path,file_name:file.name,mime_type:file.type});if(ins)throw ins;$("docTitle").value="";$("docProduct").value="";$("docFile").value="";showMessage("Document uploaded successfully.","success");await loadLibraryDocuments();}catch(e){console.error(e);showMessage(e.message||"Upload failed.","error");}}
+async function deleteLibraryDocument(id,path){if(!confirm("Delete this document?"))return;try{await sb.storage.from("library-documents").remove([path]);const{error}=await sb.from("library_documents").delete().eq("id",id);if(error)throw error;await loadLibraryDocuments();showMessage("Document deleted.","success");}catch(e){showMessage(e.message||"Unable to delete document.","error");}}
 
 // WAYBILL CENTER — always consolidate all paid orders by buyer/email.
 // This intentionally does not create duplicate shipments: it is a print view grouped by buyer.

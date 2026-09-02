@@ -816,4 +816,34 @@ async function saveManualOrder(){
     showMessage(e.message||"Unable to save manual order.","error");
   }
 }
+</script><style>
+#trackingResults .clientTrackingAdmin{border:1px solid #efd4e3;border-radius:24px;background:linear-gradient(145deg,#fff,#fff9fc);box-shadow:0 14px 38px rgba(150,60,110,.08);padding:20px;margin:14px 0}
+#trackingResults .clientTrackingAdminHead{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;border-bottom:1px solid #f1dce7;padding-bottom:14px}
+#trackingResults .clientTrackingEmail{font-size:20px;font-weight:950;color:#3e2d36;word-break:break-word}
+#trackingResults .clientTrackingOrders{margin-top:14px;border:1px solid #f0d9e5;border-radius:16px;overflow:hidden}
+#trackingResults .clientTrackingOrder{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid #f3e2eb}
+#trackingResults .clientTrackingOrder:last-child{border-bottom:0}
+#trackingResults .clientTrackingMeta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:14px 0}
+#trackingResults .clientTrackingMeta>div{padding:11px;border:1px solid #efdae5;border-radius:14px;background:#fffafd}
+#trackingResults .clientTrackingMeta small{display:block;color:#a46d86;font-weight:900;font-size:9px;letter-spacing:.08em}
+#trackingResults .clientTrackingMeta b{display:block;margin-top:4px;word-break:break-word}
+@media(max-width:700px){#trackingResults .clientTrackingAdminHead{flex-direction:column}#trackingResults .clientTrackingMeta{grid-template-columns:1fr}#trackingResults .clientTrackingOrder{flex-direction:column}}
+</style>
+<script>
+/* Clean client-based tracker: exactly one admin card per email. */
+function renderTrackingDashboard(){
+ const box=$("trackingResults");if(!box)return;
+ const byEmail=new Map();
+ for(const o of trackingDashboardOrders||[]){const e=normTrackingEmail(o.email);if(!e)continue;if(!byEmail.has(e))byEmail.set(e,[]);byEmail.get(e).push(o)}
+ for(const s of trackingDashboardShipments||[]){const e=normTrackingEmail(s.email);if(e&&!byEmail.has(e))byEmail.set(e,[])}
+ if(!byEmail.size){box.innerHTML='<div class="empty">No customer orders found yet.</div>';return}
+ box.innerHTML=[...byEmail.entries()].map(([email,orders],i)=>{
+   const rows=(trackingDashboardShipments||[]).filter(s=>normTrackingEmail(s.email)===email);
+   const s=rows.length?trackingPrimaryShipment(rows):null,k='clienttrk'+i,ci=s?TRACKING_STATUSES.indexOf(s.status):0;
+   const orderList=orders.length?orders.map(o=>'<div class="clientTrackingOrder"><div><b>'+esc(o.order_id)+'</b><div class="small">'+esc(o.gb_number||'')+'</div></div><div><b>'+peso(o.total)+'</b><div class="small">'+esc(o.payment_status||'PENDING')+'</div></div></div>').join(''):'<div class="clientTrackingOrder">No orders yet.</div>';
+   const timeline=s?'<div class="statusTimeline">'+TRACKING_STATUSES.map((x,n)=>'<div class="statusDot '+(n===ci?'current':n<ci?'done':'')+'">'+esc(x)+'</div>').join('')+'</div>':'';
+   const controls=s?'<details class="trackingEditor"><summary>EDIT CLIENT TRACKING</summary><div class="grid" style="margin-top:14px"><div class="field"><label>Status</label><select id="'+k+'-status">'+TRACKING_STATUSES.map(x=>'<option value="'+esc(x)+'" '+(x===s.status?'selected':'')+'>'+esc(x)+'</option>').join('')+'</select></div><div class="field"><label>Courier</label><select id="'+k+'-courier"><option value="">—</option><option value="J&T" '+(s.courier==="J&T"?'selected':'')+'>J&T</option><option value="Lalamove" '+(s.courier==="Lalamove"?'selected':'')+'>Lalamove</option><option value="Other" '+(s.courier==="Other"?'selected':'')+'>Other</option></select></div><div class="field"><label>Tracking Number</label><input id="'+k+'-tracking" value="'+esc(s.tracking_number||'')+'"></div><div class="field"><label>Waybill Number</label><input id="'+k+'-waybill" value="'+esc(s.waybill_number||'')+'"></div><div class="field full"><label>Notes</label><textarea id="'+k+'-notes">'+esc(s.notes||'')+'</textarea></div></div><div class="actions"><button class="btn primary" type="button" onclick="updateTrackingShipment(\''+esc(s.shipment_id)+'\',\''+k+'\')">SAVE CLIENT TRACKING</button></div></details>':'<div class="actions"><button class="btn primary" type="button" data-email="'+esc(email)+'" onclick="createTrackingShipment(this.dataset.email)">SET UP TRACKING FOR THIS CLIENT</button></div>';
+   return '<div class="clientTrackingAdmin"><div class="clientTrackingAdminHead"><div><div class="eyebrow">CLIENT TRACKER</div><div class="clientTrackingEmail">'+esc(email)+'</div><div class="small">'+orders.length+' order(s) under this email</div></div><span class="badge '+(s?'green':'')+'">'+esc(s?.status||'TRACKING NOT SET')+'</span></div>'+timeline+'<div class="clientTrackingMeta"><div><small>COURIER</small><b>'+esc(s?.courier||'Not set')+'</b></div><div><small>TRACKING NUMBER</small><b>'+esc(s?.tracking_number||'Not set')+'</b></div><div><small>WAYBILL NUMBER</small><b>'+esc(s?.waybill_number||'Not set')+'</b></div></div><div class="eyebrow">ALL ORDERS UNDER THIS EMAIL</div><div class="clientTrackingOrders">'+orderList+'</div>'+controls+'</div>';
+ }).join('');
+}
 </script></html>

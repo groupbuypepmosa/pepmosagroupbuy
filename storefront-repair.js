@@ -17,6 +17,11 @@
     #productGrid .pepStoreBottom{margin-top:10px!important;padding-top:10px!important}
     #productGrid .pepSelectVariant{position:relative;z-index:2!important}
     @media(max-width:620px){#productGrid{gap:12px!important}#productGrid .pepStoreCard .productImg{height:135px!important}#productGrid .pepStoreBody>.muted{display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important;font-size:13px!important}}
+
+    .pepFallbackModal{position:fixed;inset:0;background:rgba(30,15,25,.45);z-index:99999;display:flex;align-items:flex-end;justify-content:center;padding:18px}
+    .pepFallbackPanel{position:relative;width:min(520px,100%);background:#fff;border-radius:24px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    .pepFallbackClose{position:absolute;right:14px;top:10px;border:0;background:transparent;font-size:30px;line-height:1}
+    .pepFallbackPanel h3{margin:0 36px 6px 0}.pepFallbackPanel p{margin:0 0 14px;color:#777}.pepFallbackChoices{display:grid;gap:10px}.pepFallbackVariant{border:1px solid #f0c8da;background:#fff7fb;border-radius:14px;padding:15px;text-align:left;font-weight:800;font-size:15px}
     .pepFeeBtn{border:0;border-radius:14px;padding:13px 20px;font-weight:900;letter-spacing:.02em;cursor:pointer;background:linear-gradient(135deg,#e52b8b,#b93bb6);color:#fff;box-shadow:0 10px 22px rgba(211,43,137,.18)}.pepFeeBtn:hover{transform:translateY(-1px)}.pepFeeBtn.secondary{background:#fff;color:#6b5360;border:1px solid #ead7e3;box-shadow:none}.pepFeeBtn:disabled{opacity:.55;cursor:not-allowed;transform:none}
     .pepFeeModal{position:fixed;inset:0;background:rgba(48,25,40,.62);backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:18px;z-index:99999}.pepFeeModal.open{display:flex}
     .pepFeeBox{width:min(650px,100%);max-height:92vh;overflow:auto;background:linear-gradient(145deg,#fff,#fff9fc 55%,#fff4fa);border:1px solid rgba(235,177,208,.7);border-radius:30px;padding:0;box-shadow:0 28px 100px rgba(55,18,43,.32)}
@@ -91,11 +96,38 @@
     if(!btn)return;
     e.preventDefault();
     e.stopPropagation();
+
     const pid=btn.getAttribute('data-product-id');
     const product=products.find(p=>String(p.product_id)===String(pid));
     const picker=window.pepOpenProductPicker || window.openProductPicker;
+
     if(product && typeof picker==='function'){
       picker(pid,product);
+      return;
+    }
+
+    // Visible fallback instead of a dead button if the main picker is unavailable.
+    if(product){
+      const variants=(product.product_variants||[]).filter(v=>v.active!==false);
+      const choices=variants.map(v=>{
+        const label=esc(v.strength||'Variant');
+        return '<button type="button" class="pepFallbackVariant" data-pid="'+esc(pid)+'" data-vid="'+esc(v.variant_id)+'">'+label+' · '+peso(Number(v.price)||0)+'</button>';
+      }).join('');
+      const modal=document.createElement('div');
+      modal.className='pepFallbackModal';
+      modal.innerHTML='<div class="pepFallbackPanel"><button class="pepFallbackClose" type="button">×</button><h3>'+esc(product.product_name)+'</h3><p>Select a variant</p><div class="pepFallbackChoices">'+choices+'</div></div>';
+      document.body.appendChild(modal);
+      modal.addEventListener('click',function(ev){
+        if(ev.target===modal || ev.target.closest('.pepFallbackClose')) modal.remove();
+        const choice=ev.target.closest('.pepFallbackVariant');
+        if(choice){
+          const v=variants.find(x=>String(x.variant_id)===String(choice.dataset.vid));
+          if(v && typeof window.pepAddToCart==='function'){
+            window.pepAddToCart(pid,v.variant_id);
+            modal.remove();
+          }
+        }
+      });
     }
   },true);
   window.pepAddToCart=function(pid,vid){if(!feePayment||feePayment.status!=='PAID')return feeAction();if(!verifiedEmail)return openVerify();const p=products.find(x=>x.product_id===pid),v=p?.product_variants?.find(x=>x.variant_id===vid);if(!p||!v)return;const min=minFor(vid,p.category),q=Math.max(min,Number($('pepQty_'+vid)?.value||min));let cart=JSON.parse(localStorage.pepmosaCart||'[]');const old=cart.find(x=>x.variant_id===vid&&x.gb_number===gb.gb_number);if(old)old.qty+=q;else cart.push({gb_number:gb.gb_number,product_id:pid,variant_id:vid,product_name:p.product_name,strength:v.strength,unit_price:Number(v.price),qty:q});localStorage.pepmosaCart=JSON.stringify(cart);if(typeof window.renderCart==='function')window.renderCart();if($('cartCount'))$('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0);info('Added to Cart',`${q} × ${p.product_name} ${v.strength} added to your cart.`)};

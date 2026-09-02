@@ -2349,5 +2349,60 @@ load();
 <script>
 (function(){function showPepmosaPopup(message){var old=document.getElementById('pepmosa-popup');if(old)old.remove();var wrap=document.createElement('div');wrap.className='pepmosa-popup-backdrop';wrap.id='pepmosa-popup';wrap.innerHTML='<div class="pepmosa-popup" role="dialog" aria-modal="true"><div class="pepmosa-popup-top"></div><div class="pepmosa-popup-body"><div class="pepmosa-popup-icon">✦</div><h3 class="pepmosa-popup-title">PEPMOSA</h3><div class="pepmosa-popup-message"></div><button class="pepmosa-popup-button" type="button">OKAY</button></div></div>';wrap.querySelector('.pepmosa-popup-message').textContent=String(message||'');function close(){wrap.remove();document.removeEventListener('keydown',key)}function key(e){if(e.key==='Escape'||e.key==='Enter')close()}wrap.querySelector('button').addEventListener('click',close);wrap.addEventListener('click',function(e){if(e.target===wrap)close()});document.addEventListener('keydown',key);document.body.appendChild(wrap);setTimeout(function(){var b=wrap.querySelector('button');if(b)b.focus()},0)}window.alert=showPepmosaPopup;window.pepmosaPopup=showPepmosaPopup})();
 </script>
+
+<!-- PEPMOSA universal Admin Fee guard: last-loaded so it covers OPEN GB and KIT COMPLETION -->
+<script>
+(function(){
+  async function requireApprovedAdminFee(){
+    var email=(window.verifiedEmail||localStorage.getItem('pepmosa_verified_email')||localStorage.getItem('pepmosa_customer_email')||'').trim().toLowerCase();
+    if(!email){ if(window.pepmosaPopup) window.pepmosaPopup('Admin Fee Required\n\nPlease pay and verify your approved Admin Fee email before adding products to your cart or checking out.'); else alert('Admin Fee Required.'); return false; }
+    try{
+      var sb=window.sb;
+      if(!sb) throw new Error('Database not ready');
+      var gb=window.currentGB||null;
+      if(!gb||!gb.gb_number){
+        var q=await sb.from('group_buys').select('*').in('status',['OPEN','KIT_COMPLETION']).order('created_at',{ascending:false}).limit(1).maybeSingle();
+        gb=q.data||null;
+      }
+      if(!gb||!gb.gb_number) throw new Error('No active Group Buy');
+      var r=await sb.from('admin_fee_payments').select('status').eq('gb_number',gb.gb_number).ilike('email',email).eq('status','PAID').limit(1);
+      if(r.error) throw r.error;
+      if(!r.data||!r.data.length){
+        localStorage.removeItem('pepmosa_verified_email');
+        if(window.pepmosaPopup) window.pepmosaPopup('Admin Fee Required\n\nYour Admin Fee must be approved before you can add products to your cart or check out.'); else alert('Admin Fee Required.');
+        return false;
+      }
+      return true;
+    }catch(err){
+      console.error('Admin Fee guard:',err);
+      if(window.pepmosaPopup) window.pepmosaPopup('Unable to verify Admin Fee status. Please try again.'); else alert('Unable to verify Admin Fee status.');
+      return false;
+    }
+  }
+  window.pepRequireApprovedFee=requireApprovedAdminFee;
+  window.pepAdminFeeGuardReady=true;
+
+  // Block any direct click that would add an item before another script can write the cart.
+  document.addEventListener('click',async function(e){
+    var b=e.target.closest && e.target.closest('.pepPickerAdd,[onclick*="pepAddToCart"],.add-to-cart,.addCart');
+    if(!b) return;
+    if(b.dataset.pepFeePassed==='1') return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    var ok=await requireApprovedAdminFee();
+    if(ok){ b.dataset.pepFeePassed='1'; b.click(); setTimeout(function(){delete b.dataset.pepFeePassed},0); }
+  },true);
+
+  // Checkout is also protected even if a user somehow has old cart items.
+  var tries=0, timer=setInterval(function(){
+    tries++;
+    if(typeof window.placeOrder==='function' && !window.placeOrder.__pepUniversalFeeGuard){
+      var original=window.placeOrder;
+      window.placeOrder=async function(){ if(!await requireApprovedAdminFee()) return false; return original.apply(this,arguments); };
+      window.placeOrder.__pepUniversalFeeGuard=true;
+    }
+    if(tries>100) clearInterval(timer);
+  },100);
+})();
+</script>
 </body>
 </html>

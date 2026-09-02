@@ -44,89 +44,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 <div id="productEditModal" class="editModal" onclick="if(event.target===this)closeProductEdit()"><div class="editModalCard"><div class="itemHead"><div><div class="eyebrow">PEPMOSA ADMIN</div><h2>Edit Product</h2><div class="small">Update product details and prices.</div></div><button class="btn secondary" type="button" onclick="closeProductEdit()">CLOSE</button></div><div class="grid" style="margin-top:18px"><div class="field"><label>Product Name *</label><input id="editProductName"></div><div class="field"><label>Category *</label><select id="editProductCategory"></select></div><div class="field full"><label>Description</label><textarea id="editProductDescription"></textarea></div></div><div style="margin-top:18px"><h3 style="margin-bottom:6px">Variants & Prices</h3><div class="small">You can update prices directly here.</div><div id="editProductVariants"></div></div><div class="actions"><button class="btn primary" type="button" onclick="saveProductEdit()">SAVE CHANGES</button><button class="btn secondary" type="button" onclick="closeProductEdit()">CANCEL</button></div></div></div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260902-admin-stable"></script><script src="supabase.js?v=20260902-admin-stable"></script><script>
 if(typeof initSupabase==="function")initSupabase();else 
-// Tracking dashboard: one place for every customer, consolidated orders and waybill details.
-let trackingDashboardShipments=[],trackingDashboardOrders=[];
-async function loadTrackingDashboard(){
-  const box=$("trackingResults"); if(!box)return;
-  box.innerHTML='<div class="notice">Loading consolidated orders and waybills…</div>';
-  try{
-    const [sr,or]=await Promise.all([
-      sb.from("consolidated_shipments").select("*").order("updated_at",{ascending:false}),
-      sb.from("orders").select("order_id,shipment_id,email,gb_number,total,payment_status,created_at").order("created_at",{ascending:false})
-    ]);
-    if(sr.error)throw sr.error;
-    if(or.error)throw or.error;
-    trackingDashboardShipments=sr.data||[];
-    trackingDashboardOrders=or.data||[];
-    renderTrackingDashboard();
-  }catch(e){
-    console.error(e);
-    box.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load tracking.")+'</div>';
-  }
-}
-function trackingOrdersFor(shipmentId){return trackingDashboardOrders.filter(o=>o.shipment_id===shipmentId)}
-function renderTrackingDashboard(){
-  const box=$("trackingResults"); if(!box)return;
-  const assigned=new Set(trackingDashboardOrders.map(o=>o.shipment_id).filter(Boolean));
-  const unassigned=[...new Map(trackingDashboardOrders.filter(o=>!o.shipment_id).map(o=>[String(o.email||"").toLowerCase(),o])).values()].filter(o=>o.email);
-  const shipmentCards=trackingDashboardShipments.map((s,i)=>{
-    const orders=trackingOrdersFor(s.shipment_id),ci=TRACKING_STATUSES.indexOf(s.status),k="trk"+i;
-    return '<div class="item trackingShipmentCard">'+
-      '<div class="itemHead"><div><div class="eyebrow">CONSOLIDATED SHIPMENT</div><h3 style="margin:4px 0">'+esc(s.email)+'</h3><div class="small">Shipment: '+esc(s.shipment_id)+'</div></div>'+
-      '<div><span class="badge green">'+esc(s.status||"ORDER RECEIVED")+'</span></div></div>'+
-      '<div class="trackingQuickMeta">'+
-        '<span><b>Waybill</b><br>'+esc(s.waybill_number||"Not set")+'</span>'+
-        '<span><b>Courier</b><br>'+esc(s.courier||"Not set")+'</span>'+
-        '<span><b>Tracking No.</b><br>'+esc(s.tracking_number||"Not set")+'</span>'+
-        '<span><b>Orders</b><br>'+orders.length+'</span></div>'+
-      '<div class="statusTimeline">'+TRACKING_STATUSES.map((x,n)=>'<div class="statusDot '+(n===ci?'current':n<ci?'done':'')+'">'+esc(x)+'</div>').join('')+'</div>'+
-      '<div class="trackingOrderList"><b>CONSOLIDATED ORDERS</b>'+(
-        orders.length?orders.map(o=>'<div class="orderItem"><b>'+esc(o.order_id)+'</b> • '+esc(o.gb_number||"—")+' <span class="small">'+peso(o.total)+' • '+esc(o.payment_status||"PENDING")+'</span></div>').join(''):'<div class="small">No orders assigned yet.</div>'
-      )+'</div>'+
-      '<details class="trackingEditor"><summary>EDIT TRACKING / WAYBILL</summary><div class="grid" style="margin-top:14px">'+
-        '<div class="field"><label>Status</label><select id="'+k+'-status">'+TRACKING_STATUSES.map(x=>'<option value="'+esc(x)+'" '+(x===s.status?'selected':'')+'>'+esc(x)+'</option>').join('')+'</select></div>'+
-        '<div class="field"><label>Courier</label><select id="'+k+'-courier"><option value="">—</option><option value="J&T" '+(s.courier==="J&T"?'selected':'')+'>J&T</option><option value="Lalamove" '+(s.courier==="Lalamove"?'selected':'')+'>Lalamove</option><option value="Other" '+(s.courier==="Other"?'selected':'')+'>Other</option></select></div>'+
-        '<div class="field"><label>Tracking Number</label><input id="'+k+'-tracking" value="'+esc(s.tracking_number||"")+'"></div>'+
-        '<div class="field"><label>Waybill Number</label><input id="'+k+'-waybill" value="'+esc(s.waybill_number||"")+'" placeholder="Enter waybill"></div>'+
-        '<div class="field full"><label>Notes</label><textarea id="'+k+'-notes">'+esc(s.notes||"")+'</textarea></div>'+
-      '</div><div class="actions"><button class="btn primary" type="button" onclick="updateTrackingShipment(\''+esc(s.shipment_id)+'\',\''+k+'\')">SAVE TRACKING</button></div></details>'+
-    '</div>';
-  }).join("");
-  const unassignedCards=unassigned.map(o=>{
-    const email=String(o.email).toLowerCase();
-    const customerOrders=trackingDashboardOrders.filter(x=>String(x.email||"").toLowerCase()===email&&!x.shipment_id);
-    return '<div class="item"><div class="itemHead"><div><div class="eyebrow">UNCONSOLIDATED CUSTOMER</div><h3 style="margin:4px 0">'+esc(email)+'</h3><div class="small">'+customerOrders.length+' order(s) waiting to be consolidated</div></div><button class="btn primary" type="button" data-email="'+esc(email)+'" onclick="createTrackingShipment(this.dataset.email)">CREATE SHIPMENT</button></div>'+
-      customerOrders.map(x=>'<div class="orderItem"><b>'+esc(x.order_id)+'</b> • '+esc(x.gb_number||"—")+' • '+peso(x.total)+'</div>').join("")+'</div>';
-  }).join("");
-  if(!shipmentCards&&!unassignedCards){box.innerHTML='<div class="empty">No orders or consolidated shipments found yet.</div>';return}
-  box.innerHTML=(shipmentCards||"")+(unassignedCards?'<div class="paymentSectionTitle"><span>ORDERS NOT YET CONSOLIDATED</span></div>'+unassignedCards:"");
-}
-async function createTrackingShipment(email){
-  try{
-    const orders=trackingDashboardOrders.filter(o=>String(o.email||"").toLowerCase()===String(email).toLowerCase()&&!o.shipment_id);
-    if(!orders.length)return showMessage("No unassigned orders found for this customer.","error");
-    const ins=await sb.from("consolidated_shipments").insert({email,status:"ORDER RECEIVED"}).select().single();
-    if(ins.error)throw ins.error;
-    const up=await sb.from("orders").update({shipment_id:ins.data.shipment_id}).in("order_id",orders.map(o=>o.order_id));
-    if(up.error)throw up.error;
-    const hist=await sb.from("shipment_status_history").insert({shipment_id:ins.data.shipment_id,status:"ORDER RECEIVED"});
-    if(hist.error)console.warn(hist.error);
-    showMessage("Consolidated shipment created.","success");
-    await loadTrackingDashboard();
-  }catch(e){console.error(e);showMessage(e.message||"Unable to create shipment.","error")}
-}
-async function updateTrackingShipment(id,k){
-  try{
-    const status=$(k+"-status").value,courier=$(k+"-courier").value||null,tracking_number=$(k+"-tracking").value.trim()||null,waybill_number=$(k+"-waybill").value.trim()||null,notes=$(k+"-notes").value.trim()||null;
-    const old=trackingDashboardShipments.find(s=>s.shipment_id===id)?.status;
-    const r=await sb.from("consolidated_shipments").update({status,courier,tracking_number,waybill_number,notes,delivered_at:status==="DELIVERED"?new Date().toISOString():null,updated_at:new Date().toISOString()}).eq("shipment_id",id);
-    if(r.error)throw r.error;
-    if(old!==status){const u=await sb.auth.getUser();const h=await sb.from("shipment_status_history").insert({shipment_id:id,status,courier,tracking_number,changed_by:u.data?.user?.id||null});if(h.error)console.warn(h.error)}
-    showMessage("Tracking and waybill updated.","success");
-    await loadTrackingDashboard();
-  }catch(e){console.error(e);showMessage(e.message||"Unable to update shipment.","error")}
-}
-
 document.addEventListener("DOMContentLoaded",()=>{if(typeof initSupabase==="function")initSupabase()});
 let categories=[],groupBuys=[],products=[],fees=[],ordersCache=[],orderItemsCache=[],currentShipment=null,vialTrackerRows=[];
 const TRACKING_STATUSES=["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING","IN TRANSIT TO THE PHILIPPINES","ARRIVED IN THE PHILIPPINES","RECEIVED AT WAREHOUSE","PACKING & LABELLING","HANDED OVER TO LOCAL COURIER","DELIVERED"];
@@ -279,6 +196,90 @@ async function approveCheckoutPayment(orderId){try{const{error}=await sb.from("o
 async function rejectCheckoutPayment(orderId){if(!confirm("Reject this checkout payment?"))return;try{const{error}=await sb.from("orders").update({payment_status:"REJECTED",admin_note:"Payment rejected by admin"}).eq("order_id",orderId);if(error)throw error;await loadOrders();showMessage("Checkout payment rejected.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to reject checkout payment.","error")}}
 async function loadVialTracker(){const gb=$("vialTrackerGB").value;try{let q=sb.from("orders").select("order_id,gb_number,email,created_at").order("created_at",{ascending:true});if(gb)q=q.eq("gb_number",gb);const{data:orders,error:oe}=await q;if(oe)throw oe;const ids=(orders||[]).map(o=>o.order_id);if(!ids.length){vialTrackerRows=[];return renderVialTracker()}const{data:items,error:ie}=await sb.from("order_items").select("order_id,product_id,variant_id,product_name,strength,qty").in("order_id",ids);if(ie)throw ie;const map=new Map();for(const item of items||[]){const key=[item.product_id||item.product_name,item.variant_id||item.strength||""].join("::");if(!map.has(key))map.set(key,{product_id:item.product_id||"",product_name:item.product_name||"",variant_id:item.variant_id||"",strength:item.strength||"",qty:0,orderCount:0,emails:new Set()});const row=map.get(key);row.qty+=Number(item.qty||0);row.orderCount++;const o=orders.find(x=>x.order_id===item.order_id);if(o?.email)row.emails.add(o.email.toLowerCase())}const min=new Map();if(gb){const{data:settings,error:se}=await sb.from("gb_category_settings").select("category_name,minimum_qty").eq("gb_number",gb);if(!se)for(const x of settings||[])min.set(x.category_name,Number(x.minimum_qty||1));const{data:legacy,error:le}=await sb.from("gb_minimum_quantities").select("product_id,variant_id,minimum_qty").eq("gb_number",gb);if(!le)for(const x of legacy||[])min.set(`${x.product_id}::${x.variant_id}`,Number(x.minimum_qty||1))}const{data:pd,error:pe}=await sb.from("products").select("product_id,category");if(pe)throw pe;const pc=new Map((pd||[]).map(p=>[p.product_id,p.category||""]));vialTrackerRows=[...map.values()].map(r=>{const category=pc.get(r.product_id)||"",minimum=min.get(`${r.product_id}::${r.variant_id}`)??min.get(category)??1;return{...r,category,minimum,remaining:Math.max(minimum-r.qty,0),complete:r.qty>=minimum}});renderVialTracker()}catch(e){console.error(e);$("vialTrackerResults").innerHTML=`<div class="notice error">${esc(e.message||"Unable to load vial tracker.")}</div>`}}
 function renderVialTracker(){const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase(),rows=vialTrackerRows.filter(r=>(r.product_name+" "+r.strength+" "+r.variant_id+" "+r.category).toLowerCase().includes(q));if(!rows.length)return $("vialTrackerResults").innerHTML=`<div class="empty">No ordered products found.</div>`;$("vialTrackerResults").innerHTML=`<div class="notice"><b>Total ordered units:</b> ${rows.reduce((a,r)=>a+r.qty,0)} &nbsp;•&nbsp; <b>Product/variant rows:</b> ${rows.length}</div><div style="overflow:auto"><table class="trackerTable"><thead><tr><th>Product</th><th>Variant</th><th>Category</th><th>Ordered</th><th>Orders</th><th>Customers</th><th>Minimum</th><th>Status</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r.product_name)}</b><div class="small">${esc(r.product_id)}</div></td><td>${esc(r.strength||"—")}<div class="small">${esc(r.variant_id||"—")}</div></td><td>${esc(r.category||"—")}</td><td><b>${r.qty}</b></td><td>${r.orderCount}</td><td>${r.emails.size}</td><td>${r.minimum}</td><td>${r.complete?`<span class="badge green">COMPLETE</span>`:`<span class="badge red">KULANG ${r.remaining}</span>`}</td></tr>`).join("")}</tbody></table></div>`}
+
+// Tracking dashboard: one place for every customer, consolidated orders and waybill details.
+let trackingDashboardShipments=[],trackingDashboardOrders=[];
+async function loadTrackingDashboard(){
+  const box=$("trackingResults"); if(!box)return;
+  box.innerHTML='<div class="notice">Loading consolidated orders and waybills…</div>';
+  try{
+    const [sr,or]=await Promise.all([
+      sb.from("consolidated_shipments").select("*").order("updated_at",{ascending:false}),
+      sb.from("orders").select("order_id,shipment_id,email,gb_number,total,payment_status,created_at").order("created_at",{ascending:false})
+    ]);
+    if(sr.error)throw sr.error;
+    if(or.error)throw or.error;
+    trackingDashboardShipments=sr.data||[];
+    trackingDashboardOrders=or.data||[];
+    renderTrackingDashboard();
+  }catch(e){
+    console.error(e);
+    box.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load tracking.")+'</div>';
+  }
+}
+function trackingOrdersFor(shipmentId){return trackingDashboardOrders.filter(o=>o.shipment_id===shipmentId)}
+function renderTrackingDashboard(){
+  const box=$("trackingResults"); if(!box)return;
+  const assigned=new Set(trackingDashboardOrders.map(o=>o.shipment_id).filter(Boolean));
+  const unassigned=[...new Map(trackingDashboardOrders.filter(o=>!o.shipment_id).map(o=>[String(o.email||"").toLowerCase(),o])).values()].filter(o=>o.email);
+  const shipmentCards=trackingDashboardShipments.map((s,i)=>{
+    const orders=trackingOrdersFor(s.shipment_id),ci=TRACKING_STATUSES.indexOf(s.status),k="trk"+i;
+    return '<div class="item trackingShipmentCard">'+
+      '<div class="itemHead"><div><div class="eyebrow">CONSOLIDATED SHIPMENT</div><h3 style="margin:4px 0">'+esc(s.email)+'</h3><div class="small">Shipment: '+esc(s.shipment_id)+'</div></div>'+
+      '<div><span class="badge green">'+esc(s.status||"ORDER RECEIVED")+'</span></div></div>'+
+      '<div class="trackingQuickMeta">'+
+        '<span><b>Waybill</b><br>'+esc(s.waybill_number||"Not set")+'</span>'+
+        '<span><b>Courier</b><br>'+esc(s.courier||"Not set")+'</span>'+
+        '<span><b>Tracking No.</b><br>'+esc(s.tracking_number||"Not set")+'</span>'+
+        '<span><b>Orders</b><br>'+orders.length+'</span></div>'+
+      '<div class="statusTimeline">'+TRACKING_STATUSES.map((x,n)=>'<div class="statusDot '+(n===ci?'current':n<ci?'done':'')+'">'+esc(x)+'</div>').join('')+'</div>'+
+      '<div class="trackingOrderList"><b>CONSOLIDATED ORDERS</b>'+(
+        orders.length?orders.map(o=>'<div class="orderItem"><b>'+esc(o.order_id)+'</b> • '+esc(o.gb_number||"—")+' <span class="small">'+peso(o.total)+' • '+esc(o.payment_status||"PENDING")+'</span></div>').join(''):'<div class="small">No orders assigned yet.</div>'
+      )+'</div>'+
+      '<details class="trackingEditor"><summary>EDIT TRACKING / WAYBILL</summary><div class="grid" style="margin-top:14px">'+
+        '<div class="field"><label>Status</label><select id="'+k+'-status">'+TRACKING_STATUSES.map(x=>'<option value="'+esc(x)+'" '+(x===s.status?'selected':'')+'>'+esc(x)+'</option>').join('')+'</select></div>'+
+        '<div class="field"><label>Courier</label><select id="'+k+'-courier"><option value="">—</option><option value="J&T" '+(s.courier==="J&T"?'selected':'')+'>J&T</option><option value="Lalamove" '+(s.courier==="Lalamove"?'selected':'')+'>Lalamove</option><option value="Other" '+(s.courier==="Other"?'selected':'')+'>Other</option></select></div>'+
+        '<div class="field"><label>Tracking Number</label><input id="'+k+'-tracking" value="'+esc(s.tracking_number||"")+'"></div>'+
+        '<div class="field"><label>Waybill Number</label><input id="'+k+'-waybill" value="'+esc(s.waybill_number||"")+'" placeholder="Enter waybill"></div>'+
+        '<div class="field full"><label>Notes</label><textarea id="'+k+'-notes">'+esc(s.notes||"")+'</textarea></div>'+
+      '</div><div class="actions"><button class="btn primary" type="button" onclick="updateTrackingShipment(\''+esc(s.shipment_id)+'\',\''+k+'\')">SAVE TRACKING</button></div></details>'+
+    '</div>';
+  }).join("");
+  const unassignedCards=unassigned.map(o=>{
+    const email=String(o.email).toLowerCase();
+    const customerOrders=trackingDashboardOrders.filter(x=>String(x.email||"").toLowerCase()===email&&!x.shipment_id);
+    return '<div class="item"><div class="itemHead"><div><div class="eyebrow">UNCONSOLIDATED CUSTOMER</div><h3 style="margin:4px 0">'+esc(email)+'</h3><div class="small">'+customerOrders.length+' order(s) waiting to be consolidated</div></div><button class="btn primary" type="button" data-email="'+esc(email)+'" onclick="createTrackingShipment(this.dataset.email)">CREATE SHIPMENT</button></div>'+
+      customerOrders.map(x=>'<div class="orderItem"><b>'+esc(x.order_id)+'</b> • '+esc(x.gb_number||"—")+' • '+peso(x.total)+'</div>').join("")+'</div>';
+  }).join("");
+  if(!shipmentCards&&!unassignedCards){box.innerHTML='<div class="empty">No orders or consolidated shipments found yet.</div>';return}
+  box.innerHTML=(shipmentCards||"")+(unassignedCards?'<div class="paymentSectionTitle"><span>ORDERS NOT YET CONSOLIDATED</span></div>'+unassignedCards:"");
+}
+async function createTrackingShipment(email){
+  try{
+    const orders=trackingDashboardOrders.filter(o=>String(o.email||"").toLowerCase()===String(email).toLowerCase()&&!o.shipment_id);
+    if(!orders.length)return showMessage("No unassigned orders found for this customer.","error");
+    const ins=await sb.from("consolidated_shipments").insert({email,status:"ORDER RECEIVED"}).select().single();
+    if(ins.error)throw ins.error;
+    const up=await sb.from("orders").update({shipment_id:ins.data.shipment_id}).in("order_id",orders.map(o=>o.order_id));
+    if(up.error)throw up.error;
+    const hist=await sb.from("shipment_status_history").insert({shipment_id:ins.data.shipment_id,status:"ORDER RECEIVED"});
+    if(hist.error)console.warn(hist.error);
+    showMessage("Consolidated shipment created.","success");
+    await loadTrackingDashboard();
+  }catch(e){console.error(e);showMessage(e.message||"Unable to create shipment.","error")}
+}
+async function updateTrackingShipment(id,k){
+  try{
+    const status=$(k+"-status").value,courier=$(k+"-courier").value||null,tracking_number=$(k+"-tracking").value.trim()||null,waybill_number=$(k+"-waybill").value.trim()||null,notes=$(k+"-notes").value.trim()||null;
+    const old=trackingDashboardShipments.find(s=>s.shipment_id===id)?.status;
+    const r=await sb.from("consolidated_shipments").update({status,courier,tracking_number,waybill_number,notes,delivered_at:status==="DELIVERED"?new Date().toISOString():null,updated_at:new Date().toISOString()}).eq("shipment_id",id);
+    if(r.error)throw r.error;
+    if(old!==status){const u=await sb.auth.getUser();const h=await sb.from("shipment_status_history").insert({shipment_id:id,status,courier,tracking_number,changed_by:u.data?.user?.id||null});if(h.error)console.warn(h.error)}
+    showMessage("Tracking and waybill updated.","success");
+    await loadTrackingDashboard();
+  }catch(e){console.error(e);showMessage(e.message||"Unable to update shipment.","error")}
+}
+
 document.addEventListener("DOMContentLoaded",()=>{
   if($("variantEditorRows")&&!$("variantEditorRows").children.length)resetVariantEditor();
   const loginButton=document.querySelector('#loginScreen button[onclick*="login"]');

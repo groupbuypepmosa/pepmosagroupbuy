@@ -506,9 +506,24 @@ header{
 .pepPickerTotal{display:flex;justify-content:space-between;margin-top:16px;padding:16px 2px;border-top:1px solid #efdee7}
 .pepPickerTotal b{font-size:22px;color:#c52e7d}
 .pepPickerAdd{width:100%;min-height:52px;margin-top:8px}
-@media(max-width:620px){.pepProductPicker{align-items:flex-end;padding:8px}.pepPickerBox{padding:22px 18px 20px;border-radius:26px 26px 18px 18px;max-height:94vh}.pepPickerHead{grid-template-columns:95px 1fr;gap:13px}.pepPickerImage{height:95px}.pepPickerHead h2{font-size:23px}.pepQuantityRow{align-items:flex-start;flex-direction:column}.pepStepper{width:100%;grid-template-columns:1fr 72px 1fr}.pepStepper input{width:72px}.pepStoreCard .productImg{height:225px!important}}
+@media(max-width:620px){.pepProductPicker{align-items:flex-end;padding:8px}.pepPickerBox{padding:22px 18px 20px;border-radius:26px 26px 18px 18px;max-height:94vh}.pepPickerHead{grid-template-columns:95px 1fr;gap:13px}.pepPickerImage{height:95px}.pepPickerHead h2{font-size:23px}.pepQuantityRow{align-items:flex-start;flex-direction:column}.pepStepper{width:100%;grid-template-columns:1fr 72px 1fr}.pepStepper input{width:72px}.pepStoreCard .productImg{height:155px!important}}
 </style>
-</head>
+
+<style id="pep-mobile-product-polish">
+@media(max-width:620px){
+  #productGrid{gap:14px!important}
+  #productGrid .pepStoreCard{border-radius:20px!important}
+  #productGrid .pepStoreCard .productImg{height:155px!important}
+  #productGrid .pepStoreBody{padding:13px 14px 14px!important}
+  #productGrid .pepStoreBody h3{font-size:20px!important;margin:0 0 6px!important;letter-spacing:.02em}
+  #productGrid .pepStoreBody>.muted{font-size:14px!important;line-height:1.42!important;display:-webkit-box!important;-webkit-line-clamp:3!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
+  #productGrid .pepStoreBottom{margin-top:11px!important;padding-top:11px!important;gap:10px!important}
+  #productGrid .pepStarting small{font-size:9px!important}
+  #productGrid .pepStarting b{font-size:18px!important}
+  #productGrid .pepStarting span{display:block!important;font-size:12px!important;margin-top:2px!important}
+  #productGrid .pepSelectVariant{min-height:46px!important;padding:0 15px!important;font-size:13px!important;letter-spacing:.04em!important;border-radius:14px!important}
+}
+</style></head>
 
 
 <body>
@@ -1240,7 +1255,7 @@ function renderProducts(){
 
           const variants =
             (p.product_variants || [])
-              .filter(v => v.active);
+              .filter(v => v.active !== false);
 
           const lowest =
             variants.length
@@ -1587,6 +1602,9 @@ function openProductPicker(pid){
   render();
 
 }
+
+window.openProductPicker = openProductPicker;
+
 
 /* =========================================================
    ADD TO CART

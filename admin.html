@@ -134,7 +134,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
     <div id="ordersClientList">Loading consolidated client orders...</div>
   </div>
 </section>
-<section id="trackingPanel" class="panel"><div class="card"><div class="itemHead"><div><h2 style="margin-bottom:4px">Consolidated Tracking</h2><p class="muted" style="margin:0">All customer shipments appear here automatically. No email search needed.</p></div><button class="btn secondary" type="button" onclick="loadTrackingDashboard()">REFRESH</button></div><div id="trackingResults" style="margin-top:16px">Loading tracking…</div></div></section>
+<section id="trackingPanel" class="panel"><div class="card trackingAdminShell"><div class="itemHead trackingAdminHead"><div><div class="eyebrow">PEPMOSA SHIPPING</div><h2 style="margin:4px 0">Client Tracking</h2><p class="muted" style="margin:0">One clean tracker per client email. All orders under the same email stay together.</p></div><div class="trackingAdminActions"><button class="btn bulkTrackingBtn" type="button" onclick="openBulkTrackingModal()">✦ UPDATE TRACKING FOR ALL</button><button class="btn secondary" type="button" onclick="loadTrackingDashboard()">REFRESH</button></div></div><div class="trackingBulkHint">Update one shipment status for every client at once. Individual tracking and waybill numbers will stay unchanged.</div><div id="trackingResults" style="margin-top:16px">Loading tracking…</div></div></section>
 <section id="waybillPanel" class="panel">
   <div class="card">
     <div class="itemHead">
@@ -723,7 +723,105 @@ checkExistingSession();
     <div id="manualOrderItems" style="margin-top:10px"></div>
     <div class="actions"><button class="btn primary" type="button" onclick="saveManualOrder()">SAVE MANUAL ORDER</button><button class="btn secondary" type="button" onclick="closeManualOrderModal()">CANCEL</button></div>
   </div>
-</div></div></body>
+</div></div>
+<style>
+.trackingAdminShell{background:linear-gradient(145deg,#fff,#fff8fc);border-color:#edcee0}
+.trackingAdminHead{align-items:center}
+.trackingAdminActions{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.bulkTrackingBtn{background:linear-gradient(135deg,#f06eae,#c92d82)!important;color:#fff!important;box-shadow:0 10px 24px rgba(201,45,130,.20)}
+.bulkTrackingBtn:hover{transform:translateY(-1px);filter:brightness(.98)}
+.trackingBulkHint{margin-top:14px;padding:12px 14px;border:1px solid #f0d5e3;border-radius:14px;background:linear-gradient(135deg,#fff4fa,#fffafd);color:#81586c;font-size:12px}
+#bulkTrackingModal .editModalCard{width:min(680px,100%);background:linear-gradient(145deg,#fff,#fff7fb);border-color:#efc9dd}
+.bulkTrackingTitle{display:flex;gap:12px;align-items:center}
+.bulkTrackingIcon{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#f8b1d4,#d92d8a);color:#fff;font-size:21px;font-weight:950;box-shadow:0 10px 24px rgba(217,45,138,.20)}
+.bulkTrackingPreview{margin-top:14px;padding:14px;border:1px solid #efd7e4;border-radius:16px;background:#fffafd}
+.bulkTrackingPreview b{display:block;color:#4a3440}.bulkTrackingPreview span{display:block;margin-top:4px;font-size:12px;color:#806b75}
+@media(max-width:700px){.trackingAdminHead{align-items:flex-start}.trackingAdminActions{justify-content:flex-start}.bulkTrackingBtn{width:100%}}
+</style>
+
+<div id="bulkTrackingModal" class="editModal">
+  <div class="editModalCard">
+    <div class="itemHead">
+      <div class="bulkTrackingTitle"><div class="bulkTrackingIcon">✦</div><div><div class="eyebrow">PEPMOSA SHIPPING</div><h2 style="margin:4px 0">Update Tracking for All</h2><p class="muted" style="margin:0">Apply one shipment status to every client tracker.</p></div></div>
+      <button class="btn secondary" type="button" onclick="closeBulkTrackingModal()">CLOSE</button>
+    </div>
+    <div class="bulkTrackingPreview"><b id="bulkTrackingClientCount">Loading clients…</b><span>This bulk update changes the shipment status for all clients. Existing individual tracking and waybill numbers are preserved.</span></div>
+    <div class="grid" style="margin-top:16px">
+      <div class="field full"><label>NEW STATUS *</label><select id="bulkTrackingStatus"></select></div>
+      <div class="field"><label>COURIER (OPTIONAL)</label><select id="bulkTrackingCourier"><option value="">Keep current courier</option><option value="J&T">J&T</option><option value="Lalamove">Lalamove</option><option value="Other">Other</option></select></div>
+      <div class="field"><label>NOTE (OPTIONAL)</label><input id="bulkTrackingNote" placeholder="Example: Shipment arrived at warehouse"></div>
+    </div>
+    <div class="notice warning" style="margin-top:16px"><b>IMPORTANT:</b> Tracking number and waybill number are not bulk-updated because those can be different for each client.</div>
+    <div class="actions"><button id="bulkTrackingSaveBtn" class="btn primary" type="button" onclick="saveBulkTracking()">UPDATE ALL CLIENTS</button><button class="btn secondary" type="button" onclick="closeBulkTrackingModal()">CANCEL</button></div>
+  </div>
+</div>
+
+<script>
+function openBulkTrackingModal(){
+  const modal=document.getElementById("bulkTrackingModal");if(!modal)return;
+  const sel=document.getElementById("bulkTrackingStatus");
+  sel.innerHTML=(window.TRACKING_STATUSES||[]).map((s,i)=>'<option value="'+esc(s)+'" '+(i===0?'':'')+'>'+esc(s)+'</option>').join("");
+  const emails=[...new Set((window.trackingDashboardOrders||[]).map(o=>normTrackingEmail(o.email)).filter(Boolean))];
+  document.getElementById("bulkTrackingClientCount").textContent=emails.length+" client"+(emails.length===1?"":"s")+" will be updated";
+  modal.classList.add("show");
+}
+function closeBulkTrackingModal(){const m=document.getElementById("bulkTrackingModal");if(m)m.classList.remove("show")}
+async function saveBulkTracking(){
+  const status=document.getElementById("bulkTrackingStatus").value;
+  const courier=document.getElementById("bulkTrackingCourier").value;
+  const note=document.getElementById("bulkTrackingNote").value.trim();
+  const emails=[...new Set((window.trackingDashboardOrders||[]).map(o=>normTrackingEmail(o.email)).filter(Boolean))];
+  if(!status)return showMessage("Please select a status.","error");
+  if(!emails.length)return showMessage("No client orders found to update.","error");
+  const btn=document.getElementById("bulkTrackingSaveBtn");btn.disabled=true;btn.textContent="UPDATING...";
+  try{
+    const now=new Date().toISOString();
+    const existingByEmail=new Map();
+    (window.trackingDashboardShipments||[]).forEach(s=>{const e=normTrackingEmail(s.email);if(!e)return;if(!existingByEmail.has(e))existingByEmail.set(e,[]);existingByEmail.get(e).push(s)});
+    const user=await sb.auth.getUser();
+    let updated=0,created=0;
+    for(const email of emails){
+      const rows=existingByEmail.get(email)||[];
+      let shipmentId;
+      if(rows.length){
+        shipmentId=trackingPrimaryShipment(rows).shipment_id;
+        for(const row of rows){
+          const payload={status,updated_at:now,delivered_at:status==="DELIVERED"?now:null};
+          if(courier)payload.courier=courier;
+          if(note)payload.notes=note;
+          const r=await sb.from("consolidated_shipments").update(payload).eq("shipment_id",row.shipment_id);
+          if(r.error)throw r.error;
+          const h=await sb.from("shipment_status_history").insert({shipment_id:row.shipment_id,status,courier:payload.courier||row.courier||null,tracking_number:row.tracking_number||null,changed_by:user.data?.user?.id||null});
+          if(h.error)console.warn(h.error);
+        }
+        updated++;
+      }else{
+        const payload={email,status,updated_at:now};
+        if(courier)payload.courier=courier;
+        if(note)payload.notes=note;
+        if(status==="DELIVERED")payload.delivered_at=now;
+        const ins=await sb.from("consolidated_shipments").insert(payload).select().single();
+        if(ins.error)throw ins.error;
+        shipmentId=ins.data.shipment_id;
+        const h=await sb.from("shipment_status_history").insert({shipment_id:shipmentId,status,courier:courier||null,changed_by:user.data?.user?.id||null});
+        if(h.error)console.warn(h.error);
+        created++;
+      }
+      const orderIds=(window.trackingDashboardOrders||[]).filter(o=>normTrackingEmail(o.email)===email).map(o=>o.order_id).filter(Boolean);
+      if(orderIds.length){
+        const up=await sb.from("orders").update({shipment_id:shipmentId}).in("order_id",orderIds);
+        if(up.error)throw up.error;
+      }
+    }
+    closeBulkTrackingModal();
+    showMessage("Tracking updated for "+emails.length+" client"+(emails.length===1?"":"s")+" ("+updated+" updated, "+created+" created).","success");
+    await loadTrackingDashboard();
+  }catch(e){console.error(e);showMessage(e.message||"Unable to update all tracking records.","error")}
+  finally{btn.disabled=false;btn.textContent="UPDATE ALL CLIENTS"}
+}
+document.addEventListener("click",e=>{if(e.target?.id==="bulkTrackingModal")closeBulkTrackingModal()});
+</script>
+</body>
 
 <script>
 let manualOrderProducts=[];

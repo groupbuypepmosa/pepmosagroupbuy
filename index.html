@@ -1338,6 +1338,8 @@ function openProductPicker(pid, productOverride){
     return;
   }
 
+  window.__pepLastPickerProduct = product;
+
   const variants =
     (product.product_variants || [])
       .filter(v => v.active !== false);
@@ -1630,8 +1632,12 @@ function addToCart(pid,vid){
 
   const product =
     products.find(
-      p =>
-        p.product_id === pid
+      p => String(p.product_id) === String(pid)
+    ) || (
+      window.__pepLastPickerProduct &&
+      String(window.__pepLastPickerProduct.product_id) === String(pid)
+        ? window.__pepLastPickerProduct
+        : null
     );
 
 
@@ -1648,7 +1654,7 @@ function addToCart(pid,vid){
     (product.product_variants || [])
       .find(
         v =>
-          v.variant_id === vid
+          String(v.variant_id) === String(vid)
       );
 
 

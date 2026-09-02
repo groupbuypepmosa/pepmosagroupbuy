@@ -1326,11 +1326,11 @@ function renderProducts(){
    PRODUCT VARIANT PICKER
    ========================================================= */
 
-function openProductPicker(pid){
+function openProductPicker(pid, productOverride){
 
   const product =
-    products.find(
-      p => p.product_id === pid
+    productOverride || products.find(
+      p => String(p.product_id) === String(pid)
     );
 
   if(!product) return;

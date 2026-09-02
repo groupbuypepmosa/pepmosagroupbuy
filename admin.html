@@ -757,43 +757,89 @@ checkExistingSession();
 </div>
 
 <script>
-function openBulkTrackingModal(){
+async function openBulkTrackingModal(){
   const modal=document.getElementById("bulkTrackingModal");if(!modal)return;
+  const count=document.getElementById("bulkTrackingClientCount");
   const sel=document.getElementById("bulkTrackingStatus");
-  sel.innerHTML=(window.TRACKING_STATUSES||[]).map((s,i)=>'<option value="'+esc(s)+'" '+(i===0?'':'')+'>'+esc(s)+'</option>').join("");
-  const emails=[...new Set((window.trackingDashboardOrders||[]).map(o=>normTrackingEmail(o.email)).filter(Boolean))];
-  document.getElementById("bulkTrackingClientCount").textContent=emails.length+" client"+(emails.length===1?"":"s")+" will be updated";
   modal.classList.add("show");
+  if(count)count.textContent="Loading clients…";
+  if(sel)sel.innerHTML='<option value="">Loading statuses…</option>';
+  try{
+    const [or,sr]=await Promise.all([
+      sb.from("orders").select("order_id,email,shipment_id").not("email","is",null),
+      sb.from("consolidated_shipments").select("*").order("updated_at",{ascending:false})
+    ]);
+    if(or.error)throw or.error;
+    if(sr.error)throw sr.error;
+    trackingDashboardOrders=or.data||[];
+    trackingDashboardShipments=sr.data||[];
+    window.trackingDashboardOrders=trackingDashboardOrders;
+    window.trackingDashboardShipments=trackingDashboardShipments;
+    const statuses=(typeof TRACKING_STATUSES!=="undefined"&&TRACKING_STATUSES.length)?TRACKING_STATUSES:["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING","IN TRANSIT TO THE PHILIPPINES","ARRIVED IN THE PHILIPPINES","RECEIVED AT WAREHOUSE","PACKING & LABELLING","HANDED OVER TO LOCAL COURIER","DELIVERED"];
+    sel.innerHTML='<option value="">Select new status</option>'+statuses.map(s=>'<option value="'+esc(s)+'">'+esc(s)+'</option>').join("");
+    const emails=[...new Set(trackingDashboardOrders.map(o=>normTrackingEmail(o.email)).filter(Boolean))];
+    count.textContent=emails.length+" client"+(emails.length===1?"":"s")+" will be updated";
+    if(!emails.length)count.textContent="No clients with orders found";
+  }catch(e){
+    console.error(e);
+    if(count)count.textContent="Unable to load clients";
+    if(sel)sel.innerHTML='<option value="">Unable to load</option>';
+    showMessage(e.message||"Unable to load clients for bulk tracking.","error");
+  }
 }
 function closeBulkTrackingModal(){const m=document.getElementById("bulkTrackingModal");if(m)m.classList.remove("show")}
 async function saveBulkTracking(){
   const status=document.getElementById("bulkTrackingStatus").value;
   const courier=document.getElementById("bulkTrackingCourier").value;
   const note=document.getElementById("bulkTrackingNote").value.trim();
-  const emails=[...new Set((window.trackingDashboardOrders||[]).map(o=>normTrackingEmail(o.email)).filter(Boolean))];
   if(!status)return showMessage("Please select a status.","error");
-  if(!emails.length)return showMessage("No client orders found to update.","error");
-  const btn=document.getElementById("bulkTrackingSaveBtn");btn.disabled=true;btn.textContent="UPDATING...";
+  const btn=document.getElementById("bulkTrackingSaveBtn");
+  btn.disabled=true;btn.textContent="UPDATING...";
   try{
+    const [or,sr]=await Promise.all([
+      sb.from("orders").select("order_id,email,shipment_id").not("email","is",null),
+      sb.from("consolidated_shipments").select("*").order("updated_at",{ascending:false})
+    ]);
+    if(or.error)throw or.error;
+    if(sr.error)throw sr.error;
+    trackingDashboardOrders=or.data||[];
+    trackingDashboardShipments=sr.data||[];
+    window.trackingDashboardOrders=trackingDashboardOrders;
+    window.trackingDashboardShipments=trackingDashboardShipments;
+
+    const emails=[...new Set(trackingDashboardOrders.map(o=>normTrackingEmail(o.email)).filter(Boolean))];
+    if(!emails.length)return showMessage("No client orders found to update.","error");
+
     const now=new Date().toISOString();
     const existingByEmail=new Map();
-    (window.trackingDashboardShipments||[]).forEach(s=>{const e=normTrackingEmail(s.email);if(!e)return;if(!existingByEmail.has(e))existingByEmail.set(e,[]);existingByEmail.get(e).push(s)});
+    trackingDashboardShipments.forEach(s=>{
+      const e=normTrackingEmail(s.email);
+      if(!e)return;
+      if(!existingByEmail.has(e))existingByEmail.set(e,[]);
+      existingByEmail.get(e).push(s);
+    });
+
     const user=await sb.auth.getUser();
     let updated=0,created=0;
     for(const email of emails){
       const rows=existingByEmail.get(email)||[];
       let shipmentId;
-      if(rows.length){
-        shipmentId=trackingPrimaryShipment(rows).shipment_id;
-        for(const row of rows){
-          const payload={status,updated_at:now,delivered_at:status==="DELIVERED"?now:null};
-          if(courier)payload.courier=courier;
-          if(note)payload.notes=note;
-          const r=await sb.from("consolidated_shipments").update(payload).eq("shipment_id",row.shipment_id);
-          if(r.error)throw r.error;
-          const h=await sb.from("shipment_status_history").insert({shipment_id:row.shipment_id,status,courier:payload.courier||row.courier||null,tracking_number:row.tracking_number||null,changed_by:user.data?.user?.id||null});
-          if(h.error)console.warn(h.error);
-        }
+      const primary=rows.length?trackingPrimaryShipment(rows):null;
+
+      if(primary){
+        shipmentId=primary.shipment_id;
+        const payload={status,updated_at:now,delivered_at:status==="DELIVERED"?now:null};
+        if(courier)payload.courier=courier;
+        if(note)payload.notes=note;
+        const r=await sb.from("consolidated_shipments").update(payload).eq("shipment_id",shipmentId);
+        if(r.error)throw r.error;
+        const h=await sb.from("shipment_status_history").insert({
+          shipment_id:shipmentId,status,
+          courier:payload.courier||primary.courier||null,
+          tracking_number:primary.tracking_number||null,
+          changed_by:user.data?.user?.id||null
+        });
+        if(h.error)console.warn(h.error);
         updated++;
       }else{
         const payload={email,status,updated_at:now};
@@ -803,21 +849,30 @@ async function saveBulkTracking(){
         const ins=await sb.from("consolidated_shipments").insert(payload).select().single();
         if(ins.error)throw ins.error;
         shipmentId=ins.data.shipment_id;
-        const h=await sb.from("shipment_status_history").insert({shipment_id:shipmentId,status,courier:courier||null,changed_by:user.data?.user?.id||null});
+        const h=await sb.from("shipment_status_history").insert({
+          shipment_id:shipmentId,status,courier:courier||null,
+          changed_by:user.data?.user?.id||null
+        });
         if(h.error)console.warn(h.error);
         created++;
       }
-      const orderIds=(window.trackingDashboardOrders||[]).filter(o=>normTrackingEmail(o.email)===email).map(o=>o.order_id).filter(Boolean);
+
+      const orderIds=trackingDashboardOrders.filter(o=>normTrackingEmail(o.email)===email).map(o=>o.order_id).filter(Boolean);
       if(orderIds.length){
         const up=await sb.from("orders").update({shipment_id:shipmentId}).in("order_id",orderIds);
         if(up.error)throw up.error;
       }
     }
+
     closeBulkTrackingModal();
-    showMessage("Tracking updated for "+emails.length+" client"+(emails.length===1?"":"s")+" ("+updated+" updated, "+created+" created).","success");
+    showMessage("Tracking updated for "+emails.length+" client"+(emails.length===1?"":"s")+" ("+updated+" updated, "+created+" shipment"+(created===1?"":"s")+" created).","success");
     await loadTrackingDashboard();
-  }catch(e){console.error(e);showMessage(e.message||"Unable to update all tracking records.","error")}
-  finally{btn.disabled=false;btn.textContent="UPDATE ALL CLIENTS"}
+  }catch(e){
+    console.error(e);
+    showMessage(e.message||"Unable to update all client tracking records.","error");
+  }finally{
+    btn.disabled=false;btn.textContent="UPDATE ALL CLIENTS";
+  }
 }
 document.addEventListener("click",e=>{if(e.target?.id==="bulkTrackingModal")closeBulkTrackingModal()});
 </script>

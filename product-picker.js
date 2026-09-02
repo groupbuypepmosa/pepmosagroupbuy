@@ -13,7 +13,7 @@ function getProductData(card){
   const name=card.querySelector('h3')?.textContent.trim()||'Product';
   const desc=card.querySelector('.muted')?.textContent.trim()||'';
   const img=card.querySelector('.productImg img')?.src||'';
-  const rows=[...card.querySelectorAll('button')].filter(button=>/addToCart\\s*\\(/i.test(button.getAttribute('onclick')||'')).map(button=>{
+  const rows=[...card.querySelectorAll('button')].filter(button=>/addToCart\s*\(/i.test(button.getAttribute('onclick')||'')).map(button=>{
     const row=button.parentElement;
     const raw=button.getAttribute('onclick')||'';
     const m=raw.match(/(?:pep)?AddToCart\(\s*'([^']+)'\s*,\s*'([^']+)'/i);
@@ -87,7 +87,7 @@ function clean(){
   const grid=$('productGrid');
   if(!grid||grid.dataset.pepClean==='1')return;
   const cards=[...grid.querySelectorAll('.card')];
-  if(!cards.some(card=>[...card.querySelectorAll('button')].some(button=>/addToCart\\s*\\(/i.test(button.getAttribute('onclick')||''))))return;
+  if(!cards.some(card=>[...card.querySelectorAll('button')].some(button=>/addToCart\s*\(/i.test(button.getAttribute('onclick')||''))))return;
 
   cards.forEach(card=>{
     const data=getProductData(card);

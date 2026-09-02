@@ -83,7 +83,7 @@
         <h3>${esc(p.product_name)}</h3>
         <div class="muted">${esc(p.description||'')}</div>
         <div class="pepStoreBottom">
-          <div class="pepStarting"><small>STARTING AT</small><b>${peso(lowest)}</b><span>${variants.length} variant${variants.length===1?'':'s'} available</span></div>
+          <div class="pepStarting"><small>${gb?.status==='KIT_COMPLETION'?'KIT COMPLETION':'STARTING AT'}</small><b>${peso(lowest)}</b><span>${gb?.status==='KIT_COMPLETION'?variants.reduce((n,v)=>n+Number(v.remaining_qty||0),0)+' vial(s) remaining to complete kits':variants.length+' variant'+(variants.length===1?'':'s')+' available'}</span></div>
           <button class="pepFeeBtn pepSelectVariant" type="button" data-product-id="${esc(p.product_id)}">CHOOSE VARIANT</button>
         </div>
       </div>
@@ -111,7 +111,7 @@
       const variants=(product.product_variants||[]).filter(v=>v.active!==false);
       const choices=variants.map(v=>{
         const label=esc(v.strength||'Variant');
-        return '<button type="button" class="pepFallbackVariant" data-pid="'+esc(pid)+'" data-vid="'+esc(v.variant_id)+'">'+label+' · '+peso(Number(v.price)||0)+'</button>';
+        return '<button type="button" class="pepFallbackVariant" data-pid="'+esc(pid)+'" data-vid="'+esc(v.variant_id)+'">'+label+' · '+peso(Number(v.price)||0)+(gb?.status==='KIT_COMPLETION'?' · '+Number(v.remaining_qty||0)+' vial(s) remaining':'')+'</button>';
       }).join('');
       const modal=document.createElement('div');
       modal.className='pepFallbackModal';
@@ -130,7 +130,7 @@
       });
     }
   },true);
-  window.pepAddToCart=function(pid,vid){const p=products.find(x=>x.product_id===pid),v=p?.product_variants?.find(x=>x.variant_id===vid);if(!p||!v)return;const min=minFor(vid,p.category),q=Math.max(min,Number($('pepQty_'+vid)?.value||min));let cart=JSON.parse(localStorage.pepmosaCart||'[]');const old=cart.find(x=>x.variant_id===vid&&x.gb_number===gb.gb_number);if(gb?.status==='KIT_COMPLETION'){const remaining=Number(v.remaining_qty||0),already=Number(old?.qty||0);if(remaining<1)return info('Sold Out','This variant is no longer available. Please refresh.');if(already+q>remaining)return info('Only '+Math.max(0,remaining-already)+' vial(s) left','Please refresh your cart and try again.')}if(old)old.qty+=q;else cart.push({gb_number:gb.gb_number,product_id:pid,variant_id:vid,product_name:p.product_name,strength:v.strength,unit_price:Number(v.price),qty:q});localStorage.pepmosaCart=JSON.stringify(cart);if(typeof window.renderCart==='function')window.renderCart();if($('cartCount'))$('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0);info('Added to Cart',q+' × '+p.product_name+' '+v.strength+' added to your cart.')};
+  window.pepAddToCart=function(pid,vid){const p=products.find(x=>x.product_id===pid),v=p?.product_variants?.find(x=>x.variant_id===vid);if(!p||!v)return;const min=minFor(vid,p.category);let q=Math.max(min,Number($('pepQty_'+vid)?.value||min));let cart=JSON.parse(localStorage.pepmosaCart||'[]');const old=cart.find(x=>x.variant_id===vid&&x.gb_number===gb.gb_number);if(gb?.status==='KIT_COMPLETION'){const remaining=Number(v.remaining_qty||0),already=Number(old?.qty||0),available=Math.max(0,remaining-already);if(available<1)return info('Sold Out','All remaining vials for this variant are already in your cart or no longer available.');q=Math.min(q,available);if(q<1)return info('Sold Out','No remaining vials are available for this variant.')}if(old)old.qty+=q;else cart.push({gb_number:gb.gb_number,product_id:pid,variant_id:vid,product_name:p.product_name,strength:v.strength,unit_price:Number(v.price),qty:q});localStorage.pepmosaCart=JSON.stringify(cart);if(typeof window.renderCart==='function')window.renderCart();if($('cartCount'))$('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0);info('Added to Cart',q+' × '+p.product_name+' '+v.strength+(gb?.status==='KIT_COMPLETION'?' (limited to available remaining vials)':'')+' added to your cart.')};
   function hookCheckout(){if(typeof window.checkout!=='function'||window.checkout.__pepStableGuard)return;const original=window.checkout;window.checkout=async function(){return original()};window.checkout.__pepStableGuard=true}
   function hookPlaceOrder(){if(typeof window.placeOrder!=='function'||window.placeOrder.__pepStableGuard)return;const original=window.placeOrder;window.placeOrder=async function(){if($('email')&&verifiedEmail)$('email').value=verifiedEmail;return original()};window.placeOrder.__pepStableGuard=true}
   async function loadNotices(){if(noticeLoaded||!S())return;noticeLoaded=true;try{const r=await S().from('site_notices').select('*').eq('active',true).order('created_at',{ascending:false}).limit(10);if(r.error)throw r.error;const now=Date.now();const n=(r.data||[]).find(x=>(!x.starts_at||new Date(x.starts_at).getTime()<=now)&&(!x.ends_at||new Date(x.ends_at).getTime()>=now));if(!n)return;const key=`pepmosa_site_notice_seen_${n.notice_id}_${n.updated_at}`;if(localStorage.getItem(key))return;showNotice(n,key)}catch(e){console.error('PEPMOSA SITE NOTICE',e)}}

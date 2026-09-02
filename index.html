@@ -1114,7 +1114,7 @@ async function load(){
       await sb
         .from("group_buys")
         .select("*")
-        .eq("status","OPEN")
+        .in("status",["OPEN","KIT_COMPLETION"])
         .order(
           "created_at",
           {

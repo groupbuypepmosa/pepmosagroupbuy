@@ -62,7 +62,7 @@ a{text-decoration:none;color:inherit}.top{max-width:1280px;margin:auto;padding:2
    if(!data||!data.length){box.innerHTML='<div class="empty">No COA documents uploaded yet.</div>';return;}
    const docs=[];
    for(const d of data){docs.push({...d,url:await getUrl(client,d)});}
-   box.innerHTML='<div class="docGrid">'+docs.map(d=>'<article class="docCard" data-url="'+esc(d.url)+'"><div class="preview">'+previewMarkup(d,d.url)+'<span class="imageBadge">'+(isPdf(d)?'PDF PREVIEW':'COA PREVIEW')+'</span></div><div class="docInfo"><h3>'+esc(d.title||d.product_name||'COA Document')+'</h3><p>'+esc(d.product_name||d.file_name||'Certificate of Analysis')+'</p><div class="docActions"><button class="docBtn" type="button">OPEN FULL DOCUMENT →</button></div></div></article>').join('')+'</div>';
+   box.innerHTML='<div class="docGrid">'+docs.map(d=>'<article class="docCard" data-url="'+esc(d.url)+'"><div class="preview">'+previewMarkup(d,d.url)+'<span class="imageBadge">'+(isPdf(d)?'PDF PREVIEW':'COA PREVIEW')+'</span></div><div class="docInfo"><h3>'+esc(d.title||d.product_name||'COA Document')+'</h3><p>'+esc(d.product_name||'Certificate of Analysis')+'</p><div class="docActions"><button class="docBtn" type="button">OPEN FULL DOCUMENT →</button></div></div></article>').join('')+'</div>';
    box.querySelectorAll('.docCard').forEach(card=>card.addEventListener('click',()=>{const u=card.dataset.url;if(u) window.open(u,'_blank','noopener');}));
   }catch(e){
    console.error(e);

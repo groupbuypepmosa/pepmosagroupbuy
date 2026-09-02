@@ -3,3 +3,5 @@ Trigger Vercel production deployment for latest main commit.
 production redeploy trigger 2026-09-02T12:20:00+08:00
 
 retry deploy 2026-09-02T12:51:00+08:00
+
+final consolidated storefront picker deployment 2026-09-02T1788325147283

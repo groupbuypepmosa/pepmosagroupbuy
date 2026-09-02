@@ -6,36 +6,35 @@
 <title>PEPMOSA • Track</title>
 <link rel="stylesheet" href="style.css">
 <style>
-body{background:radial-gradient(circle at 10% 8%,rgba(255,126,185,.13),transparent 26%),linear-gradient(135deg,#fff8fc,#fff3f9 55%,#f7efff)}
-.trackHero{margin-bottom:18px}
-.trackSearch{padding:22px;border:1px solid #efd5e4;border-radius:24px;background:linear-gradient(135deg,#fff,#fff6fb);box-shadow:0 16px 40px rgba(151,57,109,.09)}
-.trackSearchRow{display:flex;gap:10px}
-.trackSearchRow input{flex:1;min-height:50px;border-radius:15px}
-.clientCard{margin-top:18px;overflow:hidden;border:1px solid #efd4e3;border-radius:26px;background:linear-gradient(145deg,#fff,#fff9fc);box-shadow:0 20px 50px rgba(152,55,108,.11)}
-.clientHead{padding:22px 22px 18px;background:linear-gradient(135deg,#fff0f7,#fff)}
-.clientEmail{font-size:24px;font-weight:950;color:#3c2b35;word-break:break-word;margin:5px 0}
-.statusPill{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border-radius:999px;background:linear-gradient(135deg,#ee4d9e,#b82b7c);color:#fff;font-size:12px;font-weight:950;letter-spacing:.04em}
-.clientBody{padding:20px 22px 24px}
-.timelineWrap{margin-top:4px;overflow-x:auto;padding-bottom:4px}
-.timeline{display:flex;min-width:max-content;gap:8px}
-.step{width:128px;padding:12px 10px;border-radius:14px;border:1px solid #ead7e2;background:#f5f1f4;color:#766c73;font-size:10px;font-weight:900;text-align:center}
-.step.done{background:#edf8f2;border-color:#cce8d9;color:#23784e}
-.step.current{background:linear-gradient(135deg,#ec4b9a,#b72a7a);border-color:#c92f84;color:#fff;box-shadow:0 8px 20px rgba(201,47,132,.22)}
-.clientMeta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px}
-.metaBox{padding:13px;border:1px solid #f0d9e5;border-radius:16px;background:#fffafd}
-.metaBox small{display:block;color:#a06f86;font-weight:900;letter-spacing:.08em;font-size:9px}
-.metaBox b{display:block;margin-top:5px;color:#493740;word-break:break-word}
-.orderSection{margin-top:22px}
-.orderSectionHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.orderCount{padding:7px 10px;border-radius:999px;background:#fff0f7;color:#b72b78;font-size:11px;font-weight:900}
-.productSummary{border:1px solid #efd6e4;border-radius:18px;overflow:hidden;background:#fff}
-.productRow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #f2e1ea}
-.productRow:last-child{border-bottom:0}
-.productName{font-weight:900;color:#44343c}
-.productQty{white-space:nowrap;padding:6px 10px;border-radius:999px;background:#fff0f7;color:#b42b75;font-size:12px;font-weight:900}
-.orderRef{margin-top:14px;padding:13px 15px;border-radius:15px;background:#fff8df;border:1px solid #f0dc8d;color:#705b2c;font-size:12px;line-height:1.5}
-.noteBox{margin-top:12px;padding:13px 15px;border-radius:15px;background:#fff5fa;border:1px solid #efcce0;color:#6b4a5b;font-size:12px}
-@media(max-width:680px){.trackSearchRow{flex-direction:column}.clientMeta{grid-template-columns:1fr}.clientEmail{font-size:19px}.productRow{align-items:flex-start}.step{width:118px}}
+:root{--pink:#d92d8a;--pink2:#f06eae;--ink:#382a34;--muted:#806f7b;--line:#efd7e4}
+body{background:
+radial-gradient(circle at 8% 6%,rgba(255,145,198,.20),transparent 24%),
+radial-gradient(circle at 92% 14%,rgba(220,194,255,.22),transparent 28%),
+linear-gradient(135deg,#fff9fc,#fff4f9 52%,#f8f2ff);min-height:100vh}
+.trackHero{margin:12px 0 18px;padding:28px 30px;border:1px solid #f0d8e5;border-radius:28px;background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,239,247,.88));box-shadow:0 20px 60px rgba(170,70,125,.10)}
+.trackHero h1{margin:4px 0 7px;font-size:34px;color:var(--ink)}
+.trackSearch{padding:18px;border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.82);box-shadow:0 18px 48px rgba(150,70,115,.08)}
+.trackSearchRow{display:flex;gap:10px}.trackSearchRow input{flex:1;min-height:52px;border-radius:15px}
+.clientCard{margin-top:18px;overflow:hidden;border:1px solid #edcfe0;border-radius:30px;background:#fff;box-shadow:0 24px 70px rgba(147,54,109,.13)}
+.clientHead{padding:26px 28px 22px;background:linear-gradient(135deg,#fff1f8,#fff 62%,#f8f1ff);border-bottom:1px solid #f2dce8}
+.clientTop{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}
+.clientEmail{font-size:24px;font-weight:950;color:var(--ink);word-break:break-word;margin:6px 0 0}
+.clientLabel{font-size:10px;letter-spacing:.18em;font-weight:950;color:#b42e76}
+.statusPill{display:inline-flex;align-items:center;justify-content:center;padding:10px 15px;border-radius:999px;background:linear-gradient(135deg,var(--pink2),var(--pink));color:#fff;font-size:11px;font-weight:950;letter-spacing:.06em;box-shadow:0 8px 20px rgba(217,45,138,.22);white-space:nowrap}
+.clientBody{padding:24px 28px 28px}
+.progressCard{padding:17px 18px;border:1px solid #f0d8e5;border-radius:20px;background:linear-gradient(135deg,#fffafd,#fff3f8)}
+.progressHead{display:flex;justify-content:space-between;gap:10px;align-items:center}.progressHead b{font-size:15px;color:var(--ink)}.progressHead span{font-size:11px;color:#a13972;font-weight:900}
+.progressBar{height:10px;background:#f0e6ec;border-radius:999px;margin-top:13px;overflow:hidden}.progressFill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#f06eae,#d92d8a)}
+.metaGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+.metaBox{padding:14px 15px;border:1px solid #efdae5;border-radius:17px;background:#fff}.metaBox small{display:block;color:#ad6b8d;font-weight:950;letter-spacing:.10em;font-size:9px}.metaBox b{display:block;margin-top:6px;color:#46343e;word-break:break-word;font-size:13px}
+.orderSection{margin-top:22px}.sectionTitle{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:11px}.sectionTitle h2{margin:3px 0 0;color:var(--ink);font-size:21px}.sectionTitle p{margin:0;color:var(--muted);font-size:12px}
+.orderCount{padding:7px 11px;border-radius:999px;background:#fff0f7;color:#b72b78;font-size:10px;font-weight:950;white-space:nowrap}
+.productSummary{border:1px solid #efd7e4;border-radius:20px;overflow:hidden;background:#fff}
+.productRow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:15px 17px;border-bottom:1px solid #f4e3eb}.productRow:last-child{border-bottom:0}
+.productName{font-weight:900;color:#44343d;font-size:14px}.productQty{white-space:nowrap;padding:7px 11px;border-radius:999px;background:linear-gradient(135deg,#fff0f7,#ffe6f2);color:#b42b75;font-size:11px;font-weight:950}
+.orderRef,.noteBox{margin-top:14px;padding:14px 16px;border-radius:17px;font-size:12px;line-height:1.55}.orderRef{background:#fff8df;border:1px solid #f0dc8d;color:#705b2c}.noteBox{background:#fff4fa;border:1px solid #efcce0;color:#6b4a5b}
+.refList{margin-top:6px;display:flex;gap:7px;flex-wrap:wrap}.refChip{padding:5px 8px;border-radius:999px;background:#fffdf5;border:1px solid #efdfaa;font-weight:800;font-size:10px}
+@media(max-width:680px){.trackHero{padding:22px 18px;border-radius:22px}.trackHero h1{font-size:28px}.trackSearchRow{flex-direction:column}.clientHead,.clientBody{padding-left:17px;padding-right:17px}.clientTop{flex-direction:column}.clientEmail{font-size:18px}.metaGrid{grid-template-columns:1fr}.sectionTitle{align-items:flex-start;flex-direction:column}.productRow{align-items:flex-start}}
 </style>
 </head>
 <body>
@@ -65,13 +64,14 @@ function noteFor(o){return o.manual_note??o.note??o.notes??o.admin_note??o.late_
 async function track(){
  const email=$('email').value.trim().toLowerCase(),out=$('out');
  if(!email){out.innerHTML='<div class="notice error">Please enter your email.</div>';return}
- out.innerHTML='<div class="notice">Loading your orders…</div>';
+ out.innerHTML='<div class="notice">Loading your client tracker…</div>';
  try{
   const r=await sb.rpc('get_customer_tracking',{p_email:email}); if(r.error)throw r.error;
   const data=r.data||{},orders=data.orders||[],shipments=data.shipments||[],allItems=data.order_items||data.items||[];
   if(!orders.length&&!shipments.length){out.innerHTML='<div class="notice">No orders found for this email.</div>';return}
   const shipment=shipments.slice().sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0))[0]||{};
   const status=shipment.status||'ORDER RECEIVED',ci=Math.max(0,STATUSES.indexOf(status));
+  const progress=Math.round(((ci+1)/STATUSES.length)*100);
   const totals=new Map(),refs=[],notes=[];
   orders.forEach(o=>{
     refs.push(o.order_id??o.id??'—');
@@ -79,8 +79,17 @@ async function track(){
     itemsFor(o,allItems).forEach(i=>{const key=itemLabel(i).toUpperCase();totals.set(key,(totals.get(key)||0)+itemQty(i))});
   });
   const productHtml=[...totals.entries()].map(([name,qty])=>'<div class="productRow"><span class="productName">'+esc(name)+'</span><span class="productQty">QTY '+qty+'</span></div>').join('')||'<div class="productRow"><span class="productName">Order details are being prepared.</span></div>';
-  const timeline=STATUSES.map((s,i)=>'<div class="step '+(i===ci?'current':i<ci?'done':'')+'">'+esc(s)+'</div>').join('');
-  out.innerHTML='<div class="clientCard"><div class="clientHead"><div class="eyebrow">PEPMOSA CLIENT TRACKER</div><div class="clientEmail">'+esc(email)+'</div><span class="statusPill">● '+esc(status)+'</span></div><div class="clientBody"><div class="timelineWrap"><div class="timeline">'+timeline+'</div></div><div class="clientMeta"><div class="metaBox"><small>COURIER</small><b>'+esc(shipment.courier||'Not set yet')+'</b></div><div class="metaBox"><small>TRACKING NUMBER</small><b>'+esc(shipment.tracking_number||'Not set yet')+'</b></div><div class="metaBox"><small>WAYBILL NUMBER</small><b>'+esc(shipment.waybill_number||'Not set yet')+'</b></div></div><div class="orderSection"><div class="orderSectionHead"><div><div class="eyebrow">YOUR COMPLETE ORDERS</div><h2 style="margin:4px 0 0">All products under this email</h2></div><span class="orderCount">'+orders.length+' ORDER'+(orders.length===1?'':'S')+'</span></div><div class="productSummary">'+productHtml+'</div><div class="orderRef"><b>ORDER REFERENCES</b><br>'+refs.map(esc).join(' • ')+'</div>'+ (notes.length?'<div class="noteBox"><b>NOTES</b><br>'+notes.map(esc).join('<br>')+'</div>':'') +'</div></div></div>';
+  const refsHtml=refs.map(x=>'<span class="refChip">'+esc(x)+'</span>').join('');
+  out.innerHTML='<div class="clientCard">'+
+   '<div class="clientHead"><div class="clientTop"><div><div class="clientLabel">PEPMOSA CLIENT TRACKER</div><div class="clientEmail">'+esc(email)+'</div></div><span class="statusPill">'+esc(status)+'</span></div></div>'+
+   '<div class="clientBody">'+
+   '<div class="progressCard"><div class="progressHead"><b>Shipment progress</b><span>STEP '+(ci+1)+' OF '+STATUSES.length+'</span></div><div class="progressBar"><div class="progressFill" style="width:'+progress+'%"></div></div></div>'+
+   '<div class="metaGrid"><div class="metaBox"><small>COURIER</small><b>'+esc(shipment.courier||'To be assigned')+'</b></div><div class="metaBox"><small>TRACKING NUMBER</small><b>'+esc(shipment.tracking_number||'To be assigned')+'</b></div><div class="metaBox"><small>WAYBILL NUMBER</small><b>'+esc(shipment.waybill_number||'To be assigned')+'</b></div></div>'+
+   '<div class="orderSection"><div class="sectionTitle"><div><div class="clientLabel">YOUR ORDERS</div><h2>Everything under this email</h2><p>Combined for a cleaner and easier view.</p></div><span class="orderCount">'+orders.length+' ORDER'+(orders.length===1?'':'S')+'</span></div>'+
+   '<div class="productSummary">'+productHtml+'</div>'+
+   '<div class="orderRef"><b>ORDER REFERENCES</b><div class="refList">'+refsHtml+'</div></div>'+
+   (notes.length?'<div class="noteBox"><b>NOTES</b><br>'+notes.map(esc).join('<br>')+'</div>':'')+
+   '</div></div></div>';
  }catch(err){console.error(err);out.innerHTML='<div class="notice error">Unable to load tracking. Please try again.</div>'}
 }
 </script>

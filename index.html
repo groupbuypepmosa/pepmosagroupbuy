@@ -1333,13 +1333,19 @@ function openProductPicker(pid, productOverride){
       p => String(p.product_id) === String(pid)
     );
 
-  if(!product) return;
+  if(!product){
+    console.error('Product picker: product not found', pid);
+    return;
+  }
 
   const variants =
     (product.product_variants || [])
       .filter(v => v.active !== false);
 
-  if(!variants.length) return;
+  if(!variants.length){
+    console.error('Product picker: no variants available', product);
+    return;
+  }
 
   let selected =
     variants[0];

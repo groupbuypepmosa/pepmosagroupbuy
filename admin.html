@@ -110,7 +110,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
     </div>
   </div>
 </section>
-<section id="vialTrackerPanel" class="panel"><div class="card"><h2>Vial / Order Tracker</h2><p class="muted">Consolidated by product + variant. Shows ordered units, order count, customers, and the current GB minimum.</p><div class="grid"><div class="field"><label>Group Buy</label><select id="vialTrackerGB" onchange="loadVialTracker()"><option value="">All Group Buys</option></select></div><div class="field"><label>Search Product / Variant</label><input id="vialTrackerSearch" placeholder="Search..." oninput="renderVialTracker()"></div></div><div id="vialTrackerResults" style="margin-top:18px">Select a Group Buy or use All Group Buys.</div></div></section>
+<section id="vialTrackerPanel" class="panel"><div class="card"><h2>Vial / Order Tracker</h2><p class="muted">Consolidated by product + variant. Shows total ordered units, distinct total orders, customers, and total kits (10 pcs = 1 kit).</p><div class="grid"><div class="field"><label>Group Buy</label><select id="vialTrackerGB" onchange="loadVialTracker()"><option value="">All Group Buys</option></select></div><div class="field"><label>Search Product / Variant</label><input id="vialTrackerSearch" placeholder="Search..." oninput="renderVialTracker()"></div></div><div id="vialTrackerResults" style="margin-top:18px">Select a Group Buy or use All Group Buys.</div></div></section>
 <div id="productEditModal" class="editModal" onclick="if(event.target===this)closeProductEdit()"><div class="editModalCard"><div class="itemHead"><div><div class="eyebrow">PEPMOSA ADMIN</div><h2>Edit Product</h2><div class="small">Update product details and prices.</div></div><button class="btn secondary" type="button" onclick="closeProductEdit()">CLOSE</button></div><div class="grid" style="margin-top:18px"><div class="field"><label>Product Name *</label><input id="editProductName"></div><div class="field"><label>Category *</label><select id="editProductCategory"></select></div><div class="field full"><label>Description</label><textarea id="editProductDescription"></textarea></div></div><div style="margin-top:18px"><h3 style="margin-bottom:6px">Variants & Prices</h3><div class="small">You can update prices directly here.</div><div id="editProductVariants"></div></div><div class="actions"><button class="btn primary" type="button" onclick="saveProductEdit()">SAVE CHANGES</button><button class="btn secondary" type="button" onclick="closeProductEdit()">CANCEL</button></div></div></div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260902-waybill-center"></script><script src="supabase.js?v=20260902-waybill-center"></script><script>
 if(typeof initSupabase==="function")initSupabase();else 
@@ -392,10 +392,121 @@ async function approveFeePayment(id){try{const{error}=await sb.from("admin_fee_p
 async function rejectFeePayment(id){if(!confirm("Reject this Admin Fee payment?"))return;try{const{error}=await sb.from("admin_fee_payments").update({status:"REJECTED",updated_at:new Date().toISOString()}).eq("id",id);if(error)throw error;await loadFees();showMessage("Admin Fee payment rejected.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to reject Admin Fee payment.","error")}}
 async function approveCheckoutPayment(orderId){try{const{error}=await sb.from("orders").update({payment_status:"PAID",admin_note:"Payment approved by admin"}).eq("order_id",orderId);if(error)throw error;await loadOrders();showMessage("Checkout payment approved.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to approve checkout payment.","error")}}
 async function rejectCheckoutPayment(orderId){if(!confirm("Reject this checkout payment?"))return;try{const{error}=await sb.from("orders").update({payment_status:"REJECTED",admin_note:"Payment rejected by admin"}).eq("order_id",orderId);if(error)throw error;await loadOrders();showMessage("Checkout payment rejected.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to reject checkout payment.","error")}}
-async function loadVialTracker(){const gb=$("vialTrackerGB").value;try{let q=sb.from("orders").select("order_id,gb_number,email,created_at").order("created_at",{ascending:true});if(gb)q=q.eq("gb_number",gb);const{data:orders,error:oe}=await q;if(oe)throw oe;const ids=(orders||[]).map(o=>o.order_id);if(!ids.length){vialTrackerRows=[];return renderVialTracker()}const{data:items,error:ie}=await sb.from("order_items").select("order_id,product_id,variant_id,product_name,strength,qty").in("order_id",ids);if(ie)throw ie;const map=new Map();for(const item of items||[]){const key=[item.product_id||item.product_name,item.variant_id||item.strength||""].join("::");if(!map.has(key))map.set(key,{product_id:item.product_id||"",product_name:item.product_name||"",variant_id:item.variant_id||"",strength:item.strength||"",qty:0,orderCount:0,emails:new Set()});const row=map.get(key);row.qty+=Number(item.qty||0);row.orderCount++;const o=orders.find(x=>x.order_id===item.order_id);if(o?.email)row.emails.add(o.email.toLowerCase())}const min=new Map();if(gb){const{data:settings,error:se}=await sb.from("gb_category_settings").select("category_name,minimum_qty").eq("gb_number",gb);if(!se)for(const x of settings||[])min.set(x.category_name,Number(x.minimum_qty||1));const{data:legacy,error:le}=await sb.from("gb_minimum_quantities").select("product_id,variant_id,minimum_qty").eq("gb_number",gb);if(!le)for(const x of legacy||[])min.set(`${x.product_id}::${x.variant_id}`,Number(x.minimum_qty||1))}const{data:pd,error:pe}=await sb.from("products").select("product_id,category");if(pe)throw pe;const pc=new Map((pd||[]).map(p=>[p.product_id,p.category||""]));vialTrackerRows=[...map.values()].map(r=>{const category=pc.get(r.product_id)||"",minimum=min.get(`${r.product_id}::${r.variant_id}`)??min.get(category)??1;return{...r,category,minimum,remaining:Math.max(minimum-r.qty,0),complete:r.qty>=minimum}});renderVialTracker()}catch(e){console.error(e);$("vialTrackerResults").innerHTML=`<div class="notice error">${esc(e.message||"Unable to load vial tracker.")}</div>`}}
-function renderVialTracker(){const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase(),rows=vialTrackerRows.filter(r=>(r.product_name+" "+r.strength+" "+r.variant_id+" "+r.category).toLowerCase().includes(q));if(!rows.length)return $("vialTrackerResults").innerHTML=`<div class="empty">No ordered products found.</div>`;$("vialTrackerResults").innerHTML=`<div class="notice"><b>Total ordered units:</b> ${rows.reduce((a,r)=>a+r.qty,0)} &nbsp;•&nbsp; <b>Product/variant rows:</b> ${rows.length}</div><div style="overflow:auto"><table class="trackerTable"><thead><tr><th>Product</th><th>Variant</th><th>Category</th><th>Ordered</th><th>Orders</th><th>Customers</th><th>Minimum</th><th>Status</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r.product_name)}</b><div class="small">${esc(r.product_id)}</div></td><td>${esc(r.strength||"—")}<div class="small">${esc(r.variant_id||"—")}</div></td><td>${esc(r.category||"—")}</td><td><b>${r.qty}</b></td><td>${r.orderCount}</td><td>${r.emails.size}</td><td>${r.minimum}</td><td>${r.complete?`<span class="badge green">COMPLETE</span>`:`<span class="badge red">KULANG ${r.remaining}</span>`}</td></tr>`).join("")}</tbody></table></div>`}
+async function loadVialTracker(){
+  const gb=$("vialTrackerGB").value;
+  try{
+    let q=sb.from("orders").select("order_id,gb_number,email,created_at").order("created_at",{ascending:true});
+    if(gb)q=q.eq("gb_number",gb);
+    const{data:orders,error:oe}=await q;
+    if(oe)throw oe;
 
+    const ids=(orders||[]).map(o=>o.order_id);
+    if(!ids.length){
+      vialTrackerRows=[];
+      return renderVialTracker();
+    }
 
+    const orderById=new Map((orders||[]).map(o=>[o.order_id,o]));
+    const{data:items,error:ie}=await sb.from("order_items")
+      .select("order_id,product_id,variant_id,product_name,strength,qty")
+      .in("order_id",ids);
+    if(ie)throw ie;
+
+    const map=new Map();
+    for(const item of items||[]){
+      const key=[item.product_id||item.product_name,item.variant_id||item.strength||""].join("::");
+      if(!map.has(key)){
+        map.set(key,{
+          product_id:item.product_id||"",
+          product_name:item.product_name||"",
+          variant_id:item.variant_id||"",
+          strength:item.strength||"",
+          qty:0,
+          orderIds:new Set(),
+          emails:new Set()
+        });
+      }
+      const row=map.get(key);
+      row.qty+=Number(item.qty||0);
+      row.orderIds.add(item.order_id);
+      const o=orderById.get(item.order_id);
+      if(o?.email)row.emails.add(o.email.toLowerCase());
+    }
+
+    const{data:pd,error:pe}=await sb.from("products").select("product_id,category");
+    if(pe)throw pe;
+    const pc=new Map((pd||[]).map(p=>[p.product_id,p.category||""]));
+
+    vialTrackerRows=[...map.values()].map(r=>({
+      ...r,
+      category:pc.get(r.product_id)||"",
+      totalOrders:r.orderIds.size,
+      totalKits:Math.floor(Number(r.qty||0)/10),
+      loosePieces:Number(r.qty||0)%10
+    }));
+
+    renderVialTracker();
+  }catch(e){
+    console.error(e);
+    $("vialTrackerResults").innerHTML=\`<div class="notice error">\${esc(e.message||"Unable to load vial tracker.")}</div>\`;
+  }
+}
+
+function renderVialTracker(){
+  const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase();
+  const rows=vialTrackerRows.filter(r=>
+    (r.product_name+" "+r.strength+" "+r.variant_id+" "+r.category).toLowerCase().includes(q)
+  );
+
+  if(!rows.length){
+    $("vialTrackerResults").innerHTML=\`<div class="empty">No ordered products found.</div>\`;
+    return;
+  }
+
+  const totalUnits=rows.reduce((a,r)=>a+Number(r.qty||0),0);
+  const allOrderIds=new Set();
+  rows.forEach(r=>r.orderIds.forEach(id=>allOrderIds.add(id)));
+  const totalOrders=allOrderIds.size;
+  const totalKits=Math.floor(totalUnits/10);
+  const loosePieces=totalUnits%10;
+
+  $("vialTrackerResults").innerHTML=\`
+    <div class="notice">
+      <b>Total ordered units:</b> \${totalUnits}
+      &nbsp;•&nbsp; <b>Total orders:</b> \${totalOrders}
+      &nbsp;•&nbsp; <b>Total kits:</b> \${totalKits} kit(s)
+      \${loosePieces?\` &nbsp;•&nbsp; <b>Extra pieces:</b> \${loosePieces}\`:""}
+    </div>
+    <div style="overflow:auto">
+      <table class="trackerTable">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Variant</th>
+            <th>Category</th>
+            <th>Total Ordered</th>
+            <th>Total Orders</th>
+            <th>Total Kits</th>
+            <th>Customers</th>
+          </tr>
+        </thead>
+        <tbody>
+          \${rows.map(r=>\`
+            <tr>
+              <td><b>\${esc(r.product_name)}</b><div class="small">\${esc(r.product_id)}</div></td>
+              <td>\${esc(r.strength||"—")}<div class="small">\${esc(r.variant_id||"—")}</div></td>
+              <td>\${esc(r.category||"—")}</td>
+              <td><b>\${r.qty}</b></td>
+              <td>\${r.totalOrders}</td>
+              <td><b>\${r.totalKits} kit(s)</b>\${r.loosePieces?\`<div class="small">+ \${r.loosePieces} pc(s)</div>\`:""}</td>
+              <td>\${r.emails.size}</td>
+            </tr>
+          \`).join("")}
+        </tbody>
+      </table>
+    </div>
+  \`;
+}
 
 // WAYBILL CENTER — always consolidate all paid orders by buyer/email.
 // This intentionally does not create duplicate shipments: it is a print view grouped by buyer.

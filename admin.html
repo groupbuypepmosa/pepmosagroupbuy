@@ -95,7 +95,7 @@ function renderTrackingDashboard(){
   const unassignedCards=unassigned.map(o=>{
     const email=String(o.email).toLowerCase();
     const customerOrders=trackingDashboardOrders.filter(x=>String(x.email||"").toLowerCase()===email&&!x.shipment_id);
-    return '<div class="item"><div class="itemHead"><div><div class="eyebrow">UNCONSOLIDATED CUSTOMER</div><h3 style="margin:4px 0">'+esc(email)+'</h3><div class="small">'+customerOrders.length+' order(s) waiting to be consolidated</div></div><button class="btn primary" type="button" onclick="createTrackingShipment('+JSON.stringify(email)+')">CREATE SHIPMENT</button></div>'+
+    return '<div class="item"><div class="itemHead"><div><div class="eyebrow">UNCONSOLIDATED CUSTOMER</div><h3 style="margin:4px 0">'+esc(email)+'</h3><div class="small">'+customerOrders.length+' order(s) waiting to be consolidated</div></div><button class="btn primary" type="button" data-email="'+esc(email)+'" onclick="createTrackingShipment(this.dataset.email)">CREATE SHIPMENT</button></div>'+
       customerOrders.map(x=>'<div class="orderItem"><b>'+esc(x.order_id)+'</b> • '+esc(x.gb_number||"—")+' • '+peso(x.total)+'</div>').join("")+'</div>';
   }).join("");
   if(!shipmentCards&&!unassignedCards){box.innerHTML='<div class="empty">No orders or consolidated shipments found yet.</div>';return}

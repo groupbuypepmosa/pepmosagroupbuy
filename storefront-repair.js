@@ -71,7 +71,7 @@
         <div class="muted">${esc(p.description||'')}</div>
         <div class="pepStoreBottom">
           <div class="pepStarting"><small>STARTING AT</small><b>${peso(lowest)}</b><span>${variants.length} variant${variants.length===1?'':'s'} available</span></div>
-          <button class="pepFeeBtn pepSelectVariant" type="button" onclick="openProductPicker('${esc(p.product_id)}')">CHOOSE VARIANT</button>
+          <button class="pepFeeBtn pepSelectVariant" type="button" onclick="window.openProductPicker && window.openProductPicker('${esc(p.product_id)}')">CHOOSE VARIANT</button>
         </div>
       </div>
       ${variants.map(v=>{const m=minFor(v.variant_id,p.category);return '<input type="hidden" id="qty-'+esc(v.variant_id)+'" value="'+m+'">';}).join('')}

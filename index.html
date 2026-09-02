@@ -1471,6 +1471,9 @@ function addToCart(pid,vid){
 
 function updateCart(){
 
+  // Always sync from storage so storefront add-to-cart and cart modal use one source of truth.
+  cart = JSON.parse(localStorage.pepmosaCart || "[]");
+
   $("cartCount").textContent =
     cart.reduce(
       (sum,item) =>
@@ -1487,6 +1490,9 @@ function updateCart(){
    ========================================================= */
 
 function openCart(){
+
+  // Refresh first because other storefront guards may write directly to localStorage.
+  cart = JSON.parse(localStorage.pepmosaCart || "[]");
 
   $("cartModal").classList.add("show");
 
@@ -1579,6 +1585,9 @@ function closeModal(id){
 
 function checkout(){
 
+  // Use the latest cart saved by Add to Cart before checking out.
+  cart = JSON.parse(localStorage.pepmosaCart || "[]");
+
   if(!cart.length){
 
     return alert(
@@ -1616,6 +1625,9 @@ function checkout(){
 async function placeOrder(){
 
   try{
+
+    // Final cart sync prevents stale in-memory cart data from blocking submitted orders.
+    cart = JSON.parse(localStorage.pepmosaCart || "[]");
 
 
     if(!currentGB){

@@ -57,6 +57,28 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 @media(max-width:1050px){.waybillShell{grid-template-columns:1fr}.waybillPreviewCard{position:static}.waybillSummary{grid-template-columns:repeat(3,1fr)}}@media(max-width:650px){.waybillSummary{grid-template-columns:1fr}.waybillToFrom{grid-template-columns:1fr}.buyerWaybillRow{grid-template-columns:1fr}.waybillActions{justify-content:flex-start}}
 @media print{body *{visibility:hidden!important}.printWaybill,.printWaybill *{visibility:visible!important}.printWaybill{position:absolute!important;left:0!important;top:0!important;width:100%!important;border:0!important;box-shadow:none!important}.printWaybillHead{padding-top:12px!important}}
 
+
+/* Mobile stabilization: admin controls stay usable without changing logic */
+@media(max-width:600px){
+  .adminPage{width:100%;margin:0 auto 36px;padding:12px}
+  header{padding:10px 12px;gap:10px;align-items:flex-start}
+  header .nav{display:flex;gap:6px;overflow-x:auto;max-width:100%;padding-bottom:4px}
+  header .nav a{white-space:nowrap;font-size:11px}
+  .tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;margin-left:-2px;margin-right:-2px}
+  .tab{white-space:nowrap;padding:10px 13px;font-size:12px}
+  .card{padding:15px;border-radius:16px}
+  .loginBox{padding:22px 18px;border-radius:20px}
+  .adminTitle h1{font-size:27px}
+  .summaryGrid,.paymentSummary,.waybillSummary{grid-template-columns:1fr}
+  .trackingQuickMeta{grid-template-columns:1fr 1fr}
+  .statusTimeline{margin-left:-3px;margin-right:-3px}
+  .statusDot{min-width:112px;font-size:9px}
+  .actions .btn{flex:1;min-width:0}
+  .paymentActions .btn{flex:0 0 auto}
+  .field input,.field select,.field textarea{font-size:16px}
+  .buyerWaybillRow,.ordersClientCard,.trackingShipmentCard{padding:12px}
+}
+
 </style>
 </head>
 <body>
@@ -197,14 +219,30 @@ async function loadCategoryMinimums(){
   if(!gb){$("minimumList").innerHTML="Select a Group Buy.";return}
   try{
     $("minimumList").innerHTML='<div class="small">Loading category minimums…</div>';
-    const{data,error}=await sb.from("gb_category_settings").select("gb_number,category_name,minimum_qty").eq("gb_number",gb);
-    if(error)throw error;
-    const settings=data||[];
-    const activeCategories=categories.filter(c=>c.active);
+
+    const [{data:gbCats,error:gcError},{data:productData,error:pError},{data:variantData,error:vError},{data:mins,error:mError}]=await Promise.all([
+      sb.from("gb_categories").select("category_name").eq("gb_number",gb),
+      sb.from("products").select("product_id,category,active").eq("active",true),
+      sb.from("product_variants").select("product_id,variant_id,active").eq("active",true),
+      sb.from("gb_minimum_quantities").select("product_id,variant_id,minimum_qty").eq("gb_number",gb)
+    ]);
+    if(gcError)throw gcError;if(pError)throw pError;if(vError)throw vError;if(mError)throw mError;
+
+    const opened=new Set((gbCats||[]).map(x=>x.category_name));
+    const activeCategories=categories.filter(c=>c.active&&opened.has(c.category_name));
+    const variantsByProduct=new Map();
+    for(const v of variantData||[]){
+      if(!variantsByProduct.has(v.product_id))variantsByProduct.set(v.product_id,[]);
+      variantsByProduct.get(v.product_id).push(v);
+    }
+    const minsByVariant=new Map((mins||[]).map(x=>[x.variant_id,Math.max(1,Number(x.minimum_qty||1))]));
+
     $("minimumList").innerHTML=activeCategories.length?activeCategories.map(c=>{
-      const x=settings.find(s=>s.category_name===c.category_name);
-      return`<div class="categoryLine"><div><b>${esc(c.category_name)}</b><div class="small">Minimum quantity applied to every active product and variant in this category for ${esc(gb)}.</div></div><input class="categoryMinimum" data-category="${esc(c.category_name)}" type="number" min="1" step="1" value="${x?Math.max(1,Number(x.minimum_qty||1)):1}"></div>`;
-    }).join(""):'<div class="empty">No active categories yet.</div>';
+      const variantIds=(productData||[]).filter(p=>p.category===c.category_name).flatMap(p=>(variantsByProduct.get(p.product_id)||[]).map(v=>v.variant_id));
+      const values=variantIds.map(id=>minsByVariant.get(id)).filter(v=>Number.isFinite(v));
+      const minimum=values.length?Math.max(1,Math.min(...values)):1;
+      return '<div class="categoryLine"><div><b>'+esc(c.category_name)+'</b><div class="small">This minimum is applied to every active variant in this category for '+esc(gb)+'.</div></div><input class="categoryMinimum" data-category="'+esc(c.category_name)+'" type="number" min="1" step="1" value="'+minimum+'"></div>';
+    }).join(""):'<div class="empty">No active categories are assigned to this Group Buy yet.</div>';
   }catch(e){
     console.error("CATEGORY MINIMUM LOAD",e);
     $("minimumList").innerHTML='<div class="notice error">'+esc(e.message||"Unable to load category minimums.")+'</div>';
@@ -214,24 +252,35 @@ async function saveCategoryMinimums(){
   const gb=$("minimumGB").value;
   if(!gb)return showMessage("Select a Group Buy first.","error");
   const inputs=[...document.querySelectorAll(".categoryMinimum")];
-  if(!inputs.length)return showMessage("There are no active categories to save.","error");
+  if(!inputs.length)return showMessage("There are no GB categories to save.","error");
   try{
+    const [{data:productData,error:pError},{data:variantData,error:vError}]=await Promise.all([
+      sb.from("products").select("product_id,category,active").eq("active",true),
+      sb.from("product_variants").select("product_id,variant_id,active").eq("active",true)
+    ]);
+    if(pError)throw pError;if(vError)throw vError;
+    const variantsByProduct=new Map();
+    for(const v of variantData||[]){
+      if(!variantsByProduct.has(v.product_id))variantsByProduct.set(v.product_id,[]);
+      variantsByProduct.get(v.product_id).push(v);
+    }
+
+    const rows=[];
     for(const i of inputs){
       const category=String(i.dataset.category||"").trim();
       const minimum_qty=Math.max(1,Math.floor(Number(i.value||1)));
-      if(!category)continue;
-      const lookup=await sb.from("gb_category_settings").select("gb_number").eq("gb_number",gb).eq("category_name",category).maybeSingle();
-      if(lookup.error && lookup.error.code!=="PGRST116")throw lookup.error;
-      let result;
-      if(lookup.data){
-        result=await sb.from("gb_category_settings").update({minimum_qty}).eq("gb_number",gb).eq("category_name",category);
-      }else{
-        result=await sb.from("gb_category_settings").insert({gb_number:gb,category_name:category,minimum_qty});
+      for(const p of (productData||[]).filter(x=>x.category===category)){
+        for(const v of variantsByProduct.get(p.product_id)||[]){
+          rows.push({gb_number:gb,product_id:p.product_id,variant_id:v.variant_id,minimum_qty});
+        }
       }
+    }
+    if(rows.length){
+      const result=await sb.from("gb_minimum_quantities").upsert(rows,{onConflict:"gb_number,product_id,variant_id"});
       if(result.error)throw result.error;
     }
     await loadCategoryMinimums();
-    showMessage("Category minimums saved and applied to this Group Buy.","success");
+    showMessage("Category minimums saved successfully.","success");
   }catch(e){
     console.error("CATEGORY MINIMUM SAVE",e);
     showMessage(e.message||"Unable to save category minimums.","error");

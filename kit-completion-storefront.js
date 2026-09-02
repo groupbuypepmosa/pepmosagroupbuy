@@ -216,6 +216,15 @@
       };
 
       modal.querySelector('.pepPickerAdd').onclick=async()=>{
+        /* HARD ACCESS GATE — Kit Completion has its own cart writer, so it
+           must use the same approved Admin Fee check before ANY cart write. */
+        if(typeof window.pepRequireApprovedFee!=='function'){
+          alert('Please wait a moment and try again.');
+          return;
+        }
+        const approved=await window.pepRequireApprovedFee();
+        if(!approved) return;
+
         /* Final live refresh before cart write. */
         const ok=await refreshInventory();
         if(!ok) return alert('Unable to refresh remaining vials. Please try again.');

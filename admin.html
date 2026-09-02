@@ -399,6 +399,7 @@ function renderOrdersCenter(){
       '<div class="ordersClientCard">'+
         '<div class="ordersClientHead"><div><div class="ordersClientName '+(q&&String(r.customer_name).toLowerCase().includes(q)?'match':'')+'">'+esc(r.customer_name)+'</div><div class="ordersClientEmail">'+esc(r.email||"No email")+(r.contact?' • '+esc(r.contact):'')+'</div></div>'+
         '<div class="ordersClientStats"><span>'+r.orders.length+' ORDER'+(r.orders.length===1?'':'S')+'</span><span>'+r.products.length+' PRODUCT TYPE'+(r.products.length===1?'':'S')+'</span><span>'+peso(r.total)+'</span></div></div>'+
+        r.orders.filter(o=>String(o.payment_reference||"").toUpperCase()==="MANUAL ADMIN ORDER"||String(o.admin_note||"").toUpperCase().includes("MANUAL / LATE ORDER")).map(o=>'<div class="notice warning" style="margin-top:12px"><b>✦ MANUAL / LATE ORDER</b><div class="small" style="margin-top:4px">'+esc(String(o.admin_note||"").replace(/^MANUAL \/ LATE ORDER •\s*/,""))+'</div></div>').join("")+
         '<div class="ordersProductSummary">'+r.products.map(p=>
           '<div class="ordersProductTile"><b>'+esc(p.product_name)+'</b><div class="small">'+esc(p.strength||"—")+' • '+peso(p.unit_price)+' each</div><span class="ordersQty">TOTAL QTY: '+Number(p.qty||0)+'</span></div>'
         ).join("")+'</div>'+

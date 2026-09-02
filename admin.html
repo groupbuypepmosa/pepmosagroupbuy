@@ -80,6 +80,26 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
   .buyerWaybillRow,.ordersClientCard,.trackingShipmentCard{padding:12px}
 }
 
+
+/* TRACKING REDESIGN — one elegant card per client */
+.trackingDashboard{display:grid;gap:16px}
+.trackingClientCard{position:relative;overflow:hidden;border:1px solid #efcfdf;border-radius:24px;padding:0;background:linear-gradient(145deg,#fff,#fff8fc);box-shadow:0 14px 40px rgba(164,63,117,.08)}
+.trackingClientTop{padding:20px 22px;background:linear-gradient(135deg,#fff0f7,#fff 65%,#f8f2ff);border-bottom:1px solid #f0dce7;display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.trackingClientEyebrow{font-size:10px;font-weight:950;letter-spacing:.16em;color:#b42e76}
+.trackingClientEmail{font-size:21px;font-weight:950;color:#392a34;margin-top:5px;word-break:break-word}
+.trackingStatusPill{display:inline-flex;align-items:center;justify-content:center;padding:9px 13px;border-radius:999px;background:linear-gradient(135deg,#ef6cab,#d22b85);color:#fff;font-size:10px;font-weight:950;letter-spacing:.06em;white-space:nowrap;box-shadow:0 8px 18px rgba(210,43,133,.18)}
+.trackingClientBody{padding:18px 22px 22px}
+.trackingProgressBox{padding:14px 16px;border:1px solid #efd9e5;border-radius:17px;background:#fffafd}
+.trackingProgressHead{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:12px}.trackingProgressHead b{font-size:14px}.trackingProgressHead span{font-size:10px;color:#a73772;font-weight:900}
+.trackingProgressBar{height:9px;border-radius:999px;background:#f0e6ec;overflow:hidden;margin-top:10px}.trackingProgressFill{height:100%;background:linear-gradient(90deg,#ef6cab,#d22b85);border-radius:inherit}
+.trackingMetaGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:12px}.trackingMetaBox{padding:11px 12px;border:1px solid #efdae5;border-radius:14px;background:#fff}.trackingMetaBox small{display:block;font-size:8px;font-weight:950;letter-spacing:.10em;color:#ad6b8d}.trackingMetaBox b{display:block;margin-top:5px;font-size:12px;color:#45343d;word-break:break-word}
+.trackingProducts{margin-top:15px;border:1px solid #efd9e5;border-radius:17px;overflow:hidden;background:#fff}.trackingProductsHead{padding:11px 14px;background:#fff5fa;border-bottom:1px solid #f2e1ea;font-size:10px;font-weight:950;letter-spacing:.10em;color:#a93872}
+.trackingProductRow{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid #f5e5ed}.trackingProductRow:last-child{border-bottom:0}.trackingProductName{font-weight:900;color:#46353e;font-size:13px}.trackingQty{padding:5px 9px;border-radius:999px;background:#fff0f7;color:#b42b75;font-size:10px;font-weight:950;white-space:nowrap}
+.trackingRefs{margin-top:12px}.trackingRefs summary{cursor:pointer;color:#a92b70;font-size:11px;font-weight:950}.trackingRefList{margin-top:9px;display:flex;flex-wrap:wrap;gap:7px}.trackingRefChip{padding:6px 9px;border-radius:999px;background:#fff;border:1px solid #efd9e5;color:#765060;font-size:10px;font-weight:900}
+.trackingEditor{margin-top:16px;border-top:1px solid #eedde7;padding-top:14px}.trackingEditor summary{cursor:pointer;font-weight:950;color:#b62b78;font-size:11px;letter-spacing:.05em}
+.trackingSetup{border:1px dashed #dfa8c6;border-radius:17px;padding:16px;background:#fff8fc;color:#7a5165}.trackingSetup .btn{margin-top:10px}
+@media(max-width:850px){.trackingMetaGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.trackingClientTop{padding:17px;flex-direction:column}.trackingClientBody{padding:15px}.trackingClientEmail{font-size:17px}.trackingMetaGrid{grid-template-columns:1fr}.trackingProgressHead{align-items:flex-start;flex-direction:column}}
+
 </style>
 </head>
 <body>
@@ -578,20 +598,22 @@ function printSelectedWaybill(){
 }
 
 
-// Tracking dashboard: one place for every customer, consolidated orders and waybill details.
-let trackingDashboardShipments=[],trackingDashboardOrders=[];
+// Tracking dashboard — ONE CLIENT / ONE EMAIL / ONE CLEAN SHIPMENT VIEW.
+let trackingDashboardShipments=[],trackingDashboardOrders=[],trackingDashboardItems=[];
 async function loadTrackingDashboard(){
   const box=$("trackingResults"); if(!box)return;
-  box.innerHTML='<div class="notice">Loading consolidated orders and waybills…</div>';
+  box.innerHTML='<div class="notice">Loading client tracking dashboard…</div>';
   try{
-    const [sr,or]=await Promise.all([
+    const [sr,or,ir]=await Promise.all([
       sb.from("consolidated_shipments").select("*").order("updated_at",{ascending:false}),
-      sb.from("orders").select("order_id,shipment_id,email,gb_number,total,payment_status,created_at").order("created_at",{ascending:false})
+      sb.from("orders").select("order_id,shipment_id,email,gb_number,total,payment_status,created_at").order("created_at",{ascending:false}),
+      sb.from("order_items").select("*")
     ]);
     if(sr.error)throw sr.error;
     if(or.error)throw or.error;
     trackingDashboardShipments=sr.data||[];
     trackingDashboardOrders=or.data||[];
+    trackingDashboardItems=ir.error?[]:(ir.data||[]);
     renderTrackingDashboard();
   }catch(e){
     console.error(e);
@@ -599,7 +621,6 @@ async function loadTrackingDashboard(){
   }
 }
 function normTrackingEmail(v){return String(v||"").trim().toLowerCase()}
-function trackingOrdersFor(shipmentId){return trackingDashboardOrders.filter(o=>o.shipment_id===shipmentId)}
 function trackingPrimaryShipment(rows){
   return rows.slice().sort((a,b)=>{
     const score=x=>(x.waybill_number?8:0)+(x.tracking_number?6:0)+(x.courier?3:0)+(x.status&&x.status!=="ORDER RECEIVED"?2:0);
@@ -607,82 +628,64 @@ function trackingPrimaryShipment(rows){
     return new Date(b.updated_at||0)-new Date(a.updated_at||0);
   })[0];
 }
+function trackingItemLabel(i){
+  const product=i.product_name||i.name||i.products?.product_name||i.products?.name||"Product";
+  const variant=i.strength||i.variant_name||i.variant||"";
+  return (product+" "+variant).replace(/\s+/g," ").trim().toUpperCase();
+}
+function trackingItemsForOrders(orders){
+  const ids=new Set(orders.map(o=>String(o.order_id||o.id||"")));
+  const totals=new Map();
+  trackingDashboardItems.filter(i=>ids.has(String(i.order_id||""))).forEach(i=>{
+    const label=trackingItemLabel(i),qty=Number(i.quantity??i.qty??1)||1;
+    totals.set(label,(totals.get(label)||0)+qty);
+  });
+  return [...totals.entries()];
+}
+function trackingStatusIndex(status){const n=TRACKING_STATUSES.indexOf(status||"ORDER RECEIVED");return n<0?0:n}
 function renderTrackingDashboard(){
   const box=$("trackingResults"); if(!box)return;
-
-  /* One buyer = one tracking card. Old duplicate/orphan shipment rows are
-     merged visually so the admin never sees confusing empty duplicate cards. */
-  const shipmentGroups=new Map();
-  for(const s of trackingDashboardShipments){
-    const email=normTrackingEmail(s.email); if(!email)continue;
-    if(!shipmentGroups.has(email))shipmentGroups.set(email,[]);
-    shipmentGroups.get(email).push(s);
-  }
-
-  const cards=[...shipmentGroups.entries()].map(([email,rows],i)=>{
-    const s=trackingPrimaryShipment(rows);
-    const orders=trackingDashboardOrders.filter(o=>normTrackingEmail(o.email)===email);
-    const ci=TRACKING_STATUSES.indexOf(s.status),k="trk"+i;
-    return '<div class="item trackingShipmentCard">'+
-      '<div class="itemHead"><div><div class="eyebrow">CONSOLIDATED SHIPMENT</div><h3 style="margin:4px 0">'+esc(email)+'</h3><div class="small">Shipment: '+esc(s.shipment_id)+'</div></div>'+
-      '<div><span class="badge green">'+esc(s.status||"ORDER RECEIVED")+'</span></div></div>'+
-      '<div class="trackingQuickMeta">'+
-        '<span><b>Waybill</b><br>'+esc(s.waybill_number||"Not set")+'</span>'+
-        '<span><b>Courier</b><br>'+esc(s.courier||"Not set")+'</span>'+
-        '<span><b>Tracking No.</b><br>'+esc(s.tracking_number||"Not set")+'</span>'+
-        '<span><b>Orders</b><br>'+orders.length+'</span></div>'+
-      '<div class="statusTimeline">'+TRACKING_STATUSES.map((x,n)=>'<div class="statusDot '+(n===ci?'current':n<ci?'done':'')+'">'+esc(x)+'</div>').join('')+'</div>'+
-      '<div class="trackingOrderList"><b>CONSOLIDATED ORDERS</b>'+(
-        orders.length?orders.map(o=>'<div class="orderItem"><b>'+esc(o.order_id)+'</b> • '+esc(o.gb_number||"—")+' <span class="small">'+peso(o.total)+' • '+esc(o.payment_status||"PENDING")+'</span></div>').join(''):'<div class="small">No orders assigned yet.</div>'
-      )+'</div>'+
-      '<details class="trackingEditor"><summary>EDIT TRACKING / WAYBILL</summary><div class="grid" style="margin-top:14px">'+
-        '<div class="field"><label>Status</label><select id="'+k+'-status">'+TRACKING_STATUSES.map(x=>'<option value="'+esc(x)+'" '+(x===s.status?'selected':'')+'>'+esc(x)+'</option>').join('')+'</select></div>'+
-        '<div class="field"><label>Courier</label><select id="'+k+'-courier"><option value="">—</option><option value="J&T" '+(s.courier==="J&T"?'selected':'')+'>J&T</option><option value="Lalamove" '+(s.courier==="Lalamove"?'selected':'')+'>Lalamove</option><option value="Other" '+(s.courier==="Other"?'selected':'')+'>Other</option></select></div>'+
-        '<div class="field"><label>Tracking Number</label><input id="'+k+'-tracking" value="'+esc(s.tracking_number||"")+'"></div>'+
-        '<div class="field"><label>Waybill Number</label><input id="'+k+'-waybill" value="'+esc(s.waybill_number||"")+'" placeholder="Enter waybill"></div>'+
-        '<div class="field full"><label>Notes</label><textarea id="'+k+'-notes">'+esc(s.notes||"")+'</textarea></div>'+
-      '</div><div class="actions"><button class="btn primary" type="button" onclick="updateTrackingShipment(\''+esc(s.shipment_id)+'\',\''+k+'\')">SAVE TRACKING</button></div></details>'+
-    '</div>';
+  const byEmail=new Map();
+  trackingDashboardOrders.forEach(o=>{const e=normTrackingEmail(o.email);if(!e)return;if(!byEmail.has(e))byEmail.set(e,[]);byEmail.get(e).push(o)});
+  trackingDashboardShipments.forEach(s=>{const e=normTrackingEmail(s.email);if(!e)return;if(!byEmail.has(e))byEmail.set(e,[])});
+  const cards=[...byEmail.entries()].sort((a,b)=>b[1].length-a[1].length).map(([email,orders],i)=>{
+    const shipments=trackingDashboardShipments.filter(s=>normTrackingEmail(s.email)===email);
+    const s=shipments.length?trackingPrimaryShipment(shipments):null;
+    const status=s?.status||"ORDER RECEIVED",ci=trackingStatusIndex(status),progress=Math.round(((ci+1)/TRACKING_STATUSES.length)*100),k="trk"+i;
+    const products=trackingItemsForOrders(orders);
+    const productHtml=products.length?products.map(([name,qty])=>'<div class="trackingProductRow"><span class="trackingProductName">'+esc(name)+'</span><span class="trackingQty">QTY '+qty+'</span></div>').join(''):'<div class="trackingProductRow"><span class="small">Products will appear here once item details are available.</span></div>';
+    const refs=orders.map(o=>'<span class="trackingRefChip">'+esc(o.order_id||"—")+'</span>').join('');
+    const meta=s?'<div class="trackingMetaGrid"><div class="trackingMetaBox"><small>COURIER</small><b>'+esc(s.courier||"To be assigned")+'</b></div><div class="trackingMetaBox"><small>TRACKING NO.</small><b>'+esc(s.tracking_number||"To be assigned")+'</b></div><div class="trackingMetaBox"><small>WAYBILL</small><b>'+esc(s.waybill_number||"To be assigned")+'</b></div><div class="trackingMetaBox"><small>ORDERS</small><b>'+orders.length+' order'+(orders.length===1?'':'s')+'</b></div></div>':'<div class="trackingSetup"><b>No shipment has been created yet.</b><div class="small" style="margin-top:4px">Create one shipment for this client and all orders under this email will stay together.</div><button class="btn primary" type="button" data-email="'+esc(email)+'" onclick="createTrackingShipment(this.dataset.email)">CREATE CLIENT SHIPMENT</button></div>';
+    const editor=s?'<details class="trackingEditor"><summary>EDIT THIS CLIENT’S TRACKING</summary><div class="grid" style="margin-top:14px">'+
+      '<div class="field"><label>Status</label><select id="'+k+'-status">'+TRACKING_STATUSES.map(x=>'<option value="'+esc(x)+'" '+(x===status?'selected':'')+'>'+esc(x)+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label>Courier</label><select id="'+k+'-courier"><option value="">—</option><option value="J&T" '+(s.courier==="J&T"?'selected':'')+'>J&T</option><option value="Lalamove" '+(s.courier==="Lalamove"?'selected':'')+'>Lalamove</option><option value="Other" '+(s.courier==="Other"?'selected':'')+'>Other</option></select></div>'+
+      '<div class="field"><label>Tracking Number</label><input id="'+k+'-tracking" value="'+esc(s.tracking_number||"")+'"></div>'+
+      '<div class="field"><label>Waybill Number</label><input id="'+k+'-waybill" value="'+esc(s.waybill_number||"")+'"></div>'+
+      '<div class="field full"><label>Notes</label><textarea id="'+k+'-notes">'+esc(s.notes||"")+'</textarea></div></div>'+
+      '<div class="actions"><button class="btn primary" type="button" onclick="updateTrackingShipment(\''+esc(s.shipment_id)+'\',\''+k+'\')">SAVE CLIENT TRACKING</button></div></details>':'';
+    return '<div class="trackingClientCard"><div class="trackingClientTop"><div><div class="trackingClientEyebrow">PEPMOSA CLIENT TRACKER</div><div class="trackingClientEmail">'+esc(email)+'</div></div><span class="trackingStatusPill">'+esc(status)+'</span></div><div class="trackingClientBody">'+
+      '<div class="trackingProgressBox"><div class="trackingProgressHead"><b>Shipment progress</b><span>STEP '+(ci+1)+' OF '+TRACKING_STATUSES.length+'</span></div><div class="trackingProgressBar"><div class="trackingProgressFill" style="width:'+progress+'%"></div></div></div>'+
+      meta+
+      '<div class="trackingProducts"><div class="trackingProductsHead">ALL PRODUCTS UNDER THIS EMAIL</div>'+productHtml+'</div>'+
+      '<details class="trackingRefs"><summary>VIEW ORDER REFERENCES ('+orders.length+')</summary><div class="trackingRefList">'+refs+'</div></details>'+
+      editor+'</div></div>';
   }).join("");
-
-  const emailsWithShipment=new Set([...shipmentGroups.keys()]);
-  const unassignedByEmail=new Map();
-  for(const o of trackingDashboardOrders){
-    const email=normTrackingEmail(o.email); if(!email||emailsWithShipment.has(email))continue;
-    if(!unassignedByEmail.has(email))unassignedByEmail.set(email,[]);
-    unassignedByEmail.get(email).push(o);
-  }
-  const unassignedCards=[...unassignedByEmail.entries()].map(([email,customerOrders])=>
-    '<div class="item"><div class="itemHead"><div><div class="eyebrow">UNCONSOLIDATED CUSTOMER</div><h3 style="margin:4px 0">'+esc(email)+'</h3><div class="small">'+customerOrders.length+' order(s) waiting to be consolidated</div></div><button class="btn primary" type="button" data-email="'+esc(email)+'" onclick="createTrackingShipment(this.dataset.email)">CREATE SHIPMENT</button></div>'+
-    customerOrders.map(x=>'<div class="orderItem"><b>'+esc(x.order_id)+'</b> • '+esc(x.gb_number||"—")+' • '+peso(x.total)+'</div>').join("")+'</div>'
-  ).join("");
-
-  if(!cards&&!unassignedCards){box.innerHTML='<div class="empty">No orders or consolidated shipments found yet.</div>';return}
-  box.innerHTML=(cards||"")+(unassignedCards?'<div class="paymentSectionTitle"><span>ORDERS NOT YET CONSOLIDATED</span></div>'+unassignedCards:"");
+  box.innerHTML=cards?'<div class="trackingDashboard">'+cards+'</div>':'<div class="empty">No client orders found yet.</div>';
 }
 async function createTrackingShipment(email){
   try{
     const key=normTrackingEmail(email);
     const orders=trackingDashboardOrders.filter(o=>normTrackingEmail(o.email)===key&&!o.shipment_id);
-    if(!orders.length)return showMessage("No unassigned orders found for this customer.","error");
-
-    /* Never create a second shipment for the same buyer. Reuse the existing one. */
     let existing=trackingDashboardShipments.filter(s=>normTrackingEmail(s.email)===key);
     let shipmentId;
-    if(existing.length){
-      shipmentId=trackingPrimaryShipment(existing).shipment_id;
-    }else{
+    if(existing.length){shipmentId=trackingPrimaryShipment(existing).shipment_id}
+    else{
       const ins=await sb.from("consolidated_shipments").insert({email:key,status:"ORDER RECEIVED"}).select().single();
-      if(ins.error)throw ins.error;
-      shipmentId=ins.data.shipment_id;
-      const hist=await sb.from("shipment_status_history").insert({shipment_id:shipmentId,status:"ORDER RECEIVED"});
-      if(hist.error)console.warn(hist.error);
+      if(ins.error)throw ins.error;shipmentId=ins.data.shipment_id;
+      const hist=await sb.from("shipment_status_history").insert({shipment_id:shipmentId,status:"ORDER RECEIVED"});if(hist.error)console.warn(hist.error);
     }
-
-    const up=await sb.from("orders").update({shipment_id:shipmentId}).in("order_id",orders.map(o=>o.order_id));
-    if(up.error)throw up.error;
-    showMessage("Orders consolidated under the buyer's existing shipment.","success");
-    await loadTrackingDashboard();
+    if(orders.length){const up=await sb.from("orders").update({shipment_id:shipmentId}).in("order_id",orders.map(o=>o.order_id));if(up.error)throw up.error}
+    showMessage("Client shipment created. All orders stay under this email.","success");await loadTrackingDashboard();
   }catch(e){console.error(e);showMessage(e.message||"Unable to create shipment.","error")}
 }
 async function updateTrackingShipment(id,k){
@@ -692,8 +695,7 @@ async function updateTrackingShipment(id,k){
     const r=await sb.from("consolidated_shipments").update({status,courier,tracking_number,waybill_number,notes,delivered_at:status==="DELIVERED"?new Date().toISOString():null,updated_at:new Date().toISOString()}).eq("shipment_id",id);
     if(r.error)throw r.error;
     if(old!==status){const u=await sb.auth.getUser();const h=await sb.from("shipment_status_history").insert({shipment_id:id,status,courier,tracking_number,changed_by:u.data?.user?.id||null});if(h.error)console.warn(h.error)}
-    showMessage("Tracking and waybill updated.","success");
-    await loadTrackingDashboard();
+    showMessage("Client tracking updated.","success");await loadTrackingDashboard();
   }catch(e){console.error(e);showMessage(e.message||"Unable to update shipment.","error")}
 }
 

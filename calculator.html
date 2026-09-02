@@ -1,1 +1,103 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA • Calculator</title><link rel="stylesheet" href="style.css"></head><body><header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a><nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a><a href="coa.html">COA</a></nav></header><main class="wrap"><section class="hero"><div><div class="eyebrow">REFERENCE</div><h1>Concentration Calculator</h1><p class="muted">Simple concentration math only.</p></div></section><section class="card" style="margin-top:16px"><div class="formGrid"><div class="field"><label>Total amount</label><input id="a" type="number"></div><div class="field"><label>Reconstitution volume (mL)</label><input id="v" type="number"></div></div><div class="actions"><button class="btn primary" onclick="calc()">CALCULATE</button></div><div id="out" class="notice"></div></section></main><script>function calc(){let a=Number(document.getElementById('a').value),v=Number(document.getElementById('v').value);document.getElementById('out').textContent=a>0&&v>0?`Concentration: ${(a/v).toFixed(4)} units per mL`:'Enter valid values.'}</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PEPMOSA • Peptide Calculator</title>
+<style>
+:root{--ink:#332832;--muted:#786d75;--pink:#d91f7b;--pink2:#b72f9a;--line:#efd7e3;--soft:#fff8fb}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 15% 10%,#fff 0 12%,transparent 32%),linear-gradient(135deg,#fff9fc,#fff1f7 55%,#faf5ff)}
+a{text-decoration:none;color:inherit}.calcTop{max-width:1280px;margin:auto;padding:22px 34px 0}.back{display:inline-flex;gap:8px;align-items:center;color:#a22d65;font-weight:800;font-size:14px}.back:hover{color:#d91f7b}
+.calcWrap{max-width:1280px;margin:auto;padding:20px 34px 50px}.calcBrand{text-align:center;margin:12px 0 10px}.calcBrand img{width:58px;height:58px;object-fit:contain;display:block;margin:0 auto 4px}.calcBrand b{display:block;font-family:Georgia,serif;letter-spacing:.12em;font-size:25px}.calcBrand span{display:block;font-size:10px;letter-spacing:.28em;font-weight:800;color:#a64a73}
+.hero{text-align:center;margin:4px auto 30px}.hero h1{font-family:Georgia,serif;font-size:clamp(46px,7vw,88px);line-height:.95;margin:0;color:#2e242d;letter-spacing:-3px}.hero h1 em{font-style:normal;color:var(--pink)}.hero p{max-width:690px;margin:16px auto 0;color:#6f6670;line-height:1.65}
+.calcGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(390px,1.1fr);gap:28px;align-items:start}.panel{background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:28px;padding:24px;box-shadow:0 18px 50px rgba(170,69,122,.08)}
+.field{margin-bottom:18px}.field label{display:flex;align-items:center;gap:8px;font-weight:900;font-size:14px;margin:0 0 9px}.field label i{font-style:normal;color:var(--pink)}.field small{display:block;color:#8a7e86;font-size:11px;margin-top:7px}.control{position:relative}.control input,.control select{appearance:none;width:100%;height:58px;border:1.5px solid #ead2df;border-radius:15px;background:#fff;padding:0 56px 0 15px;color:#3a3037;font-size:17px;outline:none;transition:.2s}.control select{padding-right:15px}.control input:focus,.control select:focus{border-color:#dc5a9b;box-shadow:0 0 0 4px rgba(217,31,123,.08)}.suffix{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-weight:900;color:#bd3b78}.reset{width:100%;height:54px;border-radius:15px;border:1.5px solid #e7bdd1;background:#fff;color:#bd3b78;font-weight:900;cursor:pointer}.reset:hover{background:#fff5fa}
+.resultCard{overflow:hidden;border-radius:28px;border:1px solid #efd7e3;background:#fff;box-shadow:0 18px 55px rgba(130,50,97,.12)}.resultHero{padding:30px 28px;background:linear-gradient(135deg,#ee4f9c,#c71b74 50%,#9e3eb3);color:#fff;text-align:center;position:relative;overflow:hidden}.resultHero:before{content:"♡";position:absolute;right:20px;top:10px;font:70px Georgia,serif;opacity:.22}.resultHero .mini{font-family:Georgia,serif;font-style:italic;font-size:25px;opacity:.9}.big{font-size:clamp(58px,9vw,98px);line-height:.9;font-weight:1000;letter-spacing:-4px;margin:10px 0 2px}.units{font-weight:900;font-size:20px}.resultHero p{margin:16px 0 0;font-size:12px;font-weight:700;opacity:.9}.scale{padding:25px 28px 8px;background:linear-gradient(#fff,#fff8fb)}.scaleNums{display:flex;justify-content:space-between;font-size:11px;font-weight:900;color:#b62d72;padding:0 6px 8px}.ticks{height:42px;border-left:2px solid #4b3d45;border-bottom:2px solid #4b3d45;background:repeating-linear-gradient(90deg,transparent 0 17px,#d94d92 18px 20px,transparent 21px 34px);opacity:.9}
+.stats{padding:20px 28px 28px}.stat{display:flex;justify-content:space-between;gap:18px;padding:14px 0;border-bottom:1px solid #f0dfe7}.stat:last-of-type{border-bottom:0}.stat span{color:#756972}.stat b{color:#b3266a;text-align:right}.note{margin-top:18px;padding:15px 16px;border-radius:15px;background:#fff6fa;border:1px solid #f3d7e4;font-size:12px;line-height:1.55;color:#76666f}.note b{display:block;color:#a22d65;margin-bottom:4px}
+.disclaimer{margin-top:26px;padding:25px 28px;border-top:1px solid #ecd7e2;color:#766c72;line-height:1.65;font-size:12px}.disclaimer h2{font-family:Georgia,serif;color:#a43a6d;margin:0 0 7px;font-size:21px}.footerLine{text-align:center;margin-top:15px;color:#cf4d8c;font-family:Georgia,serif;font-size:20px}
+@media(max-width:820px){.calcTop{padding:16px 18px 0}.calcWrap{padding:14px 18px 34px}.hero h1{letter-spacing:-2px}.calcGrid{grid-template-columns:1fr;gap:18px}.panel{padding:18px;border-radius:22px}.resultCard{border-radius:22px}.resultHero{padding:25px 20px}.stats,.scale{padding-left:20px;padding-right:20px}.calcBrand{margin-top:4px}.hero{margin-bottom:22px}}
+</style>
+</head>
+<body>
+<div class="calcTop"><a class="back" href="index.html">← <span>Back to Shop</span></a></div>
+<main class="calcWrap">
+  <div class="calcBrand">
+    <img src="https://raw.githubusercontent.com/groupbuypepmosa/pepmosagroupbuy/main/pepmosa-logo.png" alt="PEPMOSA">
+    <b>PEPMOSA</b><span>GROUP BUY</span>
+  </div>
+  <section class="hero">
+    <h1>Peptide <em>Calculator</em> ✧</h1>
+    <p>Enter the vial amount, reconstitution volume, syringe type, and intended dose to calculate the corresponding syringe volume.</p>
+  </section>
+
+  <section class="calcGrid">
+    <div class="panel">
+      <div class="field">
+        <label><i>◈</i> Syringe Type</label>
+        <div class="control"><select id="syringe"><option value="100">U-100 Standard (1 mL)</option><option value="40">U-40 (1 mL)</option></select></div>
+        <small>Select the syringe scale you are using.</small>
+      </div>
+      <div class="field">
+        <label><i>♧</i> Vial Amount</label>
+        <div class="control"><input id="amount" type="number" min="0" step="any" value="50" inputmode="decimal"><span class="suffix">mg</span></div>
+        <small>Total amount of material contained in the vial.</small>
+      </div>
+      <div class="field">
+        <label><i>✣</i> Reconstitution Volume</label>
+        <div class="control"><input id="volume" type="number" min="0" step="any" value="3" inputmode="decimal"><span class="suffix">mL</span></div>
+        <small>Total liquid volume added to the vial.</small>
+      </div>
+      <div class="field">
+        <label><i>◉</i> Intended Dose</label>
+        <div class="control"><input id="dose" type="number" min="0" step="any" value="1" inputmode="decimal"><span class="suffix">mg</span></div>
+        <small>Dose entered for the calculation.</small>
+      </div>
+      <button class="reset" id="reset" type="button">↻ Reset Calculator</button>
+    </div>
+
+    <div class="resultCard" aria-live="polite">
+      <div class="resultHero">
+        <div class="mini">Your Result ♡</div>
+        <div class="big" id="unitResult">6.00</div>
+        <div class="units">Units</div>
+        <p>Calculated syringe volume for the selected syringe scale</p>
+      </div>
+      <div class="scale"><div class="scaleNums"><span>100</span><span>80</span><span>60</span><span>40</span><span>20</span></div><div class="ticks"></div></div>
+      <div class="stats">
+        <div class="stat"><span>Total Volume</span><b id="mlResult">0.060 mL</b></div>
+        <div class="stat"><span>Total Concentration</span><b id="concResult">16.67 mg/mL</b></div>
+        <div class="stat"><span>Each Unit</span><b id="eachResult">0.167 mg</b></div>
+        <div class="note"><b>Calculation note</b><span id="noteText">For reference only. The displayed syringe units are a mathematical conversion based on the selected syringe scale and concentration.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="disclaimer">
+    <h2>Important Disclaimer</h2>
+    This calculator is provided for educational and informational purposes only. It does not provide medical advice, diagnosis, or treatment. Always verify calculations and consult a qualified healthcare professional before using any medication or injectable product.
+    <div class="footerLine">♡ Stay safe, stay informed ♡</div>
+  </section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+function fmt(n,d=2){return Number.isFinite(n)?n.toFixed(d):"—"}
+function calculate(){
+ const amount=parseFloat($("amount").value), volume=parseFloat($("volume").value), dose=parseFloat($("dose").value), scale=parseFloat($("syringe").value);
+ if(!(amount>0&&volume>0&&dose>0&&scale>0)){
+   $("unitResult").textContent="—";$("mlResult").textContent="—";$("concResult").textContent="—";$("eachResult").textContent="—";return;
+ }
+ const concentration=amount/volume;
+ const doseMl=dose/concentration;
+ const syringeUnits=doseMl*scale;
+ const eachUnit=concentration/scale;
+ $("unitResult").textContent=fmt(syringeUnits);
+ $("mlResult").textContent=fmt(doseMl,3)+" mL";
+ $("concResult").textContent=fmt(concentration)+" mg/mL";
+ $("eachResult").textContent=fmt(eachUnit,3)+" mg";
+ $("noteText").textContent="For reference only. "+fmt(doseMl,3)+" mL corresponds mathematically to "+fmt(syringeUnits)+" units on the selected U-"+scale+" syringe scale at this concentration.";
+}
+["amount","volume","dose","syringe"].forEach(id=>$(id).addEventListener("input",calculate));
+$("reset").addEventListener("click",()=>{$("syringe").value="100";$("amount").value="50";$("volume").value="3";$("dose").value="1";calculate()});
+calculate();
+</script>
+</body></html>

@@ -416,15 +416,33 @@ async function loadTrackingDashboard(){
     box.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load tracking.")+'</div>';
   }
 }
+function normTrackingEmail(v){return String(v||"").trim().toLowerCase()}
 function trackingOrdersFor(shipmentId){return trackingDashboardOrders.filter(o=>o.shipment_id===shipmentId)}
+function trackingPrimaryShipment(rows){
+  return rows.slice().sort((a,b)=>{
+    const score=x=>(x.waybill_number?8:0)+(x.tracking_number?6:0)+(x.courier?3:0)+(x.status&&x.status!=="ORDER RECEIVED"?2:0);
+    const d=score(b)-score(a); if(d)return d;
+    return new Date(b.updated_at||0)-new Date(a.updated_at||0);
+  })[0];
+}
 function renderTrackingDashboard(){
   const box=$("trackingResults"); if(!box)return;
-  const assigned=new Set(trackingDashboardOrders.map(o=>o.shipment_id).filter(Boolean));
-  const unassigned=[...new Map(trackingDashboardOrders.filter(o=>!o.shipment_id).map(o=>[String(o.email||"").toLowerCase(),o])).values()].filter(o=>o.email);
-  const shipmentCards=trackingDashboardShipments.map((s,i)=>{
-    const orders=trackingOrdersFor(s.shipment_id),ci=TRACKING_STATUSES.indexOf(s.status),k="trk"+i;
+
+  /* One buyer = one tracking card. Old duplicate/orphan shipment rows are
+     merged visually so the admin never sees confusing empty duplicate cards. */
+  const shipmentGroups=new Map();
+  for(const s of trackingDashboardShipments){
+    const email=normTrackingEmail(s.email); if(!email)continue;
+    if(!shipmentGroups.has(email))shipmentGroups.set(email,[]);
+    shipmentGroups.get(email).push(s);
+  }
+
+  const cards=[...shipmentGroups.entries()].map(([email,rows],i)=>{
+    const s=trackingPrimaryShipment(rows);
+    const orders=trackingDashboardOrders.filter(o=>normTrackingEmail(o.email)===email);
+    const ci=TRACKING_STATUSES.indexOf(s.status),k="trk"+i;
     return '<div class="item trackingShipmentCard">'+
-      '<div class="itemHead"><div><div class="eyebrow">CONSOLIDATED SHIPMENT</div><h3 style="margin:4px 0">'+esc(s.email)+'</h3><div class="small">Shipment: '+esc(s.shipment_id)+'</div></div>'+
+      '<div class="itemHead"><div><div class="eyebrow">CONSOLIDATED SHIPMENT</div><h3 style="margin:4px 0">'+esc(email)+'</h3><div class="small">Shipment: '+esc(s.shipment_id)+'</div></div>'+
       '<div><span class="badge green">'+esc(s.status||"ORDER RECEIVED")+'</span></div></div>'+
       '<div class="trackingQuickMeta">'+
         '<span><b>Waybill</b><br>'+esc(s.waybill_number||"Not set")+'</span>'+
@@ -444,26 +462,44 @@ function renderTrackingDashboard(){
       '</div><div class="actions"><button class="btn primary" type="button" onclick="updateTrackingShipment(\''+esc(s.shipment_id)+'\',\''+k+'\')">SAVE TRACKING</button></div></details>'+
     '</div>';
   }).join("");
-  const unassignedCards=unassigned.map(o=>{
-    const email=String(o.email).toLowerCase();
-    const customerOrders=trackingDashboardOrders.filter(x=>String(x.email||"").toLowerCase()===email&&!x.shipment_id);
-    return '<div class="item"><div class="itemHead"><div><div class="eyebrow">UNCONSOLIDATED CUSTOMER</div><h3 style="margin:4px 0">'+esc(email)+'</h3><div class="small">'+customerOrders.length+' order(s) waiting to be consolidated</div></div><button class="btn primary" type="button" data-email="'+esc(email)+'" onclick="createTrackingShipment(this.dataset.email)">CREATE SHIPMENT</button></div>'+
-      customerOrders.map(x=>'<div class="orderItem"><b>'+esc(x.order_id)+'</b> • '+esc(x.gb_number||"—")+' • '+peso(x.total)+'</div>').join("")+'</div>';
-  }).join("");
-  if(!shipmentCards&&!unassignedCards){box.innerHTML='<div class="empty">No orders or consolidated shipments found yet.</div>';return}
-  box.innerHTML=(shipmentCards||"")+(unassignedCards?'<div class="paymentSectionTitle"><span>ORDERS NOT YET CONSOLIDATED</span></div>'+unassignedCards:"");
+
+  const emailsWithShipment=new Set([...shipmentGroups.keys()]);
+  const unassignedByEmail=new Map();
+  for(const o of trackingDashboardOrders){
+    const email=normTrackingEmail(o.email); if(!email||emailsWithShipment.has(email))continue;
+    if(!unassignedByEmail.has(email))unassignedByEmail.set(email,[]);
+    unassignedByEmail.get(email).push(o);
+  }
+  const unassignedCards=[...unassignedByEmail.entries()].map(([email,customerOrders])=>
+    '<div class="item"><div class="itemHead"><div><div class="eyebrow">UNCONSOLIDATED CUSTOMER</div><h3 style="margin:4px 0">'+esc(email)+'</h3><div class="small">'+customerOrders.length+' order(s) waiting to be consolidated</div></div><button class="btn primary" type="button" data-email="'+esc(email)+'" onclick="createTrackingShipment(this.dataset.email)">CREATE SHIPMENT</button></div>'+
+    customerOrders.map(x=>'<div class="orderItem"><b>'+esc(x.order_id)+'</b> • '+esc(x.gb_number||"—")+' • '+peso(x.total)+'</div>').join("")+'</div>'
+  ).join("");
+
+  if(!cards&&!unassignedCards){box.innerHTML='<div class="empty">No orders or consolidated shipments found yet.</div>';return}
+  box.innerHTML=(cards||"")+(unassignedCards?'<div class="paymentSectionTitle"><span>ORDERS NOT YET CONSOLIDATED</span></div>'+unassignedCards:"");
 }
 async function createTrackingShipment(email){
   try{
-    const orders=trackingDashboardOrders.filter(o=>String(o.email||"").toLowerCase()===String(email).toLowerCase()&&!o.shipment_id);
+    const key=normTrackingEmail(email);
+    const orders=trackingDashboardOrders.filter(o=>normTrackingEmail(o.email)===key&&!o.shipment_id);
     if(!orders.length)return showMessage("No unassigned orders found for this customer.","error");
-    const ins=await sb.from("consolidated_shipments").insert({email,status:"ORDER RECEIVED"}).select().single();
-    if(ins.error)throw ins.error;
-    const up=await sb.from("orders").update({shipment_id:ins.data.shipment_id}).in("order_id",orders.map(o=>o.order_id));
+
+    /* Never create a second shipment for the same buyer. Reuse the existing one. */
+    let existing=trackingDashboardShipments.filter(s=>normTrackingEmail(s.email)===key);
+    let shipmentId;
+    if(existing.length){
+      shipmentId=trackingPrimaryShipment(existing).shipment_id;
+    }else{
+      const ins=await sb.from("consolidated_shipments").insert({email:key,status:"ORDER RECEIVED"}).select().single();
+      if(ins.error)throw ins.error;
+      shipmentId=ins.data.shipment_id;
+      const hist=await sb.from("shipment_status_history").insert({shipment_id:shipmentId,status:"ORDER RECEIVED"});
+      if(hist.error)console.warn(hist.error);
+    }
+
+    const up=await sb.from("orders").update({shipment_id:shipmentId}).in("order_id",orders.map(o=>o.order_id));
     if(up.error)throw up.error;
-    const hist=await sb.from("shipment_status_history").insert({shipment_id:ins.data.shipment_id,status:"ORDER RECEIVED"});
-    if(hist.error)console.warn(hist.error);
-    showMessage("Consolidated shipment created.","success");
+    showMessage("Orders consolidated under the buyer's existing shipment.","success");
     await loadTrackingDashboard();
   }catch(e){console.error(e);showMessage(e.message||"Unable to create shipment.","error")}
 }

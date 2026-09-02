@@ -478,7 +478,7 @@ header{
 
 <style id="pep-inline-picker-style">
 .pepStoreCard{padding:0!important;overflow:hidden;border-radius:24px!important}
-.pepStoreCard .productImg{height:220px!important;margin:0!important;border-radius:0!important;border:0!important}
+.pepStoreCard .productImg{height:185px!important;margin:0!important;border-radius:0!important;border:0!important;background:#fff7fb!important;display:flex!important;align-items:center!important;justify-content:center!important}
 .pepStoreBody{padding:16px}
 .pepStoreBottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:13px;border-top:1px dashed #ead8e3}
 .pepStarting small{display:block;font-size:10px;color:#8d7580}
@@ -490,7 +490,7 @@ header{
 .pepPickerClose{position:absolute;right:16px;top:14px;width:38px;height:38px;border-radius:50%;border:1px solid #edd3df;background:#fff;font-size:24px;cursor:pointer;z-index:2}
 .pepPickerHead{display:grid;grid-template-columns:145px 1fr;gap:20px;align-items:center;padding-right:36px}
 .pepPickerImage{height:145px;border-radius:20px;overflow:hidden;background:#fff1f7}
-.pepPickerImage img{width:100%;height:100%;object-fit:cover}
+.pepPickerImage img{width:100%;height:100%;object-fit:contain}
 .pepPickerHead h2{margin:5px 0 8px;font-size:29px}
 .pepPickerLabel{margin:23px 0 10px;font-size:10px;letter-spacing:.12em;font-weight:950;color:#a04b78}
 .pepPickerLabel.small{margin:0 0 4px}
@@ -513,7 +513,7 @@ header{
 @media(max-width:620px){
   #productGrid{gap:14px!important}
   #productGrid .pepStoreCard{border-radius:20px!important}
-  #productGrid .pepStoreCard .productImg{height:155px!important}
+  #productGrid .pepStoreCard .productImg{height:145px!important}
   #productGrid .pepStoreBody{padding:13px 14px 14px!important}
   #productGrid .pepStoreBody h3{font-size:20px!important;margin:0 0 6px!important;letter-spacing:.02em}
   #productGrid .pepStoreBody>.muted{font-size:14px!important;line-height:1.42!important;display:-webkit-box!important;-webkit-line-clamp:3!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
@@ -523,7 +523,12 @@ header{
   #productGrid .pepStarting span{display:block!important;font-size:12px!important;margin-top:2px!important}
   #productGrid .pepSelectVariant{min-height:46px!important;padding:0 15px!important;font-size:13px!important;letter-spacing:.04em!important;border-radius:14px!important}
 }
-</style></head>
+</style>
+<style id="pep-no-crop-product-images">
+#productGrid .pepStoreCard .productImg img{width:100%!important;height:100%!important;object-fit:contain!important;display:block!important}
+@media(max-width:620px){#productGrid .pepStoreCard .productImg{height:145px!important}}
+</style>
+</head>
 
 
 <body>
@@ -1332,7 +1337,7 @@ function openProductPicker(pid){
 
   const variants =
     (product.product_variants || [])
-      .filter(v => v.active);
+      .filter(v => v.active !== false);
 
   if(!variants.length) return;
 

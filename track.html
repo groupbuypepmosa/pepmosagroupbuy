@@ -1,26 +1,87 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA • Track</title><link rel="stylesheet" href="style.css"><style>
-.trackCard{margin-top:16px}
-.trackStatus{font-size:18px;font-weight:900;color:#9f245f}
-.trackTimeline{display:flex;gap:7px;overflow:auto;padding:14px 0 6px}
-.trackDot{min-width:132px;padding:10px 9px;border-radius:13px;background:linear-gradient(180deg,#faf5f8,#f0e8ee);border:1px solid #ead7e2;font-size:10px;font-weight:900;text-align:center;color:#6f6670}
-.trackDot.current{background:linear-gradient(135deg,#ec4b9a,#b72a7a);color:#fff;border-color:#c92f84;box-shadow:0 8px 20px rgba(201,47,132,.22)}
-.trackDot.done{background:#edf8f2;color:#23784e;border-color:#cce8d9}
-.orderProducts{margin-top:12px;padding:12px 14px;border-radius:14px;background:linear-gradient(180deg,#fff8fc,#fff3f9);border:1px solid #f2d6e5}
-.productLine{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed #eccbdd}
-.productLine:last-child{border-bottom:0}
-.manualNote{margin-top:12px;background:#fff8df!important;border:1px solid #f0dc8d;border-radius:12px}
-.ordersAccordion{margin-top:12px;border:1px solid #f0d6e4;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,#fff,#fff9fc);box-shadow:0 10px 28px rgba(158,47,104,.08)}
-.orderDrop{border-bottom:1px solid #f2dce7}
-.orderDrop:last-child{border-bottom:0}
-.orderDrop summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 16px;font-weight:900;background:linear-gradient(90deg,#fff9fc,#fff);transition:.2s ease}
-.orderDrop summary:hover{background:#fff2f8}
-.orderDrop summary::-webkit-details-marker{display:none}
-.orderDrop summary:after{content:'⌄';color:#c72d86;font-size:20px;font-weight:900}
-.orderDrop[open] summary{background:linear-gradient(90deg,#fff0f7,#fff9fc);border-bottom:1px solid #f2dce7}
-.orderDrop[open] summary:after{content:'⌃'}
-.orderSummaryText{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#4b4650;letter-spacing:.01em;line-height:1.35}
-.orderNumber{margin-left:auto;white-space:nowrap;font-size:12px;font-weight:900;color:#a12870;background:linear-gradient(135deg,#fff0f8,#ffe1ef);border:1px solid #efbdd7;border-radius:999px;padding:7px 10px;box-shadow:0 4px 12px rgba(185,43,117,.1)}
-.orderDropBody{padding:0 16px 16px}
-.orderDropBody .row{padding-top:12px}
-@media(max-width:640px){.orderDrop summary{align-items:flex-start;flex-wrap:wrap}.orderSummaryText{white-space:normal;flex:1 1 100%}.orderNumber{margin-left:0}.trackStatus{font-size:15px}}
-</style></head><body><header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a><nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a><a href="coa.html">COA</a></nav></header><main class="wrap"><section class="hero"><div><div class="eyebrow">ORDER TRACKING</div><h1>Track Your Order</h1><p class="muted">Enter the email used with your order.</p></div></section><section class="card trackCard"><input id="email" class="input" placeholder="Email" type="email" onkeydown="if(event.key==='Enter')track()"><div class="actions"><button class="btn primary" onclick="track()">TRACK ORDER</button></div><div id="out"></div></section></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script><script>initSupabase();const STATUSES=['ORDER RECEIVED','PAYMENT CONFIRMED','ORDER PROCESSING','IN TRANSIT TO THE PHILIPPINES','ARRIVED IN THE PHILIPPINES','RECEIVED AT WAREHOUSE','PACKING & LABELLING','HANDED OVER TO LOCAL COURIER','DELIVERED'];function $(id){return document.getElementById(id)}function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}function peso(v){return '₱'+Number(v||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})}function itemsFor(o,all){if(Array.isArray(o.items))return o.items;if(Array.isArray(o.order_items))return o.order_items;if(Array.isArray(o.products))return o.products;const oid=o.id??o.order_id;return all.filter(i=>String(i.order_id??i.order?.id??'')===String(oid))}function itemLabel(i){const p=i.product||i.products||{};const name=i.product_name??p.name??i.name??'Product';const variant=i.variant_name??i.strength??i.variant??i.mg??i.product_variant?.name??i.product_variants?.name??i.variant_label??'';return [name,String(variant||'').replace(/\\s+/g,' ').trim()].filter(Boolean).join(' ')}function itemQty(i){return Number(i.quantity??i.qty??i.count??1)||1}function orderNote(o){return o.manual_note??o.note??o.notes??o.admin_note??o.late_order_note??''}async function track(){const e=$('email').value.trim().toLowerCase();if(!e)return;const out=$('out');out.innerHTML='<div class="notice">Loading your tracking details…</div>';try{const r=await sb.rpc('get_customer_tracking',{p_email:e});if(r.error)throw r.error;const data=r.data||{},orders=data.orders||[],shipments=data.shipments||[],allItems=data.order_items||data.items||[];if(!orders.length&&!shipments.length){out.innerHTML='<div class="notice">No orders found for this email.</div>';return}const shipmentHtml=shipments.map(s=>{const ci=STATUSES.indexOf(s.status);return '<div class="card"><div class="row"><div><div class="eyebrow">CONSOLIDATED SHIPMENT</div><b>'+esc(s.shipment_id)+'</b></div><div class="trackStatus">'+esc(s.status)+'</div></div>'+(s.tracking_number?'<div class="row"><span>Tracking</span><b>'+esc(s.tracking_number)+'</b></div>':'')+(s.waybill_number?'<div class="row"><span>Waybill</span><b>'+esc(s.waybill_number)+'</b></div>':'')+'<div class="trackTimeline">'+STATUSES.map((x,i)=>'<div class="trackDot '+(i===ci?'current':i<ci?'done':'')+'">'+esc(x)+'</div>').join('')+'</div>'+(s.notes?'<div class="notice">'+esc(s.notes)+'</div>':'')+'</div>'}).join('');const ordersHtml=orders.length?'<div class="card"><h2>Your Orders</h2><div class="ordersAccordion">'+orders.map((o,idx)=>{const items=itemsFor(o,allItems),note=orderNote(o);const label=items.length?items.map(i=>itemLabel(i).toUpperCase()+'  •  QTY '+itemQty(i)).join('   |   '):'VIEW ORDER DETAILS';return '<details class="orderDrop"><summary><span class="orderSummaryText">'+esc(label)+'</span><span class="orderNumber">ORDER# '+esc(o.order_id??o.id??'—')+'</span></summary><div class="orderDropBody"><div class="row"><span>'+(o.gb_number?'<small>GB '+esc(o.gb_number)+'</small>':'')+'</span><span><b>'+peso(o.total)+'</b><br><small>'+esc(o.payment_status)+'</small></span></div>'+(items.length?'<div class="orderProducts">'+items.map(i=>'<div class="productLine"><span>'+esc(itemLabel(i))+'</span><b>× '+itemQty(i)+'</b></div>').join('')+'</div>':'<div class="notice" style="margin-top:10px">Product details unavailable for this order.</div>')+(note?'<div class="notice manualNote"><b>NOTE:</b> '+esc(note)+'</div>':'')+'</div></details>'}).join('')+'</div></div>':'';out.innerHTML=shipmentHtml+ordersHtml}catch(err){console.error(err);out.innerHTML='<div class="notice error">Unable to load tracking. Please try again.</div>'}}</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PEPMOSA • Track</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body{background:radial-gradient(circle at 10% 8%,rgba(255,126,185,.13),transparent 26%),linear-gradient(135deg,#fff8fc,#fff3f9 55%,#f7efff)}
+.trackHero{margin-bottom:18px}
+.trackSearch{padding:22px;border:1px solid #efd5e4;border-radius:24px;background:linear-gradient(135deg,#fff,#fff6fb);box-shadow:0 16px 40px rgba(151,57,109,.09)}
+.trackSearchRow{display:flex;gap:10px}
+.trackSearchRow input{flex:1;min-height:50px;border-radius:15px}
+.clientCard{margin-top:18px;overflow:hidden;border:1px solid #efd4e3;border-radius:26px;background:linear-gradient(145deg,#fff,#fff9fc);box-shadow:0 20px 50px rgba(152,55,108,.11)}
+.clientHead{padding:22px 22px 18px;background:linear-gradient(135deg,#fff0f7,#fff)}
+.clientEmail{font-size:24px;font-weight:950;color:#3c2b35;word-break:break-word;margin:5px 0}
+.statusPill{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border-radius:999px;background:linear-gradient(135deg,#ee4d9e,#b82b7c);color:#fff;font-size:12px;font-weight:950;letter-spacing:.04em}
+.clientBody{padding:20px 22px 24px}
+.timelineWrap{margin-top:4px;overflow-x:auto;padding-bottom:4px}
+.timeline{display:flex;min-width:max-content;gap:8px}
+.step{width:128px;padding:12px 10px;border-radius:14px;border:1px solid #ead7e2;background:#f5f1f4;color:#766c73;font-size:10px;font-weight:900;text-align:center}
+.step.done{background:#edf8f2;border-color:#cce8d9;color:#23784e}
+.step.current{background:linear-gradient(135deg,#ec4b9a,#b72a7a);border-color:#c92f84;color:#fff;box-shadow:0 8px 20px rgba(201,47,132,.22)}
+.clientMeta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px}
+.metaBox{padding:13px;border:1px solid #f0d9e5;border-radius:16px;background:#fffafd}
+.metaBox small{display:block;color:#a06f86;font-weight:900;letter-spacing:.08em;font-size:9px}
+.metaBox b{display:block;margin-top:5px;color:#493740;word-break:break-word}
+.orderSection{margin-top:22px}
+.orderSectionHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.orderCount{padding:7px 10px;border-radius:999px;background:#fff0f7;color:#b72b78;font-size:11px;font-weight:900}
+.productSummary{border:1px solid #efd6e4;border-radius:18px;overflow:hidden;background:#fff}
+.productRow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #f2e1ea}
+.productRow:last-child{border-bottom:0}
+.productName{font-weight:900;color:#44343c}
+.productQty{white-space:nowrap;padding:6px 10px;border-radius:999px;background:#fff0f7;color:#b42b75;font-size:12px;font-weight:900}
+.orderRef{margin-top:14px;padding:13px 15px;border-radius:15px;background:#fff8df;border:1px solid #f0dc8d;color:#705b2c;font-size:12px;line-height:1.5}
+.noteBox{margin-top:12px;padding:13px 15px;border-radius:15px;background:#fff5fa;border:1px solid #efcce0;color:#6b4a5b;font-size:12px}
+@media(max-width:680px){.trackSearchRow{flex-direction:column}.clientMeta{grid-template-columns:1fr}.clientEmail{font-size:19px}.productRow{align-items:flex-start}.step{width:118px}}
+</style>
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a>
+<nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a><a href="coa.html">COA</a></nav>
+</header>
+<main class="wrap">
+<section class="hero trackHero"><div><div class="eyebrow">ORDER TRACKING</div><h1>Track Your Orders</h1><p class="muted">One tracker per client. Enter the email used for your orders to see your complete order summary and current shipment status.</p></div></section>
+<section class="trackSearch">
+<div class="trackSearchRow"><input id="email" class="input" placeholder="Enter your email" type="email" onkeydown="if(event.key==='Enter')track()"><button class="btn primary" onclick="track()">TRACK MY ORDERS</button></div>
+<div id="out"></div>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="supabase.js"></script>
+<script>
+initSupabase();
+const STATUSES=['ORDER RECEIVED','PAYMENT CONFIRMED','ORDER PROCESSING','IN TRANSIT TO THE PHILIPPINES','ARRIVED IN THE PHILIPPINES','RECEIVED AT WAREHOUSE','PACKING & LABELLING','HANDED OVER TO LOCAL COURIER','DELIVERED'];
+function $(id){return document.getElementById(id)}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function itemsFor(o,all){const oid=o.id??o.order_id;return all.filter(i=>String(i.order_id??'')===String(oid))}
+function itemLabel(i){return [i.product_name||i.products?.product_name||i.products?.name||'Product',i.strength||i.variant_name||''].filter(Boolean).join(' ').replace(/\s+/g,' ').trim()}
+function itemQty(i){return Number(i.quantity??i.qty??1)||1}
+function noteFor(o){return o.manual_note??o.note??o.notes??o.admin_note??o.late_order_note??''}
+async function track(){
+ const email=$('email').value.trim().toLowerCase(),out=$('out');
+ if(!email){out.innerHTML='<div class="notice error">Please enter your email.</div>';return}
+ out.innerHTML='<div class="notice">Loading your orders…</div>';
+ try{
+  const r=await sb.rpc('get_customer_tracking',{p_email:email}); if(r.error)throw r.error;
+  const data=r.data||{},orders=data.orders||[],shipments=data.shipments||[],allItems=data.order_items||data.items||[];
+  if(!orders.length&&!shipments.length){out.innerHTML='<div class="notice">No orders found for this email.</div>';return}
+  const shipment=shipments.slice().sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0))[0]||{};
+  const status=shipment.status||'ORDER RECEIVED',ci=Math.max(0,STATUSES.indexOf(status));
+  const totals=new Map(),refs=[],notes=[];
+  orders.forEach(o=>{
+    refs.push(o.order_id??o.id??'—');
+    const n=noteFor(o);if(n)notes.push(n);
+    itemsFor(o,allItems).forEach(i=>{const key=itemLabel(i).toUpperCase();totals.set(key,(totals.get(key)||0)+itemQty(i))});
+  });
+  const productHtml=[...totals.entries()].map(([name,qty])=>'<div class="productRow"><span class="productName">'+esc(name)+'</span><span class="productQty">QTY '+qty+'</span></div>').join('')||'<div class="productRow"><span class="productName">Order details are being prepared.</span></div>';
+  const timeline=STATUSES.map((s,i)=>'<div class="step '+(i===ci?'current':i<ci?'done':'')+'">'+esc(s)+'</div>').join('');
+  out.innerHTML='<div class="clientCard"><div class="clientHead"><div class="eyebrow">PEPMOSA CLIENT TRACKER</div><div class="clientEmail">'+esc(email)+'</div><span class="statusPill">● '+esc(status)+'</span></div><div class="clientBody"><div class="timelineWrap"><div class="timeline">'+timeline+'</div></div><div class="clientMeta"><div class="metaBox"><small>COURIER</small><b>'+esc(shipment.courier||'Not set yet')+'</b></div><div class="metaBox"><small>TRACKING NUMBER</small><b>'+esc(shipment.tracking_number||'Not set yet')+'</b></div><div class="metaBox"><small>WAYBILL NUMBER</small><b>'+esc(shipment.waybill_number||'Not set yet')+'</b></div></div><div class="orderSection"><div class="orderSectionHead"><div><div class="eyebrow">YOUR COMPLETE ORDERS</div><h2 style="margin:4px 0 0">All products under this email</h2></div><span class="orderCount">'+orders.length+' ORDER'+(orders.length===1?'':'S')+'</span></div><div class="productSummary">'+productHtml+'</div><div class="orderRef"><b>ORDER REFERENCES</b><br>'+refs.map(esc).join(' • ')+'</div>'+ (notes.length?'<div class="noteBox"><b>NOTES</b><br>'+notes.map(esc).join('<br>')+'</div>':'') +'</div></div></div>';
+ }catch(err){console.error(err);out.innerHTML='<div class="notice error">Unable to load tracking. Please try again.</div>'}
+}
+</script>
+</body></html>

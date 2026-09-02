@@ -1,34 +1,75 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA • COA Library</title><style>:root{--ink:#332832;--muted:#786d75;--pink:#d91f7b;--pink2:#b72f9a;--line:#efd7e3;--soft:#fff8fb}*{box-sizing:border-box}body{margin:0;color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 15% 10%,#fff 0 12%,transparent 32%),linear-gradient(135deg,#fff9fc,#fff1f7 55%,#faf5ff);min-height:100vh}a{text-decoration:none;color:inherit}.top{max-width:1280px;margin:auto;padding:22px 34px 0}.back{display:inline-flex;gap:8px;align-items:center;color:#a22d65;font-weight:800;font-size:14px}.back:hover{color:var(--pink)}.page{max-width:980px;margin:auto;padding:20px 34px 60px}.brand{text-align:center;margin:10px 0 8px}.brand img{width:58px;height:58px;object-fit:contain;display:block;margin:0 auto 4px}.brand b{display:block;font-family:Georgia,serif;letter-spacing:.12em;font-size:25px}.brand span{display:block;font-size:10px;letter-spacing:.28em;font-weight:800;color:#a64a73}.hero{text-align:center;margin:4px auto 30px}.eyebrow{color:#b22e73;font-size:10px;font-weight:950;letter-spacing:.24em;margin-bottom:8px}.hero h1{font-family:Georgia,serif;font-size:clamp(48px,7vw,82px);line-height:.95;margin:0;color:#2e242d;letter-spacing:-3px}.hero h1 em{font-style:normal;color:var(--pink)}.hero p{max-width:680px;margin:16px auto 0;color:#6f6670;line-height:1.65}.library{background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 18px 50px rgba(170,69,122,.08)}.libraryHead{padding:8px 8px 18px;border-bottom:1px solid #f1dfe7;margin-bottom:10px}.libraryHead b{display:block;font-size:18px}.libraryHead span{font-size:12px;color:var(--muted)}.docCard{position:relative;background:linear-gradient(135deg,#fff,#fff8fb);border:1px solid #f0d7e4;border-radius:22px;padding:14px;margin:14px 0;display:flex;gap:18px;align-items:center;box-shadow:0 10px 28px rgba(170,69,122,.06);cursor:pointer}.docThumb{width:145px;height:105px;flex:0 0 145px;border-radius:15px;overflow:hidden;background:linear-gradient(135deg,#fff0f7,#f8e9ff);border:1px solid #efcfdf;display:flex;align-items:center;justify-content:center}.docThumb img{width:100%;height:100%;object-fit:cover;display:block}.docThumb .fallback{font-size:34px;color:#cf4d8c}.docMain{flex:1;min-width:0}.docCard h3{margin:0 0 6px;font-size:18px}.docCard p{margin:0;color:var(--muted);font-size:13px}.docHint{margin-top:10px;color:#b22e73;font-size:12px;font-weight:900;letter-spacing:.06em}.docBtn{border:0;padding:12px 18px;border-radius:14px;background:linear-gradient(135deg,#ee4f9c,#c71b74 55%,#a93ca9);color:#fff;font-weight:900;cursor:pointer;box-shadow:0 12px 24px rgba(207,43,127,.18)}.docBtn:hover{transform:translateY(-1px)}.empty,.notice{padding:30px 18px;text-align:center;color:#806f7b;border:1px dashed #ecc9da;border-radius:18px;background:#fff9fc}.notice.error{color:#a22d65;background:#fff4f8}.footer{text-align:center;margin-top:18px;color:#cf4d8c;font-family:Georgia,serif;font-size:18px}@media(max-width:680px){.top{padding:16px 18px 0}.page{padding:14px 18px 36px}.hero h1{letter-spacing:-2px}.library{padding:13px;border-radius:22px}.docCard{align-items:stretch;flex-direction:column}.docThumb{width:100%;height:190px;flex-basis:auto}.docBtn{width:100%}}</style></head><body><div class="top"><a class="back" href="index.html">← <span>Back to Shop</span></a></div><main class="page"><div class="brand"><img src="https://raw.githubusercontent.com/groupbuypepmosa/pepmosagroupbuy/main/pepmosa-logo.png" alt="PEPMOSA"><b>PEPMOSA</b><span>GROUP BUY</span></div><section class="hero"><div class="eyebrow">CERTIFICATES OF ANALYSIS</div><h1>COA <em>Library</em> ✧</h1><p>Browse available Certificates of Analysis uploaded by PEPMOSA in one clean, easy-to-read library.</p></section><section class="library"><div class="libraryHead"><b>COA Library</b><span>Available reference documents from PEPMOSA.</span></div><section id="documents"><div class="empty">Loading documents…</div></section></section><div class="footer">♡ PEPMOSA GROUP BUY ♡</div></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260903-library-live"></script><script src="supabase.js?v=20260903-library-live"></script><script>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PEPMOSA • COA Library</title>
+<style>
+:root{--ink:#332832;--muted:#786d75;--pink:#d91f7b;--pink2:#b72f9a;--line:#efd7e3}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 12% 8%,#fff 0 12%,transparent 34%),radial-gradient(circle at 88% 18%,#ffe8f2 0,transparent 28%),linear-gradient(135deg,#fff9fc,#fff1f7 55%,#faf5ff);min-height:100vh}
+a{text-decoration:none;color:inherit}.top{max-width:1280px;margin:auto;padding:22px 34px 0}.back{display:inline-flex;gap:8px;align-items:center;color:#a22d65;font-weight:900;font-size:14px}
+.page{max-width:1050px;margin:auto;padding:20px 28px 60px}.brand{text-align:center;margin:4px 0}.brand img{width:54px;height:54px;object-fit:contain;display:block;margin:0 auto 3px}.brand b{display:block;font-family:Georgia,serif;letter-spacing:.12em;font-size:24px}.brand span{display:block;font-size:10px;letter-spacing:.28em;font-weight:900;color:#a64a73}
+.hero{text-align:center;margin:6px auto 26px}.eyebrow{color:#b22e73;font-size:10px;font-weight:950;letter-spacing:.24em;margin-bottom:8px}.hero h1{font-family:Georgia,serif;font-size:clamp(46px,7vw,78px);line-height:.95;margin:0;color:#2e242d;letter-spacing:-3px}.hero h1 em{font-style:normal;color:var(--pink)}.hero p{max-width:660px;margin:15px auto 0;color:#6f6670;line-height:1.65}
+.library{background:rgba(255,255,255,.82);border:1px solid var(--line);border-radius:30px;padding:20px;box-shadow:0 18px 55px rgba(170,69,122,.10);backdrop-filter:blur(8px)}.libraryHead{padding:4px 7px 17px;border-bottom:1px solid #f1dfe7;margin-bottom:8px}.libraryHead b{display:block;font-size:19px}.libraryHead span{font-size:12px;color:var(--muted)}
+.docGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;padding:8px 2px}.docCard{background:linear-gradient(180deg,#fff,#fff8fb);border:1px solid #f0d7e4;border-radius:24px;overflow:hidden;box-shadow:0 12px 30px rgba(170,69,122,.08);transition:.18s;cursor:pointer}.docCard:hover{transform:translateY(-3px);box-shadow:0 18px 38px rgba(170,69,122,.14)}
+.preview{height:300px;background:linear-gradient(135deg,#fff0f7,#f8e9ff);position:relative;overflow:hidden;border-bottom:1px solid #f0d7e4;display:flex;align-items:center;justify-content:center}.preview img,.preview iframe{width:100%;height:100%;border:0;display:block}.preview img{object-fit:contain;background:#fff}.loading{color:#bd4a81;font-weight:900;font-size:13px;letter-spacing:.08em}.fallback{font-size:56px;color:#cf4d8c}.imageBadge{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.92);border:1px solid #f0d7e4;border-radius:999px;padding:7px 11px;color:#b22e73;font-size:10px;font-weight:950;letter-spacing:.08em;box-shadow:0 6px 18px rgba(170,69,122,.08)}
+.docInfo{padding:16px}.docInfo h3{margin:0 0 5px;font-size:18px}.docInfo p{margin:0;color:var(--muted);font-size:13px;min-height:20px}.docActions{display:flex;gap:10px;margin-top:14px}.docBtn{flex:1;border:0;padding:12px 15px;border-radius:14px;background:linear-gradient(135deg,#ee4f9c,#c71b74 55%,#a93ca9);color:#fff;font-weight:950;cursor:pointer;box-shadow:0 10px 22px rgba(207,43,127,.16)}.docBtn:hover{filter:brightness(1.03)}
+.empty,.notice{padding:34px 18px;text-align:center;color:#806f7b;border:1px dashed #ecc9da;border-radius:18px;background:#fff9fc}.notice.error{color:#a22d65;background:#fff4f8}.footer{text-align:center;margin-top:18px;color:#cf4d8c;font-family:Georgia,serif;font-size:18px}
+@media(max-width:720px){.top{padding:16px 18px 0}.page{padding:14px 18px 36px}.library{padding:13px;border-radius:22px}.docGrid{grid-template-columns:1fr}.preview{height:360px}.hero h1{letter-spacing:-2px}}
+</style>
+</head>
+<body>
+<div class="top"><a class="back" href="index.html">← <span>Back to Shop</span></a></div>
+<main class="page">
+<div class="brand"><img src="pepmosa-logo.png" alt="PEPMOSA"><b>PEPMOSA</b><span>GROUP BUY</span></div>
+<section class="hero"><div class="eyebrow">CERTIFICATES OF ANALYSIS</div><h1>COA <em>Library</em> ✧</h1><p>Your available COA documents are shown as previews below. Tap any preview to open the full document.</p></section>
+<section class="library">
+<div class="libraryHead"><b>COA Library</b><span>Preview your documents directly before opening them.</span></div>
+<section id="documents"><div class="empty">Loading COA previews…</div></section>
+</section>
+<div class="footer">♡ PEPMOSA GROUP BUY ♡</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js?v=20260903-coa-preview-fix"></script>
+<script src="supabase.js?v=20260903-coa-preview-fix"></script>
+<script>
 (function(){
- const TYPE="COA";
- const escDoc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+ const TYPE='COA';
+ const box=document.getElementById('documents');
+ const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+ const isImage=d=>/image\//i.test(d.mime_type||'')||/\.(png|jpe?g|jfif|webp|gif)$/i.test(d.file_name||d.file_path||'');
+ const isPdf=d=>/pdf/i.test(d.mime_type||'')||/\.pdf$/i.test(d.file_name||d.file_path||'');
+ const directUrl=d=>/^https?:\/\//i.test(d.file_path||'')?d.file_path:'';
+ async function getUrl(client,d){
+   if(directUrl(d)) return directUrl(d);
+   const {data,error}=await client.storage.from('library-documents').createSignedUrl(d.file_path,60*60*6);
+   if(!error&&data&&data.signedUrl) return data.signedUrl;
+   const pub=client.storage.from('library-documents').getPublicUrl(d.file_path);
+   return pub?.data?.publicUrl||'';
+ }
+ function previewMarkup(d,url){
+   if(!url) return '<div class="fallback">✦</div>';
+   if(isPdf(d)) return '<iframe src="'+esc(url)+'#view=FitH" title="'+esc(d.title||'COA preview')+'"></iframe>';
+   return '<img src="'+esc(url)+'" alt="'+esc(d.title||'COA preview')+'" loading="eager" onerror="this.style.display=\'none\';this.parentElement.querySelector(\'.fallback\').style.display=\'block\'"><div class="fallback" style="display:none">✦</div>';
+ }
  async function boot(){
-  const box=document.getElementById('documents');
   try{
-   if(!box) throw new Error('Library container is missing.');
-   box.innerHTML='<div class="empty">Loading COA documents…</div>';
    if(!window.supabase) throw new Error('Supabase failed to load.');
    const client=initSupabase();
    const {data,error}=await client.from('library_documents').select('id,document_type,title,product_name,file_path,file_name,mime_type,created_at').eq('document_type',TYPE).order('created_at',{ascending:false});
    if(error) throw error;
-   if(!data?.length){box.innerHTML='<div class="empty">No COA documents uploaded yet.</div>';return;}
-   const docs=await Promise.all(data.map(async d=>{
-    let preview='';
-    if(d.file_path){
-     const {data:link}=await client.storage.from('library-documents').createSignedUrl(d.file_path,3600);
-     preview=link?.signedUrl||'';
-    }
-    return {...d,preview};
-   }));
-   box.innerHTML=docs.map(d=>'<article class="docCard" data-url="'+escDoc(d.preview||'')+'"><div class="docThumb">'+(d.preview?'<img src="'+escDoc(d.preview)+'" alt="'+escDoc(d.title||'Document')+' preview" loading="lazy" onerror="this.parentElement.innerHTML=\'<span class=&quot;fallback&quot;>✦</span>\'">':'<span class="fallback">✦</span>')+'</div><div class="docMain"><h3>'+escDoc(d.title||'Document')+'</h3><p>'+escDoc(d.product_name||d.file_name||'Reference document')+'</p><div class="docHint">TAP TO VIEW FULL DOCUMENT →</div></div><button class="docBtn" type="button" data-url="'+escDoc(d.preview||'')+'">VIEW →</button></article>').join('');
-   const openDoc=url=>{if(url) window.open(url,'_blank','noopener');else alert('Unable to open this document.');};
-   box.querySelectorAll('.docCard').forEach(card=>card.addEventListener('click',()=>openDoc(card.dataset.url)));
-   box.querySelectorAll('.docBtn').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();openDoc(btn.dataset.url)}));
+   if(!data||!data.length){box.innerHTML='<div class="empty">No COA documents uploaded yet.</div>';return;}
+   const docs=[];
+   for(const d of data){docs.push({...d,url:await getUrl(client,d)});}
+   box.innerHTML='<div class="docGrid">'+docs.map(d=>'<article class="docCard" data-url="'+esc(d.url)+'"><div class="preview">'+previewMarkup(d,d.url)+'<span class="imageBadge">'+(isPdf(d)?'PDF PREVIEW':'COA PREVIEW')+'</span></div><div class="docInfo"><h3>'+esc(d.title||d.product_name||'COA Document')+'</h3><p>'+esc(d.product_name||d.file_name||'Certificate of Analysis')+'</p><div class="docActions"><button class="docBtn" type="button">OPEN FULL DOCUMENT →</button></div></div></article>').join('')+'</div>';
+   box.querySelectorAll('.docCard').forEach(card=>card.addEventListener('click',()=>{const u=card.dataset.url;if(u) window.open(u,'_blank','noopener');}));
   }catch(e){
-   console.error('COA LIBRARY ERROR',e);
-   box.innerHTML='<div class="notice error"><b>COA documents could not load.</b><br>'+escDoc(e?.message||'Unknown error')+'</div>';
+   console.error(e);
+   box.innerHTML='<div class="notice error"><b>COA previews could not load.</b><br>'+esc(e?.message||'Unknown error')+'</div>';
   }
  }
- if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
-</script></body></html>
+</script>
+</body></html>

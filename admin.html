@@ -320,7 +320,7 @@ function renderWaybillCenter(){
       '<div class="buyerWaybillRow '+(r.email===selectedWaybillBuyer?'selected':'')+'">'+
       '<div><div class="buyerWaybillName">'+esc(r.customer_name)+'</div><div class="small">'+esc(r.email)+(r.contact?' • '+esc(r.contact):'')+'</div>'+
       '<div class="buyerWaybillMeta"><span>'+r.orders.length+' order(s)</span><span>'+r.products.length+' item type(s)</span><span>'+esc(r.courier||"Courier pending")+'</span><span>'+esc(r.payment)+'</span></div></div>'+
-      '<div class="waybillActions"><button class="btn secondary" type="button" onclick="selectWaybillBuyer('+JSON.stringify(r.email)+')">VIEW</button><button class="btn primary" type="button" onclick="selectWaybillBuyer('+JSON.stringify(r.email)+');setTimeout(printSelectedWaybill,0)">PRINT</button></div></div>'
+      '<div class="waybillActions"><button class="btn secondary" type="button" data-email="'+esc(r.email)+'" onclick="selectWaybillBuyer(this.dataset.email)">VIEW</button><button class="btn primary" type="button" data-email="'+esc(r.email)+'" onclick="selectWaybillBuyer(this.dataset.email);setTimeout(printSelectedWaybill,0)">PRINT</button></div></div>'
     ).join("")+'</div>':'<div class="waybillEmpty">No paid orders match this search yet.</div>';
   renderSelectedWaybill();
 }

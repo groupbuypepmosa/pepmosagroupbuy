@@ -49,7 +49,35 @@
   async function sendVerify(){const email=$('pepVerifyEmail').value.trim().toLowerCase(),msg=$('pepVerifyMsg');if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){msg.innerHTML='<div class="pepFeeNotice error">Please enter a valid email.</div>';return}msg.innerHTML='<div class="pepFeeNotice">Checking your Admin Fee status in the PEPMOSA system…</div>';const access=await checkAccessByEmail(email);if(!access){verifiedEmail='';localStorage.removeItem('pepmosa_verified_email');msg.innerHTML='<div class="pepFeeNotice error">No Admin Fee payment was found for this email in the current Group Buy. Please choose PAY ADMIN FEE first.</div>';return}feePayment=access;localStorage.setItem('pepmosa_customer_email',email);if(access.id)localStorage.setItem('pepmosa_fee_payment_id',access.id);if(access.status==='SUBMITTED'){verifiedEmail='';localStorage.removeItem('pepmosa_verified_email');msg.innerHTML='<div class="pepFeeNotice warn">Your Admin Fee payment is still waiting for approval.</div>';await refreshFeeState(false);return}if(access.status==='REJECTED'){verifiedEmail='';localStorage.removeItem('pepmosa_verified_email');msg.innerHTML='<div class="pepFeeNotice error">This Admin Fee payment was rejected. Please submit a new payment proof.</div>';await refreshFeeState(false);return}if(access.status!=='PAID'){verifiedEmail='';localStorage.removeItem('pepmosa_verified_email');msg.innerHTML='<div class="pepFeeNotice error">Admin Fee approval is still required.</div>';return}verifiedEmail=email;localStorage.setItem('pepmosa_verified_email',email);localStorage.setItem('pepmosa_customer_email',email);$('pepVerifyModal').classList.remove('open');info('Email Verified ✓','Your Admin Fee is approved. This email is now verified in the PEPMOSA system and you can order immediately.','pepmosa_email_verified_popup');await refreshFeeState(false);renderProducts()}
   async function authReturn(){return}
   function minFor(variantId,category){const x=minimums.find(m=>m.variant_id===variantId);const cat=categoryMinimums.find(m=>m.category_name===category);return Math.max(1,Number(x?.minimum_qty??cat?.minimum_qty??1))}
-  function renderProducts(){const grid=$('productGrid');if(!grid)return;const q=($('search')?.value||'').toLowerCase().trim();const list=products.filter(p=>`${p.product_name} ${p.category} ${(p.product_variants||[]).map(v=>v.strength).join(' ')}`.toLowerCase().includes(q));if(!list.length){grid.innerHTML='<div class="card"><b>No products available yet.</b><br><span class="muted">No active products are available for this Group Buy.</span></div>';return}grid.innerHTML=list.map(p=>`<div class="card"><div class="productImg" style="height:180px">${p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.product_name)}">`:''}</div><h3>${esc(p.product_name)}</h3><div class="muted">${esc(p.description||'')}</div>${(p.product_variants||[]).map(v=>{const m=minFor(v.variant_id,p.category);return `<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;border-top:1px dashed #ead9e5;padding:10px 0"><div><b>${esc(v.strength)}</b><br><span class="muted">${peso(v.price)} • minimum ${m}</span></div><input id="pepQty_${esc(v.variant_id)}" type="number" min="${m}" value="${m}" style="width:70px;padding:8px;border:1px solid #e5d4e0;border-radius:9px"><button class="pepFeeBtn" onclick="window.pepAddToCart('${esc(p.product_id)}','${esc(v.variant_id)}')">ADD</button></div>`}).join('')}</div>`).join('')}
+  function renderProducts(){
+  const grid=$('productGrid');
+  if(!grid)return;
+
+  const q=($('search')?.value||'').toLowerCase().trim();
+  const list=products.filter(p=>`${p.product_name} ${p.category} ${(p.product_variants||[]).map(v=>v.strength).join(' ')}`.toLowerCase().includes(q));
+
+  if(!list.length){
+    grid.innerHTML='<div class="card"><b>No products available yet.</b><br><span class="muted">No active products are available for this Group Buy.</span></div>';
+    return;
+  }
+
+  grid.innerHTML=list.map(p=>{
+    const variants=(p.product_variants||[]).filter(v=>v.active!==false);
+    const lowest=variants.length?Math.min(...variants.map(v=>Number(v.price)||0)):0;
+    return `<article class="card pepStoreCard" data-product-id="${esc(p.product_id)}">
+      <div class="productImg">${p.image_url?'<img src="'+esc(p.image_url)+'" alt="'+esc(p.product_name)+'">':''}</div>
+      <div class="pepStoreBody">
+        <h3>${esc(p.product_name)}</h3>
+        <div class="muted">${esc(p.description||'')}</div>
+        <div class="pepStoreBottom">
+          <div class="pepStarting"><small>STARTING AT</small><b>${peso(lowest)}</b><span>${variants.length} variant${variants.length===1?'':'s'} available</span></div>
+          <button class="pepFeeBtn pepSelectVariant" type="button" onclick="openProductPicker('${esc(p.product_id)}')">CHOOSE VARIANT</button>
+        </div>
+      </div>
+      ${variants.map(v=>{const m=minFor(v.variant_id,p.category);return '<input type="hidden" id="qty-'+esc(v.variant_id)+'" value="'+m+'">';}).join('')}
+    </article>`;
+  }).join('');
+}
   window.pepAddToCart=function(pid,vid){if(!feePayment||feePayment.status!=='PAID')return feeAction();if(!verifiedEmail)return openVerify();const p=products.find(x=>x.product_id===pid),v=p?.product_variants?.find(x=>x.variant_id===vid);if(!p||!v)return;const min=minFor(vid,p.category),q=Math.max(min,Number($('pepQty_'+vid)?.value||min));let cart=JSON.parse(localStorage.pepmosaCart||'[]');const old=cart.find(x=>x.variant_id===vid&&x.gb_number===gb.gb_number);if(old)old.qty+=q;else cart.push({gb_number:gb.gb_number,product_id:pid,variant_id:vid,product_name:p.product_name,strength:v.strength,unit_price:Number(v.price),qty:q});localStorage.pepmosaCart=JSON.stringify(cart);if(typeof window.renderCart==='function')window.renderCart();if($('cartCount'))$('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0);info('Added to Cart',`${q} × ${p.product_name} ${v.strength} added to your cart.`)};
   function hookCheckout(){if(typeof window.checkout!=='function'||window.checkout.__pepStableGuard)return;const original=window.checkout;window.checkout=async function(){if(!feePayment||feePayment.status!=='PAID')return feeAction();if(!verifiedEmail)return openVerify();return original()};window.checkout.__pepStableGuard=true}
   function hookPlaceOrder(){if(typeof window.placeOrder!=='function'||window.placeOrder.__pepStableGuard)return;const original=window.placeOrder;window.placeOrder=async function(){if(!feePayment||feePayment.status!=='PAID')return feeAction();if(!verifiedEmail)return openVerify();if($('email'))$('email').value=verifiedEmail;return original()};window.placeOrder.__pepStableGuard=true}

@@ -1900,14 +1900,29 @@ function updateCart(){
   // Always sync from storage so storefront add-to-cart and cart modal use one source of truth.
   cart = JSON.parse(localStorage.pepmosaCart || "[]");
 
-  $("cartCount").textContent =
+  const count =
     cart.reduce(
       (sum,item) =>
         sum + Number(item.qty || 0),
       0
     );
 
+  if($("cartCount")) $("cartCount").textContent = count;
+
 }
+
+window.pepSyncCartBadge = function(){
+  updateCart();
+};
+
+window.addEventListener("pepmosa-cart-updated", updateCart);
+window.addEventListener("storage", function(e){
+  if(e.key === "pepmosaCart") updateCart();
+});
+window.addEventListener("focus", updateCart);
+document.addEventListener("visibilitychange", function(){
+  if(!document.hidden) updateCart();
+});
 
 
 

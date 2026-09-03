@@ -1924,6 +1924,28 @@ document.addEventListener("visibilitychange", function(){
   if(!document.hidden) updateCart();
 });
 
+/* FINAL CART BADGE GUARD
+   Other storefront scripts can replace cart logic, so the header badge is
+   always reconciled with the actual shared cart storage. */
+(function keepCartBadgeAccurate(){
+  function sync(){
+    let saved=[];
+    try{ saved=JSON.parse(localStorage.getItem("pepmosaCart")||"[]"); }
+    catch(e){ saved=[]; }
+    if(!Array.isArray(saved)) saved=[];
+    const count=saved.reduce((sum,item)=>sum+Math.max(0,Number(item?.qty??item?.quantity??0)||0),0);
+    const badge=document.getElementById("cartCount");
+    if(badge && String(badge.textContent).trim()!==String(count)){
+      badge.textContent=String(count);
+    }
+  }
+  window.pepSyncCartBadge=sync;
+  sync();
+  setInterval(sync,400);
+  window.addEventListener("pageshow",sync);
+  window.addEventListener("pepmosa-cart-updated",sync);
+})();
+
 
 
 /* =========================================================
@@ -2396,10 +2418,10 @@ load();
 
 </script>
 
-<script src="storefront-repair.js?v=20260902-admin-fee-hardgate-3"></script>
+<script src="storefront-repair.js?v=20260903-cartfix-final"></script>
 <!-- Product picker version: 2026-09-02 -->
-<script src="checkout-polish.js"></script>
-<script src="kit-completion-storefront.js?v=20260902-admin-fee-hardgate-3"></script>
+<script src="checkout-polish.js?v=20260903-cartfix-final"></script>
+<script src="kit-completion-storefront.js?v=20260903-cartfix-final"></script>
 
 <!-- PEPMOSA custom popup system: design-only replacement for browser alerts -->
 <style id="pepmosa-popup-style">

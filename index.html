@@ -320,7 +320,8 @@ header{
 }
 
 /* Make the active Group Buy name more prominent */
-#gbStatus b{
+#gbStatus > b,
+#gbStatus .gb-name{
   display:block;
   font-size:clamp(26px,4vw,42px);
   line-height:1.08;
@@ -1895,7 +1896,9 @@ function addToCart(pid,vid){
 
   updateCart();
 
-  openCart();
+  // Adding to cart must NOT navigate, reload inventory, or open the cart.
+  // Inventory remains unchanged until a successful atomic order submission.
+  window.dispatchEvent(new Event("pepmosa-cart-updated"));
 
 }
 

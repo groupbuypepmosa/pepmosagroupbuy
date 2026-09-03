@@ -612,7 +612,7 @@ function renderOrdersCenter(){
 }
 async function refreshPaymentCenter(){try{await Promise.all([loadFees(),loadOrders()]);showMessage("Payments refreshed.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to refresh payments.","error")}}
 function paymentMatches(row,type,q,filter){
- const text=type==="fee"?[row.full_name,row.telegram_name,row.email,row.gb_number,row.payment_reference].join(" "):[row.email,row.order_id,row.gb_number,row.shipping_method,row.payment_reference].join(" ");
+ const text=type==="fee"?[row.full_name,(row.whatsapp_name||row.telegram_name),row.email,row.gb_number,row.payment_reference].join(" "):[row.email,row.order_id,row.gb_number,row.shipping_method,row.payment_reference].join(" ");
  const approved=type==="fee"?feeIsApproved(row):orderIsApproved(row),rejected=type==="fee"?feeIsRejected(row):orderIsRejected(row);
  const state=approved?"APPROVED":rejected?"REJECTED":"PENDING";
  return (!q||text.toLowerCase().includes(q))&&(filter==="ALL"||filter===state);
@@ -634,7 +634,7 @@ function renderPaymentCenter(){
  if($("adminFeeCount"))$("adminFeeCount").textContent=filteredFees.length;
  if($("checkoutCount"))$("checkoutCount").textContent=filteredOrders.length;
  if($("feeList"))$("feeList").innerHTML=filteredFees.length?`<div class="paymentRows">${filteredFees.map(x=>{
-   const approved=feeIsApproved(x),rejected=feeIsRejected(x),customer=x.full_name||x.telegram_name||x.email||"Customer",sub=[x.telegram_name?("Telegram: "+x.telegram_name):"",x.email||""].filter(Boolean).join(" • ");
+   const approved=feeIsApproved(x),rejected=feeIsRejected(x),customer=x.full_name||(x.whatsapp_name||x.telegram_name)||x.email||"Customer",sub=[(x.whatsapp_name||x.telegram_name)?("WhatsApp: "+(x.whatsapp_name||x.telegram_name)):"",x.email||""].filter(Boolean).join(" • ");
    return `<div class="paymentRow ${approved?"approved":rejected?"rejected":"pending"}"><div class="paymentCustomer"><b>${esc(customer)}</b><small>${esc(sub||"No email attached yet")}</small></div><div class="paymentMeta"><b>${peso(x.amount)}</b>Admin Fee</div><div class="paymentMeta"><b>${esc(x.gb_number||"—")}</b>${new Date(x.created_at||Date.now()).toLocaleString("en-PH")}</div><div>${paymentProof(x.payment_proof_url)}</div><div class="paymentActions">${paymentStatusBadge(x.status,approved,rejected)}${!approved&&!rejected?`<button class="btn success" onclick="approveFeePayment('${esc(x.id)}')">APPROVE</button><button class="btn danger" onclick="rejectFeePayment('${esc(x.id)}')">REJECT</button>`:""}</div></div>`}).join("")}</div>`:`<div class="emptyPayment">No Admin Fee payments match this filter.</div>`;
  if($("checkoutPaymentList"))$("checkoutPaymentList").innerHTML=filteredOrders.length?`<div class="paymentRows">${filteredOrders.map(x=>{
    const approved=orderIsApproved(x),rejected=orderIsRejected(x),items=(x.order_items||[]).map(i=>`${i.product_name||"Product"} ${i.strength||""} × ${i.qty||0}`).join(", ");

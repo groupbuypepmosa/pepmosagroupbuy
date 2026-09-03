@@ -209,7 +209,7 @@
 
   async function load(){try{const s=S();if(!s)return;ensureUI();const g=await s.from('group_buys').select('*').in('status',['OPEN','KIT_COMPLETION','CLOSED']).order('created_at',{ascending:false}).limit(20);if(g.error)throw g.error;
     const rows=g.data||[];
-    gb=rows.find(x=>['OPEN','KIT_COMPLETION'].includes(x.status))||rows.find(x=>x.status==='CLOSED')||null;
+    gb=rows.find(x=>['OPEN','KIT_COMPLETION'].includes(x.status))||rows.find(x=>x.status==='CLOSED')||null; window.currentGB=gb||null;
     if(!gb){if($('gbStatus'))$('gbStatus').innerHTML='<div class="notice error">No Group Buy available right now.</div>';return}
     if($('gbStatus')){
       if(gb.status==='KIT_COMPLETION'){
@@ -233,7 +233,7 @@
     }
     products=baseProducts.map(p=>({...p,product_variants:allVariants.filter(v=>String(v.product_id)===String(p.product_id)&&v.active!==false)}));const ms=await s.from('gb_minimum_quantities').select('gb_number,product_id,variant_id,minimum_qty').eq('gb_number',gb.gb_number);if(ms.error)throw ms.error;minimums=ms.data||[];const cs=await s.from('gb_category_settings').select('gb_number,category_name,minimum_qty').eq('gb_number',gb.gb_number);if(cs.error){console.warn('PEPMOSA CATEGORY MINIMUMS',cs.error);categoryMinimums=[]}else categoryMinimums=cs.data||[];
     if(gb.status==='KIT_COMPLETION'){const kitMap=await loadKitInventory(gb.gb_number);products=products.map(p=>({...p,product_variants:(p.product_variants||[]).filter(v=>Number(kitMap.get(String(v.variant_id))||0)>0).map(v=>({...v,minimum_qty:1,remaining_qty:Number(kitMap.get(String(v.variant_id))||0)}))})).filter(p=>(p.product_variants||[]).length>0)}else{products=products.map(p=>({...p,product_variants:(p.product_variants||[]).map(v=>({...v,minimum_qty:minFor(v.variant_id,p.category)}))}))}
-    renderProducts();
+    window.products=products; renderProducts();
     if(gb.status==='CLOSED'){
       const a=$('pepFeeState')||$('groupBuyAccess');
       if(a)a.innerHTML='<div class="muted">Ordering is closed. You can browse the pricelist.</div>';

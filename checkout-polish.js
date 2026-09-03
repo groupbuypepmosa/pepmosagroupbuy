@@ -64,6 +64,10 @@
   function closeCheckout(){const m=$('checkoutModal');if(m){m.classList.remove('open','show');m.style.removeProperty('display')}}
   window.checkout=async function(){
     const{cart}=totals();if(!cart.length){if(typeof window.openCart==='function')window.openCart();return}
+    const activeGB=getGB();
+    const freshCart=cart.filter(i=>!i.gb_number||i.gb_number===activeGB?.gb_number);
+    if(freshCart.length!==cart.length){window.cart=freshCart;localStorage.pepmosaCart=JSON.stringify(freshCart);}
+    if(!freshCart.length){if(typeof window.openCart==='function')window.openCart();return}
     const email=getVerifiedEmail();
     checkoutCustomer=email?await loadCheckoutCustomer(email):null;
     buildCheckout();
@@ -71,6 +75,8 @@
   };window.placeOrder=async()=>submitOrder();
   async function submitOrder(){
     const msg=$('pepCheckoutMsg'),btn=$('pepPlaceOrder'),{cart,subtotal}=totals(),gb=getGB(),s=S();if(!s||!gb||!cart.length){if(msg)msg.innerHTML='<div class="pepFinalError">Your checkout session is not ready. Please refresh and try again.</div>';return}
+    const latest=await s.from('group_buys').select('gb_number,status').eq('gb_number',gb.gb_number).maybeSingle();
+    if(latest.error||!latest.data||!['OPEN','KIT_COMPLETION'].includes(latest.data.status)){msg.innerHTML='<div class="pepFinalError">This Group Buy is no longer open. Please refresh the page.</div>';return}
     const email=($('pepEmail')?.value||'').trim().toLowerCase(),returning=!!checkoutCustomer;
     const name=(returning?checkoutCustomer.customer_name:$('pepCustomerName')?.value||'').trim();
     const contact=(returning?checkoutCustomer.contact:$('pepContact')?.value||'').trim();

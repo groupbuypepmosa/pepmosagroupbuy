@@ -17,12 +17,8 @@ function initSupabase() {
   }
 
   if ((window.location.pathname || '/').toLowerCase().endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
-    if (!document.querySelector('script[data-pepmosa-storefront-hotfix]')) {
-      const script = document.createElement('script');
-      script.src = 'storefront-ui-hotfix.js?v=20260901-2';
-      script.dataset.pepmosaStorefrontHotfix = '1';
-      document.head.appendChild(script);
-    }
+    // Storefront hotfix loader removed: it was pointing to an old cached script
+    // that overwrote the current KIT COMPLETION hero/status UI.
 
     if (!document.querySelector('script[data-pepmosa-checkout-polish]')) {
       const checkoutScript = document.createElement('script');

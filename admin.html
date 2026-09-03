@@ -774,14 +774,19 @@ async function deleteLibraryDocument(id,path){if(!confirm("Delete this document?
 // WAYBILL CENTER — always consolidate all paid orders by buyer/email.
 // This intentionally does not create duplicate shipments: it is a print view grouped by buyer.
 function normEmail(v){return String(v||"").trim().toLowerCase()}
-function isPaidForWaybill(o){return orderIsApproved(o)}
+function isPaidForWaybill(o){
+  /* Waybill eligibility is based on an approved/paid ORDER, regardless of
+     whether it was placed during OPEN or KIT COMPLETION. */
+  return orderIsApproved(o);
+}
 async function loadWaybillCenter(){
   const list=$("waybillBuyerList"),preview=$("waybillPreview");
-  if(list)list.innerHTML='<div class="notice">Loading buyers and consolidated orders...</div>';
+  if(list)list.innerHTML='<div class="notice">Loading buyers and consolidating all eligible orders...</div>';
   try{
-    const gb=(typeof getActiveGB==="function"?getActiveGB():"");
+    /* IMPORTANT: Waybill is consolidated per CUSTOMER EMAIL across the whole
+       Group Buy lifecycle. Do not filter to only the currently selected phase,
+       because OPEN orders + KIT COMPLETION orders must print together. */
     let ordersQuery=sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});
-    if(gb)ordersQuery=ordersQuery.eq("gb_number",gb);
 
     const [or,cr,sr]=await Promise.all([
       ordersQuery,

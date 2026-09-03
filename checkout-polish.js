@@ -31,8 +31,33 @@
       return {...c.data,last_shipping_method:o.data.shipping_method||''};
     }catch(e){console.warn('PEPMOSA customer lookup',e);return null}
   }
-  function getCart(){try{return Array.isArray(window.cart)?window.cart:JSON.parse(localStorage.pepmosaCart||'[]')}catch(e){return[]}}
+  const CART_KEY='pepmosaCart', CART_GB_KEY='pepmosaCartGB';
   function getGB(){return window.currentGB||window.pepmosaCurrentGB||null}
+  function getCartRaw(){try{return Array.isArray(window.cart)?window.cart:JSON.parse(localStorage.getItem(CART_KEY)||'[]')}catch(e){return[]}}
+  function clearPersistedCart(){
+    window.cart=[];
+    try{localStorage.removeItem(CART_KEY);localStorage.removeItem(CART_GB_KEY)}catch(e){}
+    if(typeof window.clearCart==='function'){try{window.clearCart()}catch(e){}}
+    ['cartCount','cart-count'].forEach(id=>{const el=$(id);if(el)el.textContent='0'});
+    document.querySelectorAll('[data-cart-count]').forEach(el=>el.textContent='0');
+    if(typeof window.updateCart==='function'){try{window.updateCart()}catch(e){}}
+  }
+  function getCart(){
+    const raw=getCartRaw(),gb=getGB(),gbn=String(gb?.gb_number||'');
+    if(!gbn)return raw;
+    const scoped=localStorage.getItem(CART_GB_KEY);
+    // A cart is valid only for the currently open Group Buy. Legacy/unscoped carts
+    // are deliberately discarded once so old GB items can never leak into a new checkout.
+    if(scoped!==gbn){
+      if(raw.length)clearPersistedCart();
+      else {window.cart=[];try{localStorage.removeItem(CART_KEY)}catch(e){}}
+      try{localStorage.setItem(CART_GB_KEY,gbn)}catch(e){}
+      return [];
+    }
+    const valid=raw.filter(i=>String(i.gb_number||'')===gbn);
+    if(valid.length!==raw.length){window.cart=valid;try{localStorage.setItem(CART_KEY,JSON.stringify(valid))}catch(e){}}
+    return valid;
+  }
   function getVerifiedEmail(){return(localStorage.getItem('pepmosa_verified_email')||localStorage.getItem('pepmosa_customer_email')||'').trim().toLowerCase()}
   function itemName(i){return i.product_name||i.productName||i.name||'Product'}
   function itemStrength(i){return i.strength||i.variant_strength||i.variant||''}
@@ -65,8 +90,8 @@
   window.checkout=async function(){
     const{cart}=totals();if(!cart.length){if(typeof window.openCart==='function')window.openCart();return}
     const activeGB=getGB();
-    const freshCart=cart.filter(i=>!i.gb_number||i.gb_number===activeGB?.gb_number);
-    if(freshCart.length!==cart.length){window.cart=freshCart;localStorage.pepmosaCart=JSON.stringify(freshCart);}
+    const freshCart=cart.filter(i=>String(i.gb_number||'')===String(activeGB?.gb_number||''));
+    if(freshCart.length!==cart.length){window.cart=freshCart;localStorage.setItem(CART_KEY,JSON.stringify(freshCart));localStorage.setItem(CART_GB_KEY,String(activeGB?.gb_number||''));}
     if(!freshCart.length){if(typeof window.openCart==='function')window.openCart();return}
     const email=getVerifiedEmail();
     checkoutCustomer=email?await loadCheckoutCustomer(email):null;
@@ -100,7 +125,10 @@
         p_total:total,p_shipping_method:shippingMethod,p_shipping_fee:shippingFee,p_payment_proof_url:proof,p_items:items
       });
       if(submitted.error)throw new Error(submitted.error.message||'Order could not be submitted.');
-      localStorage.setItem('pepmosa_last_order_id',oid);localStorage.setItem('pepmosa_customer_email',email);localStorage.setItem('pepmosa_customer_name',name);localStorage.setItem('pepmosa_phone',contact);localStorage.removeItem('pepmosaCart');window.cart=[];if(typeof window.clearCart==='function'){window.clearCart();}else{if($('cartCount'))$('cartCount').textContent='0';}const cartModal=$('cartModal');if(cartModal)cartModal.classList.remove('show','open');closeCheckout();if($('pepInfoTitle')&&$('pepInfoText')&&$('pepInfoModal')){$('pepInfoTitle').textContent='Order Submitted ✓';$('pepInfoText').textContent=`Your order ${oid} has been submitted successfully. Payment proof is now pending admin review.`;$('pepInfoOk').textContent='DONE';$('pepInfoModal').classList.add('open')}else alert('Order submitted: '+oid)}catch(e){console.error('PEPMOSA CHECKOUT ERROR',e);msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(e?.message||'Please try again.')+'<br><small>Your cart has not been cleared.</small></div>'}finally{btn.disabled=false;btn.textContent='SUBMIT MY ORDER'}
+      localStorage.setItem('pepmosa_last_order_id',oid);localStorage.setItem('pepmosa_customer_email',email);localStorage.setItem('pepmosa_customer_name',name);localStorage.setItem('pepmosa_phone',contact);
+      // Clear both in-memory and persisted cart state only AFTER the order RPC succeeds.
+      clearPersistedCart();
+      const cartModal=$('cartModal');if(cartModal)cartModal.classList.remove('show','open');closeCheckout();if($('pepInfoTitle')&&$('pepInfoText')&&$('pepInfoModal')){$('pepInfoTitle').textContent='Order Submitted ✓';$('pepInfoText').textContent=`Your order ${oid} has been submitted successfully. Payment proof is now pending admin review.`;$('pepInfoOk').textContent='DONE';$('pepInfoModal').classList.add('open')}else alert('Order submitted: '+oid)}catch(e){console.error('PEPMOSA CHECKOUT ERROR',e);msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(e?.message||'Please try again.')+'<br><small>Your cart has not been cleared.</small></div>'}finally{btn.disabled=false;btn.textContent='SUBMIT MY ORDER'}
   }
   async function repairStorefront(){const s=S();if(!s)return false;try{let gb=getGB();if(!gb){const r=await s.from('group_buys').select('*').in('status',['OPEN','KIT_COMPLETION']).order('created_at',{ascending:false}).limit(1).maybeSingle();if(r.error||!r.data)return false;gb=r.data;window.currentGB=gb;window.pepmosaCurrentGB=gb}const cr=await s.from('gb_categories').select('category_name').eq('gb_number',gb.gb_number);if(cr.error)throw cr.error;const categories=(cr.data||[]).map(x=>x.category_name).filter(Boolean);if(!categories.length){products=[];return true}const pr=await s.from('products').select('*').eq('active',true).in('category',categories).order('product_name');if(pr.error)throw pr.error;const base=pr.data||[],ids=base.map(p=>p.product_id).filter(Boolean);let variants=[];if(ids.length){const vr=await s.from('product_variants').select('*').in('product_id',ids).eq('active',true).order('price');if(vr.error)throw vr.error;variants=vr.data||[]}const mr=await s.from('gb_minimum_quantities').select('*').eq('gb_number',gb.gb_number);const mins=mr.error?[]:(mr.data||[]);
     let kitMap=new Map();
@@ -139,7 +167,8 @@
     }
     if(existing)existing.qty=itemQty(existing)+qty;
     else cartNow.push({product_id:pid,variant_id:vid,product_name:product.product_name,strength:variant.strength||'',price:Number(variant.price||0),qty});
-    window.cart=cartNow;localStorage.pepmosaCart=JSON.stringify(cartNow);
+    const scopedCart=cartNow.map(x=>({...x,gb_number:gbNow?.gb_number||x.gb_number||null}));
+    window.cart=scopedCart;localStorage.setItem(CART_KEY,JSON.stringify(scopedCart));localStorage.setItem(CART_GB_KEY,String(gbNow?.gb_number||''));
     if(typeof window.updateCart==='function')window.updateCart();
     if(typeof window.openCart==='function')window.openCart();
   };

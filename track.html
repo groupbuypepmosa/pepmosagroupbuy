@@ -7,7 +7,7 @@
 <main class="page"><div class="brand"><img src="https://raw.githubusercontent.com/groupbuypepmosa/pepmosagroupbuy/main/pepmosa-logo.png" alt="PEPMOSA"><b>PEPMOSA</b><span>GROUP BUY</span></div>
 <section class="hero"><div class="eyebrow">ORDER TRACKING</div><h1>Track Your <em>Orders</em> ✧</h1><p>Enter the same email you used when placing your orders to see all products and quantities under that email, plus the latest shipment status.</p></section>
 <section class="searchPanel"><div class="searchRow"><input id="email" placeholder="Enter the email used for your order" type="email" onkeydown="if(event.key==='Enter')track()"><button class="searchBtn" onclick="track()">TRACK MY ORDERS →</button></div><div class="hint">♡ One email = one complete PEPMOSA order summary ♡</div><div id="out"></div></section><div class="footer">♡ PEPMOSA GROUP BUY ♡</div></main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script>
+<script src="config.js"></script>
 <script>
 // Native REST call keeps the public tracker independent from the Supabase JS client.
 
@@ -100,71 +100,38 @@ function noteFor(o){
 async function loadTrackingData(email){
   const cfg=window.PEPMOSA_CONFIG||{};
   const cleanEmail=String(email||'').trim().toLowerCase();
-  if(!cleanEmail) throw new Error('Please enter your order email.');
 
-  let lastError=null;
-
-  /* Primary method: Supabase JS RPC. This avoids browser-specific REST/RPC
-     formatting and makes the tracker use the same connection as the site. */
-  try{
-    if(window.supabase && cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY){
-      const client=window.sb||window.supabase.createClient(
-        cfg.SUPABASE_URL,
-        cfg.SUPABASE_ANON_KEY,
-        {auth:{persistSession:false,autoRefreshToken:false}}
-      );
-      window.sb=client;
-
-      const {data,error}=await client
-        .rpc('get_customer_tracking',{p_email:cleanEmail});
-
-      if(error) throw error;
-
-      const payload=normalizeTrackingPayload(data);
-      return payload;
-    }
-  }catch(err){
-    console.warn('Supabase RPC client method failed, trying fallback:',err);
-    lastError=err;
+  if(!cleanEmail) throw new Error('Please enter the email used for your order.');
+  if(!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY){
+    throw new Error('Tracker configuration is missing.');
   }
 
-  /* Fallback: direct PostgREST RPC call. */
-  try{
-    if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){
-      throw new Error('Tracker configuration is missing.');
-    }
+  const url=cfg.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/get_customer_tracking';
 
-    const res=await fetch(
-      cfg.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/get_customer_tracking',
-      {
-        method:'POST',
-        headers:{
-          'apikey':cfg.SUPABASE_ANON_KEY,
-          'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,
-          'Content-Type':'application/json'
-        },
-        body:JSON.stringify({p_email:cleanEmail}),
-        cache:'no-store'
-      }
-    );
+  const res=await fetch(url,{
+    method:'POST',
+    mode:'cors',
+    cache:'no-store',
+    headers:{
+      'apikey':cfg.SUPABASE_ANON_KEY,
+      'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,
+      'Content-Type':'application/json',
+      'Accept':'application/json'
+    },
+    body:JSON.stringify({p_email:cleanEmail})
+  });
 
-    const text=await res.text();
-    let raw=null;
-    try{raw=text?JSON.parse(text):null}catch{}
-
-    if(!res.ok){
-      throw new Error(raw?.message||raw?.hint||text||('HTTP '+res.status));
-    }
-
-    return normalizeTrackingPayload(raw);
-  }catch(err){
-    console.error('Tracker fallback failed:',err);
-    throw new Error(
-      err?.message ||
-      lastError?.message ||
-      'Could not connect to the order tracker.'
-    );
+  const text=await res.text();
+  let raw=null;
+  try{ raw=text?JSON.parse(text):null; }catch(e){
+    throw new Error('Tracker returned an invalid response.');
   }
+
+  if(!res.ok){
+    throw new Error(raw?.message||raw?.hint||raw?.details||('Unable to load orders (HTTP '+res.status+').'));
+  }
+
+  return normalizeTrackingPayload(raw);
 }
 async function track(){
   const email=$('email').value.trim().toLowerCase();

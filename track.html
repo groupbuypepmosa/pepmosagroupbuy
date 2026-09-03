@@ -99,43 +99,72 @@ function noteFor(o){
 
 async function loadTrackingData(email){
   const cfg=window.PEPMOSA_CONFIG||{};
-  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){
-    throw new Error('Tracker configuration is missing.');
-  }
-
   const cleanEmail=String(email||'').trim().toLowerCase();
+  if(!cleanEmail) throw new Error('Please enter your order email.');
 
-  const res=await fetch(
-    cfg.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/get_customer_tracking',
-    {
-      method:'POST',
-      headers:{
-        'apikey':cfg.SUPABASE_ANON_KEY,
-        'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,
-        'Content-Type':'application/json'
-      },
-      body:JSON.stringify({p_email:cleanEmail}),
-      cache:'no-store'
+  let lastError=null;
+
+  /* Primary method: Supabase JS RPC. This avoids browser-specific REST/RPC
+     formatting and makes the tracker use the same connection as the site. */
+  try{
+    if(window.supabase && cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY){
+      const client=window.sb||window.supabase.createClient(
+        cfg.SUPABASE_URL,
+        cfg.SUPABASE_ANON_KEY,
+        {auth:{persistSession:false,autoRefreshToken:false}}
+      );
+      window.sb=client;
+
+      const {data,error}=await client
+        .rpc('get_customer_tracking',{p_email:cleanEmail});
+
+      if(error) throw error;
+
+      const payload=normalizeTrackingPayload(data);
+      return payload;
     }
-  );
-
-  const text=await res.text();
-  let raw=null;
-  try{raw=text?JSON.parse(text):null}catch{}
-
-  if(!res.ok){
-    const msg=raw?.message||raw?.hint||text||('HTTP '+res.status);
-    throw new Error(msg);
+  }catch(err){
+    console.warn('Supabase RPC client method failed, trying fallback:',err);
+    lastError=err;
   }
 
-  const payload=normalizeTrackingPayload(raw);
+  /* Fallback: direct PostgREST RPC call. */
+  try{
+    if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){
+      throw new Error('Tracker configuration is missing.');
+    }
 
-  // The RPC always returns the complete client record, including nested items.
-  if(!payload.orders.length&&!payload.shipments.length){
-    return {orders:[],shipments:[],order_items:[]};
+    const res=await fetch(
+      cfg.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/get_customer_tracking',
+      {
+        method:'POST',
+        headers:{
+          'apikey':cfg.SUPABASE_ANON_KEY,
+          'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify({p_email:cleanEmail}),
+        cache:'no-store'
+      }
+    );
+
+    const text=await res.text();
+    let raw=null;
+    try{raw=text?JSON.parse(text):null}catch{}
+
+    if(!res.ok){
+      throw new Error(raw?.message||raw?.hint||text||('HTTP '+res.status));
+    }
+
+    return normalizeTrackingPayload(raw);
+  }catch(err){
+    console.error('Tracker fallback failed:',err);
+    throw new Error(
+      err?.message ||
+      lastError?.message ||
+      'Could not connect to the order tracker.'
+    );
   }
-
-  return payload;
 }
 async function track(){
   const email=$('email').value.trim().toLowerCase();
@@ -269,4 +298,5 @@ async function track(){
     }
   }
 }
+window.track=track;
 </script></body></html>

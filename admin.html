@@ -943,23 +943,81 @@ saveBulkTracking=async function(){
 }
 const __baseLoadWaybillCenter=loadWaybillCenter;
 loadWaybillCenter=async function(){
-  const list=$("waybillBuyerList"),preview=$("waybillPreview");if(list)list.innerHTML='<div class="notice">Loading this Group Buy’s paid orders...</div>';
+  const list=$("waybillBuyerList"),preview=$("waybillPreview");
+  if(list)list.innerHTML='<div class="notice">Loading ready-to-print waybills...</div>';
   try{
+    const gb=getActiveGB();
     let oq=sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});
-    const gb=getActiveGB();if(gb)oq=oq.eq("gb_number",gb);
-    const [or,cr,sr]=await Promise.all([oq,sb.from("customers").select("customer_id,email,customer_name,contact,address"),sb.from("consolidated_shipments").select("shipment_id,email,courier,tracking_number,waybill_number,status,updated_at").order("updated_at",{ascending:false})]);
+    if(gb)oq=oq.eq("gb_number",gb);
+
+    const [or,cr,sr]=await Promise.all([
+      oq,
+      sb.from("customers").select("customer_id,email,customer_name,contact,address"),
+      sb.from("consolidated_shipments").select("shipment_id,email,gb_number,courier,tracking_number,waybill_number,status,updated_at").order("updated_at",{ascending:false})
+    ]);
     if(or.error)throw or.error;
     if(cr.error)console.warn("Waybill customers warning:",cr.error);
     if(sr.error)console.warn("Waybill shipments warning:",sr.error);
-    const orderRows=or.data||[],shipmentIds=new Set(orderRows.map(o=>o.shipment_id).filter(Boolean));
+
+    const orderRows=or.data||[];
+    const shipmentIds=new Set(orderRows.map(o=>o.shipment_id).filter(Boolean));
     const customersByEmail=new Map((cr.data||[]).map(x=>[normEmail(x.email),x]));
-    const shipmentsById=new Map((sr.data||[]).filter(x=>shipmentIds.has(x.shipment_id)).map(x=>[x.shipment_id,x]));
+
+    // Use the shipment linked to the selected GB's orders first.
+    // Fallback to same-email shipment only when it is explicitly tagged to this GB.
+    const shipmentsByEmail=new Map();
+    for(const sh of (sr.data||[])){
+      const key=normEmail(sh.email);if(!key)continue;
+      const linked=shipmentIds.has(sh.shipment_id);
+      const tagged=gb&&sh.gb_number===gb;
+      if(!linked&&!tagged)continue;
+      const old=shipmentsByEmail.get(key);
+      if(!old||new Date(sh.updated_at||0)>new Date(old.updated_at||0))shipmentsByEmail.set(key,sh);
+    }
+
     const grouped=new Map();
-    for(const o of orderRows){if(!isPaidForWaybill(o))continue;const key=normEmail(o.email);if(!key)continue;if(!grouped.has(key))grouped.set(key,{email:key,orders:[],items:[],total:0,shipping:0});const g=grouped.get(key);g.orders.push(o);g.items.push(...(o.order_items||[]));g.total+=Number(o.total||0);g.shipping+=Number(o.shipping_fee||0)}
-    waybillRows=[...grouped.values()].map(g=>{const customer=customersByEmail.get(g.email)||{},latest=g.orders.slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))[0]||{},shipment=shipmentsById.get(latest.shipment_id)||{};const merged=new Map();for(const i of g.items){const key=[i.product_name||"Product",i.strength||"",Number(i.unit_price||0)].join("||"),old=merged.get(key)||{product_name:i.product_name||"Product",strength:i.strength||"",qty:0,unit_price:Number(i.unit_price||0),line_total:0};old.qty+=Number(i.qty||0);old.line_total+=Number(i.line_total||0);merged.set(key,old)}return {...g,customer_name:customer.customer_name||latest.full_name||g.email,contact:customer.contact||latest.contact_number||"",address:customer.address||latest.address||"Address not yet saved",shipping_method:latest.shipping_method||"",courier:shipment.courier||latest.shipping_method||"To be assigned",waybill_number:shipment.waybill_number||shipment.tracking_number||"",tracking_number:shipment.tracking_number||shipment.waybill_number||"",shipment_status:shipment.status||"READY TO PRINT",products:[...merged.values()],payment:"PAID"};}).sort((a,b)=>a.customer_name.localeCompare(b.customer_name));
-    if(!selectedWaybillBuyer||!waybillRows.some(x=>x.email===selectedWaybillBuyer))selectedWaybillBuyer=waybillRows[0]?.email||null;
+    for(const o of orderRows){
+      if(!isPaidForWaybill(o))continue;
+      const key=normEmail(o.email);if(!key)continue;
+      if(!grouped.has(key))grouped.set(key,{email:key,orders:[],items:[],total:0,shipping:0});
+      const g=grouped.get(key);
+      g.orders.push(o);g.items.push(...(o.order_items||[]));
+      g.total+=Number(o.total||0);g.shipping+=Number(o.shipping_fee||0);
+    }
+
+    waybillRows=[...grouped.values()].map(g=>{
+      const customer=customersByEmail.get(g.email)||{};
+      const latest=g.orders.slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))[0]||{};
+      const shipment=shipmentsByEmail.get(g.email)||{};
+      const merged=new Map();
+      for(const i of g.items){
+        const key=[i.product_name||"Product",i.strength||"",Number(i.unit_price||0)].join("||");
+        const old=merged.get(key)||{product_name:i.product_name||"Product",strength:i.strength||"",qty:0,unit_price:Number(i.unit_price||0),line_total:0};
+        old.qty+=Number(i.qty||0);old.line_total+=Number(i.line_total||0);merged.set(key,old);
+      }
+      return {
+        ...g,
+        customer_name:customer.customer_name||latest.full_name||g.email,
+        contact:customer.contact||latest.contact_number||"",
+        address:customer.address||latest.address||"Address not yet saved",
+        shipping_method:latest.shipping_method||"",
+        courier:shipment.courier||latest.shipping_method||"To be assigned",
+        waybill_number:shipment.waybill_number||shipment.tracking_number||"",
+        tracking_number:shipment.tracking_number||shipment.waybill_number||"",
+        shipment_status:shipment.status||"READY TO PRINT",
+        products:[...merged.values()],
+        payment:"PAID"
+      };
+    }).sort((a,b)=>a.customer_name.localeCompare(b.customer_name));
+
+    if(!selectedWaybillBuyer||!waybillRows.some(x=>x.email===selectedWaybillBuyer))
+      selectedWaybillBuyer=waybillRows[0]?.email||null;
     renderWaybillCenter();
-  }catch(e){console.error(e);if(list)list.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load waybills.")+'</div>';if(preview)preview.innerHTML=""}
+  }catch(e){
+    console.error("Waybill load error:",e);
+    if(list)list.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load waybills.")+'</div>';
+    if(preview)preview.innerHTML="";
+  }
 }
 
 

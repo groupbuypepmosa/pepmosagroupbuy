@@ -172,7 +172,7 @@ const STATUSES=[
   'HANDED OVER TO LOCAL COURIER','DELIVERED'
 ];
 const $=id=>document.getElementById(id);
-const TRACK_GB=new URLSearchParams(location.search).get('gb')||'';
+let TRACK_GB=new URLSearchParams(location.search).get('gb')||'';
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 
 function asArray(v){

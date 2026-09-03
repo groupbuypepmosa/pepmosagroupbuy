@@ -150,6 +150,14 @@
     if($('pepGrandTotal'))$('pepGrandTotal').textContent=fee?peso(subtotal+fee):peso(subtotal)
   }
   function closeCheckout(){const m=$('checkoutModal');if(m){m.classList.remove('open','show');m.style.removeProperty('display')}}
+  function showSoldOutAndRefresh(message){
+    clearPersistedCart();
+    closeCheckout();
+    const cartModal=$('cartModal');if(cartModal)cartModal.classList.remove('show','open');
+    const text=message||'Sorry! This variant was just completed by another customer and is now sold out. Refreshing the shop…';
+    if(typeof window.pepmosaPopup==='function')window.pepmosaPopup(text);else alert(text);
+    setTimeout(()=>window.location.reload(),1200);
+  }
   window.checkout=async function(){
     const{cart}=totals();if(!cart.length){if(typeof window.openCart==='function')window.openCart();return}
     const activeGB=getGB();
@@ -162,10 +170,12 @@
       cleanCart=cleaned.cart;
       if(cleaned.changed){
         if(!cleanCart.length){
-          clearPersistedCart();
-          alert('Your cart contained an item that is no longer available. It has been removed.');
+          showSoldOutAndRefresh('Sorry! The remaining vial was just secured by another customer. This variant is now SOLD OUT. Refreshing the shop…');
           return;
         }
+        // At least one item changed while the customer was opening checkout.
+        // Keep the still-valid items, but make the unavailable item obvious.
+        alert('Your cart was updated because one of the variants is no longer available. Please review the remaining items.');
       }
     }catch(e){
       alert(e.message||'Unable to verify live remaining vials. Please try again.');
@@ -199,8 +209,8 @@
       if(cleaned.changed){
         btn.disabled=false;btn.textContent='SUBMIT MY ORDER';
         if(!cleaned.cart.length){
-          clearPersistedCart();
-          msg.innerHTML='<div class="pepFinalError"><b>Your cart was updated.</b><br>An item is no longer available and was removed. Please go back to the shop and add only the remaining live variants.</div>';
+          showSoldOutAndRefresh('Sorry! The remaining vial was just secured by another customer. This variant is now SOLD OUT. Refreshing the shop…');
+          return;
         }else{
           msg.innerHTML='<div class="pepFinalError"><b>Your cart was updated.</b><br>One or more items changed availability. Please review the updated cart and reopen Checkout before submitting payment.</div>';
         }
@@ -222,15 +232,9 @@
       const cartModal=$('cartModal');if(cartModal)cartModal.classList.remove('show','open');closeCheckout();if($('pepInfoTitle')&&$('pepInfoText')&&$('pepInfoModal')){$('pepInfoTitle').textContent='Order Submitted ✓';$('pepInfoText').textContent=`Your order ${oid} has been submitted successfully. Payment proof is now pending admin review.`;$('pepInfoOk').textContent='DONE';$('pepInfoModal').classList.add('open')}else alert('Order submitted: '+oid)}catch(e){
       console.error('PEPMOSA CHECKOUT ERROR',e);
       const errorText=String(e?.message||'Please try again.');
-      const soldOut=/no longer available|only .* vial\(s\) remain|remaining vial|sold out/i.test(errorText);
+      const soldOut=/no longer available|only .* vial\(s\) remain|remaining vial|sold out|kit completion quantity|inventory/i.test(errorText);
       if(soldOut){
-        clearPersistedCart();
-        msg.innerHTML='<div class="pepFinalError"><b>Sorry — this variant is now sold out.</b><br>Another customer completed the remaining vial(s) first. Your cart will refresh automatically.</div>';
-        setTimeout(()=>{
-          if(typeof window.pepmosaPopup==='function') window.pepmosaPopup('Sorry! This variant is now sold out. Refreshing the shop…');
-          else alert('Sorry! This variant is now sold out. Refreshing the shop…');
-        },80);
-        setTimeout(()=>window.location.reload(),1200);
+        showSoldOutAndRefresh('Sorry! Another customer secured the last remaining vial first. This variant is now SOLD OUT. Refreshing the shop…');
       }else{
         msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(errorText)+'<br><small>Your cart has not been cleared.</small></div>';
       }

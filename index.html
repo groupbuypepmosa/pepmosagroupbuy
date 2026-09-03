@@ -1230,42 +1230,23 @@ async function load(){
       OPENED GB CATEGORIES ARE SHOWN.
     */
 
-    if(!categoryNames.length){
-
-      products = [];
-
-      renderProducts();
-
-      return;
-
-    }
-
-
-
-    /* =====================================================
-       LOAD PRODUCTS + VARIANTS
-       ===================================================== */
+    /* CLOSED GB = pricelist mode.
+       If its category mapping was cleaned up/deleted, still show the active
+       catalog instead of leaving the storefront empty. */
+    const productQuery =
+      sb
+        .from("products")
+        .select("*,product_variants(*)")
+        .eq("active",true)
+        .order("product_name");
 
     const {
       data:productData,
       error:productError
     } =
-      await sb
-        .from("products")
-        .select(
-          "*,product_variants(*)"
-        )
-        .eq(
-          "active",
-          true
-        )
-        .in(
-          "category",
-          categoryNames
-        )
-        .order(
-          "product_name"
-        );
+      categoryNames.length
+        ? await productQuery.in("category",categoryNames)
+        : await productQuery;
 
 
     if(productError){
@@ -1277,6 +1258,13 @@ async function load(){
 
     products =
       productData || [];
+
+    if(gb.status==="CLOSED" && !categoryNames.length){
+      $("gbStatus").insertAdjacentHTML(
+        "beforeend",
+        '<div class="muted" style="margin-top:8px">Showing the full active pricelist.</div>'
+      );
+    }
 
 
 
@@ -1484,6 +1472,12 @@ function renderProducts(){
    ========================================================= */
 
 function openProductPicker(pid, productOverride){
+
+  if(currentGB?.status==="CLOSED"){
+    if(window.pepmosaPopup)window.pepmosaPopup("This Group Buy is closed. You can browse the pricelist, but ordering is currently unavailable.");
+    else alert("This Group Buy is closed. You can browse the pricelist, but ordering is currently unavailable.");
+    return;
+  }
 
   const product =
     productOverride || products.find(

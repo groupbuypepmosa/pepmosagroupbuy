@@ -8,14 +8,27 @@
   let products=[];
   let checkoutCustomer=null;
   async function loadCheckoutCustomer(email){
-    const s=S();
-    if(!s||!email)return null;
+    const s=S(),gb=getGB();
+    if(!s||!email||!gb?.gb_number)return null;
     try{
+      // Returning status is scoped to the CURRENT Group Buy only.
+      // Orders from older/closed GBs must not make a customer "returning"
+      // when a brand-new GB opens.
+      const o=await s.from('orders')
+        .select('shipping_method,created_at')
+        .eq('email',email)
+        .eq('gb_number',gb.gb_number)
+        .order('created_at',{ascending:false})
+        .limit(1)
+        .maybeSingle();
+      if(o.error)throw o.error;
+      if(!o.data)return null;
+
       const c=await s.from('customers').select('*').eq('email',email).maybeSingle();
       if(c.error)throw c.error;
       if(!c.data)return null;
-      const o=await s.from('orders').select('shipping_method,created_at').eq('email',email).order('created_at',{ascending:false}).limit(1).maybeSingle();
-      return {...c.data,last_shipping_method:o.data?.shipping_method||''};
+
+      return {...c.data,last_shipping_method:o.data.shipping_method||''};
     }catch(e){console.warn('PEPMOSA customer lookup',e);return null}
   }
   function getCart(){try{return Array.isArray(window.cart)?window.cart:JSON.parse(localStorage.pepmosaCart||'[]')}catch(e){return[]}}

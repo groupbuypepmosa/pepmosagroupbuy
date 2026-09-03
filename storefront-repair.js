@@ -173,6 +173,40 @@
   function hookPlaceOrder(){if(typeof window.placeOrder!=='function'||window.placeOrder.__pepStableGuard)return;const original=window.placeOrder;window.placeOrder=async function(){if($('email')&&verifiedEmail)$('email').value=verifiedEmail;return original()};window.placeOrder.__pepStableGuard=true}
   async function loadNotices(){if(noticeLoaded||!S())return;noticeLoaded=true;try{const r=await S().from('site_notices').select('*').eq('active',true).order('created_at',{ascending:false}).limit(10);if(r.error)throw r.error;const now=Date.now();const n=(r.data||[]).find(x=>(!x.starts_at||new Date(x.starts_at).getTime()<=now)&&(!x.ends_at||new Date(x.ends_at).getTime()>=now));if(!n)return;const key=`pepmosa_site_notice_seen_${n.notice_id}_${n.updated_at}`;if(localStorage.getItem(key))return;showNotice(n,key)}catch(e){console.error('PEPMOSA SITE NOTICE',e)}}
   function showNotice(n,key){if($('pepSiteNoticeModal'))$('pepSiteNoticeModal').remove();const d=document.createElement('div');d.id='pepSiteNoticeModal';d.innerHTML=`<div class="pepSiteNoticeCard type-${esc(n.notice_type||'INFO')}"><button class="pepSiteNoticeClose" aria-label="Close">×</button><div class="pepSiteNoticeKicker">${esc(n.notice_type||'ANNOUNCEMENT')}</div><h2>${esc(n.title)}</h2><div class="pepSiteNoticeMessage">${esc(n.message)}</div><div class="pepSiteNoticeActions"><button id="pepNoticeGotIt" class="pepFeeBtn">${esc(n.button_text||'GOT IT')}</button>${n.button_url?`<a class="pepFeeBtn secondary" href="${esc(n.button_url)}" target="_blank" rel="noopener">LEARN MORE</a>`:''}</div></div>`;document.body.appendChild(d);const close=()=>{localStorage.setItem(key,'1');d.classList.remove('open');setTimeout(()=>d.remove(),180)};d.querySelector('.pepSiteNoticeClose').onclick=close;d.querySelector('#pepNoticeGotIt').onclick=close;d.onclick=e=>{if(e.target===d)close()};requestAnimationFrame(()=>d.classList.add('open'))}
+  async function loadKitInventory(gbNumber){
+    const s=S();
+    if(!s||!gbNumber)return new Map();
+    // Primary source: server-side inventory RPC.
+    const kr=await s.rpc('get_kit_completion_inventory',{p_gb_number:gbNumber});
+    if(!kr.error && Array.isArray(kr.data) && kr.data.length){
+      return new Map(kr.data.map(x=>[String(x.variant_id),Math.max(0,Number(x.remaining_qty||0))]));
+    }
+    // Fallback: calculate per-variant remainder from THIS Group Buy only.
+    // This prevents a false empty storefront when the RPC has no rows.
+    console.warn('PEPMOSA KIT RPC returned no inventory; using current-GB order fallback.',kr.error||'empty');
+    const or=await s.from('orders').select('order_id,payment_status').eq('gb_number',gbNumber);
+    if(or.error)throw or.error;
+    const valid=(or.data||[]).filter(o=>!['REJECTED','CANCELLED','CANCELED'].includes(String(o.payment_status||'').toUpperCase()));
+    const ids=valid.map(o=>o.order_id).filter(Boolean);
+    if(!ids.length)return new Map();
+    const ir=await s.from('order_items').select('variant_id,qty,order_id').in('order_id',ids);
+    if(ir.error)throw ir.error;
+    const totals=new Map();
+    for(const item of (ir.data||[])){
+      const id=String(item.variant_id||'');
+      if(!id)continue;
+      totals.set(id,(totals.get(id)||0)+Math.max(0,Number(item.qty||0)));
+    }
+    const map=new Map();
+    for(const [id,total] of totals){
+      if(total<=0)continue;
+      const remainder=total%10;
+      const remaining=remainder===0?0:10-remainder;
+      if(remaining>0)map.set(id,remaining);
+    }
+    return map;
+  }
+
   async function load(){try{const s=S();if(!s)return;ensureUI();const g=await s.from('group_buys').select('*').in('status',['OPEN','KIT_COMPLETION','CLOSED']).order('created_at',{ascending:false}).limit(20);if(g.error)throw g.error;
     const rows=g.data||[];
     gb=rows.find(x=>['OPEN','KIT_COMPLETION'].includes(x.status))||rows.find(x=>x.status==='CLOSED')||null;
@@ -198,7 +232,7 @@
       allVariants=vr.data||[];
     }
     products=baseProducts.map(p=>({...p,product_variants:allVariants.filter(v=>String(v.product_id)===String(p.product_id)&&v.active!==false)}));const ms=await s.from('gb_minimum_quantities').select('gb_number,product_id,variant_id,minimum_qty').eq('gb_number',gb.gb_number);if(ms.error)throw ms.error;minimums=ms.data||[];const cs=await s.from('gb_category_settings').select('gb_number,category_name,minimum_qty').eq('gb_number',gb.gb_number);if(cs.error){console.warn('PEPMOSA CATEGORY MINIMUMS',cs.error);categoryMinimums=[]}else categoryMinimums=cs.data||[];
-    if(gb.status==='KIT_COMPLETION'){const kr=await s.rpc('get_kit_completion_inventory',{p_gb_number:gb.gb_number});if(kr.error)throw kr.error;const kitMap=new Map((kr.data||[]).map(x=>[String(x.variant_id),Number(x.remaining_qty||0)]));products=products.map(p=>({...p,product_variants:(p.product_variants||[]).filter(v=>Number(kitMap.get(String(v.variant_id))||0)>0).map(v=>({...v,minimum_qty:1,remaining_qty:Number(kitMap.get(String(v.variant_id))||0)}))})).filter(p=>(p.product_variants||[]).length>0)}else{products=products.map(p=>({...p,product_variants:(p.product_variants||[]).map(v=>({...v,minimum_qty:minFor(v.variant_id,p.category)}))}))}
+    if(gb.status==='KIT_COMPLETION'){const kitMap=await loadKitInventory(gb.gb_number);products=products.map(p=>({...p,product_variants:(p.product_variants||[]).filter(v=>Number(kitMap.get(String(v.variant_id))||0)>0).map(v=>({...v,minimum_qty:1,remaining_qty:Number(kitMap.get(String(v.variant_id))||0)}))})).filter(p=>(p.product_variants||[]).length>0)}else{products=products.map(p=>({...p,product_variants:(p.product_variants||[]).map(v=>({...v,minimum_qty:minFor(v.variant_id,p.category)}))}))}
     renderProducts();
     if(gb.status==='CLOSED'){
       const a=$('pepFeeState')||$('groupBuyAccess');

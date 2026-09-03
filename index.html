@@ -1077,7 +1077,7 @@ header{
 
 <script src="config.js"></script>
 
-<script src="supabase.js?v=20260904-remove-stale-storefront-hotfix"></script>
+<script src="supabase.js?v=20260904-atomic-checkout"></script>
 
 
 
@@ -1846,7 +1846,8 @@ function addToCart(pid,vid){
   const existing =
     cart.find(
       x =>
-        x.variant_id === vid
+        x.variant_id === vid &&
+        String(x.gb_number || currentGB?.gb_number || "") === String(currentGB?.gb_number || "")
     );
 
 
@@ -1858,6 +1859,9 @@ function addToCart(pid,vid){
   }else{
 
     cart.push({
+
+      gb_number:
+        currentGB?.gb_number || null,
 
       product_id:
         pid,
@@ -2099,321 +2103,111 @@ function checkout(){
 
 async function placeOrder(){
 
+  const submitBtn =
+    document.querySelector('#checkoutModal .actions .btn.primary');
+
   try{
 
-    /* HARD ADMIN FEE CHECK — applies to BOTH OPEN GB and KIT COMPLETION.
-       This is intentionally inside the real checkout function, not a wrapper. */
     if(!currentGB){
-      return alert("No open Group Buy.");
-    }
-    // Use the verified Admin Fee email first. The checkout form email can be
-    // entered later or may differ in case/spacing, but approval belongs to the
-    // email that was actually verified for this current Group Buy.
-    const checkoutEmail = (
-      window.verifiedEmail ||
-      localStorage.getItem("pepmosa_verified_email") ||
-      $("email").value ||
-      ""
-    ).trim().toLowerCase();
-    if(!checkoutEmail){
-      return alert("Enter the email used for your Admin Fee.");
-    }
-    const { data:feeApproved, error:feeError } = await sb.rpc(
-      "has_approved_admin_fee",
-      { p_email: checkoutEmail, p_gb_number: currentGB.gb_number }
-    );
-    if(feeError) throw feeError;
-    if(feeApproved !== true){
-      return alert("ADMIN FEE REQUIRED\n\nYou cannot check out until the Admin Fee for this Group Buy is PAID and approved using this email.");
+      return alert("No active Group Buy.");
     }
 
-    // Final cart sync prevents stale in-memory cart data from blocking submitted orders.
+    // Always read the latest shared cart. Add to Cart does NOT change inventory.
     cart = JSON.parse(localStorage.pepmosaCart || "[]");
 
-
-    if(!currentGB){
-
-      return alert(
-        "No open Group Buy."
-      );
-
-    }
-
-
-
     if(!cart.length){
-
-      return alert(
-        "Cart is empty."
-      );
-
+      return alert("Cart is empty.");
     }
-
-
 
     const email =
-      $("email")
-        .value
-        .trim()
-        .toLowerCase();
-
+      (
+        window.verifiedEmail ||
+        localStorage.getItem("pepmosa_verified_email") ||
+        $("email")?.value ||
+        ""
+      )
+      .trim()
+      .toLowerCase();
 
     if(!email){
+      return alert("Enter the email used for your approved Admin Fee.");
+    }
 
-      return alert(
-        "Enter your email."
+    if($("email")) $("email").value=email;
+
+    if(submitBtn){
+      submitBtn.disabled=true;
+      submitBtn.textContent="SUBMITTING…";
+    }
+
+    /*
+      ONE ATOMIC DATABASE SUBMISSION
+
+      Add to Cart does NOT decrement inventory.
+
+      For KIT COMPLETION, the database checks and decrements remaining_qty
+      only here. Inventory rows are locked during the check, so two customers
+      cannot successfully submit the same remaining vial(s).
+    */
+    const { data:result, error:submitError } =
+      await sb.rpc(
+        "submit_group_buy_order",
+        {
+          p_gb_number: currentGB.gb_number,
+          p_email: email,
+          p_customer_name: $("customerName")?.value?.trim() || null,
+          p_contact: $("contact")?.value?.trim() || null,
+          p_address: $("address")?.value?.trim() || null,
+          p_shipping_method: $("shippingMethod")?.value?.trim() || null,
+          p_items: cart.map(item => ({
+            product_id: item.product_id,
+            variant_id: item.variant_id,
+            qty: Math.max(1,Number(item.qty||0))
+          }))
+        }
       );
 
+    if(submitError) throw submitError;
+
+    const submitted =
+      Array.isArray(result) ? result[0] : result;
+
+    if(!submitted?.ok || !submitted?.order_id){
+      throw new Error("Order could not be submitted. Please try again.");
     }
 
-
-
-    /* =====================================================
-       CUSTOMER
-       ===================================================== */
-
-    const {
-      data:customer,
-      error:customerError
-    } =
-      await sb
-        .from("customers")
-        .upsert(
-
-          {
-
-            email:
-
-              email,
-
-            customer_name:
-
-              $("customerName")
-                .value
-                .trim(),
-
-            contact:
-
-              $("contact")
-                .value
-                .trim(),
-
-            address:
-
-              $("address")
-                .value
-                .trim()
-
-          },
-
-          {
-            onConflict:"email"
-          }
-
-        )
-        .select()
-        .single();
-
-
-    if(customerError){
-
-      throw customerError;
-
-    }
-
-
-
-    /* =====================================================
-       TOTAL
-       ===================================================== */
-
-    const total =
-      cart.reduce(
-        (sum,item) =>
-
-          sum +
-
-          Number(item.price) *
-          Number(item.qty),
-
-        0
-      );
-
-
-
-    /* =====================================================
-       ORDER
-       ===================================================== */
-
-    const {
-      data:order,
-      error:orderError
-    } =
-      await sb
-        .from("orders")
-        .insert(
-
-          {
-
-            gb_number:
-
-              currentGB.gb_number,
-
-            customer_id:
-
-              customer.customer_id,
-
-            email:
-
-              email,
-
-            total:
-
-              total,
-
-            payment_status:
-
-              "PENDING",
-
-            shipping_method:
-
-              $("shippingMethod")
-                .value
-                .trim(),
-
-            shipping_fee:
-
-              0
-
-          }
-
-        )
-        .select()
-        .single();
-
-
-    if(orderError){
-
-      throw orderError;
-
-    }
-
-
-
-    /* =====================================================
-       ORDER ITEMS
-       ===================================================== */
-
-    const orderItems =
-
-      cart.map(
-        item => ({
-
-          order_id:
-
-            order.order_id,
-
-          product_id:
-
-            item.product_id,
-
-          variant_id:
-
-            item.variant_id,
-
-          product_name:
-
-            item.product_name,
-
-          strength:
-
-            item.strength,
-
-          qty:
-
-            item.qty,
-
-          unit_price:
-
-            item.price,
-
-          line_total:
-
-            item.price *
-            item.qty
-
-        })
-      );
-
-
-
-    const {
-      error:itemError
-    } =
-      await sb
-        .from("order_items")
-        .insert(
-          orderItems
-        );
-
-
-    if(itemError){
-
-      throw itemError;
-
-    }
-
-
-
-    /* =====================================================
-       SUCCESS
-       ===================================================== */
-
-    $("checkoutMsg")
-      .className =
-      "notice success";
-
-
-    $("checkoutMsg")
-      .textContent =
-
-        "Order submitted: " +
-
-        order.order_id +
-
-        ". Please follow the payment instructions from PEPMOSA.";
-
-
-
-    cart = [];
-
-
-    localStorage.removeItem(
-      "pepmosaCart"
-    );
-
-
+    $("checkoutMsg").className="notice success";
+    $("checkoutMsg").textContent =
+      "Order submitted: " +
+      submitted.order_id +
+      ". Your order is now secured.";
+
+    // Cart clears ONLY after a successful database submission.
+    cart=[];
+    localStorage.removeItem("pepmosaCart");
     updateCart();
 
+    window.dispatchEvent(new Event("pepmosa-order-submitted"));
 
   }catch(e){
 
-    console.error(e);
+    console.error("PEPMOSA ORDER SUBMIT",e);
 
+    $("checkoutMsg").className="notice error";
+    $("checkoutMsg").textContent =
+      e?.message ||
+      "Unable to submit your order. Please try again.";
 
-    $("checkoutMsg")
-      .className =
-      "notice error";
+  }finally{
 
-
-    $("checkoutMsg")
-      .textContent =
-      e.message;
+    if(submitBtn){
+      submitBtn.disabled=false;
+      submitBtn.textContent="SUBMIT ORDER";
+    }
 
   }
 
 }
-
 
 
 /* =========================================================
@@ -2424,7 +2218,7 @@ load();
 
 </script>
 
-<script src="storefront-repair.js?v=20260904-activegb-cleanup"></script>
+<script src="storefront-repair.js?v=20260904-atomic-checkout"></script>
 <!-- Product picker version: 2026-09-02 -->
 <script src="checkout-polish.js?v=20260904-kit-live-inventory-fix"></script>
 <script src="kit-completion-storefront.js?v=20260904-activegb-cleanup"></script>

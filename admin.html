@@ -204,12 +204,13 @@ window.activeGroupBuyNumber=localStorage.getItem("pepmosa_active_gb")||"";
 function getActiveGB(){return window.activeGroupBuyNumber||""}
 function renderActiveGroupBuySelector(){
   const sel=$("activeGroupBuy");if(!sel)return;
-  if(!groupBuys.length){sel.innerHTML='<option value="">No Group Buy available</option>';return}
-  if(!groupBuys.some(g=>g.gb_number===window.activeGroupBuyNumber)){
-    window.activeGroupBuyNumber=groupBuys[0].gb_number;
+  const list=Array.isArray(groupBuys)?groupBuys:[];
+  if(!list.length){sel.innerHTML='<option value="">No Group Buy available</option>';return}
+  if(!list.some(g=>g.gb_number===window.activeGroupBuyNumber)){
+    window.activeGroupBuyNumber=list[0].gb_number;
     localStorage.setItem("pepmosa_active_gb",window.activeGroupBuyNumber);
   }
-  sel.innerHTML=groupBuys.map(g=>'<option value="'+esc(g.gb_number)+'" '+(g.gb_number===window.activeGroupBuyNumber?'selected':'')+'>'+esc(g.gb_number)+' — '+esc(g.customer_facing_name||g.status||"Group Buy")+'</option>').join("");
+  sel.innerHTML=list.map(g=>'<option value="'+esc(g.gb_number)+'" '+(g.gb_number===window.activeGroupBuyNumber?'selected':'')+'>'+esc(g.gb_number)+' — '+esc(g.customer_facing_name||g.status||"Group Buy")+'</option>').join("");
   const hint=$("activeGroupBuyHint");if(hint)hint.textContent="All Payments, Orders, Tracking and Waybills below are for this Group Buy only.";
 }
 async function setActiveGroupBuy(gb){
@@ -339,7 +340,7 @@ loadWaybillCenter=async function(){
 }
 
 document.addEventListener("DOMContentLoaded",()=>{if(typeof initSupabase==="function")initSupabase()});
-let categories=[],groupBuys=[],products=[],fees=[],ordersCache=[],orderItemsCache=[],customersCache=[],currentShipment=null,vialTrackerRows=[],waybillRows=[],selectedWaybillBuyer=null,libraryDocuments=[];
+var categories=[],groupBuys=[],products=[],fees=[],ordersCache=[],orderItemsCache=[],customersCache=[],currentShipment=null,vialTrackerRows=[],waybillRows=[],selectedWaybillBuyer=null,libraryDocuments=[];
 const TRACKING_STATUSES=["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING","IN TRANSIT TO THE PHILIPPINES","ARRIVED IN THE PHILIPPINES","RECEIVED AT WAREHOUSE","PACKING & LABELLING","HANDED OVER TO LOCAL COURIER","DELIVERED"];
 function $(id){return document.getElementById(id)}function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}function peso(v){return "₱"+Number(v||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2})}function showMessage(m,t=""){$("globalMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`;window.scrollTo({top:0,behavior:"smooth"});setTimeout(()=>$("globalMsg").innerHTML="",5000)}function showLoginMessage(m,t="error"){$("loginMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`}function previewFile(i,p){const f=$(i).files[0];if(!f)return;$(p).src=URL.createObjectURL(f);$(p).style.display="block"}
 function openTab(b){const target=b.dataset.panel;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(target)?.classList.add("active");if(target==="vialTrackerPanel")loadVialTracker();if(target==="ordersPanel")loadOrdersCenter();if(target==="trackingPanel")loadTrackingDashboard();if(target==="waybillPanel")loadWaybillCenter();if(target==="documentsPanel")loadLibraryDocuments();if(target==="siteNoticePanel")loadSiteNotices()}

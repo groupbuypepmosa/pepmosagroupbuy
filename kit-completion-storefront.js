@@ -47,6 +47,29 @@
     return Math.max(0,Number(inventory.get(String(variantId))||0));
   }
 
+  async function fallbackInventory(gb){
+    if(!window.sb||!gb)return new Map();
+    const or=await window.sb.from('orders').select('order_id,payment_status').eq('gb_number',gb.gb_number);
+    if(or.error)throw or.error;
+    const ids=(or.data||[])
+      .filter(o=>!['REJECTED','CANCELLED','CANCELED'].includes(String(o.payment_status||'').toUpperCase()))
+      .map(o=>o.order_id).filter(Boolean);
+    if(!ids.length)return new Map();
+    const ir=await window.sb.from('order_items').select('variant_id,qty,order_id').in('order_id',ids);
+    if(ir.error)throw ir.error;
+    const totals=new Map();
+    for(const item of (ir.data||[])){
+      const id=String(item.variant_id||'');
+      if(id)totals.set(id,(totals.get(id)||0)+Math.max(0,Number(item.qty||0)));
+    }
+    const out=new Map();
+    for(const [id,total] of totals){
+      const mod=total%10,remaining=total>0&&mod?10-mod:0;
+      if(remaining>0)out.set(id,remaining);
+    }
+    return out;
+  }
+
   async function refreshInventory(){
     const gb=await ensureGB();
     if(!window.sb || !gb || !isKitMode(gb)) return false;
@@ -58,15 +81,20 @@
       p_gb_number:gb.gb_number
     });
 
-    if(r.error){
-      console.error('Kit Completion inventory RPC error:',r.error);
-      return false;
+    if(r.error || !(r.data||[]).length){
+      console.warn('Kit Completion inventory RPC unavailable/empty; using current-GB fallback.',r.error||'empty');
+      try{
+        inventory=await fallbackInventory(gb);
+      }catch(e){
+        console.error('Kit Completion fallback inventory error:',e);
+        return false;
+      }
+    }else{
+      inventory=new Map((r.data||[]).map(row=>[
+        String(row.variant_id),
+        Math.max(0,Number(row.remaining_qty||0))
+      ]));
     }
-
-    inventory=new Map((r.data||[]).map(row=>[
-      String(row.variant_id),
-      Math.max(0,Number(row.remaining_qty||0))
-    ]));
 
     window.pepKitInventory=inventory;
     renderSummary();

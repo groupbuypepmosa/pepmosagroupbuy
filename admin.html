@@ -199,146 +199,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260902-waybill-center"></script><script src="supabase.js?v=20260902-waybill-center"></script><script>
 if(typeof initSupabase==="function")initSupabase();else 
 
-// ===== GROUP BUY WORKSPACE SCOPE =====
-window.activeGroupBuyNumber=localStorage.getItem("pepmosa_active_gb")||"";
-function getActiveGB(){return window.activeGroupBuyNumber||""}
-function renderActiveGroupBuySelector(){
-  const sel=$("activeGroupBuy");if(!sel)return;
-  const list=Array.isArray(groupBuys)?groupBuys:[];
-  if(!list.length){sel.innerHTML='<option value="">No Group Buy available</option>';return}
-  if(!list.some(g=>g.gb_number===window.activeGroupBuyNumber)){
-    window.activeGroupBuyNumber=list[0].gb_number;
-    localStorage.setItem("pepmosa_active_gb",window.activeGroupBuyNumber);
-  }
-  sel.innerHTML=list.map(g=>'<option value="'+esc(g.gb_number)+'" '+(g.gb_number===window.activeGroupBuyNumber?'selected':'')+'>'+esc(g.gb_number)+' — '+esc(g.customer_facing_name||g.status||"Group Buy")+'</option>').join("");
-  const hint=$("activeGroupBuyHint");if(hint)hint.textContent="All Payments, Orders, Tracking and Waybills below are for this Group Buy only.";
-}
-async function setActiveGroupBuy(gb){
-  window.activeGroupBuyNumber=gb||"";
-  if(gb)localStorage.setItem("pepmosa_active_gb",gb);else localStorage.removeItem("pepmosa_active_gb");
-  renderActiveGroupBuySelector();
-  await Promise.all([loadFees(),loadOrders(),loadOrdersCenter(),loadTrackingDashboard(),loadWaybillCenter()]);
-  showMessage("Now managing "+gb+". Other Group Buys are kept separate.","success");
-}
-const __baseLoadGroupBuys=loadGroupBuys;
-loadGroupBuys=async function(){await __baseLoadGroupBuys();renderActiveGroupBuySelector()}
-
-loadFees=async function(){
-  let q=sb.from("admin_fee_payments").select("*").order("created_at",{ascending:false});
-  const gb=getActiveGB();if(gb)q=q.eq("gb_number",gb);
-  const{data,error}=await q;if(error)throw error;fees=data||[];renderPaymentCenter();
-}
-loadOrders=async function(){
-  let q=sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});
-  const gb=getActiveGB();if(gb)q=q.eq("gb_number",gb);
-  const{data,error}=await q;if(error)throw error;ordersCache=data||[];orderItemsCache=ordersCache.flatMap(o=>o.order_items||[]);renderPaymentCenter();renderOrdersCenter();
-}
-loadOrdersCenter=async function(){
-  const list=$("ordersClientList");if(list)list.innerHTML='<div class="notice">Loading this Group Buy’s client orders...</div>';
-  try{
-    let q=sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});
-    const gb=getActiveGB();if(gb)q=q.eq("gb_number",gb);
-    const [or,cr]=await Promise.all([q,sb.from("customers").select("customer_id,email,customer_name,contact,address")]);
-    if(or.error)throw or.error;
-    ordersCache=or.data||[];orderItemsCache=ordersCache.flatMap(o=>o.order_items||[]);customersCache=cr.data||[];
-    renderPaymentCenter();renderOrdersCenter();
-  }catch(e){console.error(e);if(list)list.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load orders.")+'</div>'}
-}
-loadTrackingDashboard=async function(){
-  const box=$("trackingResults");if(!box)return;box.innerHTML='<div class="notice">Loading this Group Buy’s tracking...</div>';
-  try{
-    let oq=sb.from("orders").select("order_id,shipment_id,email,gb_number,total,payment_status,created_at").order("created_at",{ascending:false});
-    const gb=getActiveGB();if(gb)oq=oq.eq("gb_number",gb);
-    const [or,ir,sr]=await Promise.all([oq,sb.from("order_items").select("*"),sb.from("consolidated_shipments").select("*").order("updated_at",{ascending:false})]);
-    if(or.error)throw or.error;if(sr.error)throw sr.error;
-    trackingDashboardOrders=or.data||[];
-    const ids=new Set(trackingDashboardOrders.map(o=>o.shipment_id).filter(Boolean));
-    trackingDashboardShipments=(sr.data||[]).filter(x=>ids.has(x.shipment_id));
-    trackingDashboardItems=ir.error?[]:(ir.data||[]);
-    renderTrackingDashboard();
-  }catch(e){console.error(e);box.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load tracking.")+'</div>'}
-}
-const __baseCreateTrackingShipment=createTrackingShipment;
-createTrackingShipment=async function(email){
-  try{
-    const key=normTrackingEmail(email),gb=getActiveGB();
-    const clientOrders=trackingDashboardOrders.filter(o=>normTrackingEmail(o.email)===key&&!o.shipment_id);
-    let existing=trackingDashboardShipments.filter(s=>normTrackingEmail(s.email)===key);
-    let shipmentId;
-    if(existing.length)shipmentId=trackingPrimaryShipment(existing).shipment_id;
-    else{
-      const payload={email:key,status:"ORDER RECEIVED"};if(gb)payload.gb_number=gb;
-      const ins=await sb.from("consolidated_shipments").insert(payload).select().single();
-      if(ins.error)throw ins.error;shipmentId=ins.data.shipment_id;
-      await sb.from("shipment_status_history").insert({shipment_id:shipmentId,status:"ORDER RECEIVED"});
-    }
-    if(clientOrders.length){const up=await sb.from("orders").update({shipment_id:shipmentId}).in("order_id",clientOrders.map(o=>o.order_id));if(up.error)throw up.error}
-    showMessage("Client shipment created for "+(gb||"this Group Buy")+".","success");await loadTrackingDashboard();
-  }catch(e){console.error(e);showMessage(e.message||"Unable to create shipment.","error")}
-}
-const __baseOpenManualOrderModal=openManualOrderModal;
-openManualOrderModal=async function(){await __baseOpenManualOrderModal();const gb=getActiveGB();if(gb){window.manualOrderGB=gb;const n=document.querySelector("#manualOrderModal .notice.warning .small");if(n)n.textContent="This manual order will be assigned to the currently selected Group Buy: "+gb+"."}}
-openBulkTrackingModal=async function(){
-  const modal=$("bulkTrackingModal");if(!modal)return;
-  await loadTrackingDashboard();
-  const count=$("bulkTrackingClientCount"),sel=$("bulkTrackingStatus");
-  const statuses=(typeof TRACKING_STATUSES!=="undefined"&&TRACKING_STATUSES.length)?TRACKING_STATUSES:["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING","IN TRANSIT TO THE PHILIPPINES","ARRIVED IN THE PHILIPPINES","RECEIVED AT WAREHOUSE","PACKING & LABELLING","HANDED OVER TO LOCAL COURIER","DELIVERED"];
-  if(sel)sel.innerHTML='<option value="">Select new status</option>'+statuses.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
-  const emails=[...new Set((trackingDashboardOrders||[]).map(o=>normTrackingEmail(o.email)).filter(Boolean))];
-  if(count)count.textContent=emails.length+" client"+(emails.length===1?"":"s")+" will be updated for "+(getActiveGB()||"this Group Buy");
-  modal.classList.add("show");
-}
-saveBulkTracking=async function(){
-  const status=$("bulkTrackingStatus").value,courier=$("bulkTrackingCourier").value,note=$("bulkTrackingNote").value.trim(),gb=getActiveGB();
-  if(!status)return showMessage("Please select a status.","error");
-  const btn=$("bulkTrackingSaveBtn");if(btn){btn.disabled=true;btn.textContent="UPDATING..."}
-  try{
-    await loadTrackingDashboard();
-    const emails=[...new Set((trackingDashboardOrders||[]).map(o=>normTrackingEmail(o.email)).filter(Boolean))];
-    if(!emails.length)throw new Error("No client orders found for this Group Buy.");
-    const now=new Date().toISOString(),user=await sb.auth.getUser();
-    let updated=0,created=0;
-    for(const email of emails){
-      const clientOrders=trackingDashboardOrders.filter(o=>normTrackingEmail(o.email)===email);
-      const rows=trackingDashboardShipments.filter(s=>normTrackingEmail(s.email)===email);
-      let shipmentId=rows.length?trackingPrimaryShipment(rows).shipment_id:null;
-      if(shipmentId){
-        const payload={status,updated_at:now,delivered_at:status==="DELIVERED"?now:null};if(courier)payload.courier=courier;if(note)payload.notes=note;
-        const r=await sb.from("consolidated_shipments").update(payload).eq("shipment_id",shipmentId);if(r.error)throw r.error;
-        const h=await sb.from("shipment_status_history").insert({shipment_id:shipmentId,status,courier:payload.courier||null,tracking_number:trackingPrimaryShipment(rows).tracking_number||null,changed_by:user.data?.user?.id||null});if(h.error)console.warn(h.error);
-        updated++;
-      }else{
-        const payload={email,status,updated_at:now};if(gb)payload.gb_number=gb;if(courier)payload.courier=courier;if(note)payload.notes=note;
-        const ins=await sb.from("consolidated_shipments").insert(payload).select().single();if(ins.error)throw ins.error;
-        shipmentId=ins.data.shipment_id;created++;
-        await sb.from("shipment_status_history").insert({shipment_id:shipmentId,status,courier:courier||null,changed_by:user.data?.user?.id||null});
-      }
-      const ids=clientOrders.map(o=>o.order_id).filter(Boolean);
-      if(ids.length){const up=await sb.from("orders").update({shipment_id:shipmentId}).in("order_id",ids);if(up.error)throw up.error}
-    }
-    closeBulkTrackingModal();showMessage("Tracking updated for "+emails.length+" client"+(emails.length===1?"":"s")+" in "+(gb||"this Group Buy")+".","success");await loadTrackingDashboard();
-  }catch(e){console.error(e);showMessage(e.message||"Unable to update this Group Buy’s tracking.","error")}
-  finally{if(btn){btn.disabled=false;btn.textContent="UPDATE ALL CLIENTS"}}
-}
-const __baseLoadWaybillCenter=loadWaybillCenter;
-loadWaybillCenter=async function(){
-  const list=$("waybillBuyerList"),preview=$("waybillPreview");if(list)list.innerHTML='<div class="notice">Loading this Group Buy’s paid orders...</div>';
-  try{
-    let oq=sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});
-    const gb=getActiveGB();if(gb)oq=oq.eq("gb_number",gb);
-    const [or,cr,sr]=await Promise.all([oq,sb.from("customers").select("customer_id,email,customer_name,contact,address"),sb.from("consolidated_shipments").select("shipment_id,email,courier,tracking_number,waybill_number,status,updated_at").order("updated_at",{ascending:false})]);
-    if(or.error)throw or.error;
-    const orderRows=or.data||[],shipmentIds=new Set(orderRows.map(o=>o.shipment_id).filter(Boolean));
-    const customersByEmail=new Map((cr.data||[]).map(x=>[normEmail(x.email),x]));
-    const shipmentsById=new Map((sr.data||[]).filter(x=>shipmentIds.has(x.shipment_id)).map(x=>[x.shipment_id,x]));
-    const grouped=new Map();
-    for(const o of orderRows){if(!isPaidForWaybill(o))continue;const key=normEmail(o.email);if(!key)continue;if(!grouped.has(key))grouped.set(key,{email:key,orders:[],items:[],total:0,shipping:0});const g=grouped.get(key);g.orders.push(o);g.items.push(...(o.order_items||[]));g.total+=Number(o.total||0);g.shipping+=Number(o.shipping_fee||0)}
-    waybillRows=[...grouped.values()].map(g=>{const customer=customersByEmail.get(g.email)||{},latest=g.orders.slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))[0]||{},shipment=shipmentsById.get(latest.shipment_id)||{};const merged=new Map();for(const i of g.items){const key=[i.product_name||"Product",i.strength||"",Number(i.unit_price||0)].join("||"),old=merged.get(key)||{product_name:i.product_name||"Product",strength:i.strength||"",qty:0,unit_price:Number(i.unit_price||0),line_total:0};old.qty+=Number(i.qty||0);old.line_total+=Number(i.line_total||0);merged.set(key,old)}return {...g,customer_name:customer.customer_name||latest.full_name||g.email,contact:customer.contact||latest.contact_number||"",address:customer.address||latest.address||"Address not yet saved",shipping_method:latest.shipping_method||"",courier:shipment.courier||latest.shipping_method||"To be assigned",waybill_number:shipment.waybill_number||shipment.tracking_number||"",tracking_number:shipment.tracking_number||shipment.waybill_number||"",shipment_status:shipment.status||"READY TO PRINT",products:[...merged.values()],payment:"PAID"};}).sort((a,b)=>a.customer_name.localeCompare(b.customer_name));
-    if(!selectedWaybillBuyer||!waybillRows.some(x=>x.email===selectedWaybillBuyer))selectedWaybillBuyer=waybillRows[0]?.email||null;
-    renderWaybillCenter();
-  }catch(e){console.error(e);if(list)list.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load waybills.")+'</div>';if(preview)preview.innerHTML=""}
-}
-
 document.addEventListener("DOMContentLoaded",()=>{if(typeof initSupabase==="function")initSupabase()});
 var categories=[],groupBuys=[],products=[],fees=[],ordersCache=[],orderItemsCache=[],customersCache=[],currentShipment=null,vialTrackerRows=[],waybillRows=[],selectedWaybillBuyer=null,libraryDocuments=[];
 const TRACKING_STATUSES=["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING","IN TRANSIT TO THE PHILIPPINES","ARRIVED IN THE PHILIPPINES","RECEIVED AT WAREHOUSE","PACKING & LABELLING","HANDED OVER TO LOCAL COURIER","DELIVERED"];
@@ -933,6 +793,149 @@ async function updateTrackingShipment(id,k){
     showMessage("Client tracking updated.","success");await loadTrackingDashboard();
   }catch(e){console.error(e);showMessage(e.message||"Unable to update shipment.","error")}
 }
+
+
+// ===== GROUP BUY WORKSPACE SCOPE (loaded after base functions) =====
+// ===== GROUP BUY WORKSPACE SCOPE =====
+window.activeGroupBuyNumber=localStorage.getItem("pepmosa_active_gb")||"";
+function getActiveGB(){return window.activeGroupBuyNumber||""}
+function renderActiveGroupBuySelector(){
+  const sel=$("activeGroupBuy");if(!sel)return;
+  const list=Array.isArray(groupBuys)?groupBuys:[];
+  if(!list.length){sel.innerHTML='<option value="">No Group Buy available</option>';return}
+  if(!list.some(g=>g.gb_number===window.activeGroupBuyNumber)){
+    window.activeGroupBuyNumber=list[0].gb_number;
+    localStorage.setItem("pepmosa_active_gb",window.activeGroupBuyNumber);
+  }
+  sel.innerHTML=list.map(g=>'<option value="'+esc(g.gb_number)+'" '+(g.gb_number===window.activeGroupBuyNumber?'selected':'')+'>'+esc(g.gb_number)+' — '+esc(g.customer_facing_name||g.status||"Group Buy")+'</option>').join("");
+  const hint=$("activeGroupBuyHint");if(hint)hint.textContent="All Payments, Orders, Tracking and Waybills below are for this Group Buy only.";
+}
+async function setActiveGroupBuy(gb){
+  window.activeGroupBuyNumber=gb||"";
+  if(gb)localStorage.setItem("pepmosa_active_gb",gb);else localStorage.removeItem("pepmosa_active_gb");
+  renderActiveGroupBuySelector();
+  await Promise.all([loadFees(),loadOrders(),loadOrdersCenter(),loadTrackingDashboard(),loadWaybillCenter()]);
+  showMessage("Now managing "+gb+". Other Group Buys are kept separate.","success");
+}
+const __baseLoadGroupBuys=loadGroupBuys;
+loadGroupBuys=async function(){await __baseLoadGroupBuys();renderActiveGroupBuySelector()}
+
+loadFees=async function(){
+  let q=sb.from("admin_fee_payments").select("*").order("created_at",{ascending:false});
+  const gb=getActiveGB();if(gb)q=q.eq("gb_number",gb);
+  const{data,error}=await q;if(error)throw error;fees=data||[];renderPaymentCenter();
+}
+loadOrders=async function(){
+  let q=sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});
+  const gb=getActiveGB();if(gb)q=q.eq("gb_number",gb);
+  const{data,error}=await q;if(error)throw error;ordersCache=data||[];orderItemsCache=ordersCache.flatMap(o=>o.order_items||[]);renderPaymentCenter();renderOrdersCenter();
+}
+loadOrdersCenter=async function(){
+  const list=$("ordersClientList");if(list)list.innerHTML='<div class="notice">Loading this Group Buy’s client orders...</div>';
+  try{
+    let q=sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});
+    const gb=getActiveGB();if(gb)q=q.eq("gb_number",gb);
+    const [or,cr]=await Promise.all([q,sb.from("customers").select("customer_id,email,customer_name,contact,address")]);
+    if(or.error)throw or.error;
+    ordersCache=or.data||[];orderItemsCache=ordersCache.flatMap(o=>o.order_items||[]);customersCache=cr.data||[];
+    renderPaymentCenter();renderOrdersCenter();
+  }catch(e){console.error(e);if(list)list.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load orders.")+'</div>'}
+}
+loadTrackingDashboard=async function(){
+  const box=$("trackingResults");if(!box)return;box.innerHTML='<div class="notice">Loading this Group Buy’s tracking...</div>';
+  try{
+    let oq=sb.from("orders").select("order_id,shipment_id,email,gb_number,total,payment_status,created_at").order("created_at",{ascending:false});
+    const gb=getActiveGB();if(gb)oq=oq.eq("gb_number",gb);
+    const [or,ir,sr]=await Promise.all([oq,sb.from("order_items").select("*"),sb.from("consolidated_shipments").select("*").order("updated_at",{ascending:false})]);
+    if(or.error)throw or.error;if(sr.error)throw sr.error;
+    trackingDashboardOrders=or.data||[];
+    const ids=new Set(trackingDashboardOrders.map(o=>o.shipment_id).filter(Boolean));
+    trackingDashboardShipments=(sr.data||[]).filter(x=>ids.has(x.shipment_id));
+    trackingDashboardItems=ir.error?[]:(ir.data||[]);
+    renderTrackingDashboard();
+  }catch(e){console.error(e);box.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load tracking.")+'</div>'}
+}
+const __baseCreateTrackingShipment=createTrackingShipment;
+createTrackingShipment=async function(email){
+  try{
+    const key=normTrackingEmail(email),gb=getActiveGB();
+    const clientOrders=trackingDashboardOrders.filter(o=>normTrackingEmail(o.email)===key&&!o.shipment_id);
+    let existing=trackingDashboardShipments.filter(s=>normTrackingEmail(s.email)===key);
+    let shipmentId;
+    if(existing.length)shipmentId=trackingPrimaryShipment(existing).shipment_id;
+    else{
+      const payload={email:key,status:"ORDER RECEIVED"};if(gb)payload.gb_number=gb;
+      const ins=await sb.from("consolidated_shipments").insert(payload).select().single();
+      if(ins.error)throw ins.error;shipmentId=ins.data.shipment_id;
+      await sb.from("shipment_status_history").insert({shipment_id:shipmentId,status:"ORDER RECEIVED"});
+    }
+    if(clientOrders.length){const up=await sb.from("orders").update({shipment_id:shipmentId}).in("order_id",clientOrders.map(o=>o.order_id));if(up.error)throw up.error}
+    showMessage("Client shipment created for "+(gb||"this Group Buy")+".","success");await loadTrackingDashboard();
+  }catch(e){console.error(e);showMessage(e.message||"Unable to create shipment.","error")}
+}
+const __baseOpenManualOrderModal=openManualOrderModal;
+openManualOrderModal=async function(){await __baseOpenManualOrderModal();const gb=getActiveGB();if(gb){window.manualOrderGB=gb;const n=document.querySelector("#manualOrderModal .notice.warning .small");if(n)n.textContent="This manual order will be assigned to the currently selected Group Buy: "+gb+"."}}
+openBulkTrackingModal=async function(){
+  const modal=$("bulkTrackingModal");if(!modal)return;
+  await loadTrackingDashboard();
+  const count=$("bulkTrackingClientCount"),sel=$("bulkTrackingStatus");
+  const statuses=(typeof TRACKING_STATUSES!=="undefined"&&TRACKING_STATUSES.length)?TRACKING_STATUSES:["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING","IN TRANSIT TO THE PHILIPPINES","ARRIVED IN THE PHILIPPINES","RECEIVED AT WAREHOUSE","PACKING & LABELLING","HANDED OVER TO LOCAL COURIER","DELIVERED"];
+  if(sel)sel.innerHTML='<option value="">Select new status</option>'+statuses.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
+  const emails=[...new Set((trackingDashboardOrders||[]).map(o=>normTrackingEmail(o.email)).filter(Boolean))];
+  if(count)count.textContent=emails.length+" client"+(emails.length===1?"":"s")+" will be updated for "+(getActiveGB()||"this Group Buy");
+  modal.classList.add("show");
+}
+saveBulkTracking=async function(){
+  const status=$("bulkTrackingStatus").value,courier=$("bulkTrackingCourier").value,note=$("bulkTrackingNote").value.trim(),gb=getActiveGB();
+  if(!status)return showMessage("Please select a status.","error");
+  const btn=$("bulkTrackingSaveBtn");if(btn){btn.disabled=true;btn.textContent="UPDATING..."}
+  try{
+    await loadTrackingDashboard();
+    const emails=[...new Set((trackingDashboardOrders||[]).map(o=>normTrackingEmail(o.email)).filter(Boolean))];
+    if(!emails.length)throw new Error("No client orders found for this Group Buy.");
+    const now=new Date().toISOString(),user=await sb.auth.getUser();
+    let updated=0,created=0;
+    for(const email of emails){
+      const clientOrders=trackingDashboardOrders.filter(o=>normTrackingEmail(o.email)===email);
+      const rows=trackingDashboardShipments.filter(s=>normTrackingEmail(s.email)===email);
+      let shipmentId=rows.length?trackingPrimaryShipment(rows).shipment_id:null;
+      if(shipmentId){
+        const payload={status,updated_at:now,delivered_at:status==="DELIVERED"?now:null};if(courier)payload.courier=courier;if(note)payload.notes=note;
+        const r=await sb.from("consolidated_shipments").update(payload).eq("shipment_id",shipmentId);if(r.error)throw r.error;
+        const h=await sb.from("shipment_status_history").insert({shipment_id:shipmentId,status,courier:payload.courier||null,tracking_number:trackingPrimaryShipment(rows).tracking_number||null,changed_by:user.data?.user?.id||null});if(h.error)console.warn(h.error);
+        updated++;
+      }else{
+        const payload={email,status,updated_at:now};if(gb)payload.gb_number=gb;if(courier)payload.courier=courier;if(note)payload.notes=note;
+        const ins=await sb.from("consolidated_shipments").insert(payload).select().single();if(ins.error)throw ins.error;
+        shipmentId=ins.data.shipment_id;created++;
+        await sb.from("shipment_status_history").insert({shipment_id:shipmentId,status,courier:courier||null,changed_by:user.data?.user?.id||null});
+      }
+      const ids=clientOrders.map(o=>o.order_id).filter(Boolean);
+      if(ids.length){const up=await sb.from("orders").update({shipment_id:shipmentId}).in("order_id",ids);if(up.error)throw up.error}
+    }
+    closeBulkTrackingModal();showMessage("Tracking updated for "+emails.length+" client"+(emails.length===1?"":"s")+" in "+(gb||"this Group Buy")+".","success");await loadTrackingDashboard();
+  }catch(e){console.error(e);showMessage(e.message||"Unable to update this Group Buy’s tracking.","error")}
+  finally{if(btn){btn.disabled=false;btn.textContent="UPDATE ALL CLIENTS"}}
+}
+const __baseLoadWaybillCenter=loadWaybillCenter;
+loadWaybillCenter=async function(){
+  const list=$("waybillBuyerList"),preview=$("waybillPreview");if(list)list.innerHTML='<div class="notice">Loading this Group Buy’s paid orders...</div>';
+  try{
+    let oq=sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});
+    const gb=getActiveGB();if(gb)oq=oq.eq("gb_number",gb);
+    const [or,cr,sr]=await Promise.all([oq,sb.from("customers").select("customer_id,email,customer_name,contact,address"),sb.from("consolidated_shipments").select("shipment_id,email,courier,tracking_number,waybill_number,status,updated_at").order("updated_at",{ascending:false})]);
+    if(or.error)throw or.error;
+    const orderRows=or.data||[],shipmentIds=new Set(orderRows.map(o=>o.shipment_id).filter(Boolean));
+    const customersByEmail=new Map((cr.data||[]).map(x=>[normEmail(x.email),x]));
+    const shipmentsById=new Map((sr.data||[]).filter(x=>shipmentIds.has(x.shipment_id)).map(x=>[x.shipment_id,x]));
+    const grouped=new Map();
+    for(const o of orderRows){if(!isPaidForWaybill(o))continue;const key=normEmail(o.email);if(!key)continue;if(!grouped.has(key))grouped.set(key,{email:key,orders:[],items:[],total:0,shipping:0});const g=grouped.get(key);g.orders.push(o);g.items.push(...(o.order_items||[]));g.total+=Number(o.total||0);g.shipping+=Number(o.shipping_fee||0)}
+    waybillRows=[...grouped.values()].map(g=>{const customer=customersByEmail.get(g.email)||{},latest=g.orders.slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))[0]||{},shipment=shipmentsById.get(latest.shipment_id)||{};const merged=new Map();for(const i of g.items){const key=[i.product_name||"Product",i.strength||"",Number(i.unit_price||0)].join("||"),old=merged.get(key)||{product_name:i.product_name||"Product",strength:i.strength||"",qty:0,unit_price:Number(i.unit_price||0),line_total:0};old.qty+=Number(i.qty||0);old.line_total+=Number(i.line_total||0);merged.set(key,old)}return {...g,customer_name:customer.customer_name||latest.full_name||g.email,contact:customer.contact||latest.contact_number||"",address:customer.address||latest.address||"Address not yet saved",shipping_method:latest.shipping_method||"",courier:shipment.courier||latest.shipping_method||"To be assigned",waybill_number:shipment.waybill_number||shipment.tracking_number||"",tracking_number:shipment.tracking_number||shipment.waybill_number||"",shipment_status:shipment.status||"READY TO PRINT",products:[...merged.values()],payment:"PAID"};}).sort((a,b)=>a.customer_name.localeCompare(b.customer_name));
+    if(!selectedWaybillBuyer||!waybillRows.some(x=>x.email===selectedWaybillBuyer))selectedWaybillBuyer=waybillRows[0]?.email||null;
+    renderWaybillCenter();
+  }catch(e){console.error(e);if(list)list.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load waybills.")+'</div>';if(preview)preview.innerHTML=""}
+}
+
 
 document.addEventListener("DOMContentLoaded",()=>{
   if($("variantEditorRows")&&!$("variantEditorRows").children.length)resetVariantEditor();

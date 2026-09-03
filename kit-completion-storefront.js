@@ -205,9 +205,12 @@
       );
 
     const render=()=>{
+      // DISPLAYED remaining is always the live server inventory.
+      // Adding to a cart is not a reservation and must never reduce this number.
+      const live=Math.max(0,availableFor(selected.variant_id));
       const inCart=Number(cartFor(selected.variant_id)?.qty||0);
-      const live=Math.max(0,availableFor(selected.variant_id)-inCart);
-      qty=Math.max(1,Math.min(Math.max(1,live),Number(qty)||1));
+      const canAdd=Math.max(0,live-inCart);
+      qty=Math.max(1,Math.min(Math.max(1,canAdd),Number(qty)||1));
 
       modal.innerHTML=
         '<div class="pepPickerBox">'+
@@ -218,18 +221,18 @@
           '</div>'+
           '<div class="pepPickerLabel">CHOOSE VARIANT</div>'+
           '<div class="pepVariantChoices">'+variants.map(v=>{
-            const left=Math.max(0,availableFor(v.variant_id)-Number(cartFor(v.variant_id)?.qty||0));
+            const left=Math.max(0,availableFor(v.variant_id));
             return '<button type="button" class="pepVariantChoice '+(String(v.variant_id)===String(selected.variant_id)?'selected':'')+'" data-vid="'+esc(v.variant_id)+'">'+
               '<span><b>'+esc(v.strength||'Variant')+'</b><small>'+left+' vial(s) remaining • minimum 1 vial</small></span>'+
               '<strong>'+money(v.price)+'</strong>'+
             '</button>';
           }).join('')+'</div>'+
           '<div class="pepQuantityRow">'+
-            '<div><div class="pepPickerLabel small">QUANTITY</div><div class="muted"><b>'+live+' vial(s) available</b> for '+esc(selected.strength||'this variant')+'</div></div>'+
-            '<div class="pepStepper"><button id="pepMinus" type="button">−</button><input id="pepPickerQty" type="number" min="1" max="'+Math.max(1,live)+'" value="'+qty+'"><button id="pepPlus" type="button">+</button></div>'+
+            '<div><div class="pepPickerLabel small">QUANTITY</div><div class="muted"><b>'+live+' vial(s) live remaining</b> for '+esc(selected.strength||'this variant')+'</div></div>'+
+            '<div class="pepStepper"><button id="pepMinus" type="button">−</button><input id="pepPickerQty" type="number" min="1" max="'+Math.max(1,canAdd)+'" value="'+qty+'"><button id="pepPlus" type="button">+</button></div>'+
           '</div>'+
           '<div class="pepPickerTotal"><span>SUBTOTAL</span><b>'+money(Number(selected.price||0)*qty)+'</b></div>'+
-          '<button class="btn primary pepPickerAdd" type="button" '+(live<1?'disabled':'')+'>'+(live<1?'SOLD OUT':'ADD TO CART')+'</button>'+
+          '<button class="btn primary pepPickerAdd" type="button" '+(canAdd<1?'disabled':'')+'>'+(canAdd<1?'MAX IN CART':'ADD TO CART')+'</button>'+
         '</div>';
 
       modal.querySelector('.pepPickerClose').onclick=()=>modal.classList.remove('show');
@@ -262,10 +265,11 @@
         if(!ok) return alert('Unable to refresh remaining vials. Please try again.');
 
         const already=Number(cartFor(selected.variant_id)?.qty||0);
-        const fresh=Math.max(0,availableFor(selected.variant_id)-already);
-        if(fresh<1) return render();
+        const liveRemaining=Math.max(0,availableFor(selected.variant_id));
+        const canAdd=Math.max(0,liveRemaining-already);
+        if(canAdd<1) return render();
 
-        qty=Math.min(qty,fresh);
+        qty=Math.min(qty,canAdd);
         // Keep this cart strictly scoped to the active Group Buy.
         const activeGBNumber=currentGBNumber();
         const cart=JSON.parse(localStorage.pepmosaCart||'[]')

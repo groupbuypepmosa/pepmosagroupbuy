@@ -2065,9 +2065,17 @@ async function placeOrder(){
     if(!currentGB){
       return alert("No open Group Buy.");
     }
-    const checkoutEmail = $("email").value.trim().toLowerCase();
+    // Use the verified Admin Fee email first. The checkout form email can be
+    // entered later or may differ in case/spacing, but approval belongs to the
+    // email that was actually verified for this current Group Buy.
+    const checkoutEmail = (
+      window.verifiedEmail ||
+      localStorage.getItem("pepmosa_verified_email") ||
+      $("email").value ||
+      ""
+    ).trim().toLowerCase();
     if(!checkoutEmail){
-      return alert("Enter your email.");
+      return alert("Enter the email used for your Admin Fee.");
     }
     const { data:feeApproved, error:feeError } = await sb.rpc(
       "has_approved_admin_fee",

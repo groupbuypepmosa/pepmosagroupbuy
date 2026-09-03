@@ -328,8 +328,13 @@ async function saveGroupBuy(){
     if(!selectedCategories.length)return showMessage("Please select at least one category for this Group Buy.","error");
     const p={gb_number:n,customer_facing_name:$("gbName").value.trim(),status:$("gbStatus").value,admin_fee:Number($("gbAdminFee").value||0)},a=$("adminQrFile").files[0],f=$("finalQrFile").files[0];
     if(a)p.admin_fee_qr_url=await uploadAsset(a,"admin-fee");if(f)p.final_payment_qr_url=await uploadAsset(f,"final-payment");
-    const id=$("editingGBId").value,r=id?await sb.from("group_buys").update(p).eq("gb_id",id):await sb.from("group_buys").insert(p);
+    const id=$("editingGBId").value,isNew=!id,r=id?await sb.from("group_buys").update(p).eq("gb_id",id):await sb.from("group_buys").insert(p);
     if(r.error)throw r.error;
+    if(isNew){
+      // Never carry a previous GB cart/customer state into a newly created GB.
+      ["pepmosa_cart","pepmosa_active_gb","pepmosa_checkout_customer","pepmosa_checkout_gb"].forEach(k=>localStorage.removeItem(k));
+      sessionStorage.clear();
+    }
     const {error:delError}=await sb.from("gb_categories").delete().eq("gb_number",n);if(delError)throw delError;
     const {error:catError}=await sb.from("gb_categories").insert(selectedCategories.map(category_name=>({gb_number:n,category_name})));
     if(catError)throw catError;
@@ -339,7 +344,9 @@ async function saveGroupBuy(){
 }
 async function deleteGroupBuy(gb){
   if(!gb)return showMessage("Missing Group Buy number.","error");
-  if(!confirm(`DELETE ${gb}?\n\nThis permanently deletes this Group Buy and its admin fee payments, orders, order items, tracking/shipments used only by this Group Buy, kit data, category minimums and GB settings.\n\nCustomer records themselves will NOT be deleted.\n\nTHIS CANNOT BE UNDONE.`))return;
+  const typed=prompt(`PERMANENT DELETE\n\nType the exact GB number: ${gb}\n\nThis cannot be undone.`);
+  if(typed===null)return;
+  if(typed.trim()!==gb)return showMessage("GB number did not match. Nothing was deleted.","error");
   try{
     showMessage("Deleting Group Buy and all related records...","warning");
     const{data:gbOrders,error:oe}=await sb.from("orders").select("order_id,shipment_id,customer_id").eq("gb_number",gb);
@@ -647,7 +654,11 @@ async function loadVialTracker(){
 function renderVialTracker(){
  const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase();const rows=vialTrackerRows.filter(r=>(r.product_name+" "+r.strength+" "+r.variant_id+" "+r.category).toLowerCase().includes(q));
  if(!rows.length){$("vialTrackerResults").innerHTML='<div class="empty">No ordered products found.</div>';return;}
- $("vialTrackerResults").innerHTML='<div style="overflow:auto"><table class="trackerTable"><thead><tr><th>Product</th><th>Variant</th><th>Category</th><th>Total Vials</th><th>Complete Kits</th><th>Remaining to Complete Kit</th></tr></thead><tbody>'+rows.map(r=>'<tr><td><b>'+esc(r.product_name)+'</b></td><td>'+esc(r.strength||"—")+'</td><td>'+esc(r.category||"—")+'</td><td><b>'+r.qty+'</b></td><td><b>'+r.totalKits+' kit(s)</b></td><td><b>'+(r.remainingToComplete===0?"Complete ✓":r.remainingToComplete+" vial(s)")+'</b></td></tr>').join("")+'</tbody></table></div>';
+ $("vialTrackerResults").innerHTML='<div class="pepKitCards">'+rows.map(r=>{
+   const inCurrent=Number(r.qty||0)%10,complete=r.remainingToComplete===0,percent=complete?100:Math.round((inCurrent/10)*100);
+   const status=complete?'🟢 KIT COMPLETE — Ready for ordering':(10-inCurrent)+' vial(s) remaining to complete kit';
+   return '<div class="pepKitCard"><div class="pepKitTop"><div><b>'+esc(r.product_name)+'</b><div class="small">'+esc(r.strength||"—")+' • '+esc(r.category||"—")+'</div></div><b>'+r.qty+' vial(s)</b></div><div class="pepProgress"><span style="width:'+percent+'%"></span></div><div class="pepKitMeta"><b>'+inCurrent+' / 10</b><span>'+status+'</span></div><div class="small">Complete kits: '+r.totalKits+'</div></div>';
+ }).join("")+'</div>';
 }
 async function loadLibraryDocuments(){const box=$("documentAdminList");if(box)box.innerHTML='<div class="small">Loading documents…</div>';const{data,error}=await sb.from("library_documents").select("*").order("created_at",{ascending:false});if(error){if(box)box.innerHTML='<div class="notice error">'+esc(error.message)+'</div>';return;}libraryDocuments=data||[];if(box)box.innerHTML=libraryDocuments.length?libraryDocuments.map(d=>'<div class="item"><div class="itemHead"><div><b>'+esc(d.title)+'</b><div class="small">'+esc(d.document_type)+(d.product_name?" • "+esc(d.product_name):"")+'</div></div><div class="actions"><button class="btn danger" onclick="deleteLibraryDocument(\''+esc(d.id)+'\',\''+esc(d.file_path)+'\')">DELETE</button></div></div></div>').join(""):'<div class="empty">No uploaded documents yet.</div>';}
 async function uploadLibraryDocument(){const type=$("docType").value,title=$("docTitle").value.trim(),product=$("docProduct").value.trim(),file=$("docFile").files[0];if(!title||!file)return showMessage("Title and file are required.","error");try{const safe=(crypto.randomUUID?crypto.randomUUID():Date.now())+"-"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");const path=type.toLowerCase()+"/"+safe;const{error:up}=await sb.storage.from("library-documents").upload(path,file,{upsert:false,contentType:file.type});if(up)throw up;const{error:ins}=await sb.from("library_documents").insert({document_type:type,title:title,product_name:product||null,file_path:path,file_name:file.name,mime_type:file.type});if(ins)throw ins;$("docTitle").value="";$("docProduct").value="";$("docFile").value="";showMessage("Document uploaded successfully.","success");await loadLibraryDocuments();}catch(e){console.error(e);showMessage(e.message||"Upload failed.","error");}}
@@ -1299,6 +1310,12 @@ async function saveManualOrder(){
 #trackingResults .clientTrackingMeta small{display:block;color:#a46d86;font-weight:900;font-size:9px;letter-spacing:.08em}
 #trackingResults .clientTrackingMeta b{display:block;margin-top:4px;word-break:break-word}
 @media(max-width:700px){#trackingResults .clientTrackingAdminHead{flex-direction:column}#trackingResults .clientTrackingMeta{grid-template-columns:1fr}#trackingResults .clientTrackingOrder{flex-direction:column}}
+#vialTrackerResults .pepKitCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+#vialTrackerResults .pepKitCard{border:1px solid #efd8e5;border-radius:16px;padding:15px;background:#fff}
+#vialTrackerResults .pepKitTop{display:flex;justify-content:space-between;gap:10px}
+#vialTrackerResults .pepProgress{height:10px;border-radius:999px;background:#f1e4eb;overflow:hidden;margin:14px 0 8px}
+#vialTrackerResults .pepProgress span{display:block;height:100%;background:#d76a9a;border-radius:999px}
+#vialTrackerResults .pepKitMeta{display:flex;justify-content:space-between;gap:10px;font-size:12px;align-items:center;margin-bottom:7px}
 </style>
 <script>
 /* Clean client-based tracker: exactly one admin card per email. */

@@ -53,17 +53,38 @@
   function getCart(){
     const raw=getCartRaw(),gb=getGB(),gbn=String(gb?.gb_number||'');
     if(!gbn)return raw;
-    const scoped=localStorage.getItem(CART_GB_KEY);
-    // A cart is valid only for the currently open Group Buy. Legacy/unscoped carts
-    // are deliberately discarded once so old GB items can never leak into a new checkout.
-    if(scoped!==gbn){
-      if(raw.length)clearPersistedCart();
-      else {window.cart=[];try{localStorage.removeItem(CART_KEY)}catch(e){}}
-      try{localStorage.setItem(CART_GB_KEY,gbn)}catch(e){}
+    const scoped=String(localStorage.getItem(CART_GB_KEY)||'');
+    const valid=raw.filter(i=>String(i.gb_number||'')===gbn);
+
+    /*
+      Do NOT clear a fresh cart just because the separate CART_GB_KEY has not
+      been written yet. On the first Add → Checkout, scripts can race:
+      the item already has the correct gb_number, but the marker can still be
+      empty/stale. The old code treated that as an old cart and deleted it.
+
+      The item-level gb_number is the authoritative scope.
+    */
+    if(valid.length){
+      if(scoped!==gbn){
+        try{localStorage.setItem(CART_GB_KEY,gbn)}catch(e){}
+      }
+      if(valid.length!==raw.length){
+        window.cart=valid;
+        try{localStorage.setItem(CART_KEY,JSON.stringify(valid))}catch(e){}
+      }
+      return valid;
+    }
+
+    // Only discard truly legacy/unscoped items that do not belong to this GB.
+    if(raw.length && scoped!==gbn){
+      window.cart=[];
+      try{
+        localStorage.removeItem(CART_KEY);
+        localStorage.setItem(CART_GB_KEY,gbn);
+      }catch(e){}
       return [];
     }
-    const valid=raw.filter(i=>String(i.gb_number||'')===gbn);
-    if(valid.length!==raw.length){window.cart=valid;try{localStorage.setItem(CART_KEY,JSON.stringify(valid))}catch(e){}}
+
     return valid;
   }
   async function sanitizeKitCart(cart,gb){

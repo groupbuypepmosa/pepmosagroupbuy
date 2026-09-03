@@ -9,10 +9,266 @@
 <section class="searchPanel"><div class="searchRow"><input id="email" placeholder="Enter the email used for your order" type="email" onkeydown="if(event.key==='Enter')track()"><button class="searchBtn" onclick="track()">TRACK MY ORDERS →</button></div><div class="hint">♡ One email = one complete PEPMOSA order summary ♡</div><div id="out"></div></section><div class="footer">♡ PEPMOSA GROUP BUY ♡</div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script>
 <script>
-initSupabase();const STATUSES=['ORDER RECEIVED','PAYMENT CONFIRMED','ORDER PROCESSING','IN TRANSIT TO THE PHILIPPINES','ARRIVED IN THE PHILIPPINES','RECEIVED AT WAREHOUSE','PACKING & LABELLING','HANDED OVER TO LOCAL COURIER','DELIVERED'];const $=id=>document.getElementById(id);const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-function asArray(v){if(Array.isArray(v))return v;if(typeof v==='string'){try{const p=JSON.parse(v);return Array.isArray(p)?p:[]}catch{return []}}if(v&&typeof v==='object'){if(Array.isArray(v.data))return v.data;if(Array.isArray(v.items))return v.items}return []}
-function itemsFor(o,all){const oid=String(o.order_id??o.id??'');const nested=asArray(o.items||o.order_items||o.orderItems||o.details||[]);if(nested.length)return nested;return asArray(all).filter(i=>String(i.order_id??i.order?.order_id??'')===oid)}
-function itemLabel(i){return [i.product_name||i.products?.product_name||i.product?.product_name||i.products?.name||i.product?.name||'Product',i.strength||i.variant_name||i.product_variants?.strength||i.variant?.strength||''].filter(Boolean).join(' ').replace(/\s+/g,' ').trim()}
-function itemQty(i){return Number(i.quantity??i.qty??i.total_qty??1)||1}function noteFor(o){return o.manual_note??o.note??o.notes??o.admin_note??o.late_order_note??''}
-async function track(){const email=$('email').value.trim().toLowerCase(),out=$('out');if(!email){out.innerHTML='<div class="notice error">Please enter the email used for your order.</div>';return}out.innerHTML='<div class="notice">✦ Finding all orders under this email…</div>';try{const r=await sb.rpc('get_customer_tracking',{p_email:email});if(r.error)throw r.error;let data=r.data||{};if(typeof data==='string'){try{data=JSON.parse(data)}catch{data={}}}const orders=asArray(data.orders),shipments=asArray(data.shipments),allItems=asArray(data.order_items||data.items);if(!orders.length&&!shipments.length){out.innerHTML='<div class="notice">No orders found for this email.</div>';return}const shipment=shipments.slice().sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0))[0]||{};const status=shipment.status||'ORDER RECEIVED',ci=Math.max(0,STATUSES.indexOf(status)),progress=Math.round(((ci+1)/STATUSES.length)*100);let totalItems=0;const notes=[];const emailGrouped=new Map();allItems.forEach(i=>{const key=itemLabel(i).toUpperCase(),q=itemQty(i);emailGrouped.set(key,(emailGrouped.get(key)||0)+q)});const summaryRows=[...emailGrouped.entries()].map(([name,q])=>'<div class="product"><b>'+esc(name)+'</b><span class="qty">TOTAL QTY '+q+'</span></div>').join('');const summaryCard=summaryRows?'<div class="orderCard" style="border-color:#e8a7c8"><div class="orderTop"><div><div class="orderRef">COMPLETE ORDER SUMMARY</div><div style="font-size:11px;color:#8b7a83;margin-top:4px">All products ordered under this email</div></div></div><div class="items">'+summaryRows+'</div></div>':'';const cards=orders.map((o,idx)=>{const oid=o.order_id??o.id??('ORDER '+(idx+1)),grouped=new Map();itemsFor(o,allItems).forEach(i=>{const key=itemLabel(i).toUpperCase(),q=itemQty(i);grouped.set(key,(grouped.get(key)||0)+q);totalItems+=q});const n=noteFor(o);if(n)notes.push(n);const rows=[...grouped.entries()].map(([name,q])=>'<div class="product"><b>'+esc(name)+'</b><span class="qty">QTY '+q+'</span></div>').join('')||'<div class="product"><span style="color:#8b7a83;font-size:12px">No products attached to this order yet.</span></div>';return '<article class="orderCard"><div class="orderTop"><div><div class="orderRef">ORDER # '+esc(oid)+'</div><div style="font-size:11px;color:#8b7a83;margin-top:4px">'+esc(o.gb_number||'PEPMOSA GROUP BUY')+'</div></div><div class="orderStatus">'+esc(o.payment_status||o.status||'ORDER RECEIVED')+'</div></div><div class="items">'+rows+'</div></article>'}).join('');out.innerHTML='<section class="clientCard"><div class="clientHero"><div class="clientTop"><div><div class="clientLabel">PEPMOSA CLIENT TRACKER</div><div class="clientEmail">'+esc(email)+'</div></div><span class="status">'+esc(status)+'</span></div></div><div class="body"><div class="progress"><div class="progressHead"><b>Current shipment status</b><span>STEP '+(ci+1)+' OF '+STATUSES.length+'</span></div><div class="bar"><div class="fill" style="width:'+progress+'%"></div></div></div><div class="meta"><div class="metaBox"><small>COURIER</small><b>'+esc(shipment.courier||'To be assigned')+'</b></div><div class="metaBox"><small>TRACKING NUMBER</small><b>'+esc(shipment.tracking_number||'To be assigned')+'</b></div><div class="metaBox"><small>WAYBILL NUMBER</small><b>'+esc(shipment.waybill_number||'To be assigned')+'</b></div></div><section class="orders"><div class="sectionHead"><div><div class="eyebrow">YOUR ORDERS</div><h2>Everything under this email</h2><p>All ordered products and quantities are shown here.</p></div><span class="count">'+orders.length+' ORDER'+(orders.length===1?'':'S')+(totalItems?' • '+totalItems+' ITEMS':'')+'</span></div>'+summaryCard+cards+(notes.length?'<div class="note"><b>♡ ADMIN NOTES</b><br>'+[...new Set(notes)].map(esc).join('<br>')+'</div>':'')+'</section></div></section>'}catch(err){console.error(err);out.innerHTML='<div class="notice error">Unable to load tracking right now. Please try again.</div>'}}
-</script></body></html>
+initSupabase();
+
+const STATUSES=[
+  'ORDER RECEIVED','PAYMENT CONFIRMED','ORDER PROCESSING',
+  'IN TRANSIT TO THE PHILIPPINES','ARRIVED IN THE PHILIPPINES',
+  'RECEIVED AT WAREHOUSE','PACKING & LABELLING',
+  'HANDED OVER TO LOCAL COURIER','DELIVERED'
+];
+
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+
+function asArray(v){
+  if(Array.isArray(v)) return v;
+  if(typeof v==='string'){
+    try{const x=JSON.parse(v);return asArray(x)}catch{return []}
+  }
+  if(v&&typeof v==='object'){
+    if(Array.isArray(v.data)) return v.data;
+    if(Array.isArray(v.items)) return v.items;
+  }
+  return [];
+}
+
+function normalizeTrackingPayload(raw){
+  let data=raw;
+  if(typeof data==='string'){
+    try{data=JSON.parse(data)}catch{data={}}
+  }
+  if(Array.isArray(data)) data=data[0]||{};
+  if(!data||typeof data!=='object') data={};
+
+  return {
+    orders:asArray(data.orders||data.customer_orders),
+    shipments:asArray(data.shipments||data.consolidated_shipments),
+    order_items:asArray(data.order_items||data.items)
+  };
+}
+
+function itemLabel(i){
+  const product=
+    i.product_name||
+    i.products?.product_name||
+    i.product?.product_name||
+    i.products?.name||
+    i.product?.name||
+    i.name||'Product';
+
+  const strength=
+    i.strength||
+    i.variant_name||
+    i.product_variants?.strength||
+    i.variant?.strength||
+    '';
+
+  return [product,strength].filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
+}
+
+function itemQty(i){
+  return Number(i.quantity??i.qty??i.total_qty??i.count??1)||1;
+}
+
+function nestedItems(order){
+  return asArray(
+    order.items||
+    order.order_items||
+    order.orderItems||
+    order.details||
+    order.order_item||
+    []
+  );
+}
+
+function itemsFor(order,allItems){
+  const nested=nestedItems(order);
+  if(nested.length) return nested;
+
+  const oid=String(order.order_id??order.id??'');
+  return asArray(allItems).filter(i=>{
+    const itemOrder=String(i.order_id??i.order?.order_id??i.order?.id??'');
+    return oid && itemOrder===oid;
+  });
+}
+
+function noteFor(o){
+  return o.manual_note??o.note??o.notes??o.admin_note??o.late_order_note??'';
+}
+
+async function loadTrackingData(email){
+  let rpcError=null;
+
+  try{
+    const r=await sb.rpc('get_customer_tracking',{p_email:email});
+    if(r.error) throw r.error;
+
+    const payload=normalizeTrackingPayload(r.data);
+    if(payload.orders.length||payload.shipments.length||payload.order_items.length){
+      return payload;
+    }
+  }catch(err){
+    rpcError=err;
+    console.warn('Tracking RPC failed, trying direct fallback:',err);
+  }
+
+  /* Fallback: keep this relation-free so duplicate Supabase relationships
+     cannot break the public tracker. */
+  try{
+    const ordersRes=await sb.from('orders').select('*').eq('email',email).order('created_at',{ascending:false});
+    if(ordersRes.error) throw ordersRes.error;
+
+    const orders=ordersRes.data||[];
+    const orderIds=orders.map(o=>o.order_id??o.id).filter(Boolean);
+
+    let order_items=[];
+    if(orderIds.length){
+      const itemsRes=await sb.from('order_items').select('*').in('order_id',orderIds);
+      if(!itemsRes.error) order_items=itemsRes.data||[];
+    }
+
+    let shipments=[];
+    const shipmentRes=await sb.from('consolidated_shipments').select('*').eq('email',email).order('updated_at',{ascending:false});
+    if(!shipmentRes.error) shipments=shipmentRes.data||[];
+
+    return {orders,shipments,order_items};
+  }catch(fallbackError){
+    console.error('Tracking fallback failed:',fallbackError);
+    throw rpcError||fallbackError;
+  }
+}
+
+async function track(){
+  const email=$('email').value.trim().toLowerCase();
+  const out=$('out');
+  const btn=document.querySelector('.searchBtn');
+
+  if(!email){
+    out.innerHTML='<div class="notice error">Please enter the email used for your order.</div>';
+    return;
+  }
+
+  if(btn){
+    btn.disabled=true;
+    btn.dataset.original=btn.dataset.original||btn.textContent;
+    btn.textContent='FINDING YOUR ORDERS…';
+  }
+
+  out.innerHTML='<div class="notice">✦ Finding all products and quantities under this email…</div>';
+
+  try{
+    const data=await loadTrackingData(email);
+    const orders=asArray(data.orders);
+    const shipments=asArray(data.shipments);
+    const allItems=asArray(data.order_items);
+
+    if(!orders.length&&!shipments.length){
+      out.innerHTML='<div class="notice">No orders found for this email yet.</div>';
+      return;
+    }
+
+    const shipment=shipments.slice().sort((a,b)=>
+      new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0)
+    )[0]||{};
+
+    const status=shipment.status||'ORDER RECEIVED';
+    const rawIndex=STATUSES.indexOf(status);
+    const ci=rawIndex>=0?rawIndex:0;
+    const progress=Math.round(((ci+1)/STATUSES.length)*100);
+
+    const summary=new Map();
+    const orderCards=[];
+    const notes=[];
+
+    orders.forEach((o,idx)=>{
+      const oid=o.order_id??o.id??('ORDER '+(idx+1));
+      const grouped=new Map();
+
+      itemsFor(o,allItems).forEach(i=>{
+        const name=itemLabel(i).toUpperCase();
+        const q=itemQty(i);
+        grouped.set(name,(grouped.get(name)||0)+q);
+        summary.set(name,(summary.get(name)||0)+q);
+      });
+
+      const n=noteFor(o);
+      if(n) notes.push(n);
+
+      const rows=[...grouped.entries()].map(([name,q])=>
+        '<div class="product"><b>'+esc(name)+'</b><span class="qty">QTY '+q+'</span></div>'
+      ).join('')||
+      '<div class="product"><span style="color:#8b7a83;font-size:12px">No products attached to this order yet.</span></div>';
+
+      orderCards.push(
+        '<article class="orderCard">'+
+          '<div class="orderTop">'+
+            '<div><div class="orderRef">ORDER # '+esc(oid)+'</div>'+
+            '<div style="font-size:11px;color:#8b7a83;margin-top:4px">'+esc(o.gb_number||'PEPMOSA GROUP BUY')+'</div></div>'+
+            '<div class="orderStatus">'+esc(o.payment_status||o.status||'ORDER RECEIVED')+'</div>'+
+          '</div>'+
+          '<div class="items">'+rows+'</div>'+
+        '</article>'
+      );
+    });
+
+    /* If the RPC only returned a flat item list, still show everything. */
+    if(!summary.size){
+      allItems.forEach(i=>{
+        const name=itemLabel(i).toUpperCase();
+        const q=itemQty(i);
+        summary.set(name,(summary.get(name)||0)+q);
+      });
+    }
+
+    const totalItems=[...summary.values()].reduce((a,b)=>a+b,0);
+
+    const summaryRows=[...summary.entries()].map(([name,q])=>
+      '<div class="product"><b>'+esc(name)+'</b><span class="qty">TOTAL QTY '+q+'</span></div>'
+    ).join('');
+
+    const summaryCard=summaryRows?
+      '<div class="orderCard" style="border-color:#e8a7c8">'+
+        '<div class="orderTop"><div><div class="orderRef">COMPLETE ORDER SUMMARY</div>'+
+        '<div style="font-size:11px;color:#8b7a83;margin-top:4px">All products ordered under this email</div></div></div>'+
+        '<div class="items">'+summaryRows+'</div></div>'
+      :'';
+
+    out.innerHTML=
+      '<section class="clientCard">'+
+        '<div class="clientHero">'+
+          '<div class="clientTop"><div><div class="clientLabel">PEPMOSA CLIENT TRACKER</div>'+
+          '<div class="clientEmail">'+esc(email)+'</div></div>'+
+          '<span class="status">'+esc(status)+'</span></div>'+
+        '</div>'+
+        '<div class="body">'+
+          '<div class="progress"><div class="progressHead"><b>Current shipment status</b>'+
+          '<span>STEP '+(ci+1)+' OF '+STATUSES.length+'</span></div>'+
+          '<div class="bar"><div class="fill" style="width:'+progress+'%"></div></div></div>'+
+          '<div class="meta">'+
+            '<div class="metaBox"><small>COURIER</small><b>'+esc(shipment.courier||'To be assigned')+'</b></div>'+
+            '<div class="metaBox"><small>TRACKING NUMBER</small><b>'+esc(shipment.tracking_number||'To be assigned')+'</b></div>'+
+            '<div class="metaBox"><small>WAYBILL NUMBER</small><b>'+esc(shipment.waybill_number||'To be assigned')+'</b></div>'+
+          '</div>'+
+          '<section class="orders">'+
+            '<div class="sectionHead"><div><div class="eyebrow">YOUR ORDERS</div><h2>Everything under this email</h2>'+
+            '<p>All ordered products and quantities are shown here.</p></div>'+
+            '<span class="count">'+orders.length+' ORDER'+(orders.length===1?'':'S')+(totalItems?' • '+totalItems+' ITEMS':'')+'</span></div>'+
+            summaryCard+
+            orderCards.join('')+
+            (notes.length?'<div class="note"><b>♡ ADMIN NOTES</b><br>'+[...new Set(notes)].map(esc).join('<br>')+'</div>':'')+
+          '</section>'+
+        '</div>'+
+      '</section>';
+
+  }catch(err){
+    console.error(err);
+    out.innerHTML='<div class="notice error">Unable to load your orders right now. '+esc(err?.message||'Please try again.')+'</div>';
+  }finally{
+    if(btn){
+      btn.disabled=false;
+      btn.textContent=btn.dataset.original||'TRACK MY ORDERS →';
+    }
+  }
+}
+</script></script></body></html>

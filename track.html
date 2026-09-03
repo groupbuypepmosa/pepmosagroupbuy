@@ -157,7 +157,7 @@ body{
       <button class="searchBtn" onclick="track()">TRACK MY ORDERS →</button>
     </div>
     <div class="hint">♡ One email = one complete PEPMOSA order summary ♡</div>
-    <div id="out"></div>
+    <div id="out"></div><!-- tracker-build: 20260904-tracking-reset -->
   </section>
 
   <div class="footer">♡ PEPMOSA GROUP BUY ♡</div>
@@ -345,6 +345,8 @@ async function track(){
     if(btn){btn.disabled=false;btn.textContent=btn.dataset.original||'TRACK MY ORDERS →';}
   }
 }
+// Never restore stale tracking results from browser back-forward cache.
+window.addEventListener('pageshow',function(e){ if(e.persisted){ const out=$('out'); if(out) out.innerHTML=''; }});
 window.track=track;
 </script>
 </body>

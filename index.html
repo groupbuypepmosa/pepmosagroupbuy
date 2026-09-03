@@ -2462,10 +2462,15 @@ load();
   async function loadSiteNotice(){
     try{
       if(typeof sb==="undefined"||!sb)return;
-      const now=new Date().toISOString();
-      const {data,error}=await sb.from("site_notices").select("*").eq("active",true).or("starts_at.is.null,starts_at.lte."+now).or("ends_at.is.null,ends_at.gte."+now).order("updated_at",{ascending:false}).limit(1);
+      const now=Date.now();
+      const {data,error}=await sb.from("site_notices").select("*").eq("active",true).order("updated_at",{ascending:false});
       if(error){console.warn("Site notice unavailable",error);return;}
-      if(data&&data[0])showNotice(data[0]);
+      const active=(data||[]).filter(n=>{
+        const starts=!n.starts_at||new Date(n.starts_at).getTime()<=now;
+        const ends=!n.ends_at||new Date(n.ends_at).getTime()>=now;
+        return starts&&ends;
+      });
+      if(active[0])showNotice(active[0]);
     }catch(e){console.warn("Site notice load failed",e)}
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(loadSiteNotice,700),{once:true});else setTimeout(loadSiteNotice,700);

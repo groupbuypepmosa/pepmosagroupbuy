@@ -277,7 +277,23 @@ function editSiteNotice(id){const n=siteNotices.find(x=>x.notice_id===id);if(!n)
 async function saveSiteNotice(){const title=$("noticeTitle").value.trim(),message=$("noticeMessage").value.trim();if(!title||!message)return showMessage("Notice title and message are required.","error");const payload={title,message,notice_type:$("noticeType").value||"ANNOUNCEMENT",button_text:$("noticeButtonText").value.trim()||"GOT IT! ♥",button_url:$("noticeButtonUrl").value.trim()||null,active:$("noticeActive").checked,starts_at:$("noticeStartsAt").value?new Date($("noticeStartsAt").value).toISOString():null,ends_at:$("noticeEndsAt").value?new Date($("noticeEndsAt").value).toISOString():null,updated_at:new Date().toISOString()};try{let q;if($("noticeId").value)q=sb.from("site_notices").update(payload).eq("notice_id",$("noticeId").value);else q=sb.from("site_notices").insert(payload);const{error}=await q;if(error)throw error;showMessage("Site notice saved successfully! ♥","success");resetSiteNoticeForm();await loadSiteNotices()}catch(e){console.error(e);showMessage(e.message||"Unable to save site notice.","error")}}
 async function toggleSiteNotice(id,active){try{const{error}=await sb.from("site_notices").update({active,updated_at:new Date().toISOString()}).eq("notice_id",id);if(error)throw error;showMessage(active?"Notice is now live on the website ♥":"Notice has been hidden.","success");await loadSiteNotices()}catch(e){showMessage(e.message||"Unable to update notice.","error")}}
 
-async function loadEverything(){try{await loadGroupBuys();await Promise.all([loadCategories(),loadProducts(),loadFees(),loadOrders(),loadOrdersCenter()]);$("vialTrackerGB").innerHTML=`<option value="">All Group Buys</option>`+groupBuys.map(g=>`<option value="${esc(g.gb_number)}">${esc(g.gb_number)} — ${esc(g.customer_facing_name||"")}</option>`).join("");if($("variantEditorRows")&&!$("variantEditorRows").children.length)resetVariantEditor()}catch(e){console.error(e);showMessage(e.message||"Unable to load admin data.","error")}}
+async function loadEverything(){
+  try{
+    await loadGroupBuys();
+    if(typeof renderActiveGroupBuySelector==="function")renderActiveGroupBuySelector();
+    await Promise.all([loadCategories(),loadProducts(),loadFees(),loadOrders(),loadOrdersCenter()]);
+    const vialGB=$("vialTrackerGB");
+    if(vialGB){
+      const previous=vialGB.value||"";
+      vialGB.innerHTML=`<option value="">All Group Buys</option>`+groupBuys.map(g=>`<option value="${esc(g.gb_number)}">${esc(g.gb_number)} — ${esc(g.customer_facing_name||"")}</option>`).join("");
+      if(previous&&groupBuys.some(g=>g.gb_number===previous))vialGB.value=previous;
+    }
+    if($("variantEditorRows")&&!$("variantEditorRows").children.length)resetVariantEditor();
+  }catch(e){
+    console.error("ADMIN LOAD ERROR:",e);
+    showMessage(e.message||"Unable to load admin data.","error");
+  }
+}
 async function loadGroupBuys(){const{data,error}=await sb.from("group_buys").select("*").order("created_at",{ascending:false});if(error)throw error;groupBuys=data||[];renderGroupBuys();$("minimumGB").innerHTML=`<option value="">Select GB</option>`+groupBuys.map(g=>`<option value="${esc(g.gb_number)}">${esc(g.gb_number)} — ${esc(g.customer_facing_name||"")}</option>`).join("")}
 function gbBadge(s){if(s==="OPEN")return`<span class="badge green">OPEN</span>`;if(s==="KIT_COMPLETION")return`<span class="badge yellow">KIT COMPLETION</span>`;return`<span class="badge gray">CLOSED</span>`}
 function renderGroupBuys(){if(!groupBuys.length)return $("gbList").innerHTML=`<div class="empty">No Group Buys yet.</div>`;$("gbList").innerHTML=groupBuys.map(g=>`<div class="item"><div class="itemHead"><div><h3>${esc(g.customer_facing_name||g.gb_number)}</h3><div class="small">${esc(g.gb_number)}</div></div>${gbBadge(g.status)}</div><p>Admin Fee: <b>${peso(g.admin_fee)}</b></p>${g.admin_fee_qr_url?`<img class="qrPreview" src="${esc(g.admin_fee_qr_url)}" alt="Admin fee QR">`:`<div class="small">No Admin Fee QR uploaded.</div>`}<div class="actions"><button class="btn secondary" onclick="editGroupBuy('${esc(g.gb_number)}')">EDIT</button><button class="btn danger" onclick="deleteGroupBuy('${esc(g.gb_number)}')">DELETE GB</button></div></div>`).join("")}
@@ -814,8 +830,13 @@ async function setActiveGroupBuy(gb){
   window.activeGroupBuyNumber=gb||"";
   if(gb)localStorage.setItem("pepmosa_active_gb",gb);else localStorage.removeItem("pepmosa_active_gb");
   renderActiveGroupBuySelector();
-  await Promise.all([loadFees(),loadOrders(),loadOrdersCenter(),loadTrackingDashboard(),loadWaybillCenter()]);
-  showMessage("Now managing "+gb+". Other Group Buys are kept separate.","success");
+  try{
+    await Promise.all([loadFees(),loadOrders(),loadOrdersCenter(),loadTrackingDashboard(),loadWaybillCenter()]);
+    showMessage("Now managing "+gb+". Other Group Buys are kept separate.","success");
+  }catch(e){
+    console.error("ACTIVE GB SWITCH ERROR:",e);
+    showMessage(e.message||"Some data could not refresh. Your selected Group Buy was kept.","error");
+  }
 }
 const __baseLoadGroupBuys=loadGroupBuys;
 loadGroupBuys=async function(){await __baseLoadGroupBuys();renderActiveGroupBuySelector()}
@@ -874,7 +895,7 @@ createTrackingShipment=async function(email){
   }catch(e){console.error(e);showMessage(e.message||"Unable to create shipment.","error")}
 }
 const __baseOpenManualOrderModal=openManualOrderModal;
-openManualOrderModal=async function(){await __baseOpenManualOrderModal();const gb=getActiveGB();if(gb){window.manualOrderGB=gb;const n=document.querySelector("#manualOrderModal .notice.warning .small");if(n)n.textContent="This manual order will be assigned to the currently selected Group Buy: "+gb+"."}}
+openManualOrderModal=async function(){window.manualOrderGB=getActiveGB()||"";await __baseOpenManualOrderModal();const gb=getActiveGB();if(gb){window.manualOrderGB=gb;const n=document.querySelector("#manualOrderModal .notice.warning .small");if(n)n.textContent="This manual order will be assigned to the currently selected Group Buy: "+gb+"."}}
 openBulkTrackingModal=async function(){
   const modal=$("bulkTrackingModal");if(!modal)return;
   await loadTrackingDashboard();

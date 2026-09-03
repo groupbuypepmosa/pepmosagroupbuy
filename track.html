@@ -172,6 +172,7 @@ const STATUSES=[
   'HANDED OVER TO LOCAL COURIER','DELIVERED'
 ];
 const $=id=>document.getElementById(id);
+const TRACK_GB=new URLSearchParams(location.search).get('gb')||'';
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 
 function asArray(v){
@@ -209,6 +210,7 @@ async function loadTrackingData(email){
   const cfg=window.PEPMOSA_CONFIG||{};
   const cleanEmail=String(email||'').trim().toLowerCase();
   if(!cleanEmail)throw new Error('Please enter the email used for your order.');
+  if(!TRACK_GB)throw new Error('No Group Buy selected. Please open Order Tracking from the correct Group Buy.');
   if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)throw new Error('Tracker configuration is missing.');
   const url=cfg.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/get_customer_tracking';
   const res=await fetch(url,{
@@ -218,7 +220,7 @@ async function loadTrackingData(email){
       'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,
       'Content-Type':'application/json','Accept':'application/json'
     },
-    body:JSON.stringify({p_email:cleanEmail})
+    body:JSON.stringify({p_email:cleanEmail,p_gb_number:TRACK_GB})
   });
   const text=await res.text();let raw=null;
   try{raw=text?JSON.parse(text):null}catch{throw new Error('Tracker returned an invalid response.')}
@@ -313,7 +315,7 @@ async function track(){
     ).join('');
 
     const summaryCard=summaryRows?
-      '<div class="summaryCard"><div class="summaryHead"><b>COMPLETE ORDER SUMMARY</b><span>Everything ordered under this email</span></div>'+
+      '<div class="summaryCard"><div class="summaryHead"><b>COMPLETE ORDER SUMMARY</b><span>Everything ordered in '+esc(TRACK_GB)+'</span></div>'+
       '<div class="summaryItems">'+summaryRows+'</div></div>':'';
 
     const shippingBoxes=[
@@ -325,7 +327,7 @@ async function track(){
     out.innerHTML=
       '<section class="clientCard">'+
         '<div class="clientHero"><div class="clientTop"><div><div class="clientLabel">PEPMOSA CLIENT TRACKER</div>'+
-        '<div class="clientEmail">'+esc(email)+'</div></div><span class="statusPill">● '+esc(status)+'</span></div></div>'+
+        '<div class="clientEmail">'+esc(email)+'</div><div style="margin-top:7px;font-size:10px;font-weight:900;letter-spacing:.12em;opacity:.82">GROUP BUY: '+esc(TRACK_GB)+'</div></div><span class="statusPill">● '+esc(status)+'</span></div></div>'+
         '<div class="body">'+
           '<section class="nowCard"><div class="nowIcon">✦</div><div><small>CURRENT STATUS</small>'+
           '<h2>'+esc(status)+'</h2><p>'+esc(statusMessage(status))+'</p></div>'+
@@ -333,7 +335,7 @@ async function track(){
           phaseTimeline(status)+
           (shippingBoxes?'<div class="shippingInfo">'+shippingBoxes+'</div>':'')+
           '<section class="orders"><div class="sectionHead"><div><div class="eyebrow">YOUR ORDERS</div>'+
-          '<h2>What you ordered</h2><p>All products and quantities under this email.</p></div>'+
+          '<h2>What you ordered</h2><p>Products and quantities for this Group Buy only.</p></div>'+
           '<span class="count">'+orders.length+' ORDER'+(orders.length===1?'':'S')+(totalItems?' • '+totalItems+' ITEMS':'')+'</span></div>'+
           summaryCard+orderCards.join('')+
           (notes.length?'<div class="note"><b>♡ ADMIN NOTES</b><br>'+[...new Set(notes)].map(esc).join('<br>')+'</div>':'')+

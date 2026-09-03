@@ -266,9 +266,17 @@ async function track(){
 
   try{
     const data=await loadTrackingData(email);
-    const orders=asArray(data.orders),shipments=asArray(data.shipments),allItems=asArray(data.order_items);
-    if(!orders.length&&!shipments.length){out.innerHTML='<div class="notice">No orders found for this email yet.</div>';return;}
+    const orders=asArray(data.orders),rawShipments=asArray(data.shipments),allItems=asArray(data.order_items);
 
+    // HARD SAFETY RULE: tracking must never appear unless this email has an
+    // actual order in the currently active Group Buy. Old/deleted GB shipment
+    // records are ignored completely.
+    if(!orders.length){
+      out.innerHTML='<div class="notice">No orders found for this email in the current Group Buy.</div>';
+      return;
+    }
+
+    const shipments=rawShipments;
     const shipment=shipments.slice().sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0))[0]||{};
     const status=shipment.status||'ORDER RECEIVED';
     const rawIndex=STATUSES.indexOf(status),ci=rawIndex>=0?rawIndex:0;

@@ -2415,9 +2415,11 @@ load();
         gb=q.data||null;
       }
       if(!gb||!gb.gb_number) throw new Error('No active Group Buy');
-      var r=await sb.from('admin_fee_payments').select('status').eq('gb_number',gb.gb_number).ilike('email',email).in('status',['PAID','APPROVED']).limit(1);
+      // Use a secure database function because public visitors cannot directly SELECT
+      // rows from admin_fee_payments under RLS.
+      var r=await sb.rpc('has_approved_admin_fee',{p_email:email,p_gb_number:gb.gb_number});
       if(r.error) throw r.error;
-      if(!r.data||!r.data.length){
+      if(r.data!==true){
         localStorage.removeItem('pepmosa_verified_email');
         if(window.pepmosaPopup) window.pepmosaPopup('Admin Fee Required\n\nNo approved Admin Fee was found for this email in the current Group Buy.'); else alert('Admin Fee Required.');
         return false;

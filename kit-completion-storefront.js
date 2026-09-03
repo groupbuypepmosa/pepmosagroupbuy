@@ -197,8 +197,12 @@
       });
     }
 
+    const currentGBNumber=()=>String(getGB()?.gb_number||'');
     const cartFor=id=>JSON.parse(localStorage.pepmosaCart||'[]')
-      .find(x=>String(x.variant_id)===String(id));
+      .find(x=>
+        String(x.variant_id)===String(id) &&
+        String(x.gb_number||'')===currentGBNumber()
+      );
 
     const render=()=>{
       const inCart=Number(cartFor(selected.variant_id)?.qty||0);
@@ -262,14 +266,20 @@
         if(fresh<1) return render();
 
         qty=Math.min(qty,fresh);
-        const cart=JSON.parse(localStorage.pepmosaCart||'[]');
-        const existing=cart.find(x=>String(x.variant_id)===String(selected.variant_id));
+        // Keep this cart strictly scoped to the active Group Buy.
+        const activeGBNumber=currentGBNumber();
+        const cart=JSON.parse(localStorage.pepmosaCart||'[]')
+          .filter(x=>String(x.gb_number||'')===activeGBNumber);
+        const existing=cart.find(x=>
+          String(x.variant_id)===String(selected.variant_id) &&
+          String(x.gb_number||'')===activeGBNumber
+        );
 
         if(existing){
           existing.qty=Math.min(availableFor(selected.variant_id),Number(existing.qty||0)+qty);
         }else{
           cart.push({
-            gb_number:getGB()?.gb_number||'',
+            gb_number:activeGBNumber,
             product_id:product.product_id,
             variant_id:selected.variant_id,
             product_name:product.product_name,

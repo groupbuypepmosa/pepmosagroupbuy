@@ -97,7 +97,8 @@
     }
 
     window.pepKitInventory=inventory;
-    renderSummary();
+    // Do not rewrite the hero/status area during cart or inventory activity.
+    // The normal storefront owns that UI; this script only supplies live inventory + picker.
     filterStorefront();
     return true;
   }
@@ -297,8 +298,8 @@
         localStorage.pepmosaCart=JSON.stringify(cart);
         try{ if(typeof cart!=='undefined') window.cart=cart; }catch(_){}
         if(typeof window.updateCart==='function') window.updateCart();
+        window.dispatchEvent(new Event('pepmosa-cart-updated'));
         modal.classList.remove('show');
-        if(typeof window.openCart==='function') window.openCart();
       };
     };
 
@@ -307,40 +308,10 @@
   }
 
   function patchCheckout(){
-    if(checkoutPatched || typeof window.placeOrder!=='function') return;
-    const gb=getGB();
-    if(!isKitMode(gb)) return;
-
-    checkoutPatched=true;
-    const original=window.placeOrder;
-
-    window.placeOrder=async function(){
-      const currentCart=JSON.parse(localStorage.pepmosaCart||'[]');
-      if(!currentCart.length) return original();
-
-      const ok=await refreshInventory();
-      if(!ok){
-        const msg=$('checkoutMsg');
-        if(msg){msg.className='notice error';msg.textContent='Unable to verify live Kit Completion availability. Please try again.';}
-        return;
-      }
-
-      for(const item of currentCart){
-        const live=availableFor(item.variant_id);
-        if(Number(item.qty)>live){
-          const msg=$('checkoutMsg');
-          if(msg){
-            msg.className='notice error';
-            msg.textContent='Only '+live+' vial(s) remain for '+(item.strength||'this variant')+'. Please update your cart.';
-          }
-          return;
-        }
-      }
-
-      return original();
-    };
-
-    window.placeOrder.__pepKitGuard=true;
+    // Intentionally disabled: final validation is handled by checkout-polish.js
+    // and the atomic submit_group_buy_order RPC. Keeping a second wrapper here
+    // caused duplicate/stale checkout state.
+    return;
   }
 
   async function boot(){

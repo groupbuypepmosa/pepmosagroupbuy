@@ -9,7 +9,7 @@
 <section class="searchPanel"><div class="searchRow"><input id="email" placeholder="Enter the email used for your order" type="email" onkeydown="if(event.key==='Enter')track()"><button class="searchBtn" onclick="track()">TRACK MY ORDERS →</button></div><div class="hint">♡ One email = one complete PEPMOSA order summary ♡</div><div id="out"></div></section><div class="footer">♡ PEPMOSA GROUP BUY ♡</div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script>
 <script>
-initSupabase();
+// Native REST call keeps the public tracker independent from the Supabase JS client.
 
 const STATUSES=[
   'ORDER RECEIVED','PAYMENT CONFIRMED','ORDER PROCESSING',
@@ -98,47 +98,45 @@ function noteFor(o){
 }
 
 async function loadTrackingData(email){
-  let rpcError=null;
-
-  try{
-    const r=await sb.rpc('get_customer_tracking',{p_email:email});
-    if(r.error) throw r.error;
-
-    const payload=normalizeTrackingPayload(r.data);
-    if(payload.orders.length||payload.shipments.length||payload.order_items.length){
-      return payload;
-    }
-  }catch(err){
-    rpcError=err;
-    console.warn('Tracking RPC failed, trying direct fallback:',err);
+  const cfg=window.PEPMOSA_CONFIG||{};
+  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){
+    throw new Error('Tracker configuration is missing.');
   }
 
-  /* Fallback: keep this relation-free so duplicate Supabase relationships
-     cannot break the public tracker. */
-  try{
-    const ordersRes=await sb.from('orders').select('*').eq('email',email).order('created_at',{ascending:false});
-    if(ordersRes.error) throw ordersRes.error;
+  const cleanEmail=String(email||'').trim().toLowerCase();
 
-    const orders=ordersRes.data||[];
-    const orderIds=orders.map(o=>o.order_id??o.id).filter(Boolean);
-
-    let order_items=[];
-    if(orderIds.length){
-      const itemsRes=await sb.from('order_items').select('*').in('order_id',orderIds);
-      if(!itemsRes.error) order_items=itemsRes.data||[];
+  const res=await fetch(
+    cfg.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/get_customer_tracking',
+    {
+      method:'POST',
+      headers:{
+        'apikey':cfg.SUPABASE_ANON_KEY,
+        'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({p_email:cleanEmail}),
+      cache:'no-store'
     }
+  );
 
-    let shipments=[];
-    const shipmentRes=await sb.from('consolidated_shipments').select('*').eq('email',email).order('updated_at',{ascending:false});
-    if(!shipmentRes.error) shipments=shipmentRes.data||[];
+  const text=await res.text();
+  let raw=null;
+  try{raw=text?JSON.parse(text):null}catch{}
 
-    return {orders,shipments,order_items};
-  }catch(fallbackError){
-    console.error('Tracking fallback failed:',fallbackError);
-    throw rpcError||fallbackError;
+  if(!res.ok){
+    const msg=raw?.message||raw?.hint||text||('HTTP '+res.status);
+    throw new Error(msg);
   }
+
+  const payload=normalizeTrackingPayload(raw);
+
+  // The RPC always returns the complete client record, including nested items.
+  if(!payload.orders.length&&!payload.shipments.length){
+    return {orders:[],shipments:[],order_items:[]};
+  }
+
+  return payload;
 }
-
 async function track(){
   const email=$('email').value.trim().toLowerCase();
   const out=$('out');

@@ -2221,10 +2221,10 @@ load();
 
 </script>
 
-<script src="storefront-repair.js?v=20260904-kit-card-popup-design"></script>
+<script src="storefront-repair.js?v=20260904-kit-card-popup-design-v2"></script>
 <!-- Product picker version: 2026-09-02 -->
 <script src="checkout-polish.js?v=20260904-soldout-popup-final"></script>
-<script src="kit-completion-storefront.js?v=20260904-remove-duplicate-kit-hero"></script>
+<script src="kit-completion-storefront.js?v=20260904-remove-duplicate-kit-hero-v2"></script>
 
 <!-- PEPMOSA custom popup system: design-only replacement for browser alerts -->
 <style id="pepmosa-popup-style">
@@ -2388,6 +2388,55 @@ load();
     }catch(e){nativeAlert(String(message||''))}
   };
   window.alert=function(message){window.pepmosaPopup(message,'PEPMOSA','✦')};
+})();
+</script>
+
+
+<style id="pepmosa-kit-completion-force-style">
+#pepKitCompletionCard{position:relative!important;overflow:hidden!important;margin:22px 0 26px!important;padding:30px!important;border:1px solid rgba(220,47,142,.28)!important;border-radius:28px!important;background:linear-gradient(135deg,#fff 0%,#fff4f9 54%,#f8efff 100%)!important;box-shadow:0 20px 55px rgba(174,49,124,.13)!important}
+#pepKitCompletionCard .pepKitGlow{position:absolute!important;width:280px!important;height:280px!important;right:-90px!important;top:-130px!important;border-radius:50%!important;background:radial-gradient(circle,rgba(232,50,147,.20),transparent 68%)!important}
+#pepKitCompletionCard .pepKitTop{position:relative!important;display:flex!important;align-items:center!important;justify-content:space-between!important}
+#pepKitCompletionCard .pepKitBadge{display:inline-flex!important;align-items:center!important;padding:11px 16px!important;border-radius:999px!important;background:linear-gradient(135deg,#e52b8b,#b63bb5)!important;color:#fff!important;font-weight:950!important;letter-spacing:.09em!important;font-size:12px!important;box-shadow:0 12px 26px rgba(205,43,139,.25)!important}
+#pepKitCompletionCard .pepKitIcon{display:grid!important;place-items:center!important;width:54px!important;height:54px!important;border-radius:18px!important;background:#fff!important;color:#d42f85!important;font-size:27px!important;box-shadow:0 10px 24px rgba(100,50,80,.12)!important}
+#pepKitCompletionCard h3{position:relative!important;margin:20px 0 8px!important;font-size:42px!important;line-height:1.05!important;letter-spacing:-.04em!important;color:#4b2940!important}
+#pepKitCompletionCard .pepKitLead{position:relative!important;margin:0!important;font-size:17px!important;color:#735b68!important}
+#pepKitCompletionCard .pepKitRules{position:relative!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:13px!important;margin-top:22px!important}
+#pepKitCompletionCard .pepKitRules>div{display:flex!important;gap:11px!important;padding:15px!important;border:1px solid rgba(213,43,135,.13)!important;border-radius:18px!important;background:rgba(255,255,255,.82)!important}
+#pepKitCompletionCard .pepKitRules span{display:grid!important;place-items:center!important;flex:0 0 30px!important;width:30px!important;height:30px!important;border-radius:50%!important;background:#f9d8e9!important;color:#c3337c!important;font-weight:950!important}
+#pepKitCompletionCard .pepKitRules p{margin:2px 0 0!important;color:#6d5964!important;font-size:13px!important;line-height:1.5!important}
+#pepKitCompletionCard .pepKitFooter{position:relative!important;margin-top:16px!important;padding:14px 16px!important;border-radius:15px!important;background:linear-gradient(90deg,rgba(229,43,139,.10),rgba(255,255,255,.78))!important;color:#784e65!important;font-size:13px!important;font-weight:800!important}
+@media(max-width:760px){#pepKitCompletionCard{padding:22px 18px!important;border-radius:23px!important}#pepKitCompletionCard h3{font-size:31px!important}#pepKitCompletionCard .pepKitRules{grid-template-columns:1fr!important}}
+</style>
+<script id="pepmosa-kit-completion-force-script">
+(function(){
+  function isKitPage(){
+    const txt=(document.body?.innerText||'').toUpperCase();
+    return txt.includes('KIT COMPLETION');
+  }
+  function removeLegacy(){
+    const phrases=['Each mg is tracked separately.','Only remaining vials are available.'];
+    document.querySelectorAll('div,section,p').forEach(el=>{
+      if(el.id==='pepKitCompletionCard' || el.closest('#pepKitCompletionCard')) return;
+      const t=(el.innerText||'').trim();
+      if(phrases.some(p=>t===p) || (t.includes('Each mg is tracked separately.') && t.includes('Complete the remaining vials'))){
+        el.style.display='none';
+      }
+    });
+  }
+  function ensure(){
+    if(!isKitPage()) return;
+    removeLegacy();
+    const card=document.getElementById('pepKitCompletionCard');
+    if(card) return;
+    const grid=document.getElementById('productGrid');
+    if(!grid || !grid.parentNode) return;
+    const k=document.createElement('section');
+    k.id='pepKitCompletionCard';
+    k.innerHTML='<div class="pepKitGlow"></div><div class="pepKitTop"><div class="pepKitBadge">✦ KIT COMPLETION</div><div class="pepKitIcon">◈</div></div><h3>Complete the remaining vials</h3><p class="pepKitLead">Each <b>mg / variant is tracked separately.</b></p><div class="pepKitRules"><div><span>1</span><p>Every strength has its own separate 10-vial kit and live remaining count.</p></div><div><span>2</span><p>Only variants with remaining vials are shown.</p></div><div><span>3</span><p>You may order from <b>1 vial up to the exact live remaining quantity.</b></p></div><div class="pepKitFooter">⚡ Remaining stock is secured only when the order is successfully submitted.</div>';
+    grid.parentNode.insertBefore(k,grid);
+  }
+  document.addEventListener('DOMContentLoaded',()=>{ensure();setTimeout(ensure,400);setTimeout(ensure,1200)});
+  new MutationObserver(()=>ensure()).observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script>
 

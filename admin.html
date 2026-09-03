@@ -28,6 +28,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 .paymentTypeTitle{font-size:14px;font-weight:950;letter-spacing:.06em}
 .paymentTypeSub{font-size:10px;opacity:.85;margin-top:3px}
 .paymentTypeCount{background:#fff;color:#3a2c34;border-radius:999px;padding:6px 11px;font-size:11px;font-weight:950;white-space:nowrap}
+.checkoutHeaderActions{display:flex;align-items:center;gap:10px}
+.manualAddCheckout{background:#fff!important;color:#365d7a!important;border:0!important;font-weight:950!important;padding:9px 14px!important;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.manualAddCheckout:hover{transform:translateY(-1px)}
+
 .paymentTypeLegend{padding:10px 16px;margin:0;display:flex;gap:8px;align-items:center;font-size:11px;color:#806d77;background:#fff}
 .paymentTypeLegend span{padding:5px 9px;border-radius:999px;background:#faf7f9;border:1px solid #eadce4}
 .paymentRows{display:grid;gap:8px;padding:10px}
@@ -48,7 +52,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 .paymentActions .btn{font-size:10px;padding:8px 10px}
 .paymentSectionTitle{display:none}
 @media(max-width:900px){.paymentRow{grid-template-columns:1fr 1fr 1fr 64px}.paymentActions{grid-column:1/-1;justify-content:flex-start}}
-@media(max-width:600px){.paymentTypeHeader{padding:13px}.paymentTypeLegend{padding:9px 12px}.paymentRows{padding:8px}.paymentRow{grid-template-columns:1fr 1fr;padding:12px}.paymentProof{display:none}.paymentProofPlaceholder{display:none}.paymentActions{grid-column:1/-1;justify-content:flex-start}}
+@media(max-width:600px){.paymentTypeHeader{padding:13px;align-items:flex-start}.checkoutHeaderActions{flex-direction:column-reverse;align-items:stretch;gap:7px}.manualAddCheckout{width:100%}.paymentTypeLegend{padding:9px 12px}.paymentRows{padding:8px}.paymentRow{grid-template-columns:1fr 1fr;padding:12px}.paymentProof{display:none}.paymentProofPlaceholder{display:none}.paymentActions{grid-column:1/-1;justify-content:flex-start}}
 
 /* Consolidated payments center */
 .paymentCenter{max-width:100%}.paymentHead{margin-bottom:16px}.paymentHead h2{margin:4px 0}.paymentSummary{display:grid;grid-template-columns:repeat(4,minmax(170px,1fr));gap:12px;margin:14px 0 16px}.paySummaryCard{padding:15px;border:1px solid #ecd7e4;border-radius:16px;background:linear-gradient(145deg,#fff,#fff7fb)}.paySummaryLabel{font-size:10px;font-weight:900;letter-spacing:.08em;color:#9a627c;text-transform:uppercase}.paySummaryValue{font-size:22px;font-weight:950;color:#33242d;margin-top:6px}.paySummarySub{font-size:11px;color:#7e6975;margin-top:4px}.paymentToolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px}.paymentToolbar .search{flex:1}.paymentToolbar select{min-height:42px;border:1px solid #e8d4e0;border-radius:12px;padding:0 12px;background:#fff;color:#3a2c34}.paymentSectionTitle{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:950;letter-spacing:.12em;color:#8e526f;margin:18px 0 9px}.paymentSectionTitle:after{content:"";height:1px;background:#eddce6;flex:1}.countChip{font-size:10px;letter-spacing:0;background:#f8e4ef;color:#b12573;border-radius:999px;padding:4px 8px}.checkoutTitle{margin-top:22px}.paymentRows{display:grid;gap:8px}.paymentRow{display:grid;grid-template-columns:minmax(220px,1.3fr) minmax(120px,.8fr) minmax(120px,.75fr) minmax(120px,.75fr) auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid #ead7e2;border-radius:15px;background:#fff}.paymentCustomer{min-width:0}.paymentCustomer b{display:block;color:#332630;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.paymentCustomer small{display:block;color:#86747d;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.paymentMeta{font-size:11px;color:#78656f}.paymentMeta b{display:block;color:#463640;font-size:12px;margin-bottom:3px}.paymentProof{width:48px;height:48px;object-fit:cover;border:1px solid #ead7e2;border-radius:10px;background:#fff}.paymentProofPlaceholder{width:48px;height:48px;display:grid;place-items:center;border:1px dashed #dfbdcf;border-radius:10px;color:#a98797;font-size:9px}.paymentActions{display:flex;gap:6px;justify-content:flex-end;align-items:center}.paymentActions .btn{padding:8px 10px;font-size:10px}.paymentStatus{white-space:nowrap}.emptyPayment{padding:18px;border:1px dashed #ead4df;border-radius:14px;color:#806d77;background:#fffafd}.proofLink{display:flex;align-items:center;gap:7px;color:inherit;text-decoration:none}.paymentRow.rejected{opacity:.78;background:#fff9fa}.paymentRow.pending{border-color:#e8c57f;background:#fffdf7}.paymentRow.approved{border-color:#cce7d8}.productCompact .small{white-space:normal}
@@ -185,7 +189,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
       <section class="paymentTypePanel checkoutPanel">
         <div class="paymentTypeHeader">
           <div class="paymentTypeHeaderLeft"><div class="paymentTypeIcon">🛒</div><div><div class="paymentTypeTitle">CHECKOUT PAYMENTS</div><div class="paymentTypeSub">Actual product / order payment</div></div></div>
-          <span id="checkoutCount" class="paymentTypeCount">0</span>
+          <div class="checkoutHeaderActions"><button class="btn manualAddCheckout" type="button" onclick="openManualOrderModal()">＋ MANUAL ADD ORDER</button><span id="checkoutCount" class="paymentTypeCount">0</span></div>
         </div>
         <div class="paymentTypeLegend"><span>Product orders only</span><span>Approve checkout proof here</span></div>
         <div id="checkoutPaymentList" class="paymentRows">Loading...</div>

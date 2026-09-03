@@ -1473,12 +1473,6 @@ function renderProducts(){
 
 function openProductPicker(pid, productOverride){
 
-  if(currentGB?.status==="CLOSED"){
-    if(window.pepmosaPopup)window.pepmosaPopup("This Group Buy is closed. You can browse the pricelist, but ordering is currently unavailable.");
-    else alert("This Group Buy is closed. You can browse the pricelist, but ordering is currently unavailable.");
-    return;
-  }
-
   const product =
     productOverride || products.find(
       p => String(p.product_id) === String(pid)
@@ -1662,9 +1656,9 @@ function openProductPicker(pid, productOverride){
           <button
             class="btn primary pepPickerAdd"
             type="button"
-            onclick="window.__pepAddSelected()"
+            ${currentGB?.status==="CLOSED" ? 'disabled aria-disabled="true" title="Ordering is closed"' : 'onclick="window.__pepAddSelected()"'}
           >
-            ADD TO CART
+            ${currentGB?.status==="CLOSED" ? 'ORDERING CLOSED' : 'ADD TO CART'}
           </button>
 
         </div>
@@ -1785,6 +1779,12 @@ window.pepOpenProductPicker = function(pid, product){
    ========================================================= */
 
 function addToCart(pid,vid){
+
+  if(currentGB?.status==="CLOSED"){
+    if(window.pepmosaPopup)window.pepmosaPopup("Ordering is currently closed. You can still browse variants and prices.");
+    else alert("Ordering is currently closed. You can still browse variants and prices.");
+    return;
+  }
 
   const product =
     products.find(

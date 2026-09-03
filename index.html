@@ -1122,22 +1122,24 @@ async function load(){
   try{
 
 
+    // Always show the latest GB for the public pricelist.
+    // Prefer an OPEN/KIT_COMPLETION GB for ordering, otherwise fall back to
+    // the latest CLOSED GB so customers can still browse products and prices.
     const {
-      data:gb,
+      data:gbRows,
       error:gbError
     } =
       await sb
         .from("group_buys")
         .select("*")
-        .in("status",["OPEN","KIT_COMPLETION"])
+        .in("status",["OPEN","KIT_COMPLETION","CLOSED"])
         .order(
           "created_at",
           {
             ascending:false
           }
         )
-        .limit(1)
-        .maybeSingle();
+        .limit(20);
 
 
     if(gbError){
@@ -1146,6 +1148,9 @@ async function load(){
 
     }
 
+    const activeGB=(gbRows||[]).find(x=>["OPEN","KIT_COMPLETION"].includes(x.status));
+    const closedGB=(gbRows||[]).find(x=>x.status==="CLOSED");
+    const gb=activeGB||closedGB||null;
 
     currentGB = gb;
 
@@ -1175,22 +1180,15 @@ async function load(){
 
     /* GROUP BUY NAME */
 
+    const isOrderOpen=["OPEN","KIT_COMPLETION"].includes(gb.status);
     $("gbStatus").innerHTML =
-
-      '<b>' +
-
-      esc(
-        gb.customer_facing_name ||
-        gb.gb_number
-      ) +
-
-      '</b> ' +
-
-      '<span class="status open">' +
-
-      'OPEN' +
-
-      '</span>';
+      '<b>' + esc(gb.customer_facing_name || gb.gb_number) + '</b> ' +
+      '<span class="status ' + (isOrderOpen?'open':'closed') + '">' +
+      esc(gb.status==="CLOSED" ? "CLOSED • PRICELIST VIEW" : gb.status) +
+      '</span>' +
+      (!isOrderOpen
+        ? '<div class="muted" style="margin-top:8px">Browsing is available. Ordering is currently closed.</div>'
+        : '');
 
 
 
@@ -1402,8 +1400,8 @@ function renderProducts(){
           '<p class="muted">' +
             (
               currentGB
-                ? 'No products are available in the opened Group Buy categories.'
-                : 'There is no open Group Buy at the moment.'
+                ? 'No products are available for this Group Buy.'
+                : 'There is no Group Buy available at the moment.'
             ) +
           '</p>' +
         '</div>' +

@@ -2069,15 +2069,12 @@ async function placeOrder(){
     if(!checkoutEmail){
       return alert("Enter your email.");
     }
-    const { data:feeRows, error:feeError } = await sb
-      .from("admin_fee_payments")
-      .select("status")
-      .eq("gb_number", currentGB.gb_number)
-      .ilike("email", checkoutEmail)
-      .in("status", ["PAID","APPROVED"])
-      .limit(1);
+    const { data:feeApproved, error:feeError } = await sb.rpc(
+      "has_approved_admin_fee",
+      { p_email: checkoutEmail, p_gb_number: currentGB.gb_number }
+    );
     if(feeError) throw feeError;
-    if(!feeRows || !feeRows.length){
+    if(feeApproved !== true){
       return alert("ADMIN FEE REQUIRED\n\nYou cannot check out until the Admin Fee for this Group Buy is PAID and approved using this email.");
     }
 

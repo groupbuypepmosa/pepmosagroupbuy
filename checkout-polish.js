@@ -33,7 +33,15 @@
   }
   const CART_KEY='pepmosaCart', CART_GB_KEY='pepmosaCartGB';
   function getGB(){return window.currentGB||window.pepmosaCurrentGB||null}
-  function getCartRaw(){try{return Array.isArray(window.cart)?window.cart:JSON.parse(localStorage.getItem(CART_KEY)||'[]')}catch(e){return[]}}
+  function getCartRaw(){
+    try{
+      // localStorage is the source of truth. window.cart can be stale after a GB
+      // changes or after another storefront script updates the cart.
+      const stored=localStorage.getItem(CART_KEY);
+      if(stored!==null)return JSON.parse(stored||'[]');
+      return Array.isArray(window.cart)?window.cart:[];
+    }catch(e){return[]}
+  }
   function clearPersistedCart(){
     window.cart=[];
     try{localStorage.removeItem(CART_KEY);localStorage.removeItem(CART_GB_KEY)}catch(e){}
@@ -57,6 +65,40 @@
     const valid=raw.filter(i=>String(i.gb_number||'')===gbn);
     if(valid.length!==raw.length){window.cart=valid;try{localStorage.setItem(CART_KEY,JSON.stringify(valid))}catch(e){}}
     return valid;
+  }
+  async function sanitizeKitCart(cart,gb){
+    if(!gb||String(gb.status||'').toUpperCase()!=='KIT_COMPLETION')return{cart,changed:false,removed:[]};
+    const s=S();
+    if(!s)return{cart,changed:false,removed:[]};
+    const r=await s.rpc('get_kit_completion_inventory',{p_gb_number:gb.gb_number});
+    if(r.error)throw new Error('Unable to verify live remaining vials. Please refresh and try again.');
+    const live=new Map((r.data||[]).map(x=>[String(x.variant_id),Math.max(0,Number(x.remaining_qty||0))]));
+    const kept=[],removed=[];
+    for(const item of cart){
+      const id=String(item.variant_id||item.variantId||'');
+      const left=live.get(id)||0;
+      const qty=Math.max(0,Number(item.qty??item.quantity??0));
+      if(!id||left<1){
+        removed.push(item);
+        continue;
+      }
+      if(qty>left){
+        removed.push(item);
+        // Keep only the exact live remaining quantity instead of sending an
+        // impossible quantity to checkout.
+        kept.push({...item,qty:left,quantity:left});
+      }else kept.push(item);
+    }
+    const changed=removed.length>0||kept.length!==cart.length;
+    if(changed){
+      window.cart=kept;
+      try{
+        localStorage.setItem(CART_KEY,JSON.stringify(kept));
+        localStorage.setItem(CART_GB_KEY,String(gb.gb_number||''));
+      }catch(e){}
+      if(typeof window.updateCart==='function')try{window.updateCart()}catch(e){}
+    }
+    return{cart:kept,changed,removed};
   }
   function getVerifiedEmail(){return(localStorage.getItem('pepmosa_verified_email')||localStorage.getItem('pepmosa_customer_email')||'').trim().toLowerCase()}
   function itemName(i){return i.product_name||i.productName||i.name||'Product'}
@@ -93,6 +135,22 @@
     const freshCart=cart.filter(i=>String(i.gb_number||'')===String(activeGB?.gb_number||''));
     if(freshCart.length!==cart.length){window.cart=freshCart;localStorage.setItem(CART_KEY,JSON.stringify(freshCart));localStorage.setItem(CART_GB_KEY,String(activeGB?.gb_number||''));}
     if(!freshCart.length){if(typeof window.openCart==='function')window.openCart();return}
+    let cleanCart=freshCart;
+    try{
+      const cleaned=await sanitizeKitCart(cleanCart,activeGB);
+      cleanCart=cleaned.cart;
+      if(cleaned.changed){
+        if(!cleanCart.length){
+          clearPersistedCart();
+          alert('Your cart contained an item that is no longer available. It has been removed.');
+          return;
+        }
+      }
+    }catch(e){
+      alert(e.message||'Unable to verify live remaining vials. Please try again.');
+      return;
+    }
+    if(!cleanCart.length){if(typeof window.openCart==='function')window.openCart();return}
     const email=getVerifiedEmail();
     checkoutCustomer=email?await loadCheckoutCustomer(email):null;
     buildCheckout();
@@ -115,6 +173,18 @@
     if(!file)missing.push('Payment Proof');if(missing.length){msg.innerHTML='<div class="pepFinalError"><b>Please complete the following:</b> '+missing.join(' • ')+'</div>';return}if(file.size>5*1024*1024){msg.innerHTML='<div class="pepFinalError">Payment proof must be 5MB or smaller.</div>';return}
     btn.disabled=true;btn.textContent='SUBMITTING…';msg.innerHTML='';
     try{
+      // Last-second inventory check: never submit a stale Kit Completion item.
+      const cleaned=await sanitizeKitCart(cart,gb);
+      if(cleaned.changed){
+        btn.disabled=false;btn.textContent='SUBMIT MY ORDER';
+        if(!cleaned.cart.length){
+          clearPersistedCart();
+          msg.innerHTML='<div class="pepFinalError"><b>Your cart was updated.</b><br>An item is no longer available and was removed. Please go back to the shop and add only the remaining live variants.</div>';
+        }else{
+          msg.innerHTML='<div class="pepFinalError"><b>Your cart was updated.</b><br>One or more items changed availability. Please review the updated cart and reopen Checkout before submitting payment.</div>';
+        }
+        return;
+      }
       const oid=orderId(),ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg',path=`orders/${gb.gb_number}/${oid}-${Date.now()}.${ext}`;
       const up=await s.storage.from('payment-proofs').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
       if(up.error)throw new Error('Payment proof upload failed: '+up.error.message);

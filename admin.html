@@ -372,13 +372,13 @@ async function login(){
     if(btn){btn.disabled=false;btn.textContent="LOGIN";}
   }
 }
-const ADMIN_EMAILS=["groupbuypepmosa@gmail.com"];
+var ADMIN_EMAILS=window.ADMIN_EMAILS||["groupbuypepmosa@gmail.com"];window.ADMIN_EMAILS=ADMIN_EMAILS;
 async function verifyAdmin(user){
   if(!user)throw new Error("No authenticated user found.");
   const email=String(user.email||"").trim().toLowerCase();
 
   // Primary admin is allowed directly after Supabase authentication.
-  if(ADMIN_EMAILS.includes(email)){
+  if((window.ADMIN_EMAILS||["groupbuypepmosa@gmail.com"]).includes(email)){
     enterAdmin(user);
     return;
   }

@@ -26,7 +26,7 @@ function initSupabase() {
 
     if (!document.querySelector('script[data-pepmosa-checkout-polish]')) {
       const checkoutScript = document.createElement('script');
-      checkoutScript.src = 'checkout-polish.js?v=20260901-fix2';
+      checkoutScript.src = 'checkout-polish.js?v=20260904-kit-live-inventory-fix';
       checkoutScript.dataset.pepmosaCheckoutPolish = '1';
       document.head.appendChild(checkoutScript);
     }

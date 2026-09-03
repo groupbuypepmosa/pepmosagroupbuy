@@ -17,15 +17,8 @@ function initSupabase() {
   }
 
   if ((window.location.pathname || '/').toLowerCase().endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
-    // Storefront hotfix loader removed: it was pointing to an old cached script
-    // that overwrote the current KIT COMPLETION hero/status UI.
-
-    if (!document.querySelector('script[data-pepmosa-checkout-polish]')) {
-      const checkoutScript = document.createElement('script');
-      checkoutScript.src = 'checkout-polish.js?v=20260904-kit-live-inventory-fix';
-      checkoutScript.dataset.pepmosaCheckoutPolish = '1';
-      document.head.appendChild(checkoutScript);
-    }
+    // checkout-polish.js is loaded once by index.html.
+    // Do not inject it here: loading it twice creates competing checkout/cart handlers.
 
     setTimeout(() => {
       const status = document.getElementById('gbStatus');

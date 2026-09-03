@@ -119,7 +119,14 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 <header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a><nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a><a href="coa.html">COA</a></nav></header>
 <section id="loginScreen" class="loginScreen"><div class="loginBox"><div class="loginLogo"><span>PEPMOSA</span></div><div class="loginSubtitle">Administrator Login</div><div id="loginMsg"></div><div class="field"><label>Email</label><input id="loginEmail" type="email" autocomplete="username" placeholder="Admin email"></div><br><div class="field"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password" onkeydown="if(event.key==='Enter')login()"></div><div class="actions"><button class="btn primary" style="width:100%" type="button" onclick="login()">LOGIN</button></div></div></section>
 <main id="adminApp" class="adminPage" style="display:none"><div class="adminHeader"><div class="adminTitle"><div class="eyebrow">PEPMOSA ADMIN</div><h1>Control Panel</h1><p id="signedInAs"></p></div><button class="btn dark" onclick="logout()">LOG OUT</button></div><div id="globalMsg"></div>
-<div class="tabs"><button class="tab active" data-panel="gbPanel" onclick="openTab(this)">GROUP BUY</button><button class="tab" data-panel="categoriesPanel" onclick="openTab(this)">CATEGORIES</button><button class="tab" data-panel="productsPanel" onclick="openTab(this)">PRODUCTS</button><button class="tab" data-panel="feesPanel" onclick="openTab(this)">PAYMENTS</button><button class="tab" data-panel="ordersPanel" onclick="openTab(this)">ORDERS</button><button class="tab" data-panel="trackingPanel" onclick="openTab(this)">TRACKING</button><button class="tab" data-panel="waybillPanel" onclick="openTab(this)">WAYBILL</button><button class="tab" data-panel="vialTrackerPanel" onclick="openTab(this)">VIAL TRACKER</button><button class="tab" data-panel="documentsPanel" onclick="openTab(this)">COA & PROTOCOLS</button><button class="tab" data-panel="siteNoticePanel" onclick="openTab(this)">SITE NOTICE ♥</button></div>
+<div class="card" id="activeGroupBuyCard" style="padding:14px 18px;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="font-weight:900">ACTIVE GROUP BUY</div>
+      <select id="activeGroupBuy" style="min-width:300px;padding:10px 12px;border:1px solid #e5d5e1;border-radius:10px" onchange="setActiveGroupBuy(this.value)"></select>
+      <div id="activeGroupBuyHint" class="small">Choose which Group Buy you want to manage.</div>
+    </div>
+  </div>
+  <div class="tabs"><button class="tab active" data-panel="gbPanel" onclick="openTab(this)">GROUP BUY</button><button class="tab" data-panel="categoriesPanel" onclick="openTab(this)">CATEGORIES</button><button class="tab" data-panel="productsPanel" onclick="openTab(this)">PRODUCTS</button><button class="tab" data-panel="feesPanel" onclick="openTab(this)">PAYMENTS</button><button class="tab" data-panel="ordersPanel" onclick="openTab(this)">ORDERS</button><button class="tab" data-panel="trackingPanel" onclick="openTab(this)">TRACKING</button><button class="tab" data-panel="waybillPanel" onclick="openTab(this)">WAYBILL</button><button class="tab" data-panel="vialTrackerPanel" onclick="openTab(this)">VIAL TRACKER</button><button class="tab" data-panel="documentsPanel" onclick="openTab(this)">COA & PROTOCOLS</button><button class="tab" data-panel="siteNoticePanel" onclick="openTab(this)">SITE NOTICE ♥</button></div>
 <section id="gbPanel" class="panel active"><div class="card"><h2>Create / Edit Group Buy</h2><input id="editingGBId" type="hidden"><div class="grid"><div class="field"><label>GB Number *</label><input id="gbNumber" placeholder="GB-001"></div><div class="field"><label>Customer-Facing Name</label><input id="gbName" placeholder="September Group Buy"></div><div class="field"><label>Admin Fee</label><input id="gbAdminFee" type="number" min="0" step="0.01" value="0"></div><div class="field"><label>Status *</label><select id="gbStatus"><option value="OPEN">OPEN</option><option value="CLOSED">CLOSED</option><option value="KIT_COMPLETION">KIT COMPLETION</option></select></div></div><hr><h3>Admin Fee QR</h3><div class="fileBox"><input id="adminQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('adminQrFile','adminQrPreview')"><br><br><img id="adminQrPreview" class="qrPreview" style="display:none"></div><br><h3>Final Payment QR</h3><div class="fileBox"><input id="finalQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('finalQrFile','finalQrPreview')"><br><br><img id="finalQrPreview" class="qrPreview" style="display:none"></div><div class="actions"><button class="btn primary" onclick="saveGroupBuy()">SAVE GROUP BUY</button><button class="btn secondary" onclick="clearGBForm()">NEW</button></div></div><div class="card"><h2>Group Buys</h2><div id="gbList">Loading...</div></div></section>
 <section id="categoriesPanel" class="panel"><div class="card"><h2>Categories</h2><div class="grid"><div class="field"><label>New Category</label><input id="newCategory" placeholder="Peptides"></div></div><div class="actions"><button class="btn primary" onclick="addCategory()">ADD CATEGORY</button></div><div id="categoryList"></div></div><div class="card"><h2>GB Category Minimum</h2><p class="muted">Set the minimum once per category for this GB. Every active product/variant inside that category automatically follows this minimum.</p><div class="field"><label>Select Group Buy</label><select id="minimumGB" onchange="loadCategoryMinimums()"><option value="">Select GB</option></select></div><br><div id="minimumList">Select a Group Buy.</div><div class="actions"><button class="btn primary" onclick="saveCategoryMinimums()">SAVE MINIMUMS</button></div></div></section>
 <section id="productsPanel" class="panel"><div class="card"><h2>Add Product</h2><p class="muted">Product and variant IDs are generated automatically.</p><div class="grid"><div class="field"><label>Product Name *</label><input id="productName" placeholder="Tirzepatide"></div><div class="field"><label>Category *</label><select id="productCategory"><option value="">Select category</option></select></div><div class="field"><label>Product Image</label><input id="productImageFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('productImageFile','productImagePreview')"><img id="productImagePreview" class="qrPreview" style="display:none;max-width:140px;max-height:140px"></div><div class="field full"><label>Description</label><textarea id="productDescription"></textarea></div></div><div class="variantEditor"><div class="itemHead"><div><h3 style="margin-bottom:4px">Variants & Prices</h3><div class="small">Add all strengths/variants and their prices here.</div></div><button class="btn secondary" type="button" onclick="addVariantEditorRow()">+ ADD VARIANT</button></div><div id="variantEditorRows"></div></div><div class="actions"><button class="btn primary" onclick="addProduct()">ADD PRODUCT</button></div></div><div class="card"><h2>Products</h2><input id="productSearch" class="search" placeholder="Search product..." oninput="renderProducts()"><div id="productList">Loading...</div></div></section>
@@ -191,6 +198,106 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 </section></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260902-waybill-center"></script><script src="supabase.js?v=20260902-waybill-center"></script><script>
 if(typeof initSupabase==="function")initSupabase();else 
+
+// ===== GROUP BUY WORKSPACE SCOPE =====
+window.activeGroupBuyNumber=localStorage.getItem("pepmosa_active_gb")||"";
+function getActiveGB(){return window.activeGroupBuyNumber||""}
+function renderActiveGroupBuySelector(){
+  const sel=$("activeGroupBuy");if(!sel)return;
+  if(!groupBuys.length){sel.innerHTML='<option value="">No Group Buy available</option>';return}
+  if(!groupBuys.some(g=>g.gb_number===window.activeGroupBuyNumber)){
+    window.activeGroupBuyNumber=groupBuys[0].gb_number;
+    localStorage.setItem("pepmosa_active_gb",window.activeGroupBuyNumber);
+  }
+  sel.innerHTML=groupBuys.map(g=>'<option value="'+esc(g.gb_number)+'" '+(g.gb_number===window.activeGroupBuyNumber?'selected':'')+'>'+esc(g.gb_number)+' — '+esc(g.customer_facing_name||g.status||"Group Buy")+'</option>').join("");
+  const hint=$("activeGroupBuyHint");if(hint)hint.textContent="All Payments, Orders, Tracking and Waybills below are for this Group Buy only.";
+}
+async function setActiveGroupBuy(gb){
+  window.activeGroupBuyNumber=gb||"";
+  if(gb)localStorage.setItem("pepmosa_active_gb",gb);else localStorage.removeItem("pepmosa_active_gb");
+  renderActiveGroupBuySelector();
+  await Promise.all([loadFees(),loadOrders(),loadOrdersCenter(),loadTrackingDashboard(),loadWaybillCenter()]);
+  showMessage("Now managing "+gb+". Other Group Buys are kept separate.","success");
+}
+const __baseLoadGroupBuys=loadGroupBuys;
+loadGroupBuys=async function(){await __baseLoadGroupBuys();renderActiveGroupBuySelector()}
+
+loadFees=async function(){
+  let q=sb.from("admin_fee_payments").select("*").order("created_at",{ascending:false});
+  const gb=getActiveGB();if(gb)q=q.eq("gb_number",gb);
+  const{data,error}=await q;if(error)throw error;fees=data||[];renderPaymentCenter();
+}
+loadOrders=async function(){
+  let q=sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});
+  const gb=getActiveGB();if(gb)q=q.eq("gb_number",gb);
+  const{data,error}=await q;if(error)throw error;ordersCache=data||[];orderItemsCache=ordersCache.flatMap(o=>o.order_items||[]);renderPaymentCenter();renderOrdersCenter();
+}
+loadOrdersCenter=async function(){
+  const list=$("ordersClientList");if(list)list.innerHTML='<div class="notice">Loading this Group Buy’s client orders...</div>';
+  try{
+    let q=sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});
+    const gb=getActiveGB();if(gb)q=q.eq("gb_number",gb);
+    const [or,cr]=await Promise.all([q,sb.from("customers").select("customer_id,email,customer_name,contact,address")]);
+    if(or.error)throw or.error;
+    ordersCache=or.data||[];orderItemsCache=ordersCache.flatMap(o=>o.order_items||[]);customersCache=cr.data||[];
+    renderPaymentCenter();renderOrdersCenter();
+  }catch(e){console.error(e);if(list)list.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load orders.")+'</div>'}
+}
+loadTrackingDashboard=async function(){
+  const box=$("trackingResults");if(!box)return;box.innerHTML='<div class="notice">Loading this Group Buy’s tracking...</div>';
+  try{
+    let oq=sb.from("orders").select("order_id,shipment_id,email,gb_number,total,payment_status,created_at").order("created_at",{ascending:false});
+    const gb=getActiveGB();if(gb)oq=oq.eq("gb_number",gb);
+    const [or,ir,sr]=await Promise.all([oq,sb.from("order_items").select("*"),sb.from("consolidated_shipments").select("*").order("updated_at",{ascending:false})]);
+    if(or.error)throw or.error;if(sr.error)throw sr.error;
+    trackingDashboardOrders=or.data||[];
+    const ids=new Set(trackingDashboardOrders.map(o=>o.shipment_id).filter(Boolean));
+    trackingDashboardShipments=(sr.data||[]).filter(x=>ids.has(x.shipment_id));
+    trackingDashboardItems=ir.error?[]:(ir.data||[]);
+    renderTrackingDashboard();
+  }catch(e){console.error(e);box.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load tracking.")+'</div>'}
+}
+const __baseCreateTrackingShipment=createTrackingShipment;
+createTrackingShipment=async function(email){
+  try{
+    const key=normTrackingEmail(email),gb=getActiveGB();
+    const clientOrders=trackingDashboardOrders.filter(o=>normTrackingEmail(o.email)===key&&!o.shipment_id);
+    let existing=trackingDashboardShipments.filter(s=>normTrackingEmail(s.email)===key);
+    let shipmentId;
+    if(existing.length)shipmentId=trackingPrimaryShipment(existing).shipment_id;
+    else{
+      const payload={email:key,status:"ORDER RECEIVED"};if(gb)payload.gb_number=gb;
+      const ins=await sb.from("consolidated_shipments").insert(payload).select().single();
+      if(ins.error)throw ins.error;shipmentId=ins.data.shipment_id;
+      await sb.from("shipment_status_history").insert({shipment_id:shipmentId,status:"ORDER RECEIVED"});
+    }
+    if(clientOrders.length){const up=await sb.from("orders").update({shipment_id:shipmentId}).in("order_id",clientOrders.map(o=>o.order_id));if(up.error)throw up.error}
+    showMessage("Client shipment created for "+(gb||"this Group Buy")+".","success");await loadTrackingDashboard();
+  }catch(e){console.error(e);showMessage(e.message||"Unable to create shipment.","error")}
+}
+const __baseOpenManualOrderModal=openManualOrderModal;
+openManualOrderModal=async function(){await __baseOpenManualOrderModal();const gb=getActiveGB();if(gb){window.manualOrderGB=gb;const n=document.querySelector("#manualOrderModal .notice.warning .small");if(n)n.textContent="This manual order will be assigned to the currently selected Group Buy: "+gb+"."}}
+const __baseOpenBulkTrackingModal=openBulkTrackingModal;
+openBulkTrackingModal=async function(){await loadTrackingDashboard();return __baseOpenBulkTrackingModal()}
+const __baseLoadWaybillCenter=loadWaybillCenter;
+loadWaybillCenter=async function(){
+  const list=$("waybillBuyerList"),preview=$("waybillPreview");if(list)list.innerHTML='<div class="notice">Loading this Group Buy’s paid orders...</div>';
+  try{
+    let oq=sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});
+    const gb=getActiveGB();if(gb)oq=oq.eq("gb_number",gb);
+    const [or,cr,sr]=await Promise.all([oq,sb.from("customers").select("customer_id,email,customer_name,contact,address"),sb.from("consolidated_shipments").select("shipment_id,email,courier,tracking_number,waybill_number,status,updated_at").order("updated_at",{ascending:false})]);
+    if(or.error)throw or.error;
+    const orderRows=or.data||[],shipmentIds=new Set(orderRows.map(o=>o.shipment_id).filter(Boolean));
+    const customersByEmail=new Map((cr.data||[]).map(x=>[normEmail(x.email),x]));
+    const shipmentsById=new Map((sr.data||[]).filter(x=>shipmentIds.has(x.shipment_id)).map(x=>[x.shipment_id,x]));
+    const grouped=new Map();
+    for(const o of orderRows){if(!isPaidForWaybill(o))continue;const key=normEmail(o.email);if(!key)continue;if(!grouped.has(key))grouped.set(key,{email:key,orders:[],items:[],total:0,shipping:0});const g=grouped.get(key);g.orders.push(o);g.items.push(...(o.order_items||[]));g.total+=Number(o.total||0);g.shipping+=Number(o.shipping_fee||0)}
+    waybillRows=[...grouped.values()].map(g=>{const customer=customersByEmail.get(g.email)||{},latest=g.orders.slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))[0]||{},shipment=shipmentsById.get(latest.shipment_id)||{};const merged=new Map();for(const i of g.items){const key=[i.product_name||"Product",i.strength||"",Number(i.unit_price||0)].join("||"),old=merged.get(key)||{product_name:i.product_name||"Product",strength:i.strength||"",qty:0,unit_price:Number(i.unit_price||0),line_total:0};old.qty+=Number(i.qty||0);old.line_total+=Number(i.line_total||0);merged.set(key,old)}return {...g,customer_name:customer.customer_name||latest.full_name||g.email,contact:customer.contact||latest.contact_number||"",address:customer.address||latest.address||"Address not yet saved",shipping_method:latest.shipping_method||"",courier:shipment.courier||latest.shipping_method||"To be assigned",waybill_number:shipment.waybill_number||shipment.tracking_number||"",tracking_number:shipment.tracking_number||shipment.waybill_number||"",shipment_status:shipment.status||"READY TO PRINT",products:[...merged.values()],payment:"PAID"};}).sort((a,b)=>a.customer_name.localeCompare(b.customer_name));
+    if(!selectedWaybillBuyer||!waybillRows.some(x=>x.email===selectedWaybillBuyer))selectedWaybillBuyer=waybillRows[0]?.email||null;
+    renderWaybillCenter();
+  }catch(e){console.error(e);if(list)list.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load waybills.")+'</div>';if(preview)preview.innerHTML=""}
+}
+
 document.addEventListener("DOMContentLoaded",()=>{if(typeof initSupabase==="function")initSupabase()});
 let categories=[],groupBuys=[],products=[],fees=[],ordersCache=[],orderItemsCache=[],customersCache=[],currentShipment=null,vialTrackerRows=[],waybillRows=[],selectedWaybillBuyer=null,libraryDocuments=[];
 const TRACKING_STATUSES=["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING","IN TRANSIT TO THE PHILIPPINES","ARRIVED IN THE PHILIPPINES","RECEIVED AT WAREHOUSE","PACKING & LABELLING","HANDED OVER TO LOCAL COURIER","DELIVERED"];
@@ -277,7 +384,50 @@ function clearGBForm(){$("editingGBId").value="";$("gbNumber").value="";$("gbNam
 function editGroupBuy(n){const g=groupBuys.find(x=>x.gb_number===n);if(!g)return;$("editingGBId").value=g.gb_id;$("gbNumber").value=g.gb_number;$("gbName").value=g.customer_facing_name||"";$("gbAdminFee").value=g.admin_fee||0;$("gbStatus").value=g.status;if(g.admin_fee_qr_url){$("adminQrPreview").src=g.admin_fee_qr_url;$("adminQrPreview").style.display="block"}if(g.final_payment_qr_url){$("finalQrPreview").src=g.final_payment_qr_url;$("finalQrPreview").style.display="block"}document.querySelector('[data-panel="gbPanel"]').click();window.scrollTo({top:0,behavior:"smooth"})}
 async function uploadAsset(file,folder){if(!file)return null;const ext=file.name.split(".").pop().toLowerCase(),name=folder+"/"+crypto.randomUUID()+"."+ext;const{error}=await sb.storage.from("pepmosa-assets").upload(name,file,{upsert:false,contentType:file.type});if(error)throw error;return sb.storage.from("pepmosa-assets").getPublicUrl(name).data.publicUrl}
 async function saveGroupBuy(){try{const n=$("gbNumber").value.trim();if(!n)return showMessage("GB Number is required.","error");const p={gb_number:n,customer_facing_name:$("gbName").value.trim(),status:$("gbStatus").value,admin_fee:Number($("gbAdminFee").value||0)},a=$("adminQrFile").files[0],f=$("finalQrFile").files[0];if(a)p.admin_fee_qr_url=await uploadAsset(a,"admin-fee");if(f)p.final_payment_qr_url=await uploadAsset(f,"final-payment");const id=$("editingGBId").value,r=id?await sb.from("group_buys").update(p).eq("gb_id",id):await sb.from("group_buys").insert(p);if(r.error)throw r.error;showMessage("Group Buy saved successfully.","success");clearGBForm();await loadGroupBuys()}catch(e){console.error(e);showMessage(e.message,"error")}}
-async function deleteGroupBuy(gb){if(!gb)return showMessage("Missing Group Buy number.","error");if(!confirm(`DELETE ${gb}?\n\nThis permanently deletes ALL records belonging to this GB, including admin fee/access records, orders/items, consolidated shipments/tracking history, waybill data, kit reservations/inventory, category minimums, product/variant minimums, GB categories and the GB itself.\n\nCustomer records themselves will NOT be deleted.\n\nTHIS CANNOT BE UNDONE.`))return;try{showMessage("Deleting Group Buy and all related records...","warning");const{data:orders,error:oe}=await sb.from("orders").select("order_id,shipment_id").eq("gb_number",gb);if(oe)throw oe;const orderIds=(orders||[]).map(x=>x.order_id),shipmentIds=[...new Set((orders||[]).map(x=>x.shipment_id).filter(Boolean))];async function optionalDelete(table,col,vals){if(!vals.length)return;const{error}=await sb.from(table).delete().in(col,vals);if(error&&!String(error.message||"").toLowerCase().includes("does not exist"))throw error}await optionalDelete("shipment_status_history","shipment_id",shipmentIds);await optionalDelete("waybills","shipment_id",shipmentIds);await optionalDelete("order_items","order_id",orderIds);if(orderIds.length){const{error}=await sb.from("orders").delete().in("order_id",orderIds);if(error)throw error}await optionalDelete("consolidated_shipments","shipment_id",shipmentIds);let r=await sb.from("gb_customer_access").delete().eq("gb_number",gb);if(r.error&&!String(r.error.message||"").toLowerCase().includes("does not exist"))throw r.error;r=await sb.from("kit_reservations").delete().eq("gb_number",gb);if(r.error)throw r.error;r=await sb.from("kit_inventory").delete().eq("gb_number",gb);if(r.error)throw r.error;r=await sb.from("gb_minimum_quantities").delete().eq("gb_number",gb);if(r.error)throw r.error;r=await sb.from("gb_categories").delete().eq("gb_number",gb);if(r.error)throw r.error;r=await sb.from("group_buys").delete().eq("gb_number",gb);if(r.error)throw r.error;showMessage(`${gb} and all related records were deleted.`,`success`);await loadEverything()}catch(e){console.error("DELETE GB ERROR:",e);showMessage(e.message||"Unable to delete Group Buy.","error")}}
+async function deleteGroupBuy(gb){
+  if(!gb)return showMessage("Missing Group Buy number.","error");
+  if(!confirm(`DELETE ${gb}?\n\nThis permanently deletes this Group Buy and its admin fee payments, orders, order items, tracking/shipments used only by this Group Buy, kit data, category minimums and GB settings.\n\nCustomer records themselves will NOT be deleted.\n\nTHIS CANNOT BE UNDONE.`))return;
+  try{
+    showMessage("Deleting Group Buy and all related records...","warning");
+    const{data:gbOrders,error:oe}=await sb.from("orders").select("order_id,shipment_id").eq("gb_number",gb);
+    if(oe)throw oe;
+    const orderIds=(gbOrders||[]).map(x=>x.order_id).filter(Boolean);
+    const shipmentIds=[...new Set((gbOrders||[]).map(x=>x.shipment_id).filter(Boolean))];
+
+    if(orderIds.length){
+      const{error:e1}=await sb.from("order_items").delete().in("order_id",orderIds);if(e1)throw e1;
+    }
+    let r=await sb.from("admin_fee_payments").delete().eq("gb_number",gb);if(r.error)throw r.error;
+    if(orderIds.length){
+      const{error:e2}=await sb.from("orders").delete().in("order_id",orderIds);if(e2)throw e2;
+    }
+
+    // Only remove shipments that are no longer used by another Group Buy/order.
+    let unusedShipmentIds=[];
+    if(shipmentIds.length){
+      const{data:remaining,error:re}=await sb.from("orders").select("shipment_id").in("shipment_id",shipmentIds);
+      if(re)throw re;
+      const stillUsed=new Set((remaining||[]).map(x=>x.shipment_id).filter(Boolean));
+      unusedShipmentIds=shipmentIds.filter(id=>!stillUsed.has(id));
+    }
+    if(unusedShipmentIds.length){
+      r=await sb.from("shipment_status_history").delete().in("shipment_id",unusedShipmentIds);if(r.error)throw r.error;
+      r=await sb.from("consolidated_shipments").delete().in("shipment_id",unusedShipmentIds);if(r.error)throw r.error;
+    }
+
+    for(const table of ["kit_reservations","kit_inventory","gb_minimum_quantities","gb_categories"]){
+      r=await sb.from(table).delete().eq("gb_number",gb);if(r.error)throw r.error;
+    }
+    r=await sb.from("group_buys").delete().eq("gb_number",gb);if(r.error)throw r.error;
+
+    if(window.activeGroupBuyNumber===gb){
+      window.activeGroupBuyNumber="";
+      localStorage.removeItem("pepmosa_active_gb");
+    }
+    showMessage(`${gb} and all related records were deleted.`,"success");
+    await loadEverything();
+  }catch(e){console.error("DELETE GB ERROR:",e);showMessage(e.message||"Unable to delete Group Buy.","error")}
+}
 async function loadCategories(){const{data,error}=await sb.from("categories").select("*").order("category_name");if(error)throw error;categories=data||[];renderCategories();$("productCategory").innerHTML=`<option value="">Select category</option>`+categories.filter(c=>c.active).map(c=>`<option value="${esc(c.category_name)}">${esc(c.category_name)}</option>`).join("")}
 function renderCategories(){if(!categories.length)return $("categoryList").innerHTML=`<div class="empty">No categories yet.</div>`;$("categoryList").innerHTML=categories.map(c=>`<div class="item"><div class="itemHead"><b>${esc(c.category_name)}</b><span class="badge ${c.active?"green":"red"}">${c.active?"ACTIVE":"INACTIVE"}</span></div><div class="actions"><button class="btn ${c.active?"danger":"success"}" onclick="toggleCategory('${esc(c.category_name)}',${!c.active})">${c.active?"DISABLE":"ENABLE"}</button></div></div>`).join("")}
 async function addCategory(){const n=$("newCategory").value.trim();if(!n)return showMessage("Enter a category name.","error");const{error}=await sb.from("categories").insert({category_name:n,active:true});if(error)return showMessage(error.message,"error");$("newCategory").value="";await loadCategories();showMessage("Category added.","success")}

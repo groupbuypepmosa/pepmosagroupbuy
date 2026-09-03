@@ -227,8 +227,14 @@
     if(!product||!variant){alert('Product not found.');return;}
     const input=$('qty-'+vid);
     let qty=Math.max(Number(variant.minimum_qty||1),Number(input?.value||variant.minimum_qty||1));
-    const cartNow=getCart();
-    const existing=cartNow.find(x=>String(itemVariantId(x))===String(vid));
+    // Never carry cart quantities across different Group Buys.
+    // A cart item belongs only to the GB where it was added.
+    const activeGBNumber=String(gbNow?.gb_number||'');
+    const cartNow=getCart().filter(x=>String(x.gb_number||'')===activeGBNumber);
+    const existing=cartNow.find(x=>
+      String(itemVariantId(x))===String(vid) &&
+      String(x.gb_number||'')===activeGBNumber
+    );
     if(gbNow?.status==='KIT_COMPLETION'){
       const remaining=Number(variant.remaining_qty||0),already=Number(existing?itemQty(existing):0);
       if(remaining<1){alert('This variant is no longer available. Please refresh.');return;}
@@ -236,9 +242,14 @@
       if(already+qty>remaining){alert('Only '+Math.max(0,remaining-already)+' more vial(s) can be added for this variant.');return;}
     }
     if(existing)existing.qty=itemQty(existing)+qty;
-    else cartNow.push({product_id:pid,variant_id:vid,product_name:product.product_name,strength:variant.strength||'',price:Number(variant.price||0),qty});
-    const scopedCart=cartNow.map(x=>({...x,gb_number:gbNow?.gb_number||x.gb_number||null}));
-    window.cart=scopedCart;localStorage.setItem(CART_KEY,JSON.stringify(scopedCart));localStorage.setItem(CART_GB_KEY,String(gbNow?.gb_number||''));
+    else cartNow.push({
+      gb_number:gbNow?.gb_number||null,
+      product_id:pid,variant_id:vid,product_name:product.product_name,
+      strength:variant.strength||'',price:Number(variant.price||0),qty
+    });
+    window.cart=cartNow;
+    localStorage.setItem(CART_KEY,JSON.stringify(cartNow));
+    localStorage.setItem(CART_GB_KEY,activeGBNumber);
     if(typeof window.updateCart==='function')window.updateCart();
     if(typeof window.openCart==='function')window.openCart();
   };

@@ -219,7 +219,22 @@
       localStorage.setItem('pepmosa_last_order_id',oid);localStorage.setItem('pepmosa_customer_email',email);localStorage.setItem('pepmosa_customer_name',name);localStorage.setItem('pepmosa_phone',contact);
       // Clear both in-memory and persisted cart state only AFTER the order RPC succeeds.
       clearPersistedCart();
-      const cartModal=$('cartModal');if(cartModal)cartModal.classList.remove('show','open');closeCheckout();if($('pepInfoTitle')&&$('pepInfoText')&&$('pepInfoModal')){$('pepInfoTitle').textContent='Order Submitted ✓';$('pepInfoText').textContent=`Your order ${oid} has been submitted successfully. Payment proof is now pending admin review.`;$('pepInfoOk').textContent='DONE';$('pepInfoModal').classList.add('open')}else alert('Order submitted: '+oid)}catch(e){console.error('PEPMOSA CHECKOUT ERROR',e);msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(e?.message||'Please try again.')+'<br><small>Your cart has not been cleared.</small></div>'}finally{btn.disabled=false;btn.textContent='SUBMIT MY ORDER'}
+      const cartModal=$('cartModal');if(cartModal)cartModal.classList.remove('show','open');closeCheckout();if($('pepInfoTitle')&&$('pepInfoText')&&$('pepInfoModal')){$('pepInfoTitle').textContent='Order Submitted ✓';$('pepInfoText').textContent=`Your order ${oid} has been submitted successfully. Payment proof is now pending admin review.`;$('pepInfoOk').textContent='DONE';$('pepInfoModal').classList.add('open')}else alert('Order submitted: '+oid)}catch(e){
+      console.error('PEPMOSA CHECKOUT ERROR',e);
+      const errorText=String(e?.message||'Please try again.');
+      const soldOut=/no longer available|only .* vial\(s\) remain|remaining vial|sold out/i.test(errorText);
+      if(soldOut){
+        clearPersistedCart();
+        msg.innerHTML='<div class="pepFinalError"><b>Sorry — this variant is now sold out.</b><br>Another customer completed the remaining vial(s) first. Your cart will refresh automatically.</div>';
+        setTimeout(()=>{
+          if(typeof window.pepmosaPopup==='function') window.pepmosaPopup('Sorry! This variant is now sold out. Refreshing the shop…');
+          else alert('Sorry! This variant is now sold out. Refreshing the shop…');
+        },80);
+        setTimeout(()=>window.location.reload(),1200);
+      }else{
+        msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(errorText)+'<br><small>Your cart has not been cleared.</small></div>';
+      }
+    }finally{btn.disabled=false;btn.textContent='SUBMIT MY ORDER'}
   }
   async function repairStorefront(){const s=S();if(!s)return false;try{let gb=getGB();if(!gb){const r=await s.from('group_buys').select('*').in('status',['OPEN','KIT_COMPLETION']).order('created_at',{ascending:false}).limit(1).maybeSingle();if(r.error||!r.data)return false;gb=r.data;window.currentGB=gb;window.pepmosaCurrentGB=gb}const cr=await s.from('gb_categories').select('category_name').eq('gb_number',gb.gb_number);if(cr.error)throw cr.error;const categories=(cr.data||[]).map(x=>x.category_name).filter(Boolean);if(!categories.length){products=[];return true}const pr=await s.from('products').select('*').eq('active',true).in('category',categories).order('product_name');if(pr.error)throw pr.error;const base=pr.data||[],ids=base.map(p=>p.product_id).filter(Boolean);let variants=[];if(ids.length){const vr=await s.from('product_variants').select('*').in('product_id',ids).eq('active',true).order('price');if(vr.error)throw vr.error;variants=vr.data||[]}const mr=await s.from('gb_minimum_quantities').select('*').eq('gb_number',gb.gb_number);const mins=mr.error?[]:(mr.data||[]);
     let kitMap=new Map();
@@ -272,7 +287,9 @@
     localStorage.setItem(CART_KEY,JSON.stringify(cartNow));
     localStorage.setItem(CART_GB_KEY,activeGBNumber);
     if(typeof window.updateCart==='function')window.updateCart();
-    if(typeof window.openCart==='function')window.openCart();
+    // ADD TO CART must stay on the storefront. Do not open an empty/stale cart
+    // and do not refresh or mutate Kit Completion inventory here.
+    window.dispatchEvent(new Event('pepmosa-cart-updated'));
   };
   function boot(){injectStyles();let tries=0;const t=setInterval(async()=>{tries++;if($('checkoutModal')){if(!products.length)await repairStorefront();clearInterval(t)}if(tries>=15)clearInterval(t)},500)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

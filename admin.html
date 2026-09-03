@@ -287,6 +287,7 @@ async function loadEverything(){
       const previous=vialGB.value||"";
       vialGB.innerHTML=`<option value="">All Group Buys</option>`+groupBuys.map(g=>`<option value="${esc(g.gb_number)}">${esc(g.gb_number)} — ${esc(g.customer_facing_name||"")}</option>`).join("");
       if(previous&&groupBuys.some(g=>g.gb_number===previous))vialGB.value=previous;
+      else if(!previous&&window.activeGroupBuyNumber&&groupBuys.some(g=>g.gb_number===window.activeGroupBuyNumber))vialGB.value=window.activeGroupBuyNumber;
     }
     if($("variantEditorRows")&&!$("variantEditorRows").children.length)resetVariantEditor();
   }catch(e){
@@ -831,7 +832,9 @@ async function setActiveGroupBuy(gb){
   if(gb)localStorage.setItem("pepmosa_active_gb",gb);else localStorage.removeItem("pepmosa_active_gb");
   renderActiveGroupBuySelector();
   try{
-    await Promise.all([loadFees(),loadOrders(),loadOrdersCenter(),loadTrackingDashboard(),loadWaybillCenter()]);
+    const vialGB=$("vialTrackerGB");
+    if(vialGB&&gb)vialGB.value=gb;
+    await Promise.all([loadFees(),loadOrders(),loadOrdersCenter(),loadTrackingDashboard(),loadWaybillCenter(),loadVialTracker()]);
     showMessage("Now managing "+gb+". Other Group Buys are kept separate.","success");
   }catch(e){
     console.error("ACTIVE GB SWITCH ERROR:",e);
@@ -946,6 +949,8 @@ loadWaybillCenter=async function(){
     const gb=getActiveGB();if(gb)oq=oq.eq("gb_number",gb);
     const [or,cr,sr]=await Promise.all([oq,sb.from("customers").select("customer_id,email,customer_name,contact,address"),sb.from("consolidated_shipments").select("shipment_id,email,courier,tracking_number,waybill_number,status,updated_at").order("updated_at",{ascending:false})]);
     if(or.error)throw or.error;
+    if(cr.error)console.warn("Waybill customers warning:",cr.error);
+    if(sr.error)console.warn("Waybill shipments warning:",sr.error);
     const orderRows=or.data||[],shipmentIds=new Set(orderRows.map(o=>o.shipment_id).filter(Boolean));
     const customersByEmail=new Map((cr.data||[]).map(x=>[normEmail(x.email),x]));
     const shipmentsById=new Map((sr.data||[]).filter(x=>shipmentIds.has(x.shipment_id)).map(x=>[x.shipment_id,x]));

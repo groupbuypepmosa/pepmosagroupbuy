@@ -2151,7 +2151,7 @@ async function placeOrder(){
     */
     const { data:result, error:submitError } =
       await sb.rpc(
-        "submit_group_buy_order",
+        "submit_group_buy_order_atomic",
         {
           p_gb_number: currentGB.gb_number,
           p_email: email,

@@ -106,16 +106,10 @@
   function renderSummary(){
     const status=$('gbStatus');
     const gb=getGB();
-    if(!status || !isKitMode(gb)) return;
-
-    status.innerHTML=
-      '<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:7px">'+
-        '<span class="status open">KIT COMPLETION</span>'+
-        '<b>Complete the remaining vials</b>'+
-      '</div>'+
-      '<div class="muted" style="line-height:1.55">'+
-        'Each <b>mg/variant is tracked separately</b>. Every variant has its own 10-vial kit count. You can order from <b>1 vial up to the exact live remaining quantity</b> for that specific mg/variant.'+
-      '</div>';
+    if(status && isKitMode(gb)){
+      status.innerHTML='';
+      status.style.display='none';
+    }
   }
 
   function filterStorefront(){

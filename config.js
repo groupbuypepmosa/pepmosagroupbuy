@@ -3,14 +3,22 @@ window.PEPMOSA_CONFIG = {
   SUPABASE_ANON_KEY: "sb_publishable_f-FUnzjqozjjeB-KIIml-A_i9zFvQ2U"
 };
 
-/* Keep page-specific enhancements isolated so admin changes do not touch
-   checkout, login, storefront, tracking, or payment logic. */
+/* PEPMOSA loader guard.
+   Never load storefront scripts twice: duplicate handlers caused cart/access
+   races and inconsistent behavior between fresh browser profiles. */
 (function(){
   'use strict';
-  const VERSION = '20260904-kitlive-dbfix';
+  const VERSION = '20260904-public-access-stable';
+
+  function hasScript(file){
+    return Array.from(document.scripts).some(s=>{
+      const src=(s.getAttribute('src')||'').split('?')[0];
+      return src===file || src.endsWith('/'+file);
+    });
+  }
 
   function loadOnce(file){
-    if(!file || document.querySelector('script[data-pepmosa-stable="'+file+'"]')) return;
+    if(!file || hasScript(file) || document.querySelector('script[data-pepmosa-stable="'+file+'"]')) return;
     const s=document.createElement('script');
     s.src=file+'?v='+VERSION;
     s.dataset.pepmosaStable=file;
@@ -23,13 +31,14 @@ window.PEPMOSA_CONFIG = {
     const isStorefront=path==='/'||path.endsWith('/index.html')||path.endsWith('index.html');
     const isAdmin=path.endsWith('/admin')||path.endsWith('/admin.html')||path==='/admin';
 
+    /* index.html already includes these storefront files directly.
+       Only inject a file if a future storefront page does not include it. */
     if(isStorefront){
       loadOnce('storefront-repair.js');
       loadOnce('checkout-polish.js');
       return;
     }
 
-    /* Only the admin waybill view receives this visual/print enhancement. */
     if(isAdmin){
       loadOnce('admin-waybill.js');
     }

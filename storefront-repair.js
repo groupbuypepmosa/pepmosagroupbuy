@@ -101,6 +101,7 @@
     const product=products.find(p=>String(p.product_id)===String(pid));
     const picker=window.pepOpenProductPicker || window.openProductPicker;
 
+    if(gb?.status==='CLOSED'){info('Ordering Closed','This Group Buy is closed. You can browse products and prices only.');return}
     if(product && typeof picker==='function'){
       picker(pid,product);
       return;
@@ -160,7 +161,22 @@
   function hookPlaceOrder(){if(typeof window.placeOrder!=='function'||window.placeOrder.__pepStableGuard)return;const original=window.placeOrder;window.placeOrder=async function(){if($('email')&&verifiedEmail)$('email').value=verifiedEmail;return original()};window.placeOrder.__pepStableGuard=true}
   async function loadNotices(){if(noticeLoaded||!S())return;noticeLoaded=true;try{const r=await S().from('site_notices').select('*').eq('active',true).order('created_at',{ascending:false}).limit(10);if(r.error)throw r.error;const now=Date.now();const n=(r.data||[]).find(x=>(!x.starts_at||new Date(x.starts_at).getTime()<=now)&&(!x.ends_at||new Date(x.ends_at).getTime()>=now));if(!n)return;const key=`pepmosa_site_notice_seen_${n.notice_id}_${n.updated_at}`;if(localStorage.getItem(key))return;showNotice(n,key)}catch(e){console.error('PEPMOSA SITE NOTICE',e)}}
   function showNotice(n,key){if($('pepSiteNoticeModal'))$('pepSiteNoticeModal').remove();const d=document.createElement('div');d.id='pepSiteNoticeModal';d.innerHTML=`<div class="pepSiteNoticeCard type-${esc(n.notice_type||'INFO')}"><button class="pepSiteNoticeClose" aria-label="Close">×</button><div class="pepSiteNoticeKicker">${esc(n.notice_type||'ANNOUNCEMENT')}</div><h2>${esc(n.title)}</h2><div class="pepSiteNoticeMessage">${esc(n.message)}</div><div class="pepSiteNoticeActions"><button id="pepNoticeGotIt" class="pepFeeBtn">${esc(n.button_text||'GOT IT')}</button>${n.button_url?`<a class="pepFeeBtn secondary" href="${esc(n.button_url)}" target="_blank" rel="noopener">LEARN MORE</a>`:''}</div></div>`;document.body.appendChild(d);const close=()=>{localStorage.setItem(key,'1');d.classList.remove('open');setTimeout(()=>d.remove(),180)};d.querySelector('.pepSiteNoticeClose').onclick=close;d.querySelector('#pepNoticeGotIt').onclick=close;d.onclick=e=>{if(e.target===d)close()};requestAnimationFrame(()=>d.classList.add('open'))}
-  async function load(){try{const s=S();if(!s)return;ensureUI();const g=await s.from('group_buys').select('*').in('status',['OPEN','KIT_COMPLETION']).order('created_at',{ascending:false}).limit(1).maybeSingle();if(g.error)throw g.error;gb=g.data;if(!gb){if($('gbStatus'))$('gbStatus').innerHTML='<div class="notice error">No open Group Buy right now.</div>';return}if($('gbStatus')){if(gb.status==='KIT_COMPLETION'){$('gbStatus').innerHTML='<div style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap"><span class="status open">KIT COMPLETION</span><span class="muted">Only remaining vials are available.</span></div>';if($('pepKitCompletionCard'))$('pepKitCompletionCard').style.display='block'}else{$('gbStatus').innerHTML=`<b>${esc(gb.customer_facing_name||gb.gb_number)}</b> <span class="status open">OPEN</span>`;if($('pepKitCompletionCard'))$('pepKitCompletionCard').style.display='none'}}const links=await s.from('gb_categories').select('category_name').eq('gb_number',gb.gb_number);if(links.error)throw links.error;const allowed=new Set((links.data||[]).map(x=>x.category_name));const ps=await s.from('products').select('product_id,product_name,category,description,image_url,active').eq('active',true).order('product_name');if(ps.error)throw ps.error;
+  async function load(){try{const s=S();if(!s)return;ensureUI();const g=await s.from('group_buys').select('*').in('status',['OPEN','KIT_COMPLETION','CLOSED']).order('created_at',{ascending:false}).limit(20);if(g.error)throw g.error;
+    const rows=g.data||[];
+    gb=rows.find(x=>['OPEN','KIT_COMPLETION'].includes(x.status))||rows.find(x=>x.status==='CLOSED')||null;
+    if(!gb){if($('gbStatus'))$('gbStatus').innerHTML='<div class="notice error">No Group Buy available right now.</div>';return}
+    if($('gbStatus')){
+      if(gb.status==='KIT_COMPLETION'){
+        $('gbStatus').innerHTML='<div style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap"><span class="status open">KIT COMPLETION</span><span class="muted">Only remaining vials are available.</span></div>';
+        if($('pepKitCompletionCard'))$('pepKitCompletionCard').style.display='block'
+      }else if(gb.status==='CLOSED'){
+        $('gbStatus').innerHTML=`<b>${esc(gb.customer_facing_name||gb.gb_number)}</b> <span class="status closed">CLOSED • PRICELIST VIEW</span><div class="muted" style="margin-top:8px">Products and prices are visible. Ordering is currently closed.</div>`;
+        if($('pepKitCompletionCard'))$('pepKitCompletionCard').style.display='none'
+      }else{
+        $('gbStatus').innerHTML=`<b>${esc(gb.customer_facing_name||gb.gb_number)}</b> <span class="status open">OPEN</span>`;
+        if($('pepKitCompletionCard'))$('pepKitCompletionCard').style.display='none'
+      }
+    }const links=await s.from('gb_categories').select('category_name').eq('gb_number',gb.gb_number);if(links.error)throw links.error;const allowed=new Set((links.data||[]).map(x=>x.category_name));const ps=await s.from('products').select('product_id,product_name,category,description,image_url,active').eq('active',true).order('product_name');if(ps.error)throw ps.error;
     const baseProducts=allowed.size?ps.data.filter(p=>allowed.has(p.category)):ps.data;
     const ids=baseProducts.map(p=>p.product_id).filter(Boolean);
     let allVariants=[];
@@ -171,7 +187,16 @@
     }
     products=baseProducts.map(p=>({...p,product_variants:allVariants.filter(v=>String(v.product_id)===String(p.product_id)&&v.active!==false)}));const ms=await s.from('gb_minimum_quantities').select('gb_number,product_id,variant_id,minimum_qty').eq('gb_number',gb.gb_number);if(ms.error)throw ms.error;minimums=ms.data||[];const cs=await s.from('gb_category_settings').select('gb_number,category_name,minimum_qty').eq('gb_number',gb.gb_number);if(cs.error){console.warn('PEPMOSA CATEGORY MINIMUMS',cs.error);categoryMinimums=[]}else categoryMinimums=cs.data||[];
     if(gb.status==='KIT_COMPLETION'){const kr=await s.rpc('get_kit_completion_inventory',{p_gb_number:gb.gb_number});if(kr.error)throw kr.error;const kitMap=new Map((kr.data||[]).map(x=>[String(x.variant_id),Number(x.remaining_qty||0)]));products=products.map(p=>({...p,product_variants:(p.product_variants||[]).filter(v=>Number(kitMap.get(String(v.variant_id))||0)>0).map(v=>({...v,minimum_qty:1,remaining_qty:Number(kitMap.get(String(v.variant_id))||0)}))})).filter(p=>(p.product_variants||[]).length>0)}else{products=products.map(p=>({...p,product_variants:(p.product_variants||[]).map(v=>({...v,minimum_qty:minFor(v.variant_id,p.category)}))}))}
-    renderProducts();feePayment=await findFee();lastFeeStatus=feePayment?.status||null;await refreshFeeState(false);hookCheckout();hookPlaceOrder();await loadNotices();await authReturn();}catch(e){console.error('PEPMOSA STOREFRONT STABLE',e);if($('gbStatus'))$('gbStatus').innerHTML='<div class="notice error">Unable to load the current Group Buy. Please refresh and try again.</div>'}}
+    renderProducts();
+    if(gb.status==='CLOSED'){
+      const a=$('pepFeeState')||$('groupBuyAccess');
+      if(a)a.innerHTML='<div class="muted">Ordering is closed. You can browse the pricelist.</div>';
+      const payBtn=$('pepPayFeeBtn'); if(payBtn)payBtn.style.display='none';
+      const verifyBtn=$('pepVerifyBtn'); if(verifyBtn)verifyBtn.style.display='none';
+      await loadNotices();
+      return;
+    }
+    feePayment=await findFee();lastFeeStatus=feePayment?.status||null;await refreshFeeState(false);hookCheckout();hookPlaceOrder();await loadNotices();await authReturn();}catch(e){console.error('PEPMOSA STOREFRONT STABLE',e);if($('gbStatus'))$('gbStatus').innerHTML='<div class="notice error">Unable to load the current Group Buy. Please refresh and try again.</div>'}}
   function boot(){styles();ensureUI();let n=0;const t=setInterval(()=>{if(S()){clearInterval(t);load()}if(++n>100)clearInterval(t)},100);if(S())load();setTimeout(()=>{ensureUI();if(S())load()},1800)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();

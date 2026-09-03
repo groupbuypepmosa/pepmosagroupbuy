@@ -2348,5 +2348,48 @@ load();
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(loadSiteNotice,700),{once:true});else setTimeout(loadSiteNotice,700);
 })();
 </script>
+
+<!-- PEPMOSA GLOBAL POPUP POLISH -->
+<style id="pepmosa-global-popup-style">
+#pepmosaGlobalPopup{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(47,25,40,.48);backdrop-filter:blur(8px)}
+#pepmosaGlobalPopup.show{display:flex}
+.pepGlobalPopupCard{position:relative;width:min(460px,100%);overflow:hidden;border:1px solid rgba(255,255,255,.72);border-radius:28px;background:linear-gradient(145deg,#fff,#fff5fa 60%,#f8efff);box-shadow:0 30px 90px rgba(54,18,43,.30);transform:translateY(8px);animation:pepPopupIn .22s ease forwards}
+.pepGlobalPopupGlow{position:absolute;width:230px;height:230px;right:-80px;top:-105px;border-radius:50%;background:radial-gradient(circle,rgba(229,43,139,.17),transparent 70%)}
+.pepGlobalPopupBody{position:relative;padding:30px}
+.pepGlobalPopupMark{width:58px;height:58px;display:grid;place-items:center;border-radius:20px;background:linear-gradient(135deg,#e52b8b,#b93bb6);color:#fff;font-size:26px;font-weight:900;box-shadow:0 12px 28px rgba(205,43,139,.24)}
+.pepGlobalPopupTitle{margin:18px 0 8px;color:#402b36;font-size:25px;line-height:1.08;font-weight:950}
+.pepGlobalPopupText{margin:0;color:#765f6b;line-height:1.55;font-size:15px;white-space:pre-line}
+.pepGlobalPopupActions{display:flex;justify-content:flex-end;margin-top:22px}
+.pepGlobalPopupBtn{min-width:118px;border:0;border-radius:14px;padding:13px 20px;background:linear-gradient(135deg,#e52b8b,#b93bb6);color:#fff;font-weight:950;letter-spacing:.04em;cursor:pointer;box-shadow:0 10px 24px rgba(205,43,139,.22)}
+@keyframes pepPopupIn{to{transform:translateY(0)}}
+@media(max-width:560px){#pepmosaGlobalPopup{align-items:flex-end;padding:10px}.pepGlobalPopupCard{border-radius:26px 26px 20px 20px}.pepGlobalPopupBody{padding:24px 20px}.pepGlobalPopupActions{display:block}.pepGlobalPopupBtn{width:100%}}
+</style>
+<script id="pepmosa-global-popup-script">
+(function(){
+  const nativeAlert=window.alert.bind(window);
+  function ensure(){
+    let root=document.getElementById('pepmosaGlobalPopup');
+    if(root)return root;
+    root=document.createElement('div');
+    root.id='pepmosaGlobalPopup';
+    root.innerHTML='<div class="pepGlobalPopupCard" role="dialog" aria-modal="true"><div class="pepGlobalPopupGlow"></div><div class="pepGlobalPopupBody"><div class="pepGlobalPopupMark" id="pepGlobalPopupMark">✦</div><div class="pepGlobalPopupTitle" id="pepGlobalPopupTitle">PEPMOSA</div><p class="pepGlobalPopupText" id="pepGlobalPopupText"></p><div class="pepGlobalPopupActions"><button type="button" class="pepGlobalPopupBtn" id="pepGlobalPopupBtn">OKAY</button></div></div></div>';
+    root.addEventListener('click',e=>{if(e.target===root)root.classList.remove('show')});
+    document.body.appendChild(root);
+    document.getElementById('pepGlobalPopupBtn').onclick=()=>root.classList.remove('show');
+    return root;
+  }
+  window.pepmosaPopup=function(message,title,icon){
+    try{
+      const root=ensure();
+      document.getElementById('pepGlobalPopupText').textContent=String(message||'');
+      document.getElementById('pepGlobalPopupTitle').textContent=title||'PEPMOSA';
+      document.getElementById('pepGlobalPopupMark').textContent=icon||'✦';
+      root.classList.add('show');
+    }catch(e){nativeAlert(String(message||''))}
+  };
+  window.alert=function(message){window.pepmosaPopup(message,'PEPMOSA','✦')};
+})();
+</script>
+
 </body>
 </html>

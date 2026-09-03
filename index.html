@@ -2074,7 +2074,7 @@ async function placeOrder(){
       .select("status")
       .eq("gb_number", currentGB.gb_number)
       .ilike("email", checkoutEmail)
-      .eq("status", "PAID")
+      .in("status", ["PAID","APPROVED"])
       .limit(1);
     if(feeError) throw feeError;
     if(!feeRows || !feeRows.length){
@@ -2396,7 +2396,16 @@ load();
 (function(){
   async function requireApprovedAdminFee(){
     var email=(window.verifiedEmail||localStorage.getItem('pepmosa_verified_email')||localStorage.getItem('pepmosa_customer_email')||'').trim().toLowerCase();
-    if(!email){ if(window.pepmosaPopup) window.pepmosaPopup('Admin Fee Required\n\nPlease pay and verify your approved Admin Fee email before adding products to your cart or checking out.'); else alert('Admin Fee Required.'); return false; }
+
+    // If this device has no saved verified email, let an already-approved buyer enter it.
+    // This avoids blocking customers simply because they changed device or cleared browser storage.
+    if(!email){
+      email=(window.prompt('Enter the SAME EMAIL used for your approved Admin Fee:')||'').trim().toLowerCase();
+      if(!email){
+        if(window.pepmosaPopup) window.pepmosaPopup('Admin Fee Required\n\nEnter the email you used when paying the Admin Fee.'); else alert('Admin Fee Required.');
+        return false;
+      }
+    }
     try{
       var sb=window.sb;
       if(!sb) throw new Error('Database not ready');
@@ -2406,13 +2415,16 @@ load();
         gb=q.data||null;
       }
       if(!gb||!gb.gb_number) throw new Error('No active Group Buy');
-      var r=await sb.from('admin_fee_payments').select('status').eq('gb_number',gb.gb_number).ilike('email',email).eq('status','PAID').limit(1);
+      var r=await sb.from('admin_fee_payments').select('status').eq('gb_number',gb.gb_number).ilike('email',email).in('status',['PAID','APPROVED']).limit(1);
       if(r.error) throw r.error;
       if(!r.data||!r.data.length){
         localStorage.removeItem('pepmosa_verified_email');
-        if(window.pepmosaPopup) window.pepmosaPopup('Admin Fee Required\n\nYour Admin Fee must be approved before you can add products to your cart or check out.'); else alert('Admin Fee Required.');
+        if(window.pepmosaPopup) window.pepmosaPopup('Admin Fee Required\n\nNo approved Admin Fee was found for this email in the current Group Buy.'); else alert('Admin Fee Required.');
         return false;
       }
+      localStorage.setItem('pepmosa_verified_email',email);
+      localStorage.setItem('pepmosa_customer_email',email);
+      window.verifiedEmail=email;
       return true;
     }catch(err){
       console.error('Admin Fee guard:',err);

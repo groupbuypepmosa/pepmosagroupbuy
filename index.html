@@ -924,7 +924,7 @@ header{
 
       <button
         class="btn primary wide"
-        onclick="checkout()"
+        onclick="closeModal('cartModal'); checkout();"
       >
         CHECKOUT
       </button>
@@ -1997,9 +1997,15 @@ function removeCart(index){
 
 function closeModal(id){
 
-  $(id)
-    .classList
-    .remove("show");
+  const modal=$(id);
+
+  if(!modal) return;
+
+  modal.classList.remove("show");
+
+  // Explicitly clear any inline state left by other storefront scripts.
+  modal.style.display="";
+  modal.setAttribute("aria-hidden","true");
 
 }
 

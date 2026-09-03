@@ -96,17 +96,13 @@
     if(!btn)return;
     e.preventDefault();
     e.stopPropagation();
+    e.stopImmediatePropagation();
 
     const pid=btn.getAttribute('data-product-id');
     const product=products.find(p=>String(p.product_id)===String(pid));
-    const picker=window.pepOpenProductPicker || window.openProductPicker;
-
-    if(product && typeof picker==='function'){
-      picker(pid,product);
-      return;
-    }
-
-    // Visible fallback instead of a dead button if the main picker is unavailable.
+    // Always use the storefront's own picker here. Older global pickers were
+    // reopening the KIT COMPLETION information card instead of showing variants.
+    // This keeps CHOOSE VARIANT isolated from stale page handlers.
     if(product){
       const variants=(product.product_variants||[]).filter(v=>v.active!==false);
       const choices=variants.map(v=>{
@@ -214,7 +210,7 @@
     if($('gbStatus')){
       if(gb.status==='KIT_COMPLETION'){
         $('gbStatus').innerHTML='<div style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap"><span class="status open">KIT COMPLETION</span><span class="muted">Only remaining vials are available.</span></div>';
-        if($('pepKitCompletionCard'))$('pepKitCompletionCard').style.display='block'
+        if($('pepKitCompletionCard'))$('pepKitCompletionCard').style.display='none'
       }else if(gb.status==='CLOSED'){
         $('gbStatus').innerHTML=`<b>${esc(gb.customer_facing_name||gb.gb_number)}</b> <span class="status closed">CLOSED • PRICELIST VIEW</span><div class="muted" style="margin-top:8px">Products and prices are visible. Ordering is currently closed.</div>`;
         if($('pepKitCompletionCard'))$('pepKitCompletionCard').style.display='none'

@@ -702,7 +702,7 @@ function renderOrdersCenter(){
     '<div class="summaryCard pink"><div class="summaryLabel">Clients</div><div class="summaryValue">'+rows.length+'</div><div class="small">Unique buyers</div></div>'+
     '<div class="summaryCard"><div class="summaryLabel">Orders</div><div class="summaryValue">'+totalOrders+'</div><div class="small">'+totalManual+' manual / late</div></div>'+
     '<div class="summaryCard"><div class="summaryLabel">Vials / Items</div><div class="summaryValue">'+totalProducts+'</div><div class="small">All quantities combined</div></div>'+
-    '<div class="summaryCard"><div class="summaryLabel">Order Value</div><div class="summaryValue">'+peso(rows.reduce((a,r)=>a+r.total,0))+'</div><div class="small">Selected Group Buy</div></div>';
+    '<div class="summaryCard"><div class="summaryLabel">Total Payments</div><div class="summaryValue">'+peso(rows.reduce((a,r)=>a+r.customerGrandTotal,0))+'</div><div class="small">Orders + shipping + admin fees</div></div>';
 
   list.innerHTML=filtered.length?
     '<div class="ordersClientGrid">'+filtered.map((r,index)=>{
@@ -722,8 +722,8 @@ function renderOrdersCenter(){
             (r.manualTotal?'<div class="manual"><span>✦ MANUAL ORDER</span><b>'+peso(r.manualTotal)+'</b></div>':'')+
             (r.otherTotal?'<div><span>OTHER ORDERS</span><b>'+peso(r.otherTotal)+'</b></div>':'')+
             '<div class="breakdownSubtotal"><span>TOTAL ORDERS</span><b>'+peso(r.productTotal)+'</b></div>'+
-            (r.shippingTotal?'<div class="shipping"><span>SHIPPING</span><b>'+peso(r.shippingTotal)+'</b></div>':'')+
-            (r.adminFeeTotal?'<div class="adminfee"><span>ADMIN FEE</span><b>'+peso(r.adminFeeTotal)+'</b></div>':'')+
+            '<div class="shipping"><span>SHIPPING</span><b>'+peso(r.shippingTotal)+'</b></div>'+
+            '<div class="adminfee"><span>ADMIN FEE</span><b>'+peso(r.adminFeeTotal)+'</b></div>'+
             '<div class="breakdownGrand"><span>TOTAL PAYMENT</span><b>'+peso(r.customerGrandTotal)+'</b></div>'+
           '</div>'+
         '</div>'+        '<div class="ordersStatusStrip">'+

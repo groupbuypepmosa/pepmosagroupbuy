@@ -2221,7 +2221,7 @@ load();
 
 </script>
 
-<script src="storefront-repair.js?v=20260904-kit-card-popup-design-v2"></script>
+<script src="storefront-repair.js?v=20260904-closed-status-sync-v3"></script>
 <!-- Product picker version: 2026-09-02 -->
 <script src="checkout-polish.js?v=20260904-soldout-popup-final"></script>
 <script src="kit-completion-storefront.js?v=20260904-remove-duplicate-kit-hero-v2"></script>
@@ -2232,6 +2232,43 @@ load();
 </style>
 <script>
 (function(){function showPepmosaPopup(message){var old=document.getElementById('pepmosa-popup');if(old)old.remove();var wrap=document.createElement('div');wrap.className='pepmosa-popup-backdrop';wrap.id='pepmosa-popup';wrap.innerHTML='<div class="pepmosa-popup" role="dialog" aria-modal="true"><div class="pepmosa-popup-top"></div><div class="pepmosa-popup-body"><div class="pepmosa-popup-icon">✦</div><h3 class="pepmosa-popup-title">PEPMOSA</h3><div class="pepmosa-popup-message"></div><button class="pepmosa-popup-button" type="button">OKAY</button></div></div>';wrap.querySelector('.pepmosa-popup-message').textContent=String(message||'');function close(){wrap.remove();document.removeEventListener('keydown',key)}function key(e){if(e.key==='Escape'||e.key==='Enter')close()}wrap.querySelector('button').addEventListener('click',close);wrap.addEventListener('click',function(e){if(e.target===wrap)close()});document.addEventListener('keydown',key);document.body.appendChild(wrap);setTimeout(function(){var b=wrap.querySelector('button');if(b)b.focus()},0)}window.alert=showPepmosaPopup;window.pepmosaPopup=showPepmosaPopup})();
+</script>
+
+<!-- PEPMOSA FINAL GB STATUS SYNC: database is the single source of truth -->
+<script>
+(function(){
+  async function syncPublicGBStatus(){
+    try{
+      if(!window.sb) return;
+      const r=await window.sb.from('group_buys').select('*')
+        .in('status',['OPEN','KIT_COMPLETION','CLOSED'])
+        .order('created_at',{ascending:false}).limit(20);
+      if(r.error) throw r.error;
+      const rows=r.data||[];
+      const gb=rows.find(x=>['OPEN','KIT_COMPLETION'].includes(String(x.status||'').toUpperCase()))
+        || rows.find(x=>String(x.status||'').toUpperCase()==='CLOSED') || null;
+      if(!gb) return;
+      window.currentGB=gb;
+      const el=document.getElementById('gbStatus');
+      if(!el) return;
+      const st=String(gb.status||'').toUpperCase();
+      if(st==='CLOSED'){
+        el.style.display='';
+        el.innerHTML='<span class="status closed">CLOSED</span> <span class="muted">Products and prices are visible. Ordering is currently closed.</span>';
+      }else if(st==='OPEN'){
+        el.style.display='';
+        el.innerHTML='<span class="status open">OPEN</span>';
+      }else if(st==='KIT_COMPLETION'){
+        el.style.display='none';
+      }
+    }catch(e){console.warn('Final GB status sync:',e)}
+  }
+  window.pepmosaSyncPublicGBStatus=syncPublicGBStatus;
+  let tries=0;
+  const t=setInterval(function(){tries++;syncPublicGBStatus();if(tries>=8)clearInterval(t)},700);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(syncPublicGBStatus,1200),{once:true});
+  else setTimeout(syncPublicGBStatus,1200);
+})();
 </script>
 
 <!-- PEPMOSA universal Admin Fee guard: last-loaded so it covers OPEN GB and KIT COMPLETION -->

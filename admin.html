@@ -429,24 +429,55 @@ async function editGroupBuy(n){
 async function uploadAsset(file,folder){if(!file)return null;const ext=file.name.split(".").pop().toLowerCase(),name=folder+"/"+crypto.randomUUID()+"."+ext;const{error}=await sb.storage.from("pepmosa-assets").upload(name,file,{upsert:false,contentType:file.type});if(error)throw error;return sb.storage.from("pepmosa-assets").getPublicUrl(name).data.publicUrl}
 async function saveGroupBuy(){
   try{
-    const n=$("gbNumber").value.trim();if(!n)return showMessage("GB Number is required.","error");
+    const n=$("gbNumber").value.trim();
+    if(!n)return showMessage("GB Number is required.","error");
     const selectedCategories=getSelectedGBCategories();
     if(!selectedCategories.length)return showMessage("Please select at least one category for this Group Buy.","error");
-    const p={gb_number:n,customer_facing_name:$("gbName").value.trim(),status:$("gbStatus").value,admin_fee:Number($("gbAdminFee").value||0)},a=$("adminQrFile").files[0],f=$("finalQrFile").files[0];
-    if(a)p.admin_fee_qr_url=await uploadAsset(a,"admin-fee");if(f)p.final_payment_qr_url=await uploadAsset(f,"final-payment");
-    const id=$("editingGBId").value,isNew=!id,r=id?await sb.from("group_buys").update(p).eq("gb_id",id):await sb.from("group_buys").insert(p);
-    if(r.error)throw r.error;
+
+    const p={gb_number:n,customer_facing_name:$("gbName").value.trim(),status:$("gbStatus").value,admin_fee:Number($("gbAdminFee").value||0)};
+    const a=$("adminQrFile").files[0],f=$("finalQrFile").files[0];
+    if(a)p.admin_fee_qr_url=await uploadAsset(a,"admin-fee");
+    if(f)p.final_payment_qr_url=await uploadAsset(f,"final-payment");
+
+    // A deleted/archived GB can leave an old editingGBId in the browser.
+    // Never let that stale ID cause a silent UPDATE of zero rows.
+    const rawId=$("editingGBId").value;
+    const editingExists=rawId && (groupBuys||[]).some(x=>String(x.gb_id)===String(rawId));
+    let saved,isNew=!editingExists;
+
+    if(editingExists){
+      const {data,error}=await sb.from("group_buys").update(p).eq("gb_id",rawId).select("gb_id,gb_number").maybeSingle();
+      if(error)throw error;
+      if(!data){
+        // Record disappeared since the page loaded: safely create it instead.
+        const {data:created,error:createError}=await sb.from("group_buys").insert(p).select("gb_id,gb_number").single();
+        if(createError)throw createError;
+        saved=created;isNew=true;
+      }else saved=data;
+    }else{
+      const {data,error}=await sb.from("group_buys").insert(p).select("gb_id,gb_number").single();
+      if(error)throw error;
+      saved=data;
+    }
+
+    if(!saved||saved.gb_number!==n)throw new Error("Group Buy was not saved correctly. No categories were changed.");
+
+    // Only clear stale customer/cart state after the parent GB definitely exists.
     if(isNew){
-      // Never carry a previous GB cart/customer state into a newly created GB.
       ["pepmosa_cart","pepmosa_active_gb","pepmosa_checkout_customer","pepmosa_checkout_gb"].forEach(k=>localStorage.removeItem(k));
       sessionStorage.clear();
     }
-    const {error:delError}=await sb.from("gb_categories").delete().eq("gb_number",n);if(delError)throw delError;
+
+    const {error:delError}=await sb.from("gb_categories").delete().eq("gb_number",n);
+    if(delError)throw delError;
     const {error:catError}=await sb.from("gb_categories").insert(selectedCategories.map(category_name=>({gb_number:n,category_name})));
     if(catError)throw catError;
+
     showMessage("Group Buy and categories saved successfully.","success");
-    await clearGBForm();await loadGroupBuys();
-  }catch(e){console.error(e);showMessage(e.message,"error")}
+    $("editingGBId").value="";
+    await clearGBForm();
+    await loadEverything();
+  }catch(e){console.error("SAVE GB ERROR:",e);showMessage(e.message||"Unable to save Group Buy.","error")}
 }
 async function archiveGroupBuy(gb){
   const g=groupBuys.find(x=>x.gb_number===gb);

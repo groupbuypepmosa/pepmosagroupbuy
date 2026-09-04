@@ -187,6 +187,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 .breakdownRows>div{display:flex;justify-content:space-between;gap:12px;padding:8px 11px;border-bottom:1px solid #f4e8ee;font-size:11px}
 .breakdownRows>div:last-child{border-bottom:0}
 .breakdownRows .manual{background:#fff9e5;color:#7b5900}
+.breakdownRows .shipping{background:#f4f8ff;color:#315a8d}
+.breakdownRows .adminfee{background:#f2fbf5;color:#2f7552}
 .breakdownRows .breakdownGrand{background:#fff1f8;font-weight:950;color:#a52b70;font-size:12px}
 
 </style>
@@ -616,15 +618,18 @@ async function loadOrdersCenter(){
   const list=$("ordersClientList");
   if(list)list.innerHTML='<div class="notice">Loading client orders and quantities...</div>';
   try{
-    const [or,cr]=await Promise.all([
+    const [or,cr,fr]=await Promise.all([
       sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false}),
-      sb.from("customers").select("customer_id,email,customer_name,contact,address")
+      sb.from("customers").select("customer_id,email,customer_name,contact,address"),
+      sb.from("admin_fee_payments").select("*").order("created_at",{ascending:false})
     ]);
     if(or.error)throw or.error;
     if(cr.error)console.warn("Customer details warning:",cr.error);
+    if(fr.error)console.warn("Admin fee details warning:",fr.error);
     ordersCache=or.data||[];
     orderItemsCache=ordersCache.flatMap(o=>o.order_items||[]);
     customersCache=cr.data||[];
+    fees=fr.data||[];
     renderPaymentCenter();
     renderOrdersCenter();
   }catch(e){
@@ -643,11 +648,12 @@ function renderOrdersCenter(){
   for(const o of (ordersCache||[])){
     const email=String(o.email||"").trim().toLowerCase();
     const key=email||("customer-"+String(o.customer_id||o.order_id||"unknown"));
-    if(!grouped.has(key))grouped.set(key,{key,email,orders:[],items:[],total:0});
+    if(!grouped.has(key))grouped.set(key,{key,email,orders:[],items:[],total:0,shippingTotal:0});
     const g=grouped.get(key);
     g.orders.push(o);
     g.items.push(...(o.order_items||[]));
     g.total+=Number(o.total||0);
+    g.shippingTotal+=Number(o.shipping_fee||0);
   }
 
   const rows=[...grouped.values()].map(g=>{
@@ -665,12 +671,22 @@ function renderOrdersCenter(){
     }
     const name=customer.customer_name||g.orders.find(o=>o.full_name)?.full_name||g.email||"Customer";
     const manualCount=g.orders.filter(o=>String(o.payment_reference||"").toUpperCase()==="MANUAL ADMIN ORDER"||String(o.admin_note||"").toUpperCase().includes("MANUAL / LATE ORDER")).length;
-    const bucket=(label,filter)=>g.orders.filter(filter).reduce((sum,o)=>sum+Number(o.total||0),0);
-    const openTotal=bucket("OPEN",o=>String(o.order_type||o.order_source||"").toUpperCase().includes("OPEN"));
-    const kitTotal=bucket("KIT",o=>String(o.order_type||o.order_source||"").toUpperCase().includes("KIT"));
-    const manualTotal=g.orders.filter(isManualOrder).reduce((sum,o)=>sum+Number(o.total||0),0);
-    const otherTotal=Math.max(0,g.total-openTotal-kitTotal-manualTotal);
-    return {...g,customer_name:name,contact:customer.contact||g.orders.find(o=>o.contact_number)?.contact_number||"",products:[...merged.values()],manualCount,openTotal,kitTotal,manualTotal,otherTotal};
+
+    // Product categories exclude shipping so the breakdown never double-counts it.
+    const netOrder=o=>Math.max(0,Number(o.total||0)-Number(o.shipping_fee||0));
+    const bucket=(filter)=>g.orders.filter(filter).reduce((sum,o)=>sum+netOrder(o),0);
+    const openTotal=bucket(o=>String(o.order_type||o.order_source||"").toUpperCase().includes("OPEN"));
+    const kitTotal=bucket(o=>String(o.order_type||o.order_source||"").toUpperCase().includes("KIT"));
+    const manualTotal=g.orders.filter(isManualOrder).reduce((sum,o)=>sum+netOrder(o),0);
+    const productTotal=Math.max(0,g.total-Number(g.shippingTotal||0));
+    const otherTotal=Math.max(0,productTotal-openTotal-kitTotal-manualTotal);
+
+    // Admin fees live in their own table, so match them by the same customer email.
+    const adminFeeRows=(fees||[]).filter(x=>String(x.email||"").trim().toLowerCase()===g.email&&!feeIsRejected(x));
+    const adminFeeTotal=adminFeeRows.reduce((sum,x)=>sum+Number(x.amount||0),0);
+    const customerGrandTotal=Number(g.total||0)+adminFeeTotal;
+
+    return {...g,customer_name:name,contact:customer.contact||g.orders.find(o=>o.contact_number)?.contact_number||"",products:[...merged.values()],manualCount,openTotal,kitTotal,manualTotal,otherTotal,productTotal,adminFeeTotal,customerGrandTotal};
   }).sort((a,b)=>String(a.customer_name).localeCompare(String(b.customer_name)));
 
   const filtered=rows.filter(r=>{
@@ -695,16 +711,18 @@ function renderOrdersCenter(){
       return '<article class="ordersClientCard ordersCleanCard">'+
         '<div class="ordersClientHead ordersCleanHead">'+
           '<div class="ordersClientIdentity"><div><div class="ordersClientName '+(q&&String(r.customer_name).toLowerCase().includes(q)?'match':'')+'">'+esc(r.customer_name)+'</div><div class="ordersClientEmail">'+esc(r.email||"No email")+(r.contact?' • '+esc(r.contact):'')+'</div></div></div>'+
-          '<div class="ordersClientStats"><span>'+r.orders.length+' ORDERS</span><span>'+r.products.length+' PRODUCTS</span><span>'+peso(r.total)+'</span></div>'+
+          '<div class="ordersClientStats"><span>'+r.orders.length+' ORDERS</span><span>'+r.products.length+' PRODUCTS</span><span>'+peso(r.customerGrandTotal)+'</span></div>'+
         '</div>'+
         '<div class="customerPaymentBreakdown">'+
           '<div class="breakdownTitle">CUSTOMER TOTAL BREAKDOWN</div>'+
           '<div class="breakdownRows">'+
-            (r.openTotal?'<div><span>OPEN GB</span><b>'+peso(r.openTotal)+'</b></div>':'')+
-            (r.kitTotal?'<div><span>KIT COMPLETION</span><b>'+peso(r.kitTotal)+'</b></div>':'')+
+            (r.openTotal?'<div><span>OPEN GB PRODUCTS</span><b>'+peso(r.openTotal)+'</b></div>':'')+
+            (r.kitTotal?'<div><span>KIT COMPLETION PRODUCTS</span><b>'+peso(r.kitTotal)+'</b></div>':'')+
             (r.manualTotal?'<div class="manual"><span>✦ MANUAL / LATE ORDER</span><b>'+peso(r.manualTotal)+'</b></div>':'')+
-            (r.otherTotal?'<div><span>OTHER CHECKOUT ORDERS</span><b>'+peso(r.otherTotal)+'</b></div>':'')+
-            '<div class="breakdownGrand"><span>TOTAL ORDERS</span><b>'+peso(r.total)+'</b></div>'+
+            (r.otherTotal?'<div><span>OTHER CHECKOUT PRODUCTS</span><b>'+peso(r.otherTotal)+'</b></div>':'')+
+            (r.shippingTotal?'<div class="shipping"><span>SHIPPING</span><b>'+peso(r.shippingTotal)+'</b></div>':'')+
+            (r.adminFeeTotal?'<div class="adminfee"><span>ADMIN FEE</span><b>'+peso(r.adminFeeTotal)+'</b></div>':'')+
+            '<div class="breakdownGrand"><span>CUSTOMER TOTAL</span><b>'+peso(r.customerGrandTotal)+'</b></div>'+
           '</div>'+
         '</div>'+        '<div class="ordersStatusStrip">'+
           '<span class="orderStatusChip paid">PAID '+paid+'</span>'+

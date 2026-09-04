@@ -2221,7 +2221,7 @@ load();
 
 </script>
 
-<script src="storefront-repair.js?v=20260904-closed-status-sync-v3"></script>
+<script src="storefront-repair.js?v=20260904-notice-scroll-v4"></script>
 <!-- Product picker version: 2026-09-02 -->
 <script src="checkout-polish.js?v=20260904-soldout-popup-final"></script>
 <script src="kit-completion-storefront.js?v=20260904-remove-duplicate-kit-hero-v2"></script>
@@ -2342,15 +2342,15 @@ load();
 
 <!-- PEPMOSA SITE NOTICE POPUP -->
 <style id="pepmosa-site-notice-style">
-#pepmosaSiteNotice{position:fixed;inset:0;z-index:1000005;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(42,23,43,.48);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);animation:pnFade .22s ease}
-.pn-card{width:min(520px,100%);position:relative;overflow:hidden;border-radius:30px;background:linear-gradient(145deg,#fff,#fff8fc 56%,#fff1f8);border:1px solid rgba(231,91,157,.35);box-shadow:0 28px 90px rgba(72,25,58,.35);padding:34px 30px 28px;text-align:center;animation:pnPop .28s cubic-bezier(.2,.8,.2,1)}
+#pepmosaSiteNotice{position:fixed;inset:0;z-index:1000005;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(42,23,43,.48);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);animation:pnFade .22s ease;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.pn-card{width:min(520px,100%);max-height:calc(100dvh - 44px);position:relative;overflow-y:auto;-webkit-overflow-scrolling:touch;border-radius:30px;background:linear-gradient(145deg,#fff,#fff8fc 56%,#fff1f8);border:1px solid rgba(231,91,157,.35);box-shadow:0 28px 90px rgba(72,25,58,.35);padding:34px 30px 28px;text-align:center;animation:pnPop .28s cubic-bezier(.2,.8,.2,1)}
 .pn-card:before,.pn-card:after{content:"♡";position:absolute;color:#f3a8cd;font-size:90px;opacity:.22}.pn-card:before{top:-28px;left:16px;transform:rotate(-16deg)}.pn-card:after{right:-2px;bottom:-38px;transform:rotate(15deg)}
 .pn-close{position:absolute;right:16px;top:14px;width:40px;height:40px;border-radius:50%;border:1px solid #efc5d9;background:#fff8fc;color:#a64478;font-size:25px;cursor:pointer;z-index:2}
 .pn-icon{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;margin:0 auto 15px;font-size:34px;color:#fff;background:linear-gradient(135deg,#ffb3d4,#d85da3 55%,#a94fbc);box-shadow:0 12px 28px rgba(205,62,137,.25)}
 .pn-eyebrow{font-size:11px;letter-spacing:.22em;font-weight:900;color:#b44a80;margin-bottom:8px}.pn-title{font-size:30px;line-height:1.15;margin:0 0 13px;color:#3f3540}.pn-message{font-size:15px;line-height:1.65;color:#685b65;margin:0 auto 22px;max-width:430px;white-space:pre-wrap}
 .pn-button{position:relative;z-index:2;border:0;width:100%;border-radius:15px;padding:15px 18px;background:linear-gradient(135deg,#e83a8e,#bd3b98 58%,#a34dbc);color:#fff;font-size:14px;font-weight:900;letter-spacing:.05em;cursor:pointer;box-shadow:0 12px 28px rgba(205,50,128,.25)}.pn-button:hover{transform:translateY(-1px);filter:brightness(1.04)}
 @keyframes pnFade{from{opacity:0}to{opacity:1}}@keyframes pnPop{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
-@media(max-width:520px){.pn-card{padding:30px 21px 22px;border-radius:25px}.pn-title{font-size:25px}.pn-message{font-size:14px}}
+@media(max-width:520px){#pepmosaSiteNotice{align-items:flex-start;padding:12px}.pn-card{width:100%;max-height:calc(100dvh - 24px);padding:30px 21px 22px;border-radius:25px;margin:auto 0}.pn-title{font-size:25px}.pn-message{font-size:14px}.pn-close{position:sticky;top:0;float:right;margin:-16px -8px 8px 0}.pn-button{position:sticky;bottom:0}}
 </style>
 <script id="pepmosa-site-notice-script">
 (function(){

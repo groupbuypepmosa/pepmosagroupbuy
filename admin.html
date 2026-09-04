@@ -179,6 +179,16 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
   .ordersListRow .ordersLineTotal{grid-column:1/-1;justify-self:start!important}
 }
 
+
+/* Customer total breakdown + safer manual orders */
+.customerPaymentBreakdown{padding:13px 20px 4px;background:#fffdfd}
+.breakdownTitle{font-size:10px;font-weight:950;letter-spacing:.1em;color:#9d6b84;margin-bottom:7px}
+.breakdownRows{border:1px solid #efdee7;border-radius:13px;overflow:hidden;background:#fff}
+.breakdownRows>div{display:flex;justify-content:space-between;gap:12px;padding:8px 11px;border-bottom:1px solid #f4e8ee;font-size:11px}
+.breakdownRows>div:last-child{border-bottom:0}
+.breakdownRows .manual{background:#fff9e5;color:#7b5900}
+.breakdownRows .breakdownGrand{background:#fff1f8;font-weight:950;color:#a52b70;font-size:12px}
+
 </style>
 </head>
 <body>
@@ -655,7 +665,12 @@ function renderOrdersCenter(){
     }
     const name=customer.customer_name||g.orders.find(o=>o.full_name)?.full_name||g.email||"Customer";
     const manualCount=g.orders.filter(o=>String(o.payment_reference||"").toUpperCase()==="MANUAL ADMIN ORDER"||String(o.admin_note||"").toUpperCase().includes("MANUAL / LATE ORDER")).length;
-    return {...g,customer_name:name,contact:customer.contact||g.orders.find(o=>o.contact_number)?.contact_number||"",products:[...merged.values()],manualCount};
+    const bucket=(label,filter)=>g.orders.filter(filter).reduce((sum,o)=>sum+Number(o.total||0),0);
+    const openTotal=bucket("OPEN",o=>String(o.order_type||o.order_source||"").toUpperCase().includes("OPEN"));
+    const kitTotal=bucket("KIT",o=>String(o.order_type||o.order_source||"").toUpperCase().includes("KIT"));
+    const manualTotal=g.orders.filter(isManualOrder).reduce((sum,o)=>sum+Number(o.total||0),0);
+    const otherTotal=Math.max(0,g.total-openTotal-kitTotal-manualTotal);
+    return {...g,customer_name:name,contact:customer.contact||g.orders.find(o=>o.contact_number)?.contact_number||"",products:[...merged.values()],manualCount,openTotal,kitTotal,manualTotal,otherTotal};
   }).sort((a,b)=>String(a.customer_name).localeCompare(String(b.customer_name)));
 
   const filtered=rows.filter(r=>{
@@ -682,7 +697,16 @@ function renderOrdersCenter(){
           '<div class="ordersClientIdentity"><div><div class="ordersClientName '+(q&&String(r.customer_name).toLowerCase().includes(q)?'match':'')+'">'+esc(r.customer_name)+'</div><div class="ordersClientEmail">'+esc(r.email||"No email")+(r.contact?' • '+esc(r.contact):'')+'</div></div></div>'+
           '<div class="ordersClientStats"><span>'+r.orders.length+' ORDERS</span><span>'+r.products.length+' PRODUCTS</span><span>'+peso(r.total)+'</span></div>'+
         '</div>'+
-        '<div class="ordersStatusStrip">'+
+        '<div class="customerPaymentBreakdown">'+
+          '<div class="breakdownTitle">CUSTOMER TOTAL BREAKDOWN</div>'+
+          '<div class="breakdownRows">'+
+            (r.openTotal?'<div><span>OPEN GB</span><b>'+peso(r.openTotal)+'</b></div>':'')+
+            (r.kitTotal?'<div><span>KIT COMPLETION</span><b>'+peso(r.kitTotal)+'</b></div>':'')+
+            (r.manualTotal?'<div class="manual"><span>✦ MANUAL / LATE ORDER</span><b>'+peso(r.manualTotal)+'</b></div>':'')+
+            (r.otherTotal?'<div><span>OTHER CHECKOUT ORDERS</span><b>'+peso(r.otherTotal)+'</b></div>':'')+
+            '<div class="breakdownGrand"><span>TOTAL ORDERS</span><b>'+peso(r.total)+'</b></div>'+
+          '</div>'+
+        '</div>'+        '<div class="ordersStatusStrip">'+
           '<span class="orderStatusChip paid">PAID '+paid+'</span>'+
           (pending?'<span class="orderStatusChip pending">PENDING '+pending+'</span>':'')+
           (rejected?'<span class="orderStatusChip rejected">REJECTED '+rejected+'</span>':'')+
@@ -1416,6 +1440,14 @@ async function saveManualOrder(){
       const {data,error}=await sb.from("customers").insert({email,customer_name:email,contact:"",address:""}).select("customer_id").single();
       if(error)throw error;
       customerId=data.customer_id;
+    }
+
+    const {data:existingOrders,error:existingOrdersError}=await sb.from("orders").select("order_id,order_items(product_id,variant_id,qty)").eq("gb_number",gb).eq("email",email);
+    if(existingOrdersError)throw existingOrdersError;
+    const duplicateItems=(existingOrders||[]).flatMap(o=>o.order_items||[]).filter(old=>items.some(i=>String(i.product_id)===String(old.product_id)&&String(i.variant_id)===String(old.variant_id)));
+    if(duplicateItems.length){
+      const names=[...new Set(duplicateItems.map(x=>x.product_name||x.variant_id||"selected product"))].join(", ");
+      if(!confirm("⚠️ DUPLICATE CHECK\n\nThis customer already has an order for: "+names+"\n\nDo you still want to add this Manual / Late Order?"))return;
     }
 
     const orderId="MANUAL-"+Date.now();

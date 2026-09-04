@@ -643,6 +643,43 @@ header{
 #productGrid .pepStoreCard .productImg img{width:100%!important;height:100%!important;object-fit:contain!important;display:block!important}
 @media(max-width:620px){#productGrid .pepStoreCard .productImg{height:145px!important}}
 </style>
+<style id="pep-mobile-track-fix">
+/* Keep TRACK MY ORDERS accessible on mobile even when the main nav overflows */
+@media(max-width:760px){
+  header{position:sticky!important;top:0!important;background:rgba(255,250,253,.96)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:8px 10px!important;display:flex!important;align-items:center!important;gap:8px!important;z-index:9999!important}
+  header .brand{flex:0 0 auto!important;min-width:0!important}
+  header .brand img{width:36px!important;height:34px!important}
+  header .brand span{font-size:12px!important;white-space:nowrap!important}
+  header .nav{display:none!important}
+  #trackLink{display:none!important}
+  header::after{content:"TRACK MY ORDERS";display:flex;align-items:center;justify-content:center;min-height:42px;padding:0 13px;margin-left:auto;border-radius:13px;background:linear-gradient(135deg,#d72b91,#a51f83);color:#fff;font-size:11px;font-weight:900;letter-spacing:.04em;white-space:nowrap;cursor:pointer;box-shadow:0 8px 20px rgba(215,43,145,.25)}
+  header .cart{flex:0 0 auto!important;min-height:42px!important;padding:0 11px!important;font-size:11px!important;white-space:nowrap!important}
+}
+@media(max-width:390px){
+  header .brand span{display:none!important}
+  header::after{content:"TRACK";padding:0 11px}
+}
+</style>
+<script id="pep-mobile-track-click">
+(function(){
+  document.addEventListener('click',function(e){
+    if(window.innerWidth>760)return;
+    const header=e.target.closest('header');
+    if(!header)return;
+    const r=header.getBoundingClientRect();
+    const x=e.clientX-r.left;
+    // pseudo button sits between brand and cart; route clicks in that area to tracking
+    const cart=header.querySelector('.cart');
+    const cartRect=cart?.getBoundingClientRect();
+    const brandRect=header.querySelector('.brand')?.getBoundingClientRect();
+    if(cartRect&&brandRect&&e.clientX>brandRect.right&&e.clientX<cartRect.left){
+      e.preventDefault();
+      const link=document.getElementById('trackLink');
+      window.location.href=link?.href||'track.html';
+    }
+  },true);
+})();
+</script>
 </head>
 
 

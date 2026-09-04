@@ -192,6 +192,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 .breakdownRows .breakdownSubtotal{background:#f8f7f8;font-weight:950;color:#4b3a44;border-top:2px solid #e7dbe1!important}
 .breakdownRows .breakdownGrand{background:#fff1f8;font-weight:950;color:#a52b70;font-size:13px;border-top:2px solid #e8bfd4!important}
 
+
+.waybillStatus{font-weight:950;border-radius:999px;padding:4px 8px;font-size:9px}.waybillStatus.ready{background:#eaf8ef;color:#247044}.waybillStatus.waiting{background:#fff6dc;color:#896300}
+
 </style>
 </head>
 <body>
@@ -933,15 +936,18 @@ function renderWaybillCenter(){
   const q=($("waybillSearch")?.value||"").trim().toLowerCase();
   const rows=waybillRows.filter(r=>[r.customer_name,r.email,r.contact,r.address,r.courier,r.shipping_method,...r.orders.map(o=>o.order_id),...r.products.map(p=>p.product_name+" "+p.strength)].join(" ").toLowerCase().includes(q));
   const totalOrders=waybillRows.reduce((a,r)=>a+r.orders.length,0);
+  const readyCount=waybillRows.filter(r=>String(r.waybill_number||r.tracking_number||"").trim()).length;
+  const waitingCount=Math.max(0,waybillRows.length-readyCount);
   if($("waybillSummary"))$("waybillSummary").innerHTML=
-    '<div class="waybillStat"><span>Ready to Print</span><b>'+waybillRows.length+'</b></div>'+
+    '<div class="waybillStat"><span>🟢 Waybill Ready</span><b>'+readyCount+'</b></div>'+
+    '<div class="waybillStat"><span>🟡 Waiting for Waybill</span><b>'+waitingCount+'</b></div>'+
     '<div class="waybillStat"><span>Paid Orders Consolidated</span><b>'+totalOrders+'</b></div>'+
     '<div class="waybillStat"><span>Total Paid Value</span><b>'+peso(waybillRows.reduce((a,r)=>a+r.total,0))+'</b></div>';
   if($("waybillBuyerList"))$("waybillBuyerList").innerHTML=rows.length?
     '<div class="buyerWaybillList">'+rows.map(r=>
       '<div class="buyerWaybillRow '+(r.email===selectedWaybillBuyer?'selected':'')+'">'+
       '<div><div class="buyerWaybillName">'+esc(r.customer_name)+'</div><div class="small">'+esc(r.email)+(r.contact?' • '+esc(r.contact):'')+'</div>'+
-      '<div class="buyerWaybillMeta"><span>'+r.orders.length+' order(s)</span><span>'+r.products.length+' item type(s)</span><span>'+esc(r.courier||"Courier pending")+'</span><span>'+esc(r.payment)+'</span></div></div>'+
+      '<div class="buyerWaybillMeta"><span>'+r.orders.length+' order(s)</span><span>'+r.products.length+' item type(s)</span><span>'+esc(r.courier||"Courier pending")+'</span><span>'+esc(r.payment)+'</span><span class="waybillStatus '+(String(r.waybill_number||r.tracking_number||"").trim()?'ready':'waiting')+'">'+(String(r.waybill_number||r.tracking_number||"").trim()?'🟢 WAYBILL READY':'🟡 WAITING FOR WAYBILL')+'</span></div></div>'+
       '<div class="waybillActions"><button class="btn secondary" type="button" data-email="'+esc(r.email)+'" onclick="selectWaybillBuyer(this.dataset.email)">VIEW</button><button class="btn primary" type="button" data-email="'+esc(r.email)+'" onclick="selectWaybillBuyer(this.dataset.email);setTimeout(printSelectedWaybill,0)">PRINT</button></div></div>'
     ).join("")+'</div>':'<div class="waybillEmpty">No paid orders match this search yet.</div>';
   renderSelectedWaybill();

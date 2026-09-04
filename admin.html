@@ -158,6 +158,27 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 .noticeList{display:grid;gap:12px}.noticeItem{border:1px solid #efd0df;border-radius:18px;padding:16px;background:linear-gradient(135deg,#fff,#fff8fc)}.noticeItemTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.noticePill{display:inline-block;padding:5px 9px;border-radius:999px;background:#f9e2ee;color:#a93470;font-size:11px;font-weight:800;letter-spacing:.05em}.noticePill.off{background:#eee;color:#777}
 @media(max-width:850px){.noticeEditor{grid-template-columns:1fr}.noticePreviewCard{position:static}.noticeTypeRow{grid-template-columns:1fr}}
 
+
+/* Cleaner Orders list view */
+.ordersAvatar{display:none!important}
+.ordersClientIdentity{padding-left:0!important}
+.ordersCleanHead{padding:18px 20px!important}
+.ordersCleanCard .ordersClientName{font-size:20px!important;font-weight:950!important}
+.ordersCleanProducts{display:block!important;padding:12px 18px 16px!important}
+.ordersListHeader,.ordersListRow{display:grid!important;grid-template-columns:minmax(0,1fr) 100px 150px!important;align-items:center!important}
+.ordersListHeader{padding:0 12px 8px!important;color:#a0758a!important;font-size:10px!important;font-weight:950!important;letter-spacing:.08em!important;border-bottom:1px solid #f0dfe8!important}
+.ordersListRow{margin:0!important;padding:12px!important;border-radius:0!important;border-bottom:1px solid #f3e7ed!important;background:transparent!important}
+.ordersListRow:last-child{border-bottom:0!important}
+.ordersListRow .ordersQty{justify-self:center!important;margin:0!important}
+.ordersListRow .ordersLineTotal{justify-self:end!important}
+.ordersListRow .ordersProductMain b{font-size:14px!important}
+.ordersListRow:hover{background:#fff8fc!important}
+@media(max-width:700px){
+  .ordersListHeader{display:none!important}
+  .ordersListRow{grid-template-columns:minmax(0,1fr) auto!important;gap:8px!important}
+  .ordersListRow .ordersLineTotal{grid-column:1/-1;justify-self:start!important}
+}
+
 </style>
 </head>
 <body>
@@ -657,7 +678,7 @@ function renderOrdersCenter(){
       const rejected=r.orders.filter(orderIsRejected).length;
       return '<article class="ordersClientCard ordersCleanCard">'+
         '<div class="ordersClientHead ordersCleanHead">'+
-          '<div class="ordersClientIdentity"><div class="ordersAvatar">'+esc((r.customer_name||"?").trim().charAt(0).toUpperCase())+'</div><div><div class="ordersClientName '+(q&&String(r.customer_name).toLowerCase().includes(q)?'match':'')+'">'+esc(r.customer_name)+'</div><div class="ordersClientEmail">'+esc(r.email||"No email")+(r.contact?' • '+esc(r.contact):'')+'</div></div></div>'+
+          '<div class="ordersClientIdentity"><div><div class="ordersClientName '+(q&&String(r.customer_name).toLowerCase().includes(q)?'match':'')+'">'+esc(r.customer_name)+'</div><div class="ordersClientEmail">'+esc(r.email||"No email")+(r.contact?' • '+esc(r.contact):'')+'</div></div></div>'+
           '<div class="ordersClientStats"><span>'+r.orders.length+' ORDERS</span><span>'+r.products.length+' PRODUCTS</span><span>'+peso(r.total)+'</span></div>'+
         '</div>'+
         '<div class="ordersStatusStrip">'+
@@ -666,9 +687,12 @@ function renderOrdersCenter(){
           (rejected?'<span class="orderStatusChip rejected">REJECTED '+rejected+'</span>':'')+
           (r.manualCount?'<span class="orderStatusChip manual">✦ MANUAL / LATE '+r.manualCount+'</span>':'')+
         '</div>'+
-        '<div class="ordersProductSummary ordersCleanProducts">'+r.products.map(p=>
-          '<div class="ordersProductTile ordersCleanProduct"><div class="ordersProductMain"><b>'+esc(p.product_name)+'</b><div class="small">'+esc(p.strength||"—")+' • '+peso(p.unit_price)+' each</div></div><span class="ordersQty">× '+Number(p.qty||0)+'</span><b class="ordersLineTotal">'+peso(p.line_total)+'</b></div>'
-        ).join("")+'</div>'+
+        '<div class="ordersProductSummary ordersCleanProducts">'+
+          '<div class="ordersListHeader"><span>PRODUCT</span><span>QTY</span><span>TOTAL</span></div>'+
+          r.products.map(p=>
+            '<div class="ordersCleanProduct ordersListRow"><div class="ordersProductMain"><b>'+esc(p.product_name)+'</b><div class="small">'+esc(p.strength||"—")+' • '+peso(p.unit_price)+' each</div></div><span class="ordersQty">× '+Number(p.qty||0)+'</span><b class="ordersLineTotal">'+peso(p.line_total)+'</b></div>'
+          ).join("")+
+        '</div>'+
         '<details class="ordersDetails ordersCleanDetails"><summary><span>VIEW INDIVIDUAL ORDERS</span><b>'+r.orders.length+'</b></summary>'+
           '<div class="ordersDetailTable">'+r.orders.map(o=>{
             const isManual=String(o.payment_reference||"").toUpperCase()==="MANUAL ADMIN ORDER"||String(o.admin_note||"").toUpperCase().includes("MANUAL / LATE ORDER");

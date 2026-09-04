@@ -597,6 +597,7 @@ function feeIsRejected(x){return String(x.status||"").toUpperCase()==="REJECTED"
 function orderStatus(x){return String(x.payment_status||"").toUpperCase()}
 function orderIsApproved(x){const v=orderStatus(x);return v==="PAID"||v==="PAYMENT APPROVED"||v==="APPROVED"}
 function orderIsRejected(x){return orderStatus(x)==="REJECTED"||orderStatus(x)==="PAYMENT REJECTED"}
+function isManualOrder(x){return String(x?.order_id||"").startsWith("MANUAL-")||/MANUAL/i.test(String(x?.payment_reference||""))||/MANUAL\s*\/\s*LATE/i.test(String(x?.admin_note||""))}
 function paymentStatusBadge(status,approved,rejected){const cls=approved?"green":rejected?"red":"yellow";const label=approved?"PAID / APPROVED":rejected?"REJECTED":status||"PENDING";return `<span class="badge ${cls} paymentStatus">${esc(label)}</span>`}
 async function loadFees(){const{data,error}=await sb.from("admin_fee_payments").select("*").order("created_at",{ascending:false});if(error)throw error;fees=data||[];renderPaymentCenter()}
 async function loadOrders(){const{data,error}=await sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});if(error)throw error;ordersCache=data||[];orderItemsCache=ordersCache.flatMap(o=>o.order_items||[]);renderPaymentCenter();renderOrdersCenter()}
@@ -722,13 +723,17 @@ function renderPaymentCenter(){
  const filteredFees=fees.filter(x=>paymentMatches(x,"fee",q,filter));
  const filteredOrders=ordersCache.filter(x=>paymentMatches(x,"order",q,filter));
  const adminCollected=fees.filter(feeIsApproved).reduce((a,x)=>a+Number(x.amount||0),0);
- const checkoutCollected=ordersCache.filter(orderIsApproved).reduce((a,x)=>a+Number(x.total||0),0);
+ const approvedOrders=ordersCache.filter(orderIsApproved);
+ const manualOrders=ordersCache.filter(isManualOrder);
+ const approvedManualOrders=manualOrders.filter(orderIsApproved);
+ const manualCollected=approvedManualOrders.reduce((a,x)=>a+Number(x.total||0),0);
+ const checkoutCollected=approvedOrders.reduce((a,x)=>a+Number(x.total||0),0);
  const feePending=fees.filter(x=>!feeIsApproved(x)&&!feeIsRejected(x)).length;
  const orderPending=ordersCache.filter(x=>!orderIsApproved(x)&&!orderIsRejected(x)).length;
  if($("paymentSummary"))$("paymentSummary").innerHTML=
   `<div class="paySummaryCard"><div class="paySummaryLabel">Admin Fee Collected</div><div class="paySummaryValue">${peso(adminCollected)}</div><div class="paySummarySub">${fees.filter(feeIsApproved).length} approved payment(s)</div></div>
-   <div class="paySummaryCard"><div class="paySummaryLabel">Checkout Payments Collected</div><div class="paySummaryValue">${peso(checkoutCollected)}</div><div class="paySummarySub">${ordersCache.filter(orderIsApproved).length} approved checkout(s)</div></div>
-   <div class="paySummaryCard"><div class="paySummaryLabel">Total Collected</div><div class="paySummaryValue">${peso(adminCollected+checkoutCollected)}</div><div class="paySummarySub">Admin fee + checkout payments</div></div>
+   <div class="paySummaryCard"><div class="paySummaryLabel">Checkout Payments Collected</div><div class="paySummaryValue">${peso(checkoutCollected)}</div><div class="paySummarySub">${approvedOrders.length} approved order(s) • includes ${approvedManualOrders.length} manual / late</div></div>
+   <div class="paySummaryCard"><div class="paySummaryLabel">Total Collected</div><div class="paySummaryValue">${peso(adminCollected+checkoutCollected)}</div><div class="paySummarySub">Admin fee + all paid orders • manual / late: ${peso(manualCollected)}</div></div>
    <div class="paySummaryCard"><div class="paySummaryLabel">Pending Approval</div><div class="paySummaryValue">${feePending+orderPending}</div><div class="paySummarySub">${feePending} admin fee • ${orderPending} checkout</div></div>`;
  if($("adminFeeCount"))$("adminFeeCount").textContent=filteredFees.length;
  if($("checkoutCount"))$("checkoutCount").textContent=filteredOrders.length;
@@ -736,7 +741,7 @@ function renderPaymentCenter(){
    const approved=feeIsApproved(x),rejected=feeIsRejected(x),customer=x.full_name||(x.whatsapp_name||x.telegram_name)||x.email||"Customer",sub=[(x.whatsapp_name||x.telegram_name)?("WhatsApp: "+(x.whatsapp_name||x.telegram_name)):"",x.email||""].filter(Boolean).join(" • ");
    return `<div class="paymentRow ${approved?"approved":rejected?"rejected":"pending"}"><div class="paymentCustomer"><span class="paymentKind fee">ADMIN FEE</span><b>${esc(customer)}</b><small>${esc(sub||"No email attached yet")}</small></div><div class="paymentMeta"><span class="metaLabel">Amount</span><b>${peso(x.amount)}</b>Admin Fee</div><div class="paymentMeta"><span class="metaLabel">Group Buy / Date</span><b>${esc(x.gb_number||"—")}</b>${new Date(x.created_at||Date.now()).toLocaleString("en-PH")}</div><div>${paymentProof(x.payment_proof_url)}</div><div class="paymentActions">${paymentStatusBadge(x.status,approved,rejected)}${!approved&&!rejected?`<button class="btn success" onclick="approveFeePayment('${esc(x.id)}')">APPROVE</button><button class="btn danger" onclick="rejectFeePayment('${esc(x.id)}')">REJECT</button>`:""}</div></div>`}).join("")}</div>`:`<div class="emptyPayment">No Admin Fee payments match this filter.</div>`;
  if($("checkoutPaymentList"))$("checkoutPaymentList").innerHTML=filteredOrders.length?`<div class="paymentRows">${filteredOrders.map(x=>{
-   const approved=orderIsApproved(x),rejected=orderIsRejected(x),isManual=String(x.order_id||"").startsWith("MANUAL-")||/MANUAL/i.test(String(x.payment_reference||""))||/MANUAL/i.test(String(x.admin_note||"")),items=(x.order_items||[]).map(i=>`${i.product_name||"Product"} ${i.strength||""} × ${i.qty||0}`).join(", ");
+   const approved=orderIsApproved(x),rejected=orderIsRejected(x),isManual=isManualOrder(x),items=(x.order_items||[]).map(i=>`${i.product_name||"Product"} ${i.strength||""} × ${i.qty||0}`).join(", ");
    return `<div class="paymentRow ${isManual?"manualOrder ":""}${approved?"approved":rejected?"rejected":"pending"}"><div class="paymentCustomer"><span class="paymentKind ${isManual?"manual":"checkout"}">${isManual?"✦ MANUAL ADD":"CHECKOUT"}</span><b>${esc(x.email||"Customer")}</b><small>${esc(items||x.order_id||"Order")}</small></div><div class="paymentMeta"><span class="metaLabel">Order Total</span><b>${peso(x.total)}</b><span class="${isManual?"manualOrderId":""}">${isManual?"MANUALLY ADDED":" "+esc(x.order_id||"Checkout")}</span></div><div class="paymentMeta"><span class="metaLabel">Group Buy / Shipping</span><b>${esc(x.gb_number||"—")}</b>${esc(x.shipping_method||"No shipping")}</div><div>${paymentProof(x.payment_proof_url)}</div><div class="paymentActions">${paymentStatusBadge(x.payment_status,approved,rejected)}${!approved&&!rejected?`<button class="btn success" onclick="approveCheckoutPayment('${esc(x.order_id)}')">APPROVE</button><button class="btn danger" onclick="rejectCheckoutPayment('${esc(x.order_id)}')">REJECT</button>`:""}</div></div>`}).join("")}</div>`:`<div class="emptyPayment">No Checkout payments match this filter.</div>`;
 }
 async function approveFeePayment(id){try{const{error}=await sb.from("admin_fee_payments").update({status:"PAID",updated_at:new Date().toISOString()}).eq("id",id);if(error)throw error;await loadFees();showMessage("Admin Fee payment approved.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to approve Admin Fee payment.","error")}}
@@ -1428,8 +1433,11 @@ async function saveManualOrder(){
     /* Manual orders must count in the same vial tracker as customer orders.
        Refresh immediately after saving. */
     closeManualOrderModal();
+    /* Reload the same source used by Orders + Payments so the manual order is
+       immediately included in customer totals, Checkout Payments Collected,
+       Total Collected, and the Vial Tracker. */
     await Promise.all([loadOrdersCenter(),loadVialTracker()]);
-    showMessage("Manual order saved and included in the Vial Tracker. It is marked clearly in Individual Orders with your note.","success");
+    showMessage("Manual order saved and automatically included in the customer's total, Payment Center totals, and the Vial Tracker.","success");
   }catch(e){
     console.error(e);
     showMessage(e.message||"Unable to save manual order.","error");

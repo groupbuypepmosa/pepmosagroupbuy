@@ -189,7 +189,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 .breakdownRows .manual{background:#fff9e5;color:#7b5900}
 .breakdownRows .shipping{background:#f4f8ff;color:#315a8d}
 .breakdownRows .adminfee{background:#f2fbf5;color:#2f7552}
-.breakdownRows .breakdownGrand{background:#fff1f8;font-weight:950;color:#a52b70;font-size:12px}
+.breakdownRows .breakdownSubtotal{background:#f8f7f8;font-weight:950;color:#4b3a44;border-top:2px solid #e7dbe1!important}
+.breakdownRows .breakdownGrand{background:#fff1f8;font-weight:950;color:#a52b70;font-size:13px;border-top:2px solid #e8bfd4!important}
 
 </style>
 </head>
@@ -716,13 +717,14 @@ function renderOrdersCenter(){
         '<div class="customerPaymentBreakdown">'+
           '<div class="breakdownTitle">CUSTOMER TOTAL BREAKDOWN</div>'+
           '<div class="breakdownRows">'+
-            (r.openTotal?'<div><span>OPEN GB PRODUCTS</span><b>'+peso(r.openTotal)+'</b></div>':'')+
-            (r.kitTotal?'<div><span>KIT COMPLETION PRODUCTS</span><b>'+peso(r.kitTotal)+'</b></div>':'')+
-            (r.manualTotal?'<div class="manual"><span>✦ MANUAL / LATE ORDER</span><b>'+peso(r.manualTotal)+'</b></div>':'')+
-            (r.otherTotal?'<div><span>OTHER CHECKOUT PRODUCTS</span><b>'+peso(r.otherTotal)+'</b></div>':'')+
+            (r.openTotal?'<div><span>OPEN GB ORDERS</span><b>'+peso(r.openTotal)+'</b></div>':'')+
+            (r.kitTotal?'<div><span>KIT COMPLETION</span><b>'+peso(r.kitTotal)+'</b></div>':'')+
+            (r.manualTotal?'<div class="manual"><span>✦ MANUAL ORDER</span><b>'+peso(r.manualTotal)+'</b></div>':'')+
+            (r.otherTotal?'<div><span>OTHER ORDERS</span><b>'+peso(r.otherTotal)+'</b></div>':'')+
+            '<div class="breakdownSubtotal"><span>TOTAL ORDERS</span><b>'+peso(r.productTotal)+'</b></div>'+
             (r.shippingTotal?'<div class="shipping"><span>SHIPPING</span><b>'+peso(r.shippingTotal)+'</b></div>':'')+
             (r.adminFeeTotal?'<div class="adminfee"><span>ADMIN FEE</span><b>'+peso(r.adminFeeTotal)+'</b></div>':'')+
-            '<div class="breakdownGrand"><span>CUSTOMER TOTAL</span><b>'+peso(r.customerGrandTotal)+'</b></div>'+
+            '<div class="breakdownGrand"><span>TOTAL PAYMENT</span><b>'+peso(r.customerGrandTotal)+'</b></div>'+
           '</div>'+
         '</div>'+        '<div class="ordersStatusStrip">'+
           '<span class="orderStatusChip paid">PAID '+paid+'</span>'+

@@ -1401,9 +1401,25 @@ async function saveManualOrder(){
     const {error:ie}=await sb.from("order_items").insert(items.map(x=>({order_id:orderId,...x})));
     if(ie)throw ie;
 
+    /* KIT COMPLETION manual orders must reserve the SAME live inventory used
+       by customer checkout. If inventory cannot be reserved, delete the
+       just-created manual order so orders and remaining vials never diverge. */
+    const activeGBRow=(groupBuys||[]).find(x=>String(x.gb_number)===String(gb));
+    if(String(activeGBRow?.status||"").toUpperCase()==="KIT_COMPLETION"){
+      const {error:kitError}=await sb.rpc("apply_manual_kit_completion_inventory",{
+        p_gb_number:gb,
+        p_items:items.map(x=>({variant_id:x.variant_id,qty:x.qty})),
+        p_order_id:orderId
+      });
+      if(kitError){
+        await sb.from("order_items").delete().eq("order_id",orderId);
+        await sb.from("orders").delete().eq("order_id",orderId);
+        throw kitError;
+      }
+    }
+
     /* Manual orders must count in the same vial tracker as customer orders.
-       The normal tracker already reads order_items, but refresh the active
-       tracker explicitly after saving so the new quantity appears immediately. */
+       Refresh immediately after saving. */
     closeManualOrderModal();
     await Promise.all([loadOrdersCenter(),loadVialTracker()]);
     showMessage("Manual order saved and included in the Vial Tracker. It is marked clearly in Individual Orders with your note.","success");

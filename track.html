@@ -82,16 +82,20 @@ body{
 .stepText{color:#b22e73;font-size:11px;font-weight:950;text-align:right;background:#ffe8f3;padding:10px 13px;border-radius:14px}
 
 .timeline{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px;padding:0;
-  border:0;background:transparent
+  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;padding:0;border:0;background:transparent
 }
 .phase{
-  position:relative;padding:16px 10px;border-radius:18px;background:#f5f1f3;border:1px solid #eee3e8;color:#9a8d94;text-align:center;
-  font-size:10px;font-weight:950;line-height:1.3;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px
+  position:relative;isolation:isolate;padding:18px 10px;border-radius:20px;background:linear-gradient(145deg,#faf8f9,#f0edef);
+  border:1px solid #e8e1e5;color:#8e838a;text-align:center;font-size:10px;font-weight:950;line-height:1.3;
+  min-height:116px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+  box-shadow:0 8px 18px rgba(80,48,65,.045);overflow:hidden;transition:.2s ease
 }
-.phase.active{background:linear-gradient(135deg,#ee4f9c,#b62d91);color:#fff;border-color:transparent;box-shadow:0 10px 24px rgba(207,43,127,.24)}
-.phase.done{background:#ecf8f1;color:#2f7c5e;border-color:#d5ecdf}
-.phase .dot{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:currentColor;color:#fff;font-size:11px;font-weight:950;margin:0}
+.phase:before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.9),transparent 55%);z-index:-1}
+.phase.active{background:linear-gradient(135deg,#e94497,#bc2a91 58%,#a92d9e);color:#fff;border-color:transparent;box-shadow:0 14px 28px rgba(207,43,127,.25);transform:translateY(-2px)}
+.phase.done{background:linear-gradient(145deg,#eff9f4,#e3f3eb);color:#33795e;border-color:#d1e7da}
+.phase .dot{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#fff;color:#b8afb4;font-size:14px;font-weight:950;margin:0;box-shadow:0 5px 12px rgba(60,30,45,.09)}
+.phase.active .dot{background:#fff;color:#ca2d86;box-shadow:0 7px 18px rgba(92,17,61,.2)}
+.phase.done .dot{background:#4b9b76;color:#fff}
 .shippingInfo{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
 .infoBox{padding:14px 15px;border:1px solid #efdae5;border-radius:17px;background:#fff}
 .infoBox small{display:block;color:#ad6b8d;font-weight:950;letter-spacing:.1em;font-size:9px}
@@ -126,13 +130,18 @@ body{
 .footer{text-align:center;margin-top:20px;color:#cf4d8c;font-family:Georgia,serif;font-size:18px}
 
 @media(max-width:760px){
-  .top{padding:16px 18px 0}.page{padding:14px 18px 40px}.hero h1{letter-spacing:-2px}
-  .searchPanel{padding:14px;border-radius:22px}.searchRow{flex-direction:column}.searchBtn{width:100%}
-  .clientTop{flex-direction:column}.body{padding:18px}
-  .nowCard{grid-template-columns:auto 1fr}.stepText{grid-column:1/-1;text-align:left}
-  .timeline{grid-template-columns:repeat(2,1fr)}
-  .shippingInfo{grid-template-columns:1fr}.sectionHead{align-items:flex-start;flex-direction:column}.product{align-items:flex-start}
-  .orderTop{flex-direction:column}
+  html,body{width:100%;overflow-x:hidden}
+  .top{padding:14px 16px 0}.page{padding:12px 12px 36px}.hero{margin-bottom:18px}.hero h1{letter-spacing:-1.5px;font-size:clamp(38px,12vw,56px)}
+  .hero p{font-size:13px;padding:0 6px}.searchPanel{padding:12px;border-radius:20px}.searchRow{flex-direction:column;gap:9px}
+  .searchRow input,.searchBtn{width:100%;min-height:54px}.searchBtn{font-size:13px}
+  .clientCard{margin-top:16px;border-radius:22px}.clientHero{padding:20px 18px}.clientEmail{font-size:18px}.clientTop{flex-direction:column;gap:12px}
+  .statusPill{align-self:flex-start;max-width:100%;white-space:normal;text-align:center;padding:10px 14px}.body{padding:14px}
+  .nowCard{grid-template-columns:50px 1fr;padding:16px;gap:12px;border-radius:19px}.nowIcon{width:48px;height:48px;border-radius:15px;font-size:21px}
+  .nowCard h2{font-size:20px}.nowCard p{font-size:12px}.stepText{grid-column:1/-1;text-align:center;width:100%;padding:9px}
+  .timeline{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
+  .phase{min-height:108px;padding:14px 8px;border-radius:17px;font-size:9px}.phase .dot{width:34px;height:34px;font-size:12px}
+  .shippingInfo{grid-template-columns:1fr}.sectionHead{align-items:flex-start;flex-direction:column}.sectionHead h2{font-size:24px}.count{white-space:normal}
+  .product{align-items:flex-start}.orderTop{flex-direction:column}.summaryHead span{line-height:1.4}
 }
 </style>
 </head>
@@ -206,11 +215,28 @@ function itemsFor(order,allItems){
 }
 function noteFor(o){return o.manual_note??o.note??o.notes??o.admin_note??o.late_order_note??''}
 
+async function resolveTrackingGB(){
+  if(TRACK_GB)return TRACK_GB;
+  const cfg=window.PEPMOSA_CONFIG||{};
+  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)throw new Error('Tracker configuration is missing.');
+  const base=cfg.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/group_buys';
+  const res=await fetch(base+'?select=gb_number,status,created_at&status=in.(OPEN,KIT_COMPLETION,CLOSED)&order=created_at.desc&limit=20',{
+    headers:{'apikey':cfg.SUPABASE_ANON_KEY,'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,'Accept':'application/json'},
+    cache:'no-store'
+  });
+  if(!res.ok)throw new Error('Unable to find the current Group Buy.');
+  const rows=await res.json();
+  const gb=(rows||[]).find(x=>['OPEN','KIT_COMPLETION'].includes(x.status))||(rows||[]).find(x=>x.status==='CLOSED');
+  if(!gb?.gb_number)throw new Error('No Group Buy is available for tracking right now.');
+  TRACK_GB=gb.gb_number;
+  return TRACK_GB;
+}
+
 async function loadTrackingData(email){
   const cfg=window.PEPMOSA_CONFIG||{};
   const cleanEmail=String(email||'').trim().toLowerCase();
   if(!cleanEmail)throw new Error('Please enter the email used for your order.');
-  if(!TRACK_GB)throw new Error('No Group Buy selected. Please open Order Tracking from the correct Group Buy.');
+  await resolveTrackingGB();
   if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)throw new Error('Tracker configuration is missing.');
   const url=cfg.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/get_customer_tracking';
   const res=await fetch(url,{

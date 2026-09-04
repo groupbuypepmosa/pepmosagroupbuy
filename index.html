@@ -2440,5 +2440,62 @@ load();
 })();
 </script>
 
+
+<style id="pepmosa-popup-unified-style">
+#pepmosaGlobalPopup{z-index:2147483647!important}
+</style>
+<script id="pepmosa-popup-unified-script">
+(function(){
+  const nativePrompt=window.prompt.bind(window);
+  let resolver=null;
+  function ensure(){
+    let root=document.getElementById('pepmosaGlobalPopup');
+    if(root && root.querySelector('.pepGlobalPopupCard')) return root;
+    return null;
+  }
+  window.pepmosaConfirm=function(message,title){
+    return new Promise(resolve=>{
+      const root=ensure();
+      if(!root){resolve(window.confirm(message));return}
+      const card=root.querySelector('.pepGlobalPopupCard');
+      const actions=root.querySelector('.pepGlobalPopupActions');
+      const text=root.querySelector('#pepGlobalPopupText');
+      const ttl=root.querySelector('#pepGlobalPopupTitle');
+      if(!card||!actions||!text||!ttl){resolve(window.confirm(message));return}
+      ttl.textContent=title||'PLEASE CONFIRM';
+      text.textContent=String(message||'');
+      actions.innerHTML='<button type="button" class="pepGlobalPopupBtn" data-pep-confirm="cancel" style="background:#f1e8ed;color:#755b67;box-shadow:none">CANCEL</button><button type="button" class="pepGlobalPopupBtn" data-pep-confirm="ok">CONFIRM</button>';
+      root.classList.add('show');
+      actions.onclick=e=>{
+        const b=e.target.closest('[data-pep-confirm]');if(!b)return;
+        root.classList.remove('show');actions.onclick=null;resolve(b.dataset.pepConfirm==='ok');
+      };
+    });
+  };
+  window.pepmosaPrompt=function(message,defaultValue,title){
+    return new Promise(resolve=>{
+      const root=ensure();
+      if(!root){resolve(nativePrompt(message,defaultValue||''));return}
+      const card=root.querySelector('.pepGlobalPopupCard');
+      const actions=root.querySelector('.pepGlobalPopupActions');
+      const text=root.querySelector('#pepGlobalPopupText');
+      const ttl=root.querySelector('#pepGlobalPopupTitle');
+      if(!card||!actions||!text||!ttl){resolve(nativePrompt(message,defaultValue||''));return}
+      ttl.textContent=title||'PEPMOSA';
+      text.innerHTML='';
+      const p=document.createElement('div');p.textContent=String(message||'');text.appendChild(p);
+      const input=document.createElement('input');input.type='text';input.value=defaultValue||'';input.style.cssText='width:100%;box-sizing:border-box;margin-top:14px;padding:13px 14px;border:1px solid rgba(213,43,135,.22);border-radius:13px;font:inherit;outline:none;background:#fff';
+      text.appendChild(input);
+      actions.innerHTML='<button type="button" class="pepGlobalPopupBtn" data-pep-prompt="cancel" style="background:#f1e8ed;color:#755b67;box-shadow:none">CANCEL</button><button type="button" class="pepGlobalPopupBtn" data-pep-prompt="ok">CONTINUE</button>';
+      root.classList.add('show');setTimeout(()=>input.focus(),50);
+      actions.onclick=e=>{
+        const b=e.target.closest('[data-pep-prompt]');if(!b)return;
+        const val=b.dataset.pepPrompt==='ok'?input.value:null;
+        root.classList.remove('show');actions.onclick=null;resolve(val);
+      };
+    });
+  };
+})();
+</script>
 </body>
 </html>

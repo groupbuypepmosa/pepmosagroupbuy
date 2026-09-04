@@ -196,6 +196,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 
 .historyRow{display:flex;justify-content:space-between;gap:14px;padding:13px 8px;border-bottom:1px solid #f0e3ea}.historyType{font-size:10px;font-weight:950;color:#a52b70}.historyText{font-size:12px;font-weight:750}.historyTime{font-size:10px;color:#907b86}.historyEmpty{padding:25px;text-align:center;color:#907b86}
 
+
+.btn.warning{background:#fff3cd;color:#7a5a00;border-color:#efd98a}.btn.warning:hover{filter:brightness(.98)}
 </style>
 </head>
 <body>
@@ -402,8 +404,8 @@ async function loadEverything(){
   }
 }
 async function loadGroupBuys(){const{data,error}=await sb.from("group_buys").select("*").order("created_at",{ascending:false});if(error)throw error;groupBuys=data||[];renderGroupBuys();$("minimumGB").innerHTML=`<option value="">Select GB</option>`+groupBuys.map(g=>`<option value="${esc(g.gb_number)}">${esc(g.gb_number)} — ${esc(g.customer_facing_name||"")}</option>`).join("")}
-function gbBadge(s){if(s==="OPEN")return`<span class="badge green">OPEN</span>`;if(s==="KIT_COMPLETION")return`<span class="badge yellow">KIT COMPLETION</span>`;return`<span class="badge gray">CLOSED</span>`}
-function renderGroupBuys(){if(!groupBuys.length)return $("gbList").innerHTML=`<div class="empty">No Group Buys yet.</div>`;$("gbList").innerHTML=groupBuys.map(g=>`<div class="item"><div class="itemHead"><div><h3>${esc(g.customer_facing_name||g.gb_number)}</h3><div class="small">${esc(g.gb_number)}</div></div>${gbBadge(g.status)}</div><p>Admin Fee: <b>${peso(g.admin_fee)}</b></p>${g.admin_fee_qr_url?`<img class="qrPreview" src="${esc(g.admin_fee_qr_url)}" alt="Admin fee QR">`:`<div class="small">No Admin Fee QR uploaded.</div>`}<div class="actions"><button class="btn secondary" onclick="editGroupBuy('${esc(g.gb_number)}')">EDIT</button><button class="btn danger" onclick="deleteGroupBuy('${esc(g.gb_number)}')">DELETE GB</button></div></div>`).join("")}
+function gbBadge(s){if(s==="OPEN")return`<span class="badge green">OPEN</span>`;if(s==="KIT_COMPLETION")return`<span class="badge yellow">KIT COMPLETION</span>`;if(s==="ARCHIVED")return`<span class="badge gray">ARCHIVED</span>`;return`<span class="badge gray">CLOSED</span>`}
+function renderGroupBuys(){if(!groupBuys.length)return $("gbList").innerHTML=`<div class="empty">No Group Buys yet.</div>`;$("gbList").innerHTML=groupBuys.map(g=>`<div class="item"><div class="itemHead"><div><h3>${esc(g.customer_facing_name||g.gb_number)}</h3><div class="small">${esc(g.gb_number)}</div></div>${gbBadge(g.status)}</div><p>Admin Fee: <b>${peso(g.admin_fee)}</b></p>${g.admin_fee_qr_url?`<img class="qrPreview" src="${esc(g.admin_fee_qr_url)}" alt="Admin fee QR">`:`<div class="small">No Admin Fee QR uploaded.</div>`}<div class="actions"><button class="btn secondary" onclick="editGroupBuy('${esc(g.gb_number)}')">EDIT</button><button class="btn warning" onclick="archiveGroupBuy('${esc(g.gb_number)}')">${String(g.status)==="ARCHIVED"?"UNARCHIVE":"ARCHIVE"}</button><button class="btn danger" onclick="deleteGroupBuy('${esc(g.gb_number)}')">DELETE GB</button></div></div>`).join("")}
 async function renderGBCategoryPicker(selectedNames=null){
   const box=$("gbCategoryPicker");if(!box)return;
   try{
@@ -446,6 +448,23 @@ async function saveGroupBuy(){
     await clearGBForm();await loadGroupBuys();
   }catch(e){console.error(e);showMessage(e.message,"error")}
 }
+async function archiveGroupBuy(gb){
+  const g=groupBuys.find(x=>x.gb_number===gb);
+  if(!g)return showMessage("Group Buy not found.","error");
+  const archived=String(g.status)==="ARCHIVED";
+  if(!confirm((archived?"UNARCHIVE":"ARCHIVE")+" "+gb+"?\n\nOrders, payments, customers and history will NOT be deleted."))return;
+  try{
+    const {error}=await sb.from("group_buys").update({status:archived?"CLOSED":"ARCHIVED"}).eq("gb_number",gb);
+    if(error)throw error;
+    if(!archived&&window.activeGroupBuyNumber===gb){
+      window.activeGroupBuyNumber="";
+      localStorage.removeItem("pepmosa_active_gb");
+    }
+    showMessage(gb+" "+(archived?"restored from archive.":"archived safely. No records were deleted."),"success");
+    await loadEverything();
+  }catch(e){console.error("ARCHIVE GB ERROR:",e);showMessage(e.message||"Unable to archive Group Buy.","error")}
+}
+
 async function deleteGroupBuy(gb){
   if(!gb)return showMessage("Missing Group Buy number.","error");
   const typed=prompt(`PERMANENT DELETE\n\nType the exact GB number: ${gb}\n\nThis cannot be undone.`);

@@ -192,6 +192,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 .breakdownRows .breakdownSubtotal{background:#f8f7f8;font-weight:950;color:#4b3a44;border-top:2px solid #e7dbe1!important}
 .breakdownRows .breakdownGrand{background:#fff1f8;font-weight:950;color:#a52b70;font-size:13px;border-top:2px solid #e8bfd4!important}
 
+
+/* Dashboard + activity */
+.dashboardGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.dashboardStat{border:1px solid #ecdce5;border-radius:16px;padding:17px;background:linear-gradient(135deg,#fff,#fff6fa)}.dashboardStat span{display:block;font-size:10px;font-weight:950;letter-spacing:.08em;color:#9a637e}.dashboardStat b{display:block;font-size:26px;margin-top:6px;color:#a92b70}.activityRow{display:flex;justify-content:space-between;gap:14px;padding:13px;border-bottom:1px solid #f0e3ea}.activityRow:last-child{border-bottom:0}.activityMain b{display:block}.activityTime{font-size:10px;color:#8b7380;white-space:nowrap}@media(max-width:700px){.dashboardGrid{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
@@ -205,10 +209,12 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
       <div id="activeGroupBuyHint" class="small">Choose which Group Buy you want to manage.</div>
     </div>
   </div>
-  <div class="tabs"><button class="tab active" data-panel="gbPanel" onclick="openTab(this)">GROUP BUY</button><button class="tab" data-panel="categoriesPanel" onclick="openTab(this)">CATEGORIES</button><button class="tab" data-panel="productsPanel" onclick="openTab(this)">PRODUCTS</button><button class="tab" data-panel="feesPanel" onclick="openTab(this)">PAYMENTS</button><button class="tab" data-panel="ordersPanel" onclick="openTab(this)">ORDERS</button><button class="tab" data-panel="trackingPanel" onclick="openTab(this)">TRACKING</button><button class="tab" data-panel="waybillPanel" onclick="openTab(this)">WAYBILL</button><button class="tab" data-panel="vialTrackerPanel" onclick="openTab(this)">VIAL TRACKER</button><button class="tab" data-panel="documentsPanel" onclick="openTab(this)">COA & PROTOCOLS</button><button class="tab" data-panel="siteNoticePanel" onclick="openTab(this)">SITE NOTICE ♥</button></div>
+  <div class="tabs"><button class="tab active" data-panel="gbPanel" onclick="openTab(this)">GROUP BUY</button><button class="tab" data-panel="dashboardPanel" onclick="openTab(this)">DASHBOARD</button><button class="tab" data-panel="activityPanel" onclick="openTab(this)">ACTIVITY</button><button class="tab" data-panel="categoriesPanel" onclick="openTab(this)">CATEGORIES</button><button class="tab" data-panel="productsPanel" onclick="openTab(this)">PRODUCTS</button><button class="tab" data-panel="feesPanel" onclick="openTab(this)">PAYMENTS</button><button class="tab" data-panel="ordersPanel" onclick="openTab(this)">ORDERS</button><button class="tab" data-panel="trackingPanel" onclick="openTab(this)">TRACKING</button><button class="tab" data-panel="waybillPanel" onclick="openTab(this)">WAYBILL</button><button class="tab" data-panel="vialTrackerPanel" onclick="openTab(this)">VIAL TRACKER</button><button class="tab" data-panel="documentsPanel" onclick="openTab(this)">COA & PROTOCOLS</button><button class="tab" data-panel="siteNoticePanel" onclick="openTab(this)">SITE NOTICE ♥</button></div>
 <section id="gbPanel" class="panel active"><div class="card"><h2>Create / Edit Group Buy</h2><input id="editingGBId" type="hidden"><div class="grid"><div class="field"><label>GB Number *</label><input id="gbNumber" placeholder="GB-001"></div><div class="field"><label>Customer-Facing Name</label><input id="gbName" placeholder="September Group Buy"></div><div class="field"><label>Admin Fee</label><input id="gbAdminFee" type="number" min="0" step="0.01" value="0"></div><div class="field"><label>Status *</label><select id="gbStatus"><option value="OPEN">OPEN</option><option value="CLOSED">CLOSED</option><option value="KIT_COMPLETION">KIT COMPLETION</option></select></div></div>
 <div class="field full" style="margin-top:14px"><label>Categories for this Group Buy</label><div id="gbCategoryPicker" class="checkList"><div class="small">Loading categories...</div></div><div class="small" style="margin-top:8px">Choose the categories that should appear in this Group Buy.</div></div>
 <hr><h3>Admin Fee QR</h3><div class="fileBox"><input id="adminQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('adminQrFile','adminQrPreview')"><br><br><img id="adminQrPreview" class="qrPreview" style="display:none"></div><br><h3>Final Payment QR</h3><div class="fileBox"><input id="finalQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('finalQrFile','finalQrPreview')"><br><br><img id="finalQrPreview" class="qrPreview" style="display:none"></div><div class="actions"><button class="btn primary" onclick="saveGroupBuy()">SAVE GROUP BUY</button><button class="btn secondary" onclick="clearGBForm()">NEW</button></div></div><div class="card"><h2>Group Buys</h2><div id="gbList">Loading...</div></div></section>
+<section id="dashboardPanel" class="panel"><div class="card"><h2>Admin Dashboard</h2><p class="muted">Live overview of orders, payments, manual orders and admin fees.</p><div id="dashboardSummary" class="dashboardGrid">Loading dashboard...</div></div></section>
+<section id="activityPanel" class="panel"><div class="card"><div class="itemHead"><div><h2>Activity / Audit Log</h2><p class="muted">Recent system activity for easier troubleshooting.</p></div><button class="btn secondary" onclick="loadActivityLog()">REFRESH</button></div><div id="activityLog">Loading activity...</div></div></section>
 <section id="categoriesPanel" class="panel"><div class="card"><h2>Categories</h2><div class="grid"><div class="field"><label>New Category</label><input id="newCategory" placeholder="Peptides"></div></div><div class="actions"><button class="btn primary" onclick="addCategory()">ADD CATEGORY</button></div><div id="categoryList"></div></div><div class="card"><h2>GB Category Minimum</h2><p class="muted">Set the minimum once per category for this GB. Every active product/variant inside that category automatically follows this minimum.</p><div class="field"><label>Select Group Buy</label><select id="minimumGB" onchange="loadCategoryMinimums()"><option value="">Select GB</option></select></div><br><div id="minimumList">Select a Group Buy.</div><div class="actions"><button class="btn primary" onclick="saveCategoryMinimums()">SAVE MINIMUMS</button></div></div></section>
 <section id="productsPanel" class="panel"><div class="card"><h2>Add Product</h2><p class="muted">Product and variant IDs are generated automatically.</p><div class="grid"><div class="field"><label>Product Name *</label><input id="productName" placeholder="Tirzepatide"></div><div class="field"><label>Category *</label><select id="productCategory"><option value="">Select category</option></select></div><div class="field"><label>Product Image</label><input id="productImageFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('productImageFile','productImagePreview')"><img id="productImagePreview" class="qrPreview" style="display:none;max-width:140px;max-height:140px"></div><div class="field full"><label>Description</label><textarea id="productDescription"></textarea></div></div><div class="variantEditor"><div class="itemHead"><div><h3 style="margin-bottom:4px">Variants & Prices</h3><div class="small">Add all strengths/variants and their prices here.</div></div><button class="btn secondary" type="button" onclick="addVariantEditorRow()">+ ADD VARIANT</button></div><div id="variantEditorRows"></div></div><div class="actions"><button class="btn primary" onclick="addProduct()">ADD PRODUCT</button></div></div><div class="card"><h2>Products</h2><input id="productSearch" class="search" placeholder="Search product..." oninput="renderProducts()"><div id="productList">Loading...</div></div></section>
 <section id="feesPanel" class="panel">
@@ -298,7 +304,57 @@ document.addEventListener("DOMContentLoaded",()=>{if(typeof initSupabase==="func
 var categories=[],groupBuys=[],products=[],fees=[],ordersCache=[],orderItemsCache=[],customersCache=[],currentShipment=null,vialTrackerRows=[],waybillRows=[],selectedWaybillBuyer=null,libraryDocuments=[];
 const TRACKING_STATUSES=["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING","IN TRANSIT TO THE PHILIPPINES","ARRIVED IN THE PHILIPPINES","RECEIVED AT WAREHOUSE","PACKING & LABELLING","HANDED OVER TO LOCAL COURIER","DELIVERED"];
 function $(id){return document.getElementById(id)}function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}function peso(v){return "₱"+Number(v||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2})}function showMessage(m,t=""){$("globalMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`;window.scrollTo({top:0,behavior:"smooth"});setTimeout(()=>$("globalMsg").innerHTML="",5000)}function showLoginMessage(m,t="error"){$("loginMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`}function previewFile(i,p){const f=$(i).files[0];if(!f)return;$(p).src=URL.createObjectURL(f);$(p).style.display="block"}
-function openTab(b){const target=b.dataset.panel;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(target)?.classList.add("active");if(target==="vialTrackerPanel")loadVialTracker();if(target==="ordersPanel")loadOrdersCenter();if(target==="trackingPanel")loadTrackingDashboard();if(target==="waybillPanel")loadWaybillCenter();if(target==="documentsPanel")loadLibraryDocuments();if(target==="siteNoticePanel")loadSiteNotices()}
+
+// ADMIN DASHBOARD + ACTIVITY LOG
+async function loadAdminDashboard(){
+ const box=$("dashboardSummary"); if(!box)return;
+ box.innerHTML='<div class="small">Loading dashboard...</div>';
+ try{
+  const [or,fr]=await Promise.all([
+   sb.from("orders").select("order_id,total,payment_status,payment_reference,admin_note,created_at"),
+   sb.from("admin_fee_payments").select("amount,status,created_at")
+  ]);
+  if(or.error)throw or.error;
+  const orders=or.data||[], fees=fr.error?[]:(fr.data||[]);
+  const approved=orders.filter(orderIsApproved);
+  const manual=orders.filter(isManualOrder);
+  const pending=orders.filter(o=>!orderIsApproved(o)&&!orderIsRejected(o));
+  const paidValue=approved.reduce((a,o)=>a+Number(o.total||0),0);
+  const adminPaid=fees.filter(feeIsApproved).reduce((a,x)=>a+Number(x.amount||0),0);
+  const cards=[
+   ["TOTAL SALES",peso(paidValue+adminPaid)],
+   ["TOTAL ORDERS",orders.length],
+   ["PAID ORDERS",approved.length],
+   ["PENDING PAYMENTS",pending.length],
+   ["MANUAL ORDERS",manual.length],
+   ["ADMIN FEES",peso(adminPaid)]
+  ];
+  box.innerHTML=cards.map(x=>'<div class="dashboardStat"><span>'+x[0]+'</span><b>'+x[1]+'</b></div>').join("");
+ }catch(e){box.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load dashboard.")+'</div>'}
+}
+async function loadActivityLog(){
+ const box=$("activityLog");if(!box)return;
+ box.innerHTML='<div class="small">Loading activity...</div>';
+ try{
+  const [or,fr,sr]=await Promise.all([
+   sb.from("orders").select("order_id,email,total,payment_status,payment_reference,admin_note,created_at").order("created_at",{ascending:false}).limit(80),
+   sb.from("admin_fee_payments").select("email,amount,status,created_at").order("created_at",{ascending:false}).limit(80),
+   sb.from("consolidated_shipments").select("email,status,waybill_number,tracking_number,updated_at").order("updated_at",{ascending:false}).limit(80)
+  ]);
+  const rows=[];
+  (or.data||[]).forEach(o=>rows.push({t:o.created_at,type:isManualOrder(o)?"MANUAL ORDER":"ORDER",text:(o.order_id||"Order")+" • "+(o.email||"Unknown customer")+" • "+peso(o.total),status:orderStatus(o)}));
+  (fr.data||[]).forEach(x=>rows.push({t:x.created_at,type:"ADMIN FEE",text:(x.email||"Customer")+" • "+peso(x.amount),status:String(x.status||"PENDING")}));
+  (sr.data||[]).forEach(x=>rows.push({t:x.updated_at,type:"SHIPMENT UPDATE",text:(x.email||"Customer")+" • "+(x.waybill_number||x.tracking_number||"No waybill yet"),status:x.status||"UPDATED"}));
+  rows.sort((a,b)=>new Date(b.t||0)-new Date(a.t||0));
+  box.innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="activityRow"><div class="activityMain"><b>'+esc(x.type)+' • '+esc(x.status)+'</b><div class="small">'+esc(x.text)+'</div></div><div class="activityTime">'+(x.t?new Date(x.t).toLocaleString():"—")+'</div></div>').join(""):'<div class="empty">No activity yet.</div>';
+ }catch(e){box.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load activity.")+'</div>'}
+}
+function waybillStatusFor(r){
+ const hasWaybill=!!String(r.waybill_number||r.tracking_number||"").trim();
+ return hasWaybill?'<span class="statusPill paid">🟢 WAYBILL READY</span>':'<span class="statusPill pending">🟡 WAITING FOR WAYBILL</span>';
+}
+
+function openTab(b){const target=b.dataset.panel;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(target)?.classList.add("active");if(target==="vialTrackerPanel")loadVialTracker();if(target==="ordersPanel")loadOrdersCenter();if(target==="trackingPanel")loadTrackingDashboard();if(target==="waybillPanel")loadWaybillCenter();if(target==="documentsPanel")loadLibraryDocuments();if(target==="dashboardPanel")loadAdminDashboard();if(target==="activityPanel")loadActivityLog();if(target==="siteNoticePanel")loadSiteNotices()}
 function enterAdmin(user){
   const loginScreen=$("loginScreen"), adminApp=$("adminApp");
   if(loginScreen) loginScreen.style.display="none";
@@ -941,7 +997,7 @@ function renderWaybillCenter(){
     '<div class="buyerWaybillList">'+rows.map(r=>
       '<div class="buyerWaybillRow '+(r.email===selectedWaybillBuyer?'selected':'')+'">'+
       '<div><div class="buyerWaybillName">'+esc(r.customer_name)+'</div><div class="small">'+esc(r.email)+(r.contact?' • '+esc(r.contact):'')+'</div>'+
-      '<div class="buyerWaybillMeta"><span>'+r.orders.length+' order(s)</span><span>'+r.products.length+' item type(s)</span><span>'+esc(r.courier||"Courier pending")+'</span><span>'+esc(r.payment)+'</span></div></div>'+
+      '<div class="buyerWaybillMeta"><span>'+r.orders.length+' order(s)</span><span>'+r.products.length+' item type(s)</span><span>'+esc(r.courier||"Courier pending")+'</span><span>'+esc(r.payment)+'</span>'+waybillStatusFor(r)</div></div>'+
       '<div class="waybillActions"><button class="btn secondary" type="button" data-email="'+esc(r.email)+'" onclick="selectWaybillBuyer(this.dataset.email)">VIEW</button><button class="btn primary" type="button" data-email="'+esc(r.email)+'" onclick="selectWaybillBuyer(this.dataset.email);setTimeout(printSelectedWaybill,0)">PRINT</button></div></div>'
     ).join("")+'</div>':'<div class="waybillEmpty">No paid orders match this search yet.</div>';
   renderSelectedWaybill();

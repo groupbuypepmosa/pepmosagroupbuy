@@ -205,7 +205,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 <section id="ordersPanel" class="panel">
   <div class="card">
     <div class="itemHead">
-      <div><div class="eyebrow">PEPMOSA ORDERS</div><h2 style="margin:4px 0">Consolidated Orders by Client</h2><p class="muted" style="margin:0">One client card shows all of their orders and the total quantity of every product ordered.</p></div>
+      <div><div class="eyebrow">PEPMOSA ORDERS</div><h2 style="margin:4px 0">Consolidated Orders by Client</h2><p class="muted" style="margin:0">Cleaner customer-first view: totals first, products next, then individual orders only when you expand them.</p></div>
       <button class="btn secondary" type="button" onclick="loadOrdersCenter()">REFRESH</button>
     </div>
     <div class="actions" style="margin:16px 0 10px"><button class="btn primary" type="button" onclick="openManualOrderModal()">+ ADD LATE / MANUAL ORDER</button></div>
@@ -632,7 +632,8 @@ function renderOrdersCenter(){
       merged.set(k,old);
     }
     const name=customer.customer_name||g.orders.find(o=>o.full_name)?.full_name||g.email||"Customer";
-    return {...g,customer_name:name,contact:customer.contact||g.orders.find(o=>o.contact_number)?.contact_number||"",products:[...merged.values()]};
+    const manualCount=g.orders.filter(o=>String(o.payment_reference||"").toUpperCase()==="MANUAL ADMIN ORDER"||String(o.admin_note||"").toUpperCase().includes("MANUAL / LATE ORDER")).length;
+    return {...g,customer_name:name,contact:customer.contact||g.orders.find(o=>o.contact_number)?.contact_number||"",products:[...merged.values()],manualCount};
   }).sort((a,b)=>String(a.customer_name).localeCompare(String(b.customer_name)));
 
   const filtered=rows.filter(r=>{
@@ -641,35 +642,50 @@ function renderOrdersCenter(){
   });
 
   const totalProducts=rows.reduce((a,r)=>a+r.products.reduce((b,p)=>b+Number(p.qty||0),0),0);
+  const totalOrders=rows.reduce((a,r)=>a+r.orders.length,0);
+  const totalManual=rows.reduce((a,r)=>a+r.manualCount,0);
   if($("ordersClientSummary"))$("ordersClientSummary").innerHTML=
-    '<div class="summaryCard pink"><div class="summaryLabel">Clients</div><div class="summaryValue">'+rows.length+'</div></div>'+
-    '<div class="summaryCard"><div class="summaryLabel">Total Orders</div><div class="summaryValue">'+rows.reduce((a,r)=>a+r.orders.length,0)+'</div></div>'+
-    '<div class="summaryCard"><div class="summaryLabel">Total Items Ordered</div><div class="summaryValue">'+totalProducts+'</div></div>'+
-    '<div class="summaryCard"><div class="summaryLabel">Order Value</div><div class="summaryValue">'+peso(rows.reduce((a,r)=>a+r.total,0))+'</div></div>';
+    '<div class="summaryCard pink"><div class="summaryLabel">Clients</div><div class="summaryValue">'+rows.length+'</div><div class="small">Unique buyers</div></div>'+
+    '<div class="summaryCard"><div class="summaryLabel">Orders</div><div class="summaryValue">'+totalOrders+'</div><div class="small">'+totalManual+' manual / late</div></div>'+
+    '<div class="summaryCard"><div class="summaryLabel">Vials / Items</div><div class="summaryValue">'+totalProducts+'</div><div class="small">All quantities combined</div></div>'+
+    '<div class="summaryCard"><div class="summaryLabel">Order Value</div><div class="summaryValue">'+peso(rows.reduce((a,r)=>a+r.total,0))+'</div><div class="small">Selected Group Buy</div></div>';
 
   list.innerHTML=filtered.length?
-    '<div class="ordersClientGrid">'+filtered.map(r=>
-      '<div class="ordersClientCard">'+
-        '<div class="ordersClientHead"><div><div class="ordersClientName '+(q&&String(r.customer_name).toLowerCase().includes(q)?'match':'')+'">'+esc(r.customer_name)+'</div><div class="ordersClientEmail">'+esc(r.email||"No email")+(r.contact?' • '+esc(r.contact):'')+'</div></div>'+
-        '<div class="ordersClientStats"><span>'+r.orders.length+' ORDER'+(r.orders.length===1?'':'S')+'</span><span>'+r.products.length+' PRODUCT TYPE'+(r.products.length===1?'':'S')+'</span><span>'+peso(r.total)+'</span></div></div>'+
-        r.orders.filter(o=>String(o.payment_reference||"").toUpperCase()==="MANUAL ADMIN ORDER"||String(o.admin_note||"").toUpperCase().includes("MANUAL / LATE ORDER")).map(o=>'<div class="notice warning" style="margin-top:12px"><b>✦ MANUAL / LATE ORDER</b><div class="small" style="margin-top:4px">'+esc(String(o.admin_note||"").replace(/^MANUAL \/ LATE ORDER •\s*/,""))+'</div></div>').join("")+
-        '<div class="ordersProductSummary">'+r.products.map(p=>
-          '<div class="ordersProductTile"><b>'+esc(p.product_name)+'</b><div class="small">'+esc(p.strength||"—")+' • '+peso(p.unit_price)+' each</div><span class="ordersQty">TOTAL QTY: '+Number(p.qty||0)+'</span></div>'
+    '<div class="ordersClientGrid">'+filtered.map((r,index)=>{
+      const paid=r.orders.filter(orderIsApproved).length;
+      const pending=r.orders.filter(o=>!orderIsApproved(o)&&!orderIsRejected(o)).length;
+      const rejected=r.orders.filter(orderIsRejected).length;
+      return '<article class="ordersClientCard ordersCleanCard">'+
+        '<div class="ordersClientHead ordersCleanHead">'+
+          '<div class="ordersClientIdentity"><div class="ordersAvatar">'+esc((r.customer_name||"?").trim().charAt(0).toUpperCase())+'</div><div><div class="ordersClientName '+(q&&String(r.customer_name).toLowerCase().includes(q)?'match':'')+'">'+esc(r.customer_name)+'</div><div class="ordersClientEmail">'+esc(r.email||"No email")+(r.contact?' • '+esc(r.contact):'')+'</div></div></div>'+
+          '<div class="ordersClientStats"><span>'+r.orders.length+' ORDERS</span><span>'+r.products.length+' PRODUCTS</span><span>'+peso(r.total)+'</span></div>'+
+        '</div>'+
+        '<div class="ordersStatusStrip">'+
+          '<span class="orderStatusChip paid">PAID '+paid+'</span>'+
+          (pending?'<span class="orderStatusChip pending">PENDING '+pending+'</span>':'')+
+          (rejected?'<span class="orderStatusChip rejected">REJECTED '+rejected+'</span>':'')+
+          (r.manualCount?'<span class="orderStatusChip manual">✦ MANUAL / LATE '+r.manualCount+'</span>':'')+
+        '</div>'+
+        '<div class="ordersProductSummary ordersCleanProducts">'+r.products.map(p=>
+          '<div class="ordersProductTile ordersCleanProduct"><div class="ordersProductMain"><b>'+esc(p.product_name)+'</b><div class="small">'+esc(p.strength||"—")+' • '+peso(p.unit_price)+' each</div></div><span class="ordersQty">× '+Number(p.qty||0)+'</span><b class="ordersLineTotal">'+peso(p.line_total)+'</b></div>'
         ).join("")+'</div>'+
-        '<details class="ordersDetails"><summary>VIEW INDIVIDUAL ORDERS ('+r.orders.length+')</summary>'+
-          r.orders.map(o=>{
-            const items=(o.order_items||[]).map(i=>esc(i.product_name||"Product")+' '+esc(i.strength||"")+' × '+Number(i.qty||0)).join(' • ');
+        '<details class="ordersDetails ordersCleanDetails"><summary><span>VIEW INDIVIDUAL ORDERS</span><b>'+r.orders.length+'</b></summary>'+
+          '<div class="ordersDetailTable">'+r.orders.map(o=>{
             const isManual=String(o.payment_reference||"").toUpperCase()==="MANUAL ADMIN ORDER"||String(o.admin_note||"").toUpperCase().includes("MANUAL / LATE ORDER");
-            const manualNote=String(o.admin_note||"").replace(/^MANUAL \/ LATE ORDER •\s*/,"");
-            return '<div class="ordersDetailRow '+(isManual?'manualOrderRow':'')+'">'+
-              (isManual?'<div class="notice warning" style="margin:0 0 8px"><b>✦ THIS IS THE MANUAL / LATE ORDER YOU ADDED</b><div class="small" style="margin-top:4px"><b>NOTE:</b> '+esc(manualNote)+'</div></div>':'')+
-              '<b>'+esc(o.gb_number||"GB")+'</b> <span class="small">'+new Date(o.created_at||Date.now()).toLocaleString("en-PH")+'</span><div>'+items+'</div><div class="orderMeta"><span>'+peso(o.total)+'</span><span>'+esc(o.payment_status||"PENDING")+'</span></div></div>';
-          }).join("")+
+            const manualNote=String(o.admin_note||"").replace(/^MANUAL \/ LATE ORDER •\s*/,"").trim();
+            const status=orderIsApproved(o)?"PAID":orderIsRejected(o)?"REJECTED":"PENDING";
+            const statusClass=status.toLowerCase();
+            const items=(o.order_items||[]).map(i=>'<span class="orderItemChip">'+esc(i.product_name||"Product")+' '+esc(i.strength||"")+' × '+Number(i.qty||0)+'</span>').join("");
+            return '<div class="ordersDetailRow ordersCleanRow">'+
+              '<div class="orderRowTop"><div><b>'+esc(o.order_id||"Order")+'</b><div class="small">'+esc(o.gb_number||"GB")+' • '+new Date(o.created_at||Date.now()).toLocaleString("en-PH")+'</div></div><div class="orderRowBadges">'+(isManual?'<span class="orderStatusChip manual">MANUAL / LATE</span>':'')+'<span class="orderStatusChip '+statusClass+'">'+status+'</span><b>'+peso(o.total)+'</b></div></div>'+
+              '<div class="orderItemChips">'+items+'</div>'+
+              (isManual&&manualNote?'<div class="manualNoteCompact"><b>ADMIN NOTE:</b> '+esc(manualNote)+'</div>':'')+
+            '</div>';
+          }).join("")+'</div>'+
         '</details>'+
-      '</div>'
-    ).join("")+'</div>':'<div class="empty">No client orders match your search.</div>';
-}
-async function refreshPaymentCenter(){try{await Promise.all([loadFees(),loadOrders()]);showMessage("Payments refreshed.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to refresh payments.","error")}}
+      '</article>';
+    }).join("")+'</div>':'<div class="empty">No client orders match your search.</div>';
+}async function refreshPaymentCenter(){try{await Promise.all([loadFees(),loadOrders()]);showMessage("Payments refreshed.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to refresh payments.","error")}}
 function paymentMatches(row,type,q,filter){
  const text=type==="fee"?[row.full_name,(row.whatsapp_name||row.telegram_name),row.email,row.gb_number,row.payment_reference].join(" "):[row.email,row.order_id,row.gb_number,row.shipping_method,row.payment_reference].join(" ");
  const approved=type==="fee"?feeIsApproved(row):orderIsApproved(row),rejected=type==="fee"?feeIsRejected(row):orderIsRejected(row);

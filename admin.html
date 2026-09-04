@@ -1401,10 +1401,12 @@ async function saveManualOrder(){
     const {error:ie}=await sb.from("order_items").insert(items.map(x=>({order_id:orderId,...x})));
     if(ie)throw ie;
 
+    /* Manual orders must count in the same vial tracker as customer orders.
+       The normal tracker already reads order_items, but refresh the active
+       tracker explicitly after saving so the new quantity appears immediately. */
     closeManualOrderModal();
-    await loadOrdersCenter();
-    await loadVialTracker();
-    showMessage("Manual order saved. It is marked clearly in Individual Orders with your note.","success");
+    await Promise.all([loadOrdersCenter(),loadVialTracker()]);
+    showMessage("Manual order saved and included in the Vial Tracker. It is marked clearly in Individual Orders with your note.","success");
   }catch(e){
     console.error(e);
     showMessage(e.message||"Unable to save manual order.","error");

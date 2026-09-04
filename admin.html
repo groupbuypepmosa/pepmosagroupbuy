@@ -706,67 +706,51 @@ async function rejectCheckoutPayment(orderId){if(!confirm("Reject this checkout 
 async function loadVialTracker(){
  const gb=$("vialTrackerGB").value;
  try{
-  // KIT COMPLETION MUST use the exact same live inventory source as the storefront.
-  // Otherwise the admin tracker and customer-facing remaining-vial count can disagree.
-  if(gb){
-    const{data:gbRow,error:ge}=await sb.from("group_buys").select("gb_number,status").eq("gb_number",gb).maybeSingle();
-    if(ge)throw ge;
-    if(String(gbRow?.status||"").toUpperCase()==="KIT_COMPLETION"){
-      const{data:live,error:le}=await sb.rpc("get_kit_completion_inventory",{p_gb_number:gb});
-      if(le)throw le;
-      const{data:variants,error:ve}=await sb.from("product_variants").select("variant_id,product_id,strength").in("variant_id",(live||[]).map(x=>x.variant_id));
-      if(ve)throw ve;
-      const{data:pd,error:pe}=await sb.from("products").select("product_id,product_name,category").eq("active",true);
-      if(pe)throw pe;
-      const byVariant=new Map((variants||[]).map(v=>[String(v.variant_id),v]));
-      const byProduct=new Map((pd||[]).map(p=>[String(p.product_id),p]));
-      vialTrackerRows=(live||[]).map(x=>{
-        const v=byVariant.get(String(x.variant_id))||{};
-        const p=byProduct.get(String(v.product_id))||{};
-        const remaining=Math.max(0,Number(x.remaining_qty||0));
-        return {
-          product_id:v.product_id||"",
-          product_name:p.product_name||String(x.variant_id),
-          variant_id:String(x.variant_id),
-          strength:v.strength||"—",
-          category:p.category||"",
-          qty:Math.max(0,Number(x.ordered_qty||0)),
-          totalKits:0,
-          remainingToComplete:remaining,
-          liveRemaining:remaining,
-          liveKitMode:true
-        };
-      });
-      return renderVialTracker();
-    }
-  }
-
-  // Normal tracker: count only valid orders. Rejected/cancelled orders must not
-  // affect the kit remainder.
-  let q=sb.from("orders").select("order_id,gb_number,payment_status").order("created_at",{ascending:true});if(gb)q=q.eq("gb_number",gb);
+  /* ONE tracker rule for OPEN and KIT COMPLETION:
+     count all valid orders, including MANUAL ADMIN ORDER.
+     Every 10 vials = one completed kit; the remainder starts the next kit. */
+  let q=sb.from("orders").select("order_id,gb_number,payment_status").order("created_at",{ascending:true});
+  if(gb)q=q.eq("gb_number",gb);
   const{data:orders,error:oe}=await q;if(oe)throw oe;
   const valid=(orders||[]).filter(o=>!["REJECTED","CANCELLED","CANCELED"].includes(String(o.payment_status||"").toUpperCase()));
   const ids=valid.map(o=>o.order_id);
   if(!ids.length){vialTrackerRows=[];return renderVialTracker();}
   const{data:items,error:ie}=await sb.from("order_items").select("product_id,variant_id,product_name,strength,qty").in("order_id",ids);if(ie)throw ie;
-  const map=new Map();for(const item of items||[]){const key=[item.product_id||item.product_name,item.variant_id||item.strength||""].join("::");if(!map.has(key))map.set(key,{product_id:item.product_id||"",product_name:item.product_name||"",variant_id:item.variant_id||"",strength:item.strength||"",qty:0});map.get(key).qty+=Number(item.qty||0);}
-  const{data:pd,error:pe}=await sb.from("products").select("product_id,category");if(pe)throw pe;const pc=new Map((pd||[]).map(p=>[p.product_id,p.category||""]));
-  vialTrackerRows=[...map.values()].map(r=>({...r,category:pc.get(r.product_id)||"",totalKits:Math.floor(Number(r.qty||0)/10),remainingToComplete:(10-(Number(r.qty||0)%10))%10,liveKitMode:false}));renderVialTracker();
+  const map=new Map();
+  for(const item of items||[]){
+    const key=[item.product_id||item.product_name,item.variant_id||item.strength||""].join("::");
+    if(!map.has(key))map.set(key,{product_id:item.product_id||"",product_name:item.product_name||"",variant_id:item.variant_id||"",strength:item.strength||"",qty:0});
+    map.get(key).qty+=Number(item.qty||0);
+  }
+  const{data:pd,error:pe}=await sb.from("products").select("product_id,category");if(pe)throw pe;
+  const pc=new Map((pd||[]).map(p=>[p.product_id,p.category||""]));
+  vialTrackerRows=[...map.values()].map(r=>{
+    const qty=Number(r.qty||0),totalKits=Math.floor(qty/10),inCurrent=qty%10;
+    return {...r,category:pc.get(r.product_id)||"",totalKits,inCurrent,remainingToComplete:(10-inCurrent)%10};
+  });
+  renderVialTracker();
  }catch(e){console.error(e);$("vialTrackerResults").innerHTML='<div class="notice error">'+esc(e.message||"Unable to load vial tracker.")+'</div>';}
 }
 function renderVialTracker(){
- const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase();const rows=vialTrackerRows.filter(r=>(r.product_name+" "+r.strength+" "+r.variant_id+" "+r.category).toLowerCase().includes(q));
+ const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase();
+ const rows=vialTrackerRows.filter(r=>(r.product_name+" "+r.strength+" "+r.variant_id+" "+r.category).toLowerCase().includes(q));
  if(!rows.length){$("vialTrackerResults").innerHTML='<div class="empty">No ordered products found.</div>';return;}
- $("vialTrackerResults").innerHTML='<div class="pepKitCards">'+rows.map(r=>{
-   if(r.liveKitMode){
-     const remaining=Number(r.liveRemaining||0);
-     return '<div class="pepKitCard"><div class="pepKitTop"><div><b>'+esc(r.product_name)+'</b><div class="small">'+esc(r.strength||"—")+' • '+esc(r.category||"—")+'</div></div><b>'+remaining+' vial(s) left</b></div><div class="pepProgress"><span style="width:'+Math.max(0,Math.min(100,remaining*10))+'%"></span></div><div class="pepKitMeta"><b>LIVE INVENTORY</b><span>🟣 '+remaining+' vial(s) remaining for customers</span></div><div class="small">This is the same live count shown on the storefront.</div></div>';
-   }
-   const inCurrent=Number(r.qty||0)%10,complete=r.remainingToComplete===0,percent=complete?100:Math.round((inCurrent/10)*100);
-   const status=complete?'🟢 KIT COMPLETE — Ready for ordering':(10-inCurrent)+' vial(s) remaining to complete kit';
-   return '<div class="pepKitCard"><div class="pepKitTop"><div><b>'+esc(r.product_name)+'</b><div class="small">'+esc(r.strength||"—")+' • '+esc(r.category||"—")+'</div></div><b>'+r.qty+' vial(s)</b></div><div class="pepProgress"><span style="width:'+percent+'%"></span></div><div class="pepKitMeta"><b>'+inCurrent+' / 10</b><span>'+status+'</span></div><div class="small">Complete kits: '+r.totalKits+'</div></div>';
- }).join("")+'</div>';
+ const active=rows.filter(r=>Number(r.inCurrent||0)>0);
+ const completed=rows.filter(r=>Number(r.totalKits||0)>0);
+ const card=r=>{
+   const inCurrent=Number(r.inCurrent||0),need=Number(r.remainingToComplete||0),completeNow=inCurrent===0;
+   const percent=Math.round((inCurrent/10)*100);
+   return '<div class="pepKitCard"><div class="pepKitTop"><div><b>'+esc(r.product_name)+'</b><div class="small">'+esc(r.strength||"—")+' • '+esc(r.category||"—")+'</div></div><b>'+r.qty+' vial(s) total</b></div><div class="pepProgress"><span style="width:'+percent+'%"></span></div><div class="pepKitMeta"><b>'+inCurrent+' / 10</b><span>'+need+' vial(s) remaining to complete next kit</span></div></div>';
+ };
+ const completedCard=r=>'<div class="pepKitCard pepCompletedCard"><div class="pepKitTop"><div><b>'+esc(r.product_name)+'</b><div class="small">'+esc(r.strength||"—")+' • '+esc(r.category||"—")+'</div></div><b>🟢 '+r.totalKits+' KIT'+(r.totalKits>1?'S':'')+' COMPLETED</b></div><div class="small">Completed quantity: '+(r.totalKits*10)+' vial(s) • Total ordered: '+r.qty+' vial(s)</div></div>';
+ let html='';
+ html+='<div class="eyebrow" style="margin:6px 0 10px">CURRENT KIT COMPLETION</div>';
+ html+=active.length?'<div class="pepKitCards">'+active.map(card).join("")+'</div>':'<div class="empty">No incomplete kits right now.</div>';
+ html+='<div class="eyebrow" style="margin:22px 0 10px">🟢 KIT COMPLETED</div>';
+ html+=completed.length?'<div class="pepKitCards">'+completed.map(completedCard).join("")+'</div>':'<div class="empty">No completed kits yet.</div>';
+ $("vialTrackerResults").innerHTML=html;
 }
+
 async function loadLibraryDocuments(){const box=$("documentAdminList");if(box)box.innerHTML='<div class="small">Loading documents…</div>';const{data,error}=await sb.from("library_documents").select("*").order("created_at",{ascending:false});if(error){if(box)box.innerHTML='<div class="notice error">'+esc(error.message)+'</div>';return;}libraryDocuments=data||[];if(box)box.innerHTML=libraryDocuments.length?libraryDocuments.map(d=>'<div class="item"><div class="itemHead"><div><b>'+esc(d.title)+'</b><div class="small">'+esc(d.document_type)+(d.product_name?" • "+esc(d.product_name):"")+'</div></div><div class="actions"><button class="btn danger" onclick="deleteLibraryDocument(\''+esc(d.id)+'\',\''+esc(d.file_path)+'\')">DELETE</button></div></div></div>').join(""):'<div class="empty">No uploaded documents yet.</div>';}
 async function uploadLibraryDocument(){const type=$("docType").value,title=$("docTitle").value.trim(),product=$("docProduct").value.trim(),file=$("docFile").files[0];if(!title||!file)return showMessage("Title and file are required.","error");try{const safe=(crypto.randomUUID?crypto.randomUUID():Date.now())+"-"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");const path=type.toLowerCase()+"/"+safe;const{error:up}=await sb.storage.from("library-documents").upload(path,file,{upsert:false,contentType:file.type});if(up)throw up;const{error:ins}=await sb.from("library_documents").insert({document_type:type,title:title,product_name:product||null,file_path:path,file_name:file.name,mime_type:file.type});if(ins)throw ins;$("docTitle").value="";$("docProduct").value="";$("docFile").value="";showMessage("Document uploaded successfully.","success");await loadLibraryDocuments();}catch(e){console.error(e);showMessage(e.message||"Upload failed.","error");}}
 async function deleteLibraryDocument(id,path){if(!confirm("Delete this document?"))return;try{await sb.storage.from("library-documents").remove([path]);const{error}=await sb.from("library_documents").delete().eq("id",id);if(error)throw error;await loadLibraryDocuments();showMessage("Document deleted.","success");}catch(e){showMessage(e.message||"Unable to delete document.","error");}}
@@ -1400,23 +1384,6 @@ async function saveManualOrder(){
     if(oe)throw oe;
     const {error:ie}=await sb.from("order_items").insert(items.map(x=>({order_id:orderId,...x})));
     if(ie)throw ie;
-
-    /* KIT COMPLETION manual orders must reserve the SAME live inventory used
-       by customer checkout. If inventory cannot be reserved, delete the
-       just-created manual order so orders and remaining vials never diverge. */
-    const activeGBRow=(groupBuys||[]).find(x=>String(x.gb_number)===String(gb));
-    if(String(activeGBRow?.status||"").toUpperCase()==="KIT_COMPLETION"){
-      const {error:kitError}=await sb.rpc("apply_manual_kit_completion_inventory",{
-        p_gb_number:gb,
-        p_items:items.map(x=>({variant_id:x.variant_id,qty:x.qty})),
-        p_order_id:orderId
-      });
-      if(kitError){
-        await sb.from("order_items").delete().eq("order_id",orderId);
-        await sb.from("orders").delete().eq("order_id",orderId);
-        throw kitError;
-      }
-    }
 
     /* Manual orders must count in the same vial tracker as customer orders.
        Refresh immediately after saving. */

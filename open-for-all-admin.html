@@ -16,6 +16,28 @@ plist.innerHTML=(p.data||[]).map(x=>`<div class="row"><span>${x.image_url?'<img 
 payments.innerHTML=O.map(x=>`<div class="row"><span><b>${x.order_id}</b><br>${x.customer_name} • ${x.email}<br><b>${ofaPeso(x.total)}</b> • <span class="tag">${x.payment_status}</span><br>${x.payment_proof_url?'<a target="_blank" href="'+x.payment_proof_url+'">View payment proof</a>':'No payment proof'}</span><div class="actions"><button class="btn" onclick="stat('${x.order_id}','PAID')">APPROVE</button><button class="btn alt" onclick="stat('${x.order_id}','REJECTED')">REJECT</button><button class="btn alt" style="color:#b42318;border-color:#b42318" onclick="deleteOrder('${x.order_id}')">DELETE ORDER</button></div></div>`).join('')||empty('No payments yet.');
 const waybillRows=w.data||[];
 const items=it.data||[];
+
+// Build consolidated Open for All groups by email.
+// This stays completely separate from the regular Group Buy system.
+const groups={};
+O.forEach(order=>{
+  const key=(order.email||order.order_id||'unknown').trim().toLowerCase();
+  if(!groups[key]) groups[key]={email:order.email||'No email',orders:[],items:[],waybills:[]};
+  groups[key].orders.push(order);
+});
+items.forEach(item=>{
+  const order=O.find(x=>x.order_id===item.order_id);
+  if(!order) return;
+  const key=(order.email||order.order_id||'unknown').trim().toLowerCase();
+  if(groups[key]) groups[key].items.push(item);
+});
+waybillRows.forEach(row=>{
+  const order=O.find(x=>x.order_id===row.order_id);
+  if(!order) return;
+  const key=(order.email||order.order_id||'unknown').trim().toLowerCase();
+  if(groups[key]) groups[key].waybills.push(row);
+});
+
 ways.innerHTML=Object.values(groups).map(g=>{const first=g.orders[0],qty=g.items.reduce((a,z)=>a+(+z.qty||0),0),products={};g.items.forEach(z=>products[z.product_name]=(products[z.product_name]||0)+(+z.qty||0));const productText=Object.entries(products).map(([n,q])=>n+' × '+q).join(' • ')||'No items';return '<div class="row"><span><b>'+g.email+'</b><br>'+first.customer_name+' • '+(first.contact||'No contact')+'<br><span class="small">'+first.address+'</span><br><span class="tag">'+g.orders.length+' ORDER(S)</span> <span class="tag">'+qty+' TOTAL QTY</span><br><span class="small">'+productText+'</span></span><div class="actions"><button class="btn" onclick="printConsolidated(\''+g.email+'\')">PRINT CONSOLIDATED</button><button class="btn alt" onclick="editConsolidatedWaybill(\''+g.email+'\')">SET WAYBILL</button></div></div>';}).join('')||empty('No Open for All orders yet.');
 pay.value=settings.payment_name||'';ins.value=settings.payment_instructions||'';lu.value=settings.luzon_fee??100;vi.value=settings.visayas_fee??150;mi.value=settings.mindanao_fee??180;la.value=settings.lalamove_fee??0;if(settings.payment_qr_url){qrprev.src=settings.payment_qr_url;qrprev.style.display='block'}}
 async function upload(file,folder){if(!file)return null;let ext=(file.name.split('.').pop()||'jpg').replace(/[^a-z0-9]/gi,''),path=folder+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext,r=await s.storage.from('ofa-assets').upload(path,file,{contentType:file.type,upsert:false});if(r.error)throw r.error;return s.storage.from('ofa-assets').getPublicUrl(path).data.publicUrl}

@@ -44,7 +44,25 @@ async function upload(file,folder){if(!file)return null;let ext=(file.name.split
 async function addP(){const pnEl=document.getElementById('pn'),paEl=document.getElementById('pa'),pmEl=document.getElementById('pm'),piEl=document.getElementById('pi'),pp=document.getElementById('pprev'),b=document.getElementById('addProductBtn'),statusEl=document.getElementById('saveStatus');statusEl.textContent='Starting save...';if(!pnEl.value.trim()||!paEl.value){statusEl.textContent='Please enter Product Name and Amount.';return alert('Please enter Product Name and Amount.');}b.disabled=true;b.textContent='SAVING...';statusEl.textContent='Saving product to database...';try{let r=await s.rpc('ofa_add_product_admin',{p_name:pnEl.value.trim(),p_amount:Number(paEl.value),p_moq:Math.max(1,Number(pmEl.value||1)),p_status:'AVAILABLE'});if(r.error)throw r.error;let saved=Array.isArray(r.data)?r.data[0]:r.data;if(!saved||!saved.id)throw new Error('Product save returned no ID');let photoWarning='';if(piEl.files[0]){try{let url=await upload(piEl.files[0],'products');if(url){let u=await s.from('ofa_products').update({image_url:url}).eq('id',saved.id);if(u.error)throw u.error}}catch(e){console.error('Photo upload failed',e);photoWarning=' Product was saved, but the photo did not upload: '+(e.message||'unknown error')}}pnEl.value=paEl.value='';pmEl.value=1;piEl.value='';pp.style.display='none';statusEl.textContent='Product saved successfully.';alert('Product saved!'+photoWarning);await load()}catch(e){console.error(e);statusEl.textContent='ERROR: '+(e.message||JSON.stringify(e));alert('Could not add product: '+(e.message||JSON.stringify(e)))}finally{b.disabled=false;b.textContent='ADD PRODUCT'}}
 async function toggle(id,st){let r=await s.from('ofa_products').update({status:st==='AVAILABLE'?'SOLD_OUT':'AVAILABLE'}).eq('id',id);if(r.error)alert(r.error.message);else load()}
 async function deleteProduct(id){if(!confirm('Delete this Open for All product? This is for trial only. Products already used in an order cannot be deleted.'))return;let r=await s.from('ofa_products').delete().eq('id',id);if(r.error)alert('Could not delete product: '+r.error.message);else load()}
-async function deleteOrder(orderId){if(!confirm('DELETE Open for All order '+orderId+'? This removes only this Open for All order, its items and its waybill. Group Buy orders are NOT touched.'))return;let r=await s.from('ofa_orders').delete().eq('order_id',orderId);if(r.error)alert('Could not delete order: '+r.error.message);else load()}
+async function deleteOrder(orderId){
+  if(!confirm('DELETE Open for All order '+orderId+'? This removes only this Open for All order, its items and its waybill. Group Buy orders are NOT touched.'))return;
+  try{
+    // Delete child records first so foreign-key constraints cannot leave a "deleted" order visible.
+    const [itemsRes,waybillRes]=await Promise.all([
+      s.from('ofa_order_items').delete().eq('order_id',orderId),
+      s.from('ofa_waybills').delete().eq('order_id',orderId)
+    ]);
+    if(itemsRes.error)throw itemsRes.error;
+    if(waybillRes.error)throw waybillRes.error;
+    const r=await s.from('ofa_orders').delete().eq('order_id',orderId);
+    if(r.error)throw r.error;
+    alert('Order deleted successfully.');
+    await load();
+  }catch(e){
+    console.error(e);
+    alert('Could not delete order: '+(e.message||JSON.stringify(e)));
+  }
+}
 async function stat(id,v){
   const label=v==='PAID'?'approve this payment':'mark this payment as rejected';
   if(!confirm('Are you sure you want to '+label+'?'))return;

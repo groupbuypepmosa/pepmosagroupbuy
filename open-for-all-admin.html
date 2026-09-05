@@ -5,7 +5,8 @@
 <div id="stats" class="stats"></div>
 <div class="card"><h2>➕ Add Product</h2><div class="grid"><label class="f">Product Name<input id="pn" placeholder="e.g. Tirzepatide 15mg"></label><label class="f">Amount<input id="pa" type="number" placeholder="0"></label><label class="f">MOQ<input id="pm" type="number" value="1"></label><label class="f">Product Photo<input id="pi" type="file" accept="image/png,image/jpeg,image/webp"></label></div><img id="pprev" class="preview" style="display:none"><br><button id="addProductBtn" type="button" class="btn">ADD PRODUCT</button><div id="saveStatus" class="small" style="margin-top:10px"></div><div id="plist"></div></div>
 <div class="card"><h2>💳 Payments / Approval</h2><div id="payments"></div></div>
-<div class="card"><h2>📦 Update Tracking for All</h2><p class="small">Set one tracking/waybill number for all current Open for All orders.</p><button class="btn" type="button" onclick="updateTrackingForAll()">UPDATE TRACKING FOR ALL</button></div>
+<div class="card"><h2>📦 Update Tracking for All</h2><p class="small">Choose a shipment status from the tracking list and apply it to all current Open for All orders. Individual tracking/waybill numbers stay unchanged.</p><button class="btn" type="button" onclick="openOfaBulkTracking()">✦ UPDATE TRACKING FOR ALL</button></div>
+<div id="ofaBulkTrackingModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;padding:18px;overflow:auto"><div class="card" style="max-width:560px;margin:8vh auto;background:#fff"><h2 style="margin-top:0">📦 Update Tracking for All</h2><p class="small">Apply one shipment status to all current Open for All orders.</p><div id="ofaBulkTrackingCount" class="small" style="padding:10px;border-radius:10px;background:#fff5fa;margin:12px 0"></div><label class="f">NEW STATUS<select id="ofaBulkTrackingStatus"></select></label><label class="f">COURIER (OPTIONAL)<select id="ofaBulkTrackingCourier"><option value="">Keep current courier</option><option value="J&T">J&T</option><option value="Lalamove">Lalamove</option><option value="Other">Other</option></select></label><div class="actions" style="margin-top:16px"><button class="btn" type="button" onclick="saveOfaBulkTracking()">UPDATE ALL ORDERS</button><button class="btn alt" type="button" onclick="closeOfaBulkTracking()">CANCEL</button></div></div></div>
 <div class="card"><h2>🚚 Consolidated Waybills</h2><p class="small">Same-email orders are consolidated here for MOQ/Open for All only.</p><div id="ways"></div></div>
 <div class="card"><h2>📱 Separate QR & Shipping</h2><div class="grid"><label class="f">Payment QR Image<input id="qrfile" type="file" accept="image/png,image/jpeg,image/webp"></label><label class="f">Payment Name<input id="pay" placeholder="Account / payment name"></label><label class="f">Luzon Shipping<input id="lu" type="number"></label><label class="f">Visayas Shipping<input id="vi" type="number"></label><label class="f">Mindanao Shipping<input id="mi" type="number"></label><label class="f">Lalamove Shipping<input id="la" type="number" placeholder="0"></label></div><img id="qrprev" class="preview" style="display:none"><label class="f" style="margin-top:12px">Instructions<textarea id="ins" placeholder="Payment instructions"></textarea></label><br><button id="saveSettingsBtn" type="button" class="btn">SAVE SETTINGS</button></div>
 </div><script>
@@ -70,18 +71,34 @@ async function stat(id,v){
     alert('Could not update payment: '+(e.message||JSON.stringify(e)));
   }
 }
-async function updateTrackingForAll(){
-  const v=prompt('Enter tracking / waybill number to apply to ALL current Open for All orders:');
-  if(v===null)return;
-  const tracking=v.trim();
-  if(!tracking){alert('Tracking number cannot be empty.');return;}
-  if(!confirm('Apply "'+tracking+'" to ALL current Open for All orders?'))return;
+async function openOfaBulkTracking(){
+  const modal=document.getElementById('ofaBulkTrackingModal');
+  const count=document.getElementById('ofaBulkTrackingCount');
+  const sel=document.getElementById('ofaBulkTrackingStatus');
+  modal.style.display='block';
+  const statuses=['ORDER RECEIVED','PAYMENT CONFIRMED','ORDER PROCESSING','IN TRANSIT TO THE PHILIPPINES','ARRIVED IN THE PHILIPPINES','RECEIVED AT WAREHOUSE','PACKING & LABELLING','HANDED OVER TO LOCAL COURIER','DELIVERED'];
+  sel.innerHTML='<option value="">Select new status</option>'+statuses.map(x=>'<option value="'+x+'">'+x+'</option>').join('');
+  try{
+    const q=await s.from('ofa_waybills').select('order_id');
+    if(q.error)throw q.error;
+    count.textContent=(q.data||[]).length+' Open for All order(s) will be updated. Individual tracking/waybill numbers will stay unchanged.';
+  }catch(e){count.textContent='Unable to load current Open for All orders.';console.error(e);}
+}
+function closeOfaBulkTracking(){document.getElementById('ofaBulkTrackingModal').style.display='none'}
+async function saveOfaBulkTracking(){
+  const status=document.getElementById('ofaBulkTrackingStatus').value;
+  const courier=document.getElementById('ofaBulkTrackingCourier').value;
+  if(!status){alert('Please select a status.');return;}
+  if(!confirm('Update tracking status to "'+status+'" for ALL current Open for All orders?'))return;
   try{
     const rows=(await s.from('ofa_waybills').select('id')).data||[];
-    if(!rows.length){alert('No Open for All waybills found.');return;}
-    const u=await s.from('ofa_waybills').update({waybill_number:tracking,tracking_number:tracking,status:'WAYBILL READY',updated_at:new Date().toISOString()}).in('id',rows.map(x=>x.id));
+    if(!rows.length){alert('No Open for All orders found.');return;}
+    const payload={status,updated_at:new Date().toISOString()};
+    if(courier)payload.courier=courier;
+    const u=await s.from('ofa_waybills').update(payload).in('id',rows.map(x=>x.id));
     if(u.error)throw u.error;
-    alert('Tracking updated for '+rows.length+' Open for All order(s).');
+    closeOfaBulkTracking();
+    alert('Tracking status updated for '+rows.length+' Open for All order(s). Tracking numbers were not changed.');
     await load();
   }catch(e){console.error(e);alert('Could not update tracking: '+(e.message||JSON.stringify(e)));}
 }

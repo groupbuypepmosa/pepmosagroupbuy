@@ -123,17 +123,30 @@ async function trackOFA(){
   if(!/^\S+@\S+\.\S+$/.test(email)){out.innerHTML='<div class="track-empty">Please enter the email used for your MOQ/Open for All checkout.</div>';return;}
   out.innerHTML='<div class="track-empty">Checking your MOQ orders…</div>';
   try{
-    const r=await S().rpc('ofa_get_customer_tracking',{p_email:email});
+    const [r,gs]=await Promise.all([
+      S().rpc('ofa_get_customer_tracking',{p_email:email}),
+      S().from('ofa_settings').select('global_tracking_status,global_tracking_courier,global_tracking_number,global_tracking_notes').eq('id',true).single()
+    ]);
     if(r.error)throw r.error;
-    const data=r.data||{},orders=Array.isArray(data.orders)?data.orders:[],items=Array.isArray(data.items)?data.items:[],waybills=Array.isArray(data.waybills)?data.waybills:[];
+    if(gs.error)throw gs.error;
+    const data=r.data||{},orders=Array.isArray(data.orders)?data.orders:[],items=Array.isArray(data.items)?data.items:[];
     if(!orders.length){out.innerHTML='<div class="track-empty">No MOQ/Open for All orders found for this email yet.</div>';return;}
-    out.innerHTML=orders.map(o=>{
-      const its=items.filter(i=>i.order_id===o.order_id);
-      const wb=waybills.find(w=>w.order_id===o.order_id);
-      const itemText=its.length?its.map(i=>'<div>• '+String(i.product_name||'Product')+' × <b>'+Number(i.qty||0)+'</b></div>').join(''):'<div>Items are being prepared.</div>';
-      const ship=wb?'<div class="track-waybill"><b>🚚 '+String(wb.status||'WAITING FOR WAYBILL')+'</b>'+ (wb.courier?'<br>Courier: '+String(wb.courier):'') + (wb.tracking_number||wb.waybill_number?'<br>Tracking / Waybill: <b>'+String(wb.tracking_number||wb.waybill_number)+'</b>':'<br>Waybill will appear here once assigned.') + (wb.notes?'<br>'+String(wb.notes):'')+'</div>':'<div class="track-waybill">🚚 WAITING FOR WAYBILL<br>Waybill will appear here once assigned.</div>';
-      return '<div class="track-card"><div class="track-head"><div><div class="track-id">'+String(o.order_id)+'</div><div style="font-size:11px;color:#8a6a79;margin-top:4px">Payment: '+String(o.payment_status||'SUBMITTED')+'</div></div><span class="track-status">'+String(wb?.status||'WAITING FOR WAYBILL')+'</span></div><div class="track-items">'+itemText+'</div>'+ship+'</div>';
-    }).join('');
+    const g=gs.data||{};
+    const status=g.global_tracking_status||'WAITING FOR WAYBILL';
+    const courier=g.global_tracking_courier||'';
+    const number=g.global_tracking_number||'';
+    const notes=g.global_tracking_notes||'';
+    const products={};
+    items.forEach(i=>products[i.product_name]=(products[i.product_name]||0)+Number(i.qty||0));
+    const itemText=Object.entries(products).map(([name,qty])=>'<div>• '+String(name)+' × <b>'+qty+'</b></div>').join('')||'<div>Items are being prepared.</div>';
+    const orderText=orders.map(o=>'<span class="track-id" style="margin-right:6px">'+String(o.order_id)+'</span>').join('');
+    out.innerHTML='<div class="track-card" style="border:2px solid #efb5d2"><div class="track-head"><div><div class="small" style="font-weight:900;color:#cc2d88">GLOBAL MOQ SHIPPING UPDATE</div><h3 style="margin:5px 0">📦 '+String(status)+'</h3></div><span class="track-status">'+String(status)+'</span></div>'+
+      '<div class="track-waybill"><b>🚚 '+(courier?String(courier):'Courier to be announced')+'</b>'+
+      (number?'<br>Tracking / Waybill: <b>'+String(number)+'</b>':'<br>Tracking number will appear here once available.')+
+      (notes?'<br><br>'+String(notes):'')+'</div>'+
+      '<div class="track-items"><b>Your combined MOQ orders</b><div style="margin-top:8px">'+itemText+'</div></div>'+
+      '<div style="margin-top:12px"><div class="small">Your checkout references</div>'+orderText+'</div>'+
+      '<div class="small" style="margin-top:12px">This is one shared shipping update for all Open for All / MOQ customers.</div></div>';
   }catch(err){console.error(err);out.innerHTML='<div class="track-empty">Unable to load your tracking right now. Please try again.</div>';}
 }
 window.trackOFA=trackOFA;

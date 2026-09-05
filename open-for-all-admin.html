@@ -1,5 +1,23 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Open for All Admin</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script><style>
 :root{--pink:#cc2d88;--dark:#2d2730;--soft:#fff8fb;--line:#edd8e5}*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#fff8fb,#f6effa);margin:0;color:var(--dark)}.w{max-width:1180px;margin:auto;padding:28px 18px}.hero{background:linear-gradient(135deg,#d92f8d,#a843bd);color:#fff;border-radius:26px;padding:26px 30px;box-shadow:0 15px 40px #b62b7b33}.hero h1{margin:0 0 6px}.hero p{margin:0;opacity:.9}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}.stat,.card{background:#fff;border:1px solid var(--line);border-radius:20px}.stat{padding:18px}.stat .num{font-size:28px;font-weight:900;color:var(--pink);margin-top:7px}.card{padding:20px;margin:15px 0}.card h2{margin:0 0 15px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.f{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:13px}.f input,.f textarea,.f select{width:100%;padding:12px;border:1px solid #e2cbd8;border-radius:11px;font:inherit;background:#fff}.btn{background:var(--pink);color:#fff;border:0;border-radius:11px;padding:11px 14px;font-weight:800;cursor:pointer}.btn.alt{background:#fff;color:var(--pink);border:1px solid var(--pink)}.row{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:14px 0;border-bottom:1px solid #f0e6ec}.empty{padding:22px;text-align:center;color:#8a7b84;background:#fff8fb;border-radius:12px}.preview{width:110px;height:110px;object-fit:contain;border:1px dashed #e0b8cf;border-radius:12px;padding:5px;margin-top:8px}.actions{display:flex;gap:8px;flex-wrap:wrap}.small{font-size:12px;color:#8a7b84}.tag{display:inline-block;background:#fff0f7;color:var(--pink);padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.row{align-items:flex-start;flex-direction:column}}
+.trackingDashboard{display:grid;gap:16px}
+.trackingClientCard{overflow:hidden;border:1px solid #efcfdf;border-radius:24px;background:linear-gradient(145deg,#fff,#fff8fc);box-shadow:0 14px 40px rgba(164,63,117,.08)}
+.trackingClientTop{padding:20px 22px;background:linear-gradient(135deg,#fff0f7,#fff 65%,#f8f2ff);border-bottom:1px solid #f0dce7;display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.trackingClientEyebrow{font-size:10px;font-weight:950;letter-spacing:.16em;color:#b42e76}
+.trackingClientEmail{font-size:21px;font-weight:950;color:#392a34;margin-top:5px;word-break:break-word}
+.trackingStatusPill{display:inline-flex;align-items:center;justify-content:center;padding:9px 13px;border-radius:999px;background:linear-gradient(135deg,#ef6cab,#d22b85);color:#fff;font-size:10px;font-weight:950;letter-spacing:.06em;white-space:nowrap;box-shadow:0 8px 18px rgba(210,43,133,.18)}
+.trackingClientBody{padding:18px 22px 22px}
+.trackingProgressBox{padding:14px 16px;border:1px solid #efd9e5;border-radius:17px;background:#fffafd}
+.trackingProgressHead{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:12px}.trackingProgressHead b{font-size:14px}.trackingProgressHead span{font-size:10px;color:#a73772;font-weight:900}
+.trackingProgressBar{height:9px;border-radius:999px;background:#f0e6ec;overflow:hidden;margin-top:10px}.trackingProgressFill{height:100%;background:linear-gradient(90deg,#ef6cab,#d22b85);border-radius:inherit}
+.trackingMetaGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:12px}.trackingMetaBox{padding:11px 12px;border:1px solid #efdae5;border-radius:14px;background:#fff}.trackingMetaBox small{display:block;font-size:8px;font-weight:950;letter-spacing:.10em;color:#ad6b8d}.trackingMetaBox b{display:block;margin-top:5px;font-size:12px;color:#45343d;word-break:break-word}
+.trackingProducts{margin-top:15px;border:1px solid #efd9e5;border-radius:17px;overflow:hidden;background:#fff}.trackingProductsHead{padding:11px 14px;background:#fff5fa;border-bottom:1px solid #f2e1ea;font-size:10px;font-weight:950;letter-spacing:.10em;color:#a93872}
+.trackingProductRow{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid #f5e5ed}.trackingProductRow:last-child{border-bottom:0}.trackingProductName{font-weight:900;color:#46353e;font-size:13px}.trackingQty{padding:5px 9px;border-radius:999px;background:#fff0f7;color:#b42b75;font-size:10px;font-weight:950;white-space:nowrap}
+.trackingRefs{margin-top:12px}.trackingRefs summary{cursor:pointer;color:#a92b70;font-size:11px;font-weight:950}.trackingRefList{margin-top:9px;display:flex;flex-wrap:wrap;gap:7px}.trackingRefChip{padding:6px 9px;border-radius:999px;background:#fff;border:1px solid #efd9e5;color:#765060;font-size:10px;font-weight:900}
+.trackingEditor{margin-top:16px;border-top:1px solid #eedde7;padding-top:14px}.trackingEditor summary{cursor:pointer;font-weight:950;color:#b62b78;font-size:11px;letter-spacing:.05em}
+.trackingSaveAll{margin-top:14px;width:100%;font-size:13px;padding:14px}
+@media(max-width:850px){.trackingMetaGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.trackingClientTop{padding:17px;flex-direction:column}.trackingClientBody{padding:15px}.trackingClientEmail{font-size:17px}.trackingMetaGrid{grid-template-columns:1fr}.trackingProgressHead{align-items:flex-start;flex-direction:column}}
+
 </style></head><body><div class="w">
 <div class="hero"><h1>🌐 Open for All Admin</h1><p>Completely separate from Group Buy — Products • Payments • Waybills • Totals</p></div>
 <div id="stats" class="stats"></div>
@@ -16,8 +34,45 @@ async function load(){let [o,p,w,st,it]=await Promise.all([s.from('ofa_orders').
 plist.innerHTML=(p.data||[]).map(x=>`<div class="row"><span>${x.image_url?'<img class="preview" style="width:60px;height:60px;vertical-align:middle;margin-right:10px" src="'+x.image_url+'">':''}<b>${x.name}</b><br><span class="small">${ofaPeso(x.amount)} • MOQ ${x.moq} • <span class="tag">${x.status}</span></span></span><div class="actions"><button class="btn alt" onclick="toggle('${x.id}','${x.status}')">${x.status==='AVAILABLE'?'SOLD OUT':'MAKE AVAILABLE'}</button><button class="btn alt" style="color:#b42318;border-color:#b42318" onclick="deleteProduct('${x.id}')">DELETE</button></div></div>`).join('')||empty('No Open for All products yet.');
 payments.innerHTML=O.map(x=>`<div class="row"><span><b>${x.order_id}</b><br>${x.customer_name} • ${x.email}<br><b>${ofaPeso(x.total)}</b> • <span class="tag">${x.payment_status}</span><br>${x.payment_proof_url?'<a target="_blank" href="'+x.payment_proof_url+'">View payment proof</a>':'No payment proof'}</span><div class="actions"><button class="btn" onclick="stat('${x.order_id}','PAID')">APPROVE</button><button class="btn alt" onclick="stat('${x.order_id}','REJECTED')">REJECT</button><button class="btn alt" style="color:#b42318;border-color:#b42318" onclick="deleteOrder('${x.order_id}')">DELETE ORDER</button></div></div>`).join('')||empty('No payments yet.');
 const W=w.data||[];
-tracking.innerHTML=O.map(x=>{const tw=(W.find(z=>z.order_id===x.order_id)||{});const status=tw.status||'WAITING FOR WAYBILL';const courier=tw.courier||'';const num=tw.tracking_number||tw.waybill_number||'';const notes=tw.notes||'';return `<div class="row"><span><b>${x.order_id}</b><br><span class="small">${x.customer_name} • ${x.email}</span></span><div class="grid" style="flex:1;min-width:320px"><label class="f">Courier<select id="tc-${x.order_id}"><option value="">Select courier</option><option value="J&T Luzon" ${courier==='J&T Luzon'?'selected':''}>J&T Luzon</option><option value="J&T Visayas" ${courier==='J&T Visayas'?'selected':''}>J&T Visayas</option><option value="J&T Mindanao" ${courier==='J&T Mindanao'?'selected':''}>J&T Mindanao</option><option value="Lalamove" ${courier==='Lalamove'?'selected':''}>Lalamove</option></select></label><label class="f">Tracking / Waybill<input id="tn-${x.order_id}" value="${String(num).replace(/"/g,'&quot;')}" placeholder="Enter tracking number"></label><label class="f">Status<select id="ts-${x.order_id}"><option value="WAITING FOR WAYBILL" ${status==='WAITING FOR WAYBILL'?'selected':''}>Waiting for Waybill</option><option value="PACKING" ${status==='PACKING'?'selected':''}>Packing</option><option value="IN TRANSIT" ${status==='IN TRANSIT'?'selected':''}>In Transit</option><option value="OUT FOR DELIVERY" ${status==='OUT FOR DELIVERY'?'selected':''}>Out for Delivery</option><option value="DELIVERED" ${status==='DELIVERED'?'selected':''}>Delivered</option></select></label><label class="f">Notes<input id="tno-${x.order_id}" value="${String(notes).replace(/"/g,'&quot;')}" placeholder="Optional update"></label></div><div class="actions"><button class="btn" onclick="saveTracking('${x.order_id}')">SAVE TRACKING</button></div></div>`}).join('')||empty('No MOQ/Open for All orders to track yet.');
-const items=it.data||[], groups={};
+const items=it.data||[];
+const byEmail={};
+O.forEach(ord=>{
+  const email=String(ord.email||'').trim().toLowerCase();
+  if(!email)return;
+  if(!byEmail[email])byEmail[email]={email,orders:[],items:[]};
+  byEmail[email].orders.push(ord);
+  byEmail[email].items.push(...items.filter(z=>z.order_id===ord.order_id));
+});
+const statusSteps=['WAITING FOR WAYBILL','PACKING','IN TRANSIT','OUT FOR DELIVERY','DELIVERED'];
+tracking.innerHTML='<div class="trackingDashboard">'+Object.values(byEmail).map((g,i)=>{
+  const key='ofaTrack'+i;
+  const orderIds=g.orders.map(o=>o.order_id);
+  const rows=W.filter(z=>orderIds.includes(z.order_id)).sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0));
+  const tw=rows[0]||{};
+  const status=tw.status||'WAITING FOR WAYBILL';
+  const courier=tw.courier||'';
+  const num=tw.tracking_number||tw.waybill_number||'';
+  const notes=tw.notes||'';
+  const si=Math.max(0,statusSteps.indexOf(status));
+  const progress=Math.round(((si+1)/statusSteps.length)*100);
+  const products={};
+  g.items.forEach(z=>products[z.product_name]=(products[z.product_name]||0)+(+z.qty||0));
+  const productHtml=Object.keys(products).length?Object.entries(products).map(([name,qty])=>'<div class="trackingProductRow"><span class="trackingProductName">'+name+'</span><span class="trackingQty">QTY '+qty+'</span></div>').join(''):'<div class="trackingProductRow"><span class="small">No item details yet.</span></div>';
+  const refs=g.orders.map(o=>'<span class="trackingRefChip">'+o.order_id+'</span>').join('');
+  return '<div class="trackingClientCard"><div class="trackingClientTop"><div><div class="trackingClientEyebrow">MOQ / OPEN FOR ALL TRACKING</div><div class="trackingClientEmail">'+g.email+'</div></div><span class="trackingStatusPill">'+status+'</span></div><div class="trackingClientBody">'+
+    '<div class="trackingProgressBox"><div class="trackingProgressHead"><b>Shipment progress</b><span>STEP '+(si+1)+' OF '+statusSteps.length+'</span></div><div class="trackingProgressBar"><div class="trackingProgressFill" style="width:'+progress+'%"></div></div></div>'+
+    '<div class="trackingMetaGrid"><div class="trackingMetaBox"><small>CLIENT</small><b>'+((g.orders[0]&&g.orders[0].customer_name)||'—')+'</b></div><div class="trackingMetaBox"><small>COURIER</small><b>'+(courier||'To be assigned')+'</b></div><div class="trackingMetaBox"><small>TRACKING NO.</small><b>'+(num||'To be assigned')+'</b></div><div class="trackingMetaBox"><small>ORDERS</small><b>'+g.orders.length+' order'+(g.orders.length===1?'':'s')+'</b></div></div>'+
+    '<div class="trackingProducts"><div class="trackingProductsHead">ALL PRODUCTS UNDER THIS EMAIL</div>'+productHtml+'</div>'+
+    '<details class="trackingRefs"><summary>VIEW ALL ORDER IDS</summary><div class="trackingRefList">'+refs+'</div></details>'+
+    '<details class="trackingEditor" open><summary>UPDATE TRACKING FOR ALL ORDERS UNDER THIS EMAIL</summary><div class="grid" style="margin-top:14px">'+
+      '<label class="f">Status<select id="'+key+'-status">'+statusSteps.map(v=>'<option value="'+v+'" '+(v===status?'selected':'')+'>'+v+'</option>').join('')+'</select></label>'+
+      '<label class="f">Courier<select id="'+key+'-courier"><option value="">Select courier</option><option value="J&T Luzon" '+(courier==='J&T Luzon'?'selected':'')+'>J&T Luzon</option><option value="J&T Visayas" '+(courier==='J&T Visayas'?'selected':'')+'>J&T Visayas</option><option value="J&T Mindanao" '+(courier==='J&T Mindanao'?'selected':'')+'>J&T Mindanao</option><option value="Lalamove" '+(courier==='Lalamove'?'selected':'')+'>Lalamove</option></select></label>'+
+      '<label class="f">Tracking / Waybill<input id="'+key+'-number" value="'+String(num).replace(/"/g,'&quot;')+'" placeholder="Enter tracking number"></label>'+
+      '<label class="f">Notes<input id="'+key+'-notes" value="'+String(notes).replace(/"/g,'&quot;')+'" placeholder="Optional update"></label>'+
+    '</div><button class="btn trackingSaveAll" type="button" onclick="saveTrackingForEmail(\''+encodeURIComponent(g.email)+'\',\''+key+'\')">SAVE TRACKING FOR ALL '+g.orders.length+' ORDER'+(g.orders.length===1?'':'S')+'</button></details>'+
+  '</div></div>';
+}).join('')+'</div>'||empty('No MOQ/Open for All orders to track yet.');
+const groups={};
 O.forEach(ord=>{const key=(ord.email||'').toLowerCase();if(!groups[key])groups[key]={email:key,orders:[],items:[],waybills:[]};groups[key].orders.push(ord);groups[key].items.push(...items.filter(z=>z.order_id===ord.order_id));groups[key].waybills.push(...W.filter(z=>z.order_id===ord.order_id));});
 ways.innerHTML=Object.values(groups).map(g=>{const first=g.orders[0],qty=g.items.reduce((a,z)=>a+(+z.qty||0),0),products={};g.items.forEach(z=>products[z.product_name]=(products[z.product_name]||0)+(+z.qty||0));const productText=Object.entries(products).map(([n,q])=>n+' × '+q).join(' • ')||'No items';return '<div class="row"><span><b>'+g.email+'</b><br>'+first.customer_name+' • '+(first.contact||'No contact')+'<br><span class="small">'+first.address+'</span><br><span class="tag">'+g.orders.length+' ORDER(S)</span> <span class="tag">'+qty+' TOTAL QTY</span><br><span class="small">'+productText+'</span></span><div class="actions"><button class="btn" onclick="printConsolidated(\''+g.email+'\')">PRINT CONSOLIDATED</button><button class="btn alt" onclick="editConsolidatedWaybill(\''+g.email+'\')">SET WAYBILL</button></div></div>';}).join('')||empty('No Open for All orders yet.');
 pay.value=settings.payment_name||'';ins.value=settings.payment_instructions||'';lu.value=settings.luzon_fee??100;vi.value=settings.visayas_fee??150;mi.value=settings.mindanao_fee??180;la.value=settings.lalamove_fee??0;if(settings.payment_qr_url){qrprev.src=settings.payment_qr_url;qrprev.style.display='block'}}
@@ -27,21 +82,33 @@ async function toggle(id,st){let r=await s.from('ofa_products').update({status:s
 async function deleteProduct(id){if(!confirm('Delete this Open for All product? This is for trial only. Products already used in an order cannot be deleted.'))return;let r=await s.from('ofa_products').delete().eq('id',id);if(r.error)alert('Could not delete product: '+r.error.message);else load()}
 async function deleteOrder(orderId){if(!confirm('DELETE Open for All order '+orderId+'? This removes only this Open for All order, its items and its waybill. Group Buy orders are NOT touched.'))return;let r=await s.from('ofa_orders').delete().eq('order_id',orderId);if(r.error)alert('Could not delete order: '+r.error.message);else load()}
 async function stat(id,v){let r=await s.from('ofa_orders').update({payment_status:v,updated_at:new Date().toISOString()}).eq('order_id',id);if(r.error)alert(r.error.message);else load()}
-async function saveTracking(orderId){
-  const courier=document.getElementById('tc-'+orderId).value;
-  const trackingNumber=document.getElementById('tn-'+orderId).value.trim();
-  const status=document.getElementById('ts-'+orderId).value;
-  const notes=document.getElementById('tno-'+orderId).value.trim();
+async function saveTrackingForEmail(encodedEmail,key){
+  const email=decodeURIComponent(encodedEmail);
+  const courier=document.getElementById(key+'-courier').value;
+  const trackingNumber=document.getElementById(key+'-number').value.trim();
+  const status=document.getElementById(key+'-status').value;
+  const notes=document.getElementById(key+'-notes').value.trim();
   if(!courier){alert('Please select a courier.');return;}
-  const r=await s.from('ofa_waybills').upsert({
-    order_id:orderId,courier:courier,status:status,
-    tracking_number:trackingNumber||null,waybill_number:trackingNumber||null,
-    notes:notes||null,updated_at:new Date().toISOString()
-  },{onConflict:'order_id'});
-  if(r.error){console.error(r.error);alert('Could not save tracking: '+r.error.message);return;}
-  alert('Tracking updated successfully!');
-  await load();
+  try{
+    const ords=(await s.from('ofa_orders').select('order_id').ilike('email',email)).data||[];
+    if(!ords.length){alert('No MOQ/Open for All orders found for this email.');return;}
+    const now=new Date().toISOString();
+    const payload=ords.map(o=>({
+      order_id:o.order_id,courier,status,
+      tracking_number:trackingNumber||null,
+      waybill_number:trackingNumber||null,
+      notes:notes||null,updated_at:now
+    }));
+    const r=await s.from('ofa_waybills').upsert(payload,{onConflict:'order_id'});
+    if(r.error)throw r.error;
+    alert('Tracking saved for ALL '+ords.length+' Open for All order(s) under '+email+'.');
+    await load();
+  }catch(e){
+    console.error(e);
+    alert('Could not save tracking for all: '+(e.message||JSON.stringify(e)));
+  }
 }
+
 async function wb(id){let v=prompt('Waybill / tracking number');if(v===null)return;let r=await s.from('ofa_waybills').update({waybill_number:v,tracking_number:v,status:v?'WAYBILL READY':'WAITING FOR WAYBILL',updated_at:new Date().toISOString()}).eq('id',id);if(r.error)alert(r.error.message);else load()}
 async function editConsolidatedWaybill(email){const ords=(await s.from('ofa_orders').select('order_id').eq('email',email)).data||[];if(!ords.length)return;const v=prompt('Waybill / tracking number for ALL consolidated orders of '+email);if(v===null)return;for(const o of ords){let r=await s.from('ofa_waybills').update({waybill_number:v,tracking_number:v,status:v?'WAYBILL READY':'WAITING FOR WAYBILL',updated_at:new Date().toISOString()}).eq('order_id',o.order_id);if(r.error)console.error(r.error)}await load()}
 async function printConsolidated(email){const [or,ir]=await Promise.all([s.from('ofa_orders').select('*').eq('email',email).order('created_at',{ascending:true}),s.from('ofa_order_items').select('*')]);const O2=or.data||[],all=ir.data||[],items=all.filter(x=>O2.some(o=>o.order_id===x.order_id));if(!O2.length)return;const products={};items.forEach(x=>products[x.product_name]=(products[x.product_name]||0)+(+x.qty||0));const qty=items.reduce((a,x)=>a+(+x.qty||0),0),first=O2[0],w=window.open('','_blank','width=850,height=700');w.document.write('<!doctype html><html><head><title>PEPMOSA MOQ Waybill</title><style>body{font-family:Arial;padding:28px;color:#302530}.box{border:2px solid #e83f9b;border-radius:18px;padding:24px;max-width:760px;margin:auto}h1{color:#d92f8d;margin:0}.top{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding-bottom:16px}.row{padding:10px 0;border-bottom:1px dashed #ddd}.qty{font-size:28px;font-weight:900;color:#d92f8d}.small{font-size:12px;color:#777}</style></head><body><div class="box"><div class="top"><div><h1>PEPMOSA</h1><b>MOQ / OPEN FOR ALL • CONSOLIDATED WAYBILL</b></div><div class="qty">'+qty+' TOTAL ITEMS</div></div><div class="row"><b>TO:</b><br>'+first.customer_name+'<br>'+first.contact+'<br>'+first.address+'</div><div class="row"><b>EMAIL:</b> '+email+'<br><span class="small">Consolidated from '+O2.length+' MOQ/Open for All checkout(s)</span></div><div class="row"><b>CONTENTS / TOTAL QUANTITY</b><br>'+Object.entries(products).map(([n,q])=>n+' × <b>'+q+'</b>').join('<br>')+'</div><div class="row"><b>ORDER IDS</b><br>'+O2.map(x=>x.order_id).join('<br>')+'</div><p class="small">Only MOQ/Open for All orders are included.</p></div><script>window.onload=function(){window.print()}<\/script></body></html>');w.document.close()}

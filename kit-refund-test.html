@@ -1,7 +1,89 @@
 <!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA Kit Refund Test</title><style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff7fb;color:#382c35}.wrap{max-width:900px;margin:auto;padding:25px 14px}.head{display:flex;gap:12px;align-items:center}.head img{width:55px;height:55px;object-fit:contain}.badge{background:#fff0f6;color:#bd2d86;border-radius:99px;padding:7px 10px;font-weight:800;font-size:11px}.note,.card,.stat{background:#fff;border:1px solid #eddee6;border-radius:20px;padding:17px;box-shadow:0 10px 28px #7a315515;margin-top:15px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat b{display:block;font-size:28px;margin-top:8px}.top,.row{display:flex;justify-content:space-between;gap:15px}.row{padding:10px 0;border-bottom:1px solid #f2e9ee}.tag{padding:8px 10px;border-radius:99px;font-size:11px;font-weight:900;background:#fff0f1;color:#b52c43}.ok{background:#edf9f2;color:#287852}.muted{color:#857780;font-size:13px}.total{font-size:20px;font-weight:900;color:#bd2d86;padding-top:12px}button{border:0;border-radius:12px;padding:11px 14px;font-weight:800;cursor:pointer}.primary{background:#c32f8b;color:#fff}.secondary{background:#f4edf1;color:#70465e}.actions{display:flex;gap:8px;margin-top:14px}.modal{display:none;position:fixed;inset:0;background:#321b2c88;align-items:center;justify-content:center;padding:15px}.modal.show{display:flex}.box{width:min(480px,100%);background:#fff;border-radius:24px;padding:20px}input{width:100%;padding:12px;border:1px solid #e6dce1;border-radius:11px;margin:10px 0}@media(max-width:600px){.grid{grid-template-columns:1fr}.top{flex-direction:column}}
-</style></head><body><main class="wrap"><div class="head"><img src="pepmosa-no-name.png"><div><h1>Kit Refund Center</h1><span class="badge">TEST ONLY • SAFE PROTOTYPE</span></div></div><div class="note">🧪 This page is only for testing the workflow. It does not change any live order, payment, waybill, or database record.</div><div class="grid"><div class="stat">Incomplete Kits<b id="a">2</b></div><div class="stat">Refund Pending<b id="b">2</b></div><div class="stat">Refunded<b id="c">0</b></div></div><div id="list"></div></main><div class="modal" id="m"><div class="box"><h2>Confirm Refund</h2><p class="muted" id="info"></p><input id="ref" placeholder="GCash / Bank reference (optional)"><div class="actions"><button class="secondary" onclick="closeM()">Cancel</button><button class="primary" onclick="confirmRefund()">Mark Refunded</button></div></div></div><script>
-const data=[{id:1,name:'Sample Customer A',email:'customer@example.com',product:'Tirzepatide 30mg',qty:1,ordered:7,target:10,price:949,fee:200,status:'PENDING'},{id:2,name:'Sample Customer B',email:'sample2@example.com',product:'Lipo C + B12',qty:2,ordered:8,target:10,price:600,fee:0,status:'PENDING'}];let chosen=null;const peso=n=>'₱'+n.toLocaleString('en-PH',{minimumFractionDigits:2});
-function render(){a.textContent=data.filter(x=>x.status!=='REFUNDED').length;b.textContent=data.filter(x=>x.status==='PENDING').length;c.textContent=data.filter(x=>x.status==='REFUNDED').length;list.innerHTML=data.map(x=>{let total=x.qty*x.price+x.fee;return '<section class="card"><div class="top"><div><span class="tag">⚠ KIT INCOMPLETE</span><h2>'+x.product+'</h2><div class="muted">'+x.name+' • '+x.email+'</div></div><span class="tag '+(x.status==='REFUNDED'?'ok':'')+'">'+(x.status==='REFUNDED'?'✓ REFUNDED':'⏳ REFUND PENDING')+'</span></div><div class="row"><span>Kit progress</span><b>'+x.ordered+'/'+x.target+' • '+(x.target-x.ordered)+' short</b></div><div class="row"><span>Product refund</span><b>'+peso(x.qty*x.price)+'</b></div><div class="row"><span>Admin fee refund</span><b>'+peso(x.fee)+'</b></div><div class="total">Total Refund: '+peso(total)+'</div><div class="actions">'+(x.status==='PENDING'?'<button class="primary" onclick="openM('+x.id+')">Mark as Refunded</button>':'<button class="secondary">Refund complete</button>')+'</div></section>'}).join('')}
-function openM(id){chosen=data.find(x=>x.id===id);info.textContent=chosen.name+' • Total: '+peso(chosen.qty*chosen.price+chosen.fee);m.classList.add('show')}function closeM(){m.classList.remove('show')}function confirmRefund(){chosen.status='REFUNDED';chosen.ref=ref.value||'Manual refund';closeM();render()}render();
+.toolbar{display:flex;gap:10px;margin:18px 0}.toolbar select,.toolbar input{border:1px solid #eadce4;background:#fff;border-radius:14px;padding:13px;font:inherit}.toolbar select{min-width:210px}.toolbar input{flex:1}.six{grid-template-columns:repeat(3,1fr)}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tab{background:#f4edf1;color:#70465e}.tab.active{background:#c32f8b;color:#fff}.kitCard{background:#fff;border:1px solid #eddee6;border-radius:24px;padding:20px;margin:15px 0;box-shadow:0 12px 32px #7a315515}.kitTop{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}.kitTop h2{margin:6px 0;font-size:24px}.kitTop h2 span{font-size:14px;color:#8b7b84}.kitCount{text-align:right}.kitCount b{display:block;font-size:27px;color:#c32f8b}.kitCount small,.customer small{display:block;color:#8c7d85;margin-top:3px}.progress{height:11px;background:#f0e8ed;border-radius:99px;overflow:hidden;margin:17px 0 10px}.progress div{height:100%;background:linear-gradient(90deg,#e34298,#b52c8b);border-radius:99px}.kitMeta{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:#796b73;margin-bottom:15px}.customerList{border-top:1px solid #f0e8ec}.customer{display:flex;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px solid #f0e8ec}.customer>div:last-child{text-align:right}.warn{background:#fff8e7;color:#a97713}.danger{background:#fff0f2;color:#b32b43;border:1px solid #f0cbd4}.empty{text-align:center;padding:45px;color:#8d7b85}@media(max-width:650px){.six{grid-template-columns:repeat(2,1fr)}.toolbar{flex-direction:column}.toolbar select{min-width:0;width:100%}.kitTop{flex-direction:column}.kitCount{text-align:left}.customer{font-size:13px}}</style></head><body>
+<main class="wrap">
+  <div class="head"><img src="pepmosa-no-name.png"><div><h1>Kit Management Center</h1><span class="badge">TEST ONLY • SAFE PROTOTYPE</span></div></div>
+  <div class="note">🧪 Test page only. You can review kit completion, incomplete kits, cancellations and refunds here without changing any live order, payment, waybill or database record.</div>
+
+  <div class="toolbar">
+    <select id="gbFilter" onchange="render()"><option value="ALL">📦 All Group Buys</option><option value="GB-TEST-001">GB-TEST-001</option><option value="GB-TEST-002">GB-TEST-002</option></select>
+    <input id="search" placeholder="🔎 Search product or customer..." oninput="render()">
+  </div>
+
+  <div class="grid six">
+    <div class="stat">Total Kits<b id="totalKits">0</b></div>
+    <div class="stat">Completed<b id="completedKits">0</b></div>
+    <div class="stat">Incomplete<b id="incompleteKits">0</b></div>
+    <div class="stat">Cancelled<b id="cancelledKits">0</b></div>
+    <div class="stat">Refund Pending<b id="pendingRefunds">0</b></div>
+    <div class="stat">Refunded<b id="refundedKits">0</b></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-filter="ALL" onclick="setStatus('ALL',this)">All Kits</button>
+    <button class="tab" data-filter="COMPLETE" onclick="setStatus('COMPLETE',this)">🟢 Completed</button>
+    <button class="tab" data-filter="INCOMPLETE" onclick="setStatus('INCOMPLETE',this)">🟡 Incomplete</button>
+    <button class="tab" data-filter="CANCELLED" onclick="setStatus('CANCELLED',this)">🔴 Cancelled</button>
+  </div>
+
+  <div id="kitList"></div>
+  <div class="footerNote">Prototype data only. When you approve the layout/workflow, we can safely connect this as a separate admin feature.</div>
+</main>
+
+<div class="modal" id="m"><div class="box">
+  <h2 id="modalTitle">Confirm Action</h2>
+  <div id="modalContent"></div>
+  <div class="actions"><button class="secondary" onclick="closeM()">Cancel</button><button class="primary" id="modalConfirm">Confirm</button></div>
+</div></div>
+
+<script>
+const kits=[
+ {id:1,gb:'GB-TEST-001',product:'Tirzepatide',strength:'30mg',target:10,ordered:10,status:'COMPLETE',customers:[
+  {name:'Sample Customer A',email:'customer@example.com',qty:2,paid:1898},
+  {name:'Sample Customer B',email:'sampleb@example.com',qty:3,paid:2847},
+  {name:'Sample Customer C',email:'samplec@example.com',qty:5,paid:4745}
+ ]},
+ {id:2,gb:'GB-TEST-001',product:'Lipo C + B12',strength:'10ml',target:10,ordered:7,status:'INCOMPLETE',customers:[
+  {name:'Sample Customer D',email:'sampled@example.com',qty:1,paid:600},
+  {name:'Sample Customer E',email:'samplee@example.com',qty:3,paid:1800},
+  {name:'Sample Customer F',email:'samplef@example.com',qty:3,paid:1800}
+ ]},
+ {id:3,gb:'GB-TEST-002',product:'Tirzepatide',strength:'15mg',target:10,ordered:10,status:'COMPLETE',customers:[
+  {name:'Sample Customer G',email:'sampleg@example.com',qty:4,paid:3396},
+  {name:'Sample Customer H',email:'sampleh@example.com',qty:6,paid:5094}
+ ]},
+ {id:4,gb:'GB-TEST-002',product:'Glow Blend',strength:'',target:10,ordered:6,status:'CANCELLED',refundStatus:'PENDING',price:750,adminFee:200,customers:[
+  {name:'Sample Customer I',email:'samplei@example.com',qty:2,paid:1500,refund:'PENDING'},
+  {name:'Sample Customer J',email:'samplej@example.com',qty:4,paid:3000,refund:'PENDING'}
+ ]}
+];
+let statusFilter='ALL', selected=null;
+const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2});
+function setStatus(v,el){statusFilter=v;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');render()}
+function bar(k){let p=Math.min(100,Math.round(k.ordered/k.target*100));return '<div class="progress"><div style="width:'+p+'%"></div></div>'}
+function statusTag(k){
+ if(k.status==='COMPLETE')return '<span class="tag ok">✓ KIT COMPLETE</span>';
+ if(k.status==='INCOMPLETE')return '<span class="tag warn">⚠ INCOMPLETE • '+(k.target-k.ordered)+' SHORT</span>';
+ return '<span class="tag bad">✕ CANCELLED</span>';
+}
+function render(){
+ const gb=gbFilter.value,q=search.value.toLowerCase();
+ let filtered=kits.filter(k=>(gb==='ALL'||k.gb===gb)&&(statusFilter==='ALL'||k.status===statusFilter)&&((k.product+' '+k.strength+' '+k.customers.map(c=>c.name+' '+c.email).join(' ')).toLowerCase().includes(q)));
+ totalKits.textContent=kits.length;completedKits.textContent=kits.filter(k=>k.status==='COMPLETE').length;incompleteKits.textContent=kits.filter(k=>k.status==='INCOMPLETE').length;cancelledKits.textContent=kits.filter(k=>k.status==='CANCELLED').length;
+ pendingRefunds.textContent=kits.filter(k=>k.refundStatus==='PENDING').length;refundedKits.textContent=kits.filter(k=>k.refundStatus==='REFUNDED').length;
+ kitList.innerHTML=filtered.length?filtered.map(k=>{
+ const total=k.customers.reduce((a,c)=>a+c.qty,0);
+ return '<section class="kitCard"><div class="kitTop"><div><div class="muted">'+k.gb+' • KIT #'+String(k.id).padStart(3,'0')+'</div><h2>'+k.product+' <span>'+k.strength+'</span></h2>'+statusTag(k)+'</div><div class="kitCount"><b>'+k.ordered+' / '+k.target+'</b><small>VIALS</small></div></div>'+
+ bar(k)+'<div class="kitMeta"><span>Target: <b>'+k.target+' vials</b></span><span>Customers: <b>'+k.customers.length+'</b></span><span>Ordered: <b>'+total+' vials</b></span></div>'+
+ '<div class="customerList">'+k.customers.map(c=>'<div class="customer"><div><b>'+c.name+'</b><small>'+c.email+'</small></div><div><b>'+c.qty+' vial(s)</b><small>'+peso(c.paid)+'</small></div></div>').join('')+'</div>'+
+ '<div class="actions">'+(k.status==='INCOMPLETE'?'<button class="primary" onclick="completeManually('+k.id+')">➕ Add Manual Order</button><button class="secondary" onclick="moveNext('+k.id+')">🔄 Move to Next GB</button><button class="danger" onclick="cancelKit('+k.id+')">❌ Cancel Kit</button>':k.status==='CANCELLED'?'<button class="primary" onclick="processRefund('+k.id+')">💸 Process Refunds</button>':'<button class="secondary">✓ Kit Ready</button>')+'</div></section>'
+ }).join(''):'<div class="empty">No kits found for this filter.</div>';
+}
+function openModal(title,html,fn,label='Confirm'){modalTitle.textContent=title;modalContent.innerHTML=html;modalConfirm.textContent=label;modalConfirm.onclick=fn;m.classList.add('show')}
+function closeM(){m.classList.remove('show')}
+function completeManually(id){let k=kits.find(x=>x.id===id);openModal('Add Manual Order','<p class="muted">Test only: this simulates adding remaining vials manually.</p><div class="row"><span>Current</span><b>'+k.ordered+'/'+k.target+'</b></div><div class="row"><span>Short</span><b>'+Math.max(0,k.target-k.ordered)+' vial(s)</b></div>',()=>{k.ordered=k.target;k.status='COMPLETE';closeM();render()},'Mark Kit Complete')}
+function moveNext(id){let k=kits.find(x=>x.id===id);openModal('Move to Next Group Buy','<p class="muted">Prototype only. This records the intended workflow without moving any real order.</p><label>Next Group Buy</label><input placeholder="Example: GB-TEST-003">',()=>{closeM();alert('Prototype: ready to move '+k.product+' orders to the next GB. No real data changed.')},'Confirm Move')}
+function cancelKit(id){let k=kits.find(x=>x.id===id);let total=k.customers.reduce((a,c)=>a+c.paid,0);openModal('Cancel Incomplete Kit','<p class="muted">This test action will change this prototype kit to CANCELLED and prepare refunds.</p><div class="row"><span>Product</span><b>'+k.product+' '+k.strength+'</b></div><div class="row"><span>Customers</span><b>'+k.customers.length+'</b></div><div class="row"><span>Estimated product refunds</span><b>'+peso(total)+'</b></div>',()=>{k.status='CANCELLED';k.refundStatus='PENDING';k.customers.forEach(c=>c.refund='PENDING');closeM();render()},'Cancel & Prepare Refunds')}
+function processRefund(id){let k=kits.find(x=>x.id===id);openModal('Process Kit Refunds','<p class="muted">Mark the prototype refunds as completed after you have issued them.</p>'+k.customers.map(c=>'<div class="row"><span>'+c.name+' • '+c.qty+' vial(s)</span><b>'+peso(c.paid)+'</b></div>').join('')+'<label>Refund Reference / Note</label><input id="refundRef" placeholder="Optional reference">',()=>{k.refundStatus='REFUNDED';k.customers.forEach(c=>c.refund='REFUNDED');closeM();render()},'Mark All Refunded')}
+render();
 </script></body></html>

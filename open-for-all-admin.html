@@ -5,6 +5,7 @@
 <div id="stats" class="stats"></div>
 <div class="card"><h2>➕ Add Product</h2><div class="grid"><label class="f">Product Name<input id="pn" placeholder="e.g. Tirzepatide 15mg"></label><label class="f">Amount<input id="pa" type="number" placeholder="0"></label><label class="f">MOQ<input id="pm" type="number" value="1"></label><label class="f">Product Photo<input id="pi" type="file" accept="image/png,image/jpeg,image/webp"></label></div><img id="pprev" class="preview" style="display:none"><br><button id="addProductBtn" type="button" class="btn">ADD PRODUCT</button><div id="saveStatus" class="small" style="margin-top:10px"></div><div id="plist"></div></div>
 <div class="card"><h2>💳 Payments / Approval</h2><div id="payments"></div></div>
+<div class="card"><h2>📦 Update Tracking for All</h2><p class="small">Set one tracking/waybill number for all current Open for All orders.</p><button class="btn" type="button" onclick="updateTrackingForAll()">UPDATE TRACKING FOR ALL</button></div>
 <div class="card"><h2>🚚 Consolidated Waybills</h2><p class="small">Same-email orders are consolidated here for MOQ/Open for All only.</p><div id="ways"></div></div>
 <div class="card"><h2>📱 Separate QR & Shipping</h2><div class="grid"><label class="f">Payment QR Image<input id="qrfile" type="file" accept="image/png,image/jpeg,image/webp"></label><label class="f">Payment Name<input id="pay" placeholder="Account / payment name"></label><label class="f">Luzon Shipping<input id="lu" type="number"></label><label class="f">Visayas Shipping<input id="vi" type="number"></label><label class="f">Mindanao Shipping<input id="mi" type="number"></label><label class="f">Lalamove Shipping<input id="la" type="number" placeholder="0"></label></div><img id="qrprev" class="preview" style="display:none"><label class="f" style="margin-top:12px">Instructions<textarea id="ins" placeholder="Payment instructions"></textarea></label><br><button id="saveSettingsBtn" type="button" class="btn">SAVE SETTINGS</button></div>
 </div><script>
@@ -68,6 +69,21 @@ async function stat(id,v){
     console.error(e);
     alert('Could not update payment: '+(e.message||JSON.stringify(e)));
   }
+}
+async function updateTrackingForAll(){
+  const v=prompt('Enter tracking / waybill number to apply to ALL current Open for All orders:');
+  if(v===null)return;
+  const tracking=v.trim();
+  if(!tracking){alert('Tracking number cannot be empty.');return;}
+  if(!confirm('Apply "'+tracking+'" to ALL current Open for All orders?'))return;
+  try{
+    const rows=(await s.from('ofa_waybills').select('id')).data||[];
+    if(!rows.length){alert('No Open for All waybills found.');return;}
+    const u=await s.from('ofa_waybills').update({waybill_number:tracking,tracking_number:tracking,status:'WAYBILL READY',updated_at:new Date().toISOString()}).in('id',rows.map(x=>x.id));
+    if(u.error)throw u.error;
+    alert('Tracking updated for '+rows.length+' Open for All order(s).');
+    await load();
+  }catch(e){console.error(e);alert('Could not update tracking: '+(e.message||JSON.stringify(e)));}
 }
 async function wb(id){let v=prompt('Waybill / tracking number');if(v===null)return;let r=await s.from('ofa_waybills').update({waybill_number:v,tracking_number:v,status:v?'WAYBILL READY':'WAITING FOR WAYBILL',updated_at:new Date().toISOString()}).eq('id',id);if(r.error)alert(r.error.message);else load()}
 async function editConsolidatedWaybill(email){const ords=(await s.from('ofa_orders').select('order_id').eq('email',email)).data||[];if(!ords.length)return;const v=prompt('Waybill / tracking number for ALL consolidated orders of '+email);if(v===null)return;for(const o of ords){let r=await s.from('ofa_waybills').update({waybill_number:v,tracking_number:v,status:v?'WAYBILL READY':'WAITING FOR WAYBILL',updated_at:new Date().toISOString()}).eq('order_id',o.order_id);if(r.error)console.error(r.error)}await load()}

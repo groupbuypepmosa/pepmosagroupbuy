@@ -89,16 +89,14 @@ async function saveOfaBulkTracking(){
   const status=document.getElementById('ofaBulkTrackingStatus').value;
   const courier=document.getElementById('ofaBulkTrackingCourier').value;
   if(!status){alert('Please select a status.');return;}
-  if(!confirm('Update tracking status to "'+status+'" for ALL current Open for All orders?'))return;
+  if(!confirm('Set the GLOBAL Open for All tracking status to "'+status+'"? This is what customers will see.'))return;
   try{
-    const rows=(await s.from('ofa_waybills').select('id')).data||[];
-    if(!rows.length){alert('No Open for All orders found.');return;}
-    const payload={status,updated_at:new Date().toISOString()};
-    if(courier)payload.courier=courier;
-    const u=await s.from('ofa_waybills').update(payload).in('id',rows.map(x=>x.id));
+    const payload={global_tracking_status:status};
+    if(courier)payload.global_tracking_notes='Courier: '+courier;
+    const u=await s.from('ofa_settings').update(payload).eq('id',true);
     if(u.error)throw u.error;
     closeOfaBulkTracking();
-    alert('Tracking status updated for '+rows.length+' Open for All order(s). Tracking numbers were not changed.');
+    alert('Global tracking updated to '+status+'. Customers will now see this status.');
     await load();
   }catch(e){console.error(e);alert('Could not update tracking: '+(e.message||JSON.stringify(e)));}
 }

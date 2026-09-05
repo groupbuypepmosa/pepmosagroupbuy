@@ -50,7 +50,19 @@ async function addP(){const pnEl=document.getElementById('pn'),paEl=document.get
 async function toggle(id,st){let r=await s.from('ofa_products').update({status:st==='AVAILABLE'?'SOLD_OUT':'AVAILABLE'}).eq('id',id);if(r.error)alert(r.error.message);else load()}
 async function deleteProduct(id){if(!confirm('Delete this Open for All product? This is for trial only. Products already used in an order cannot be deleted.'))return;let r=await s.from('ofa_products').delete().eq('id',id);if(r.error)alert('Could not delete product: '+r.error.message);else load()}
 async function deleteOrder(orderId){if(!confirm('DELETE Open for All order '+orderId+'? This removes only this Open for All order, its items and its waybill. Group Buy orders are NOT touched.'))return;let r=await s.from('ofa_orders').delete().eq('order_id',orderId);if(r.error)alert('Could not delete order: '+r.error.message);else load()}
-async function stat(id,v){let r=await s.from('ofa_orders').update({payment_status:v,updated_at:new Date().toISOString()}).eq('order_id',id);if(r.error)alert(r.error.message);else load()}
+async function stat(id,v){
+  const label=v==='PAID'?'approve this payment':'mark this payment as rejected';
+  if(!confirm('Are you sure you want to '+label+'?'))return;
+  try{
+    const r=await s.rpc('ofa_set_payment_status_admin',{p_order_id:id,p_status:v});
+    if(r.error)throw r.error;
+    alert(v==='PAID'?'Payment approved successfully.':'Payment marked as rejected.');
+    await load();
+  }catch(e){
+    console.error(e);
+    alert('Could not update payment: '+(e.message||JSON.stringify(e)));
+  }
+}
 async function saveTrackingForEmail(encodedEmail,key){
   const email=decodeURIComponent(encodedEmail);
   const courier=document.getElementById(key+'-courier').value;

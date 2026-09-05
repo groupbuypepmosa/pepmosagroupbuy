@@ -83,10 +83,7 @@ async function checkout(){
   if(!EMAIL){document.getElementById('gate').classList.add('show');return;}
   if(!C.length){popup('Your cart is empty','Add a product first before checking out.','🛍️');return;}
   await Promise.all([refreshShippingStatus(),refreshCustomerProfile()]);
-  OFA_SUBMITTING=true;
-  const submitBtn=document.querySelector('#box .btn[onclick="submit()"]');
-  if(submitBtn){submitBtn.disabled=true;submitBtn.textContent='SUBMITTING... ♡';submitBtn.style.opacity='.65';submitBtn.style.cursor='wait';}
-  const unlock=()=>{OFA_SUBMITTING=false;if(submitBtn){submitBtn.disabled=false;submitBtn.textContent='SUBMIT ORDER ♡';submitBtn.style.opacity='';submitBtn.style.cursor='';}};
+  OFA_SUBMITTING=false;
   const hasSaved=!!(PROFILE.customer_name&&PROFILE.address&&(SHIP.status==='PAID'||SHIP.status==='SUBMITTED'));
   const savedMethod=PROFILE.shipping_method||SHIP.shipping_method||'JT_LUZON';
   m.classList.add('show');
@@ -123,12 +120,15 @@ function total(){
 let OFA_SUBMITTING=false;
 async function submit(){
   if(OFA_SUBMITTING)return;
+  OFA_SUBMITTING=true;
+  const submitBtn=document.querySelector('#box .btn[onclick="submit()"]');
+  if(submitBtn){submitBtn.disabled=true;submitBtn.textContent='SUBMITTING... ♡';}
   const hasSaved=!!(PROFILE.customer_name&&PROFILE.address&&(SHIP.status==='PAID'||SHIP.status==='SUBMITTED'));
   let name=hasSaved?PROFILE.customer_name:(document.getElementById('n')?.value||'').trim();
   let contact=hasSaved?(PROFILE.contact||''):(document.getElementById('c')?.value||'').trim();
   let address=hasSaved?PROFILE.address:(document.getElementById('a')?.value||'').trim();
   let file=proof.files[0];
-  if(!EMAIL||!name||!address||!file){popup('Almost there!','Please complete all required fields and upload your proof of payment.','♡');unlock();return;}
+  if(!EMAIL||!name||!address||!file){popup('Almost there!','Please complete all required fields and upload your proof of payment.','♡');return;}
   let id='OFA-'+Date.now(),s=S();
   try{
     let ext=(file.name.split('.').pop()||'jpg').replace(/[^a-z0-9]/gi,''),path='open-for-all/'+id+'.'+ext,up=await s.storage.from('payment-proofs').upload(path,file,{contentType:file.type});
@@ -141,8 +141,8 @@ async function submit(){
     await refreshShippingStatus();
     m.classList.remove('show');C=[];draw();
     popup('Order Submitted! ♡','Your order '+id+' was submitted successfully and is now waiting for payment approval.','✓');
-    unlock();
-  }catch(err){console.error(err);popup('Something went wrong',err.message||'Please try again.','!');unlock()}
+    OFA_SUBMITTING=false;
+  }catch(err){console.error(err);popup('Something went wrong',err.message||'Please try again.','!');OFA_SUBMITTING=false;if(submitBtn){submitBtn.disabled=false;submitBtn.textContent='SUBMIT ORDER ♡';}}
 }
 
 (async function initPage(){

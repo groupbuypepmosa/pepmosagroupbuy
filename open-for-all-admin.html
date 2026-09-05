@@ -35,12 +35,12 @@ plist.innerHTML=(p.data||[]).map(x=>`<div class="row"><span>${x.image_url?'<img 
 payments.innerHTML=O.map(x=>`<div class="row"><span><b>${x.order_id}</b><br>${x.customer_name} • ${x.email}<br><b>${ofaPeso(x.total)}</b> • <span class="tag">${x.payment_status}</span><br>${x.payment_proof_url?'<a target="_blank" href="'+x.payment_proof_url+'">View payment proof</a>':'No payment proof'}</span><div class="actions"><button class="btn" onclick="stat('${x.order_id}','PAID')">APPROVE</button><button class="btn alt" onclick="stat('${x.order_id}','REJECTED')">REJECT</button><button class="btn alt" style="color:#b42318;border-color:#b42318" onclick="deleteOrder('${x.order_id}')">DELETE ORDER</button></div></div>`).join('')||empty('No payments yet.');
 const waybillRows=w.data||[];
 const items=it.data||[];
-const statusSteps=['WAITING FOR WAYBILL','PACKING','IN TRANSIT','OUT FOR DELIVERY','DELIVERED'];
-const globalStatus=settings.global_tracking_status||'WAITING FOR WAYBILL';
+const statusSteps=['ORDER RECEIVED','PAYMENT CONFIRMED','ORDER PROCESSING','IN TRANSIT TO THE PHILIPPINES','ARRIVED IN THE PHILIPPINES','RECEIVED AT WAREHOUSE','PACKING & LABELLING','HANDED OVER TO LOCAL COURIER','DELIVERED'];
+const globalStatus=settings.global_tracking_status||'ORDER RECEIVED';
 const globalCourier=settings.global_tracking_courier||'';
 const globalNumber=settings.global_tracking_number||'';
 const globalNotes=settings.global_tracking_notes||'';
-tracking.innerHTML='<div class="card" style="margin:0;background:linear-gradient(135deg,#fff8fb,#fff);border:2px solid #f1b7d3"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap"><div><div class="small" style="font-weight:900;color:#cc2d88;letter-spacing:.08em">ONE UPDATE FOR ALL CUSTOMERS</div><h3 style="margin:6px 0">📦 Global MOQ Tracking</h3><div class="small">Update this once and every Open for All / MOQ customer will see the same shipping status.</div></div><span class="tag">GLOBAL TRACKING</span></div><div class="grid" style="margin-top:16px"><label class="f">Status<select id="globalTrackStatus">'+statusSteps.map(x=>'<option value="'+x+'" '+(globalStatus===x?'selected':'')+'>'+x+'</option>').join('')+'</select></label><label class="f">Courier<select id="globalTrackCourier"><option value="">Select courier</option><option '+(globalCourier==='J&T Express'?'selected':'')+'>J&T Express</option><option '+(globalCourier==='Lalamove'?'selected':'')+'>Lalamove</option><option '+(globalCourier==='Other'?'selected':'')+'>Other</option></select></label><label class="f">Tracking / Waybill Number<input id="globalTrackNumber" value="'+String(globalNumber).replace(/"/g,'&quot;')+'" placeholder="Enter one tracking number"></label></div><label class="f" style="margin-top:12px">Update / Notes<textarea id="globalTrackNotes" placeholder="Optional update visible to all customers">'+String(globalNotes).replace(/</g,'&lt;')+'</textarea></label><div class="actions" style="margin-top:14px"><button class="btn" onclick="saveGlobalTracking()">SAVE GLOBAL TRACKING FOR ALL CUSTOMERS</button></div></div>'; 
+tracking.innerHTML='<div class="card" style="margin:0;background:linear-gradient(135deg,#fff8fb,#fff);border:2px solid #f1b7d3"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap"><div><div class="small" style="font-weight:900;color:#cc2d88;letter-spacing:.08em">ONE UPDATE FOR ALL CUSTOMERS</div><h3 style="margin:6px 0">📦 Global MOQ Tracking</h3><div class="small">Use the same shipment milestones as the regular Group Buy tracker. No courier or tracking number is needed here.</div></div><span class="tag">GLOBAL TRACKING</span></div><div class="grid" style="margin-top:16px"><label class="f">Current Shipping Status<select id="globalTrackStatus">'+statusSteps.map(x=>'<option value="'+x+'" '+(globalStatus===x?'selected':'')+'>'+x+'</option>').join('')+'</select></label></div><label class="f" style="margin-top:12px">Update / Notes<textarea id="globalTrackNotes" placeholder="Optional update visible to all customers">'+String(globalNotes).replace(/</g,'&lt;')+'</textarea></label><div class="actions" style="margin-top:14px"><button class="btn" onclick="saveGlobalTracking()">SAVE SHIPPING UPDATE</button></div></div>'; 
 const groups={};
 O.forEach(ord=>{const key=(ord.email||'').toLowerCase();if(!groups[key])groups[key]={email:key,orders:[],items:[],waybills:[]};groups[key].orders.push(ord);groups[key].items.push(...items.filter(z=>z.order_id===ord.order_id));groups[key].waybills.push(...waybillRows.filter(z=>z.order_id===ord.order_id));});
 ways.innerHTML=Object.values(groups).map(g=>{const first=g.orders[0],qty=g.items.reduce((a,z)=>a+(+z.qty||0),0),products={};g.items.forEach(z=>products[z.product_name]=(products[z.product_name]||0)+(+z.qty||0));const productText=Object.entries(products).map(([n,q])=>n+' × '+q).join(' • ')||'No items';return '<div class="row"><span><b>'+g.email+'</b><br>'+first.customer_name+' • '+(first.contact||'No contact')+'<br><span class="small">'+first.address+'</span><br><span class="tag">'+g.orders.length+' ORDER(S)</span> <span class="tag">'+qty+' TOTAL QTY</span><br><span class="small">'+productText+'</span></span><div class="actions"><button class="btn" onclick="printConsolidated(\''+g.email+'\')">PRINT CONSOLIDATED</button><button class="btn alt" onclick="editConsolidatedWaybill(\''+g.email+'\')">SET WAYBILL</button></div></div>';}).join('')||empty('No Open for All orders yet.');
@@ -80,21 +80,17 @@ async function saveTrackingForEmail(encodedEmail,key){
 
 async function saveGlobalTracking(){
   const status=document.getElementById('globalTrackStatus').value;
-  const courier=document.getElementById('globalTrackCourier').value;
-  const trackingNumber=document.getElementById('globalTrackNumber').value.trim();
   const notes=document.getElementById('globalTrackNotes').value.trim();
   try{
     const r=await s.from('ofa_settings').update({
       global_tracking_status:status,
-      global_tracking_courier:courier||null,
-      global_tracking_number:trackingNumber||null,
       global_tracking_notes:notes||null,
       updated_at:new Date().toISOString()
     }).eq('id',true);
     if(r.error)throw r.error;
-    alert('Global tracking saved. All MOQ/Open for All customers will now see this same update.');
+    alert('Shipping update saved. All MOQ/Open for All customers will now see this same status.');
     await load();
-  }catch(e){console.error(e);alert('Could not save global tracking: '+(e.message||JSON.stringify(e)));}
+  }catch(e){console.error(e);alert('Could not save shipping update: '+(e.message||JSON.stringify(e)));}
 }
 
 async function wb(id){let v=prompt('Waybill / tracking number');if(v===null)return;let r=await s.from('ofa_waybills').update({waybill_number:v,tracking_number:v,status:v?'WAYBILL READY':'WAITING FOR WAYBILL',updated_at:new Date().toISOString()}).eq('id',id);if(r.error)alert(r.error.message);else load()}

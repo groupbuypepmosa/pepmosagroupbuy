@@ -128,11 +128,10 @@ async function submit(){
     let ext=(file.name.split('.').pop()||'jpg').replace(/[^a-z0-9]/gi,''),path='open-for-all/'+id+'.'+ext,up=await s.storage.from('payment-proofs').upload(path,file,{contentType:file.type});
     if(up.error)throw up.error;
     let proofUrl=s.storage.from('payment-proofs').getPublicUrl(path).data.publicUrl,sub=C.reduce((a,x)=>a+x.amount*x.qty,0),f=fee(),sm=document.getElementById('sm').value;
-    let o=await s.from('ofa_orders').insert({order_id:id,email:EMAIL,customer_name:name,contact:contact,address,region:(sm==='JT_VISAYAS'?'VISAYAS':sm==='JT_MINDANAO'?'MINDANAO':'LUZON'),shipping_method:sm,subtotal:sub,shipping_fee:f,total:sub+f,payment_reference:null,payment_proof_url:proofUrl}).select().single();
+    let o=await s.from('ofa_orders').insert({order_id:id,email:EMAIL,customer_name:name,contact:contact,address,region:(sm==='JT_VISAYAS'?'VISAYAS':sm==='JT_MINDANAO'?'MINDANAO':'LUZON'),shipping_method:sm,subtotal:sub,shipping_fee:f,total:sub+f,payment_status:'SUBMITTED',payment_reference:null,payment_proof_url:proofUrl}).select().single();
     if(o.error)throw o.error;
     let it=await s.from('ofa_order_items').insert(C.map(x=>({order_id:id,product_id:x.id,product_name:x.name,qty:x.qty,unit_price:x.amount,line_total:x.amount*x.qty})));
     if(it.error)throw it.error;
-    await s.from('ofa_waybills').insert({order_id:id});
     await refreshShippingStatus();
     m.classList.remove('show');C=[];draw();
     popup('Order Submitted! ♡','Your order '+id+' was submitted successfully and is now waiting for payment approval.','✓');

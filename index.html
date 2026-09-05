@@ -1131,7 +1131,7 @@ function $(id){
    ========================================================= */
 
 function getOpenForAllProducts(){try{return JSON.parse(localStorage.getItem("pepmosa_open_for_all_products")||"[]")}catch(e){return []}}
-function renderOpenForAll(){const box=$("openForAllGrid");if(!box)return;const list=getOpenForAllProducts().filter(x=>x.status==="AVAILABLE");box.innerHTML=list.length?list.map(x=>`<article class="card" style="margin:0"><h3>${esc(x.name)}</h3><div class="muted">MOQ: ${Number(x.moq||1)}</div><div style="font-size:22px;font-weight:800;margin-top:8px">₱${Number(x.amount||0).toLocaleString("en-PH",{minimumFractionDigits:2})}</div><div class="notice success" style="margin-top:10px">Open for All • No Admin Fee</div></article>`).join(""):`<div class="muted">No Open for All products available right now.</div>`}
+function renderOpenForAll(){const box=$("openForAllGrid");if(!box)return;const list=getOpenForAllProducts().filter(x=>x.status==="AVAILABLE");box.innerHTML=list.length?list.map(x=>`<article class="card" style="margin:0">${x.image_url?`<div style="height:180px;margin:-2px -2px 14px;border-radius:14px;overflow:hidden;background:#fff"><img src="${esc(x.image_url)}" alt="${esc(x.name)}" style="width:100%;height:100%;object-fit:contain;display:block"></div>`:''}<h3>${esc(x.name)}</h3><div class="muted">MOQ: ${Number(x.moq||1)}</div><div style="font-size:22px;font-weight:800;margin-top:8px">₱${Number(x.amount||0).toLocaleString("en-PH",{minimumFractionDigits:2})}</div><div class="notice success" style="margin-top:10px">Open for All • No Admin Fee</div></article>`).join(""):`<div class="muted">No Open for All products available right now.</div>`}
 async function load(){
 
   renderOpenForAll();

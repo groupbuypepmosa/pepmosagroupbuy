@@ -166,7 +166,7 @@ async function submit(){
     let it=await s.from('ofa_order_items').insert(C.map(x=>({order_id:id,product_id:x.id,product_name:x.name,qty:x.qty,unit_price:x.amount,line_total:x.amount*x.qty})));
     if(it.error)throw it.error;
     const courierMap={JT_LUZON:'J&T Luzon',JT_VISAYAS:'J&T Visayas',JT_MINDANAO:'J&T Mindanao',LALAMOVE:'Lalamove'};
-    const wb=await s.from('ofa_waybills').upsert({order_id:id,status:'WAITING FOR WAYBILL',courier:courierMap[sm]||null,updated_at:new Date().toISOString()},{onConflict:'order_id'});
+    const wb=await s.from('ofa_waybills').insert({order_id:id,status:'WAITING FOR WAYBILL',courier:courierMap[sm]||null,updated_at:new Date().toISOString()});
     if(wb.error)throw wb.error;
     await refreshShippingStatus();
     m.classList.remove('show');C=[];draw();

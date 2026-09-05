@@ -45,16 +45,15 @@ async function addP(){const pnEl=document.getElementById('pn'),paEl=document.get
 async function toggle(id,st){let r=await s.from('ofa_products').update({status:st==='AVAILABLE'?'SOLD_OUT':'AVAILABLE'}).eq('id',id);if(r.error)alert(r.error.message);else load()}
 async function deleteProduct(id){if(!confirm('Delete this Open for All product? This is for trial only. Products already used in an order cannot be deleted.'))return;let r=await s.from('ofa_products').delete().eq('id',id);if(r.error)alert('Could not delete product: '+r.error.message);else load()}
 async function deleteOrder(orderId){
-  if(!confirm('DELETE Open for All order '+orderId+'? This permanently removes only this MOQ/Open for All order. Its items and waybill are automatically deleted too. Regular Group Buy is NOT touched.'))return;
+  if(!confirm('Move Open for All order '+orderId+' to TRASH? You can restore it later.'))return;
   try{
-    const r=await s.from('ofa_orders').delete().eq('order_id',orderId).select('order_id');
+    const r=await s.rpc('ofa_soft_delete_order_admin',{p_order_id:orderId});
     if(r.error)throw r.error;
-    if(!r.data||!r.data.length)throw new Error('Order was not deleted. Please refresh and try again.');
-    alert('Order permanently deleted. It will no longer appear in orders, tracking, or TOTAL UNITS ORDERED.');
+    alert('Order moved to Trash. It was NOT permanently deleted.');
     await load();
   }catch(e){
     console.error(e);
-    alert('Could not delete order: '+(e.message||JSON.stringify(e)));
+    alert('Could not move order to Trash: '+(e.message||JSON.stringify(e)));
   }
 }
 async function stat(id,v){

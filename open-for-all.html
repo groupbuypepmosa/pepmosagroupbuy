@@ -12,7 +12,7 @@ async function load(){
     SET=b.data||{};
     const list=document.getElementById('list');
     list.innerHTML=P.length
-      ? P.map(x=>'<div class="card">'+(x.image_url?'<img class="pic" src="'+x.image_url+'">':'')+'<h3>'+x.name+'</h3><div>MOQ: '+x.moq+'</div><div class="price">'+ofaPeso(x.amount)+'</div><input id="q'+x.id+'" type="number" min="'+x.moq+'" value="'+x.moq+'"> <button class="btn" onclick="add(\\''+x.id+'\\')">ADD</button></div>').join('')
+      ? P.map(x=>`<div class="card">${x.image_url?`<img class="pic" src="${x.image_url}">`:''}<h3>${x.name}</h3><div>MOQ: ${x.moq}</div><div class="price">${ofaPeso(x.amount)}</div><input id="q${x.id}" type="number" min="${x.moq}" value="${x.moq}"> <button class="btn" onclick="add('${x.id}')">ADD</button></div>`).join('')
       : '<div class="card" style="grid-column:1/-1;text-align:center;padding:30px"><h3>No products available yet</h3><p>Please check back soon.</p></div>';
     draw();
   }catch(err){

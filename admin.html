@@ -287,7 +287,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
     </div>
   </div>
 </section>
-<section id="vialTrackerPanel" class="panel"><div class="card"><h2>Vial / Order Tracker</h2><p class="muted">Consolidated by product + variant. 10 vials = 1 kit, with remaining vials needed to complete the next kit.</p><div class="grid"><div class="field"><label>Group Buy</label><select id="vialTrackerGB" onchange="loadVialTracker()"><option value="">All Group Buys</option></select></div><div class="field"><label>Search Product / Variant</label><input id="vialTrackerSearch" placeholder="Search..." oninput="renderVialTracker()"></div></div><div id="vialTrackerResults" style="margin-top:18px">Select a Group Buy or use All Group Buys.</div></div></section>
+<section id="vialTrackerPanel" class="panel"><div class="card"><div class="itemHead"><div><h2>Vial / Order Tracker</h2><p class="muted">Consolidated by product + variant. 10 vials = 1 kit, with remaining vials needed to complete the next kit.</p></div><button class="btn primary" type="button" onclick="printTotalVials()">🖨 PRINT TOTAL VIALS</button></div><div class="grid"><div class="field"><label>Group Buy</label><select id="vialTrackerGB" onchange="loadVialTracker()"><option value="">All Group Buys</option></select></div><div class="field"><label>Search Product / Variant</label><input id="vialTrackerSearch" placeholder="Search..." oninput="renderVialTracker()"></div></div><div id="vialTrackerResults" style="margin-top:18px">Select a Group Buy or use All Group Buys.</div></div></section>
 <section id="documentsPanel" class="panel"><div class="card"><h2>COA & Protocol Library</h2><p class="muted">Upload files directly from your device. No URL required.</p><div class="grid"><div class="field"><label>Document Type *</label><select id="docType"><option value="COA">COA</option><option value="PROTOCOL">PROTOCOL</option></select></div><div class="field"><label>Title *</label><input id="docTitle"></div><div class="field full"><label>Product / Reference</label><input id="docProduct"></div><div class="field full"><label>Upload File *</label><input id="docFile" type="file" accept=".pdf,image/png,image/jpeg,image/webp"></div></div><div class="actions"><button class="btn primary" type="button" onclick="uploadLibraryDocument()">UPLOAD DOCUMENT</button></div></div><div class="card"><h2>Uploaded Documents</h2><div id="documentAdminList">Loading...</div></div></section>
 <div id="productEditModal" class="editModal" onclick="if(event.target===this)closeProductEdit()"><div class="editModalCard"><div class="itemHead"><div><div class="eyebrow">PEPMOSA ADMIN</div><h2>Edit Product</h2><div class="small">Update product details and prices.</div></div><button class="btn secondary" type="button" onclick="closeProductEdit()">CLOSE</button></div><div class="grid" style="margin-top:18px"><div class="field"><label>Product Name *</label><input id="editProductName"></div><div class="field"><label>Category *</label><select id="editProductCategory"></select></div><div class="field full"><label>Description</label><textarea id="editProductDescription"></textarea></div></div><div style="margin-top:18px"><h3 style="margin-bottom:6px">Variants & Prices</h3><div class="small">You can update prices directly here.</div><div id="editProductVariants"></div></div><div class="actions"><button class="btn primary" type="button" onclick="saveProductEdit()">SAVE CHANGES</button><button class="btn secondary" type="button" onclick="closeProductEdit()">CANCEL</button></div></div></div>
 <section id="siteNoticePanel" class="panel">
@@ -901,6 +901,24 @@ async function loadVialTracker(){
   renderVialTracker();
  }catch(e){console.error(e);$("vialTrackerResults").innerHTML='<div class="notice error">'+esc(e.message||"Unable to load vial tracker.")+'</div>';}
 }
+function printTotalVials(){
+ const gb=$("vialTrackerGB")?.value||"";
+ const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase();
+ const rows=vialTrackerRows.filter(r=>(r.product_name+" "+r.strength+" "+r.variant_id+" "+r.category).toLowerCase().includes(q));
+ if(!rows.length){showMessage("No vial totals available to print.","warning");return;}
+ const title=gb?("TOTAL VIALS • "+gb):"TOTAL VIALS • ALL GROUP BUYS";
+ const sorted=[...rows].sort((a,b)=>(a.product_name+" "+a.strength).localeCompare(b.product_name+" "+b.strength));
+ const total=sorted.reduce((sum,r)=>sum+Number(r.qty||0),0);
+ const html='<!doctype html><html><head><meta charset="utf-8"><title>'+esc(title)+'</title><style>'+
+ 'body{font-family:Arial,sans-serif;color:#222;padding:26px;max-width:760px;margin:auto}h1{margin:0;font-size:28px}p{color:#666;margin:6px 0 22px}.head{border-bottom:3px solid #222;padding-bottom:14px;margin-bottom:18px}.row{display:grid;grid-template-columns:1fr auto;gap:18px;padding:14px 4px;border-bottom:1px solid #ddd;font-size:17px}.row b:last-child{font-size:20px}.strength{display:block;color:#666;font-size:12px;margin-top:3px}.grand{display:flex;justify-content:space-between;margin-top:20px;padding:16px 4px;border-top:3px solid #222;font-size:20px;font-weight:900}@media print{body{padding:0}.noPrint{display:none}}'+
+ '</style></head><body><div class="head"><h1>PEPMOSA</h1><p>'+esc(title)+'<br>Generated: '+new Date().toLocaleString()+'</p></div>'+
+ sorted.map(r=>'<div class="row"><div><b>'+esc(r.product_name||"Unnamed Product")+'</b><span class="strength">'+esc(r.strength||r.variant_id||"")+'</span></div><b>'+Number(r.qty||0)+' VIAL'+(Number(r.qty||0)===1?"":"S")+'</b></div>').join("")+
+ '<div class="grand"><span>GRAND TOTAL</span><span>'+total+' VIAL'+(total===1?"":"S")+'</span></div><script>window.onload=()=>window.print();<\/script></body></html>';
+ const w=window.open("","_blank","width=850,height=900");
+ if(!w){showMessage("Please allow popups to print the vial totals.","warning");return;}
+ w.document.open();w.document.write(html);w.document.close();
+}
+
 function renderVialTracker(){
  const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase();
  const rows=vialTrackerRows.filter(r=>(r.product_name+" "+r.strength+" "+r.variant_id+" "+r.category).toLowerCase().includes(q));

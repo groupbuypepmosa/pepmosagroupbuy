@@ -11,7 +11,7 @@
 @media(max-width:600px){.w{padding:16px 13px 110px}.hero{padding:25px 20px;border-radius:24px}.hero h1{font-size:32px}.section-head h2{font-size:24px}.bar{bottom:10px;width:calc(100% - 20px);border-radius:16px}.bar .btn{padding:12px}.box{padding:18px;margin:8px auto;border-radius:23px}.pic,.placeholder{height:170px}.chips{gap:6px}.chip{font-size:11px}.popcard{padding:22px}}
 </style></head><body><div class="w"><div class="hero"><div class="brand">PEPMOSA • DIRECT SHOP</div><h1>🌐 OPEN FOR ALL</h1><p>Shop separately from Group Buy — no Admin Fee, with separate payment and waybill.</p><div class="chips"><span class="chip">✓ No Admin Fee</span><span class="chip">✓ Separate Orders</span><span class="chip">✓ MOQ Available</span><span class="chip">✓ Smart Shipping Status</span></div></div><div class="section-head"><div><div class="section-kicker">AVAILABLE NOW</div><h2>Shop Products</h2></div></div><div id="list" class="grid"></div><div class="bar"><div class="cart-label"><small>YOUR CART</small><span id="sum">0 item(s) • ₱0.00</span></div><button class="btn" onclick="checkout()">CHECKOUT →</button></div></div><div id="gate" class="modal show"><div class="box"><h2>Welcome to MOQ ♡</h2><div class="notice">Please enter your email before shopping. We use it to keep your MOQ/Open for All orders together and to check whether your shipping fee has already been paid.</div><div class="f">Email*<input id="gateEmail" type="email" placeholder="your@email.com" autocomplete="email"></div><button id="gateBtn" class="btn" onclick="continueWithEmail()">CONTINUE SHOPPING ♡</button></div></div><div id="m" class="modal"><div id="box" class="box"></div></div><div id="pop" class="pop"><div class="popcard"><div id="popicon" class="popicon">♡</div><h3 id="poptitle">PEPMOSA</h3><p id="popmsg"></p><button class="btn" onclick="closePop()">OK ♡</button></div></div><script>
 const S=()=>window.sb||initSupabase(),ofaPeso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2});
-let P=[],C=[],SET={},EMAIL='',SHIP={status:'NONE',shipping_method:null,shipping_fee:0};
+let P=[],C=[],SET={},EMAIL='',SHIP={status:'NONE',shipping_method:null,shipping_fee:0},PROFILE={};
 
 async function refreshShippingStatus(){
   if(!EMAIL){SHIP={status:'NONE',shipping_method:null,shipping_fee:0};return SHIP;}
@@ -27,6 +27,17 @@ async function refreshShippingStatus(){
   return SHIP;
 }
 
+async function refreshCustomerProfile(){
+  PROFILE={};
+  if(!EMAIL) return PROFILE;
+  try{
+    const r=await S().rpc('ofa_get_customer_profile',{p_email:EMAIL});
+    if(r.error) throw r.error;
+    PROFILE=(r.data||[])[0]||{};
+  }catch(err){ console.error('Customer profile error:',err); PROFILE={}; }
+  return PROFILE;
+}
+
 async function continueWithEmail(){
   const input=document.getElementById('gateEmail');
   const email=(input?.value||'').trim().toLowerCase();
@@ -35,7 +46,7 @@ async function continueWithEmail(){
   localStorage.setItem('ofa_email',EMAIL);
   const btn=document.getElementById('gateBtn');
   if(btn){btn.disabled=true;btn.textContent='CHECKING...';}
-  await refreshShippingStatus();
+  await Promise.all([refreshShippingStatus(),refreshCustomerProfile()]);
   document.getElementById('gate').classList.remove('show');
   if(btn){btn.disabled=false;btn.textContent='CONTINUE SHOPPING ♡';}
   load();
@@ -44,16 +55,18 @@ async function continueWithEmail(){
 async function load(){
   try{
     const s=S();
-    const [a,b]=await Promise.all([
+    const [a,b,t]=await Promise.all([
       s.from('ofa_products').select('*').eq('status','AVAILABLE'),
-      s.from('ofa_settings').select('*').eq('id',true).single()
+      s.from('ofa_settings').select('*').eq('id',true).single(),
+      s.rpc('ofa_public_product_totals')
     ]);
     if(a.error) throw a.error;
     P=a.data||[];
     SET=b.data||{};
+    const totalsById=new Map((t.data||[]).map(x=>[x.product_id,+x.total_qty||0]));
     const list=document.getElementById('list');
     list.innerHTML=P.length
-      ? P.map(x=>`<div class="card">${x.image_url?`<img class="pic" src="${x.image_url}">`:'<div class="placeholder">🧪</div>'}<h3 class="product-name">${x.name}</h3><div class="meta"><span class="badge">MOQ ${x.moq}</span><span>Available Now</span></div><div class="price">${ofaPeso(x.amount)}</div><div class="qtyrow"><input id="q${x.id}" type="number" min="${x.moq}" value="${x.moq}"><button class="btn" onclick="add('${x.id}')">ADD TO CART</button></div></div>`).join('')
+      ? P.map(x=>`<div class="card">${x.image_url?`<img class="pic" src="${x.image_url}">`:'<div class="placeholder">🧪</div>'}<h3 class="product-name">${x.name}</h3><div class="meta"><span class="badge">MOQ ${x.moq}</span><span>Available Now</span></div><div class="order-count">♡ ${totalsById.get(x.id)||0} total ordered</div><div class="price">${ofaPeso(x.amount)}</div><div class="qtyrow"><input id="q${x.id}" type="number" min="${x.moq}" value="${x.moq}"><button class="btn" onclick="add('${x.id}')">ADD TO CART</button></div></div>`).join('')
       : '<div class="card" style="grid-column:1/-1;text-align:center;padding:30px"><h3>No products available yet</h3><p>Please check back soon.</p></div>';
     draw();
   }catch(err){
@@ -69,16 +82,17 @@ function closePop(){pop.classList.remove('show')}
 async function checkout(){
   if(!EMAIL){document.getElementById('gate').classList.add('show');return;}
   if(!C.length){popup('Your cart is empty','Add a product first before checking out.','🛍️');return;}
-  await refreshShippingStatus();
+  await Promise.all([refreshShippingStatus(),refreshCustomerProfile()]);
+  const hasSaved=!!(PROFILE.customer_name&&PROFILE.address&&(SHIP.status==='PAID'||SHIP.status==='SUBMITTED'));
+  const savedMethod=PROFILE.shipping_method||SHIP.shipping_method||'JT_LUZON';
   m.classList.add('show');
   box.innerHTML='<h2>Checkout ♡</h2>'+
-    '<div class="notice">💌 <b>'+EMAIL+'</b><br>All your MOQ/Open for All orders use this email so we can recognize your shipping status.</div>'+
+    '<div class="notice">💌 <b>'+EMAIL+'</b><br>'+(hasSaved?(SHIP.status==='PAID'?'💗 Shipping is already paid for this email. Your saved delivery details will be used.':'💌 Your shipping payment is already submitted and pending approval. No duplicate shipping fee will be added.'):'We use this email to keep your MOQ/Open for All orders together and check your shipping status.')+'</div>'+
     C.map(x=>'<div class="line"><span>'+x.name+' × '+x.qty+'</span><b>'+ofaPeso(x.amount*x.qty)+'</b></div>').join('')+
-    '<div class="f">Name*<input id="n" placeholder="Full name"></div>'+
-    '<div class="f">Contact<input id="c" placeholder="09XXXXXXXXX"></div>'+
-    '<div class="f">Address*<textarea id="a" placeholder="Complete delivery address"></textarea></div>'+
-    '<div class="f">Shipping Method<select id="sm" onchange="shippingChange()"><option value="JT_LUZON">J&T Luzon</option><option value="JT_VISAYAS">J&T Visayas</option><option value="JT_MINDANAO">J&T Mindanao</option><option value="LALAMOVE">Lalamove</option></select></div>'+
-    '<div class="ship-choice" id="shipNote"></div><div id="tot"></div>'+
+    (hasSaved
+      ? '<div class="saved-details"><b>Saved delivery details ♡</b><br>'+PROFILE.customer_name+' • '+(PROFILE.contact||'No contact')+'<br>'+PROFILE.address+'</div><input id="sm" type="hidden" value="'+savedMethod+'">'
+      : '<div class="f">Name*<input id="n" placeholder="Full name"></div><div class="f">Contact<input id="c" placeholder="09XXXXXXXXX"></div><div class="f">Address*<textarea id="a" placeholder="Complete delivery address"></textarea></div><div class="f">Shipping Method<select id="sm" onchange="shippingChange()"><option value="JT_LUZON">J&T Luzon</option><option value="JT_VISAYAS">J&T Visayas</option><option value="JT_MINDANAO">J&T Mindanao</option><option value="LALAMOVE">Lalamove</option></select></div>'
+    )+'<div class="ship-choice" id="shipNote"></div><div id="tot"></div>'+
     (SET.payment_qr_url?'<div class="payment-card qrwrap"><h3>💗 Payment QR</h3><img class="pic" src="'+SET.payment_qr_url+'"><p><b>'+(SET.payment_name||'PEPMOSA')+'</b></p><p>'+(SET.payment_instructions||'')+'</p></div>':'')+
     '<div class="f">Proof of payment*<input id="proof" type="file" accept="image/*"></div><button class="btn" onclick="submit()">SUBMIT ORDER ♡</button>';
   total();
@@ -96,21 +110,25 @@ function total(){
   let sub=C.reduce((a,x)=>a+x.amount*x.qty,0),f=fee(),sm=document.getElementById('sm').value;
   let labels={JT_LUZON:'J&T Luzon',JT_VISAYAS:'J&T Visayas',JT_MINDANAO:'J&T Mindanao',LALAMOVE:'Lalamove'};
   let statusMsg='';
-  if(SHIP.status==='PAID') statusMsg='💗 <b>Shipping already paid ♡</b> We found an approved shipping payment under this email, so no additional shipping fee is added.';
-  else if(SHIP.status==='SUBMITTED') statusMsg='💌 <b>Shipping payment pending approval.</b> We found a previous shipping payment submission under this email, so no duplicate shipping fee is added while it is being reviewed.';
-  else statusMsg='💗 <b>'+labels[sm]+'</b> selected. Shipping fee is added only because there is no existing shipping payment under this email.';
+  if(SHIP.status==='PAID') statusMsg='💗 <b>Shipping already paid ♡</b> No additional shipping fee is added for this email.';
+  else if(SHIP.status==='SUBMITTED') statusMsg='💌 <b>Shipping payment pending approval.</b> No duplicate shipping fee is added while your first shipping payment is being reviewed.';
+  else statusMsg='💗 <b>'+labels[sm]+'</b> selected. This shipping fee is charged once for this email.';
   shipNote.innerHTML=statusMsg;
   tot.innerHTML='<div class="line"><span>Shipping'+(SHIP.status==='PAID'?' (ALREADY PAID)':SHIP.status==='SUBMITTED'?' (PENDING APPROVAL)':'')+'</span><b>'+ofaPeso(f)+'</b></div><div class="line"><b>TOTAL ♡</b><b>'+ofaPeso(sub+f)+'</b></div>';
 }
 async function submit(){
-  let name=n.value.trim(),address=a.value.trim(),file=proof.files[0];
+  const hasSaved=!!(PROFILE.customer_name&&PROFILE.address&&(SHIP.status==='PAID'||SHIP.status==='SUBMITTED'));
+  let name=hasSaved?PROFILE.customer_name:(document.getElementById('n')?.value||'').trim();
+  let contact=hasSaved?(PROFILE.contact||''):(document.getElementById('c')?.value||'').trim();
+  let address=hasSaved?PROFILE.address:(document.getElementById('a')?.value||'').trim();
+  let file=proof.files[0];
   if(!EMAIL||!name||!address||!file){popup('Almost there!','Please complete all required fields and upload your proof of payment.','♡');return;}
   let id='OFA-'+Date.now(),s=S();
   try{
     let ext=(file.name.split('.').pop()||'jpg').replace(/[^a-z0-9]/gi,''),path='open-for-all/'+id+'.'+ext,up=await s.storage.from('payment-proofs').upload(path,file,{contentType:file.type});
     if(up.error)throw up.error;
     let proofUrl=s.storage.from('payment-proofs').getPublicUrl(path).data.publicUrl,sub=C.reduce((a,x)=>a+x.amount*x.qty,0),f=fee(),sm=document.getElementById('sm').value;
-    let o=await s.from('ofa_orders').insert({order_id:id,email:EMAIL,customer_name:name,contact:c.value.trim(),address,region:(sm==='JT_VISAYAS'?'VISAYAS':sm==='JT_MINDANAO'?'MINDANAO':'LUZON'),shipping_method:sm,subtotal:sub,shipping_fee:f,total:sub+f,payment_reference:null,payment_proof_url:proofUrl}).select().single();
+    let o=await s.from('ofa_orders').insert({order_id:id,email:EMAIL,customer_name:name,contact:contact,address,region:(sm==='JT_VISAYAS'?'VISAYAS':sm==='JT_MINDANAO'?'MINDANAO':'LUZON'),shipping_method:sm,subtotal:sub,shipping_fee:f,total:sub+f,payment_reference:null,payment_proof_url:proofUrl}).select().single();
     if(o.error)throw o.error;
     let it=await s.from('ofa_order_items').insert(C.map(x=>({order_id:id,product_id:x.id,product_name:x.name,qty:x.qty,unit_price:x.amount,line_total:x.amount*x.qty})));
     if(it.error)throw it.error;
@@ -126,7 +144,7 @@ async function submit(){
   if(saved&&/^\S+@\S+\.\S+$/.test(saved)){
     EMAIL=saved;
     const ge=document.getElementById('gateEmail'); if(ge) ge.value=EMAIL;
-    await refreshShippingStatus();
+    await Promise.all([refreshShippingStatus(),refreshCustomerProfile()]);
     document.getElementById('gate').classList.remove('show');
     load();
   }else{

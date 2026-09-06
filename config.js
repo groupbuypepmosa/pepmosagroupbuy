@@ -8,7 +8,7 @@ window.PEPMOSA_CONFIG = {
    races and inconsistent behavior between fresh browser profiles. */
 (function(){
   'use strict';
-  const VERSION = '20260904-public-access-stable';
+  const VERSION = '20260906-open-gb-total-ordered';
 
   function hasScript(file){
     return Array.from(document.scripts).some(s=>{
@@ -36,6 +36,7 @@ window.PEPMOSA_CONFIG = {
     if(isStorefront){
       loadOnce('storefront-repair.js');
       loadOnce('checkout-polish.js');
+      loadOnce('group-buy-total-polish.js');
       return;
     }
 

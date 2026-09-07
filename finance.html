@@ -79,7 +79,7 @@ function updateVariants(){
 $('pname').addEventListener('change',updateVariants);
 
 function renderPrices(){
- $('prices').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Manuf. Price</th><th></th></tr>'+prices.map(x=>'<tr><td>'+esc(x.product_name)+'</td><td>'+esc(x.variant||'—')+'</td><td>'+peso(x.manufacturer_price)+'</td><td><button class="danger" onclick="delPrice(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
+ $('prices').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Manuf. Price</th><th>Action</th></tr>'+prices.map(x=>'<tr><td>'+esc(x.product_name)+'</td><td>'+esc(x.variant||'—')+'</td><td>'+peso(x.manufacturer_price)+'</td><td><button onclick="editPrice(\''+x.id+'\')">Edit</button> <button class="danger" onclick="delPrice(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
 }
 function renderExpenses(){
  $('expenses').innerHTML='<table><tr><th>Date</th><th>Scope</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr>'+expenses.map(x=>'<tr><td>'+x.expense_date+'</td><td>'+esc(x.scope||'GENERAL')+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.description||'')+'</td><td>'+peso(x.amount)+'</td><td><button class="danger" onclick="delExpense(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
@@ -126,6 +126,15 @@ window.loadSales=function(){
  // Net profit changes only when you manually record an actual expense/payment.
  $('profit').textContent=peso(revenue-exp);
  $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>';
+};
+window.editPrice=function(id){
+ const x=prices.find(p=>String(p.id)===String(id));if(!x)return;
+ $('pname').value=x.product_id||'';
+ updateVariants();
+ if(x.variant_id)$('variant').value=x.variant_id;
+ $('pprice').value=x.manufacturer_price??'';
+ $('pprice').scrollIntoView({behavior:'smooth',block:'center'});
+ $('pprice').focus();
 };
 window.savePrice=async function(){
  const product_id=$('pname').value,variant_id=$('variant').value,manufacturer_price=Number($('pprice').value),c=catalog.find(x=>x.product_id===product_id);

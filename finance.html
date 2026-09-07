@@ -20,6 +20,7 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script>
 <script>
+initSupabase();
 const $=id=>document.getElementById(id);let prices=[],expenses=[],availableProducts=[];
 const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
 $('edate').value=new Date().toISOString().slice(0,10);
@@ -40,7 +41,7 @@ async function load(){
  availableProducts=[...productMap.entries()].map(([name,variants])=>({name,variants:[...variants]})).sort((a,b)=>a.name.localeCompare(b.name));
  renderProductDropdown();
  const map=new Map();
- items.forEach(x=>{const key=[x.product_name||'',x.strength||x.variant_id||''].join('::');const r=map.get(key)||{name:x.product_name||'',variant:x.strength||x.variant_id||'',qty:0,revenue:0};r.qty+=Number(x.qty||0);r.revenue+=Number(x.qty||0)*Number(x.unit_price||0);map.set(key,r)});
+ items.forEach(x=>{const key=[x.product_name||'',''].join('::');const r=map.get(key)||{name:x.product_name||'',variant:'',qty:0,revenue:0};r.qty+=Number(x.qty||0);r.revenue+=Number(x.qty||0)*Number(x.unit_price||0);map.set(key,r)});
  let revenue=0,cost=0;const rows=[...map.values()].map(r=>{revenue+=r.revenue;const p=prices.find(x=>x.product_name.toLowerCase()===r.name.toLowerCase()&&String(x.variant||'').toLowerCase()===String(r.variant||'').toLowerCase());const pc=p?Number(p.manufacturer_price||0)*r.qty:0;cost+=pc;return {...r,pc,profit:r.revenue-pc,hasPrice:!!p}});
  const exp=expenses.reduce((s,x)=>s+Number(x.amount||0),0);$('rev').textContent=peso(revenue);$('cost').textContent=peso(cost);$('exp').textContent=peso(exp);$('profit').textContent=peso(revenue-cost-exp);
  $('prices').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Manuf. Price</th><th></th></tr>'+prices.map(x=>'<tr><td>'+esc(x.product_name)+'</td><td>'+esc(x.variant||'—')+'</td><td>'+peso(x.manufacturer_price)+'</td><td><button class="danger" onclick="delPrice(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
@@ -55,5 +56,5 @@ async function savePrice(){const product_name=$('pname').value.trim(),variant=$(
 async function saveExpense(){const amount=Number($('eamount').value);if(!amount)return alert('Enter expense amount.');const r=await sb.from('finance_expenses').insert({expense_date:$('edate').value,category:$('ecat').value,description:$('edesc').value.trim(),amount});if(r.error)return alert(r.error.message);$('eamount').value=$('edesc').value='';load()}
 async function delPrice(id){if(confirm('Delete this manufacturer price?')){const r=await sb.from('finance_manufacturer_prices').delete().eq('id',id);if(r.error)alert(r.error.message);else load()}}
 async function delExpense(id){if(confirm('Delete this expense?')){const r=await sb.from('finance_expenses').delete().eq('id',id);if(r.error)alert(r.error.message);else load()}}
-load();
+load().catch(e=>{console.error(e);$('sales').innerHTML='<div style="color:#a33">Error loading Finance: '+esc(e.message||String(e))+'</div>';$('pname').innerHTML='<option value="">Unable to load products</option>';});
 </script></body></html>

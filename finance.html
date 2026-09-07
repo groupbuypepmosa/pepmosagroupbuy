@@ -43,11 +43,11 @@ async function init(){
   sb.from('group_buys').select('gb_number,customer_facing_name,status').order('created_at',{ascending:false}),
   sb.from('finance_manufacturer_prices').select('*').order('product_name'),
   sb.from('finance_expenses').select('*').order('expense_date',{ascending:false}),
-  sb.from('orders').select('order_id,gb_number,payment_status'),
+  sb.from('orders').select('order_id,gb_number,payment_status,total,shipping_fee'),
   sb.from('order_items').select('product_id,variant_id,product_name,strength,qty,unit_price,order_id'),
   sb.from('ofa_order_items').select('product_id,product_name,qty,unit_price,order_id'),
   sb.from('ofa_orders').select('order_id,total,subtotal,shipping_fee,payment_status'),
-  sb.from('admin_fee_payments').select('amount,status')
+  sb.from('admin_fee_payments').select('amount,status,gb_number')
  ]);
  for(const x of rs)if(x.error)throw x.error;
  const [prods,vars,ofap,gbs,pr,ex,ord,items,ofi,ofaOrders,adminFees]=rs;
@@ -111,7 +111,8 @@ window.loadSales=function(){
  const shippingCollected=checkoutOrders.reduce((s,o)=>s+Number(o.shipping_fee||0),0);
  const shippingCustomers=checkoutOrders.filter(o=>Number(o.shipping_fee||0)>0).length;
  // Admin fees are global in the current database, so they are shown in the overall/all view only.
- const adminFeeCollected=(scope==='ALL')?(window.adminFeesCache||[]).filter(f=>approvedStatus(f.status)).reduce((s,f)=>s+Number(f.amount||0),0):0;
+ const selectedGb=scope.startsWith('GB:')?scope.slice(3):null;
+ const adminFeeCollected=(window.adminFeesCache||[]).filter(f=>approvedStatus(f.status)&&(scope==='ALL'||(selectedGb!==null&&String(f.gb_number)===String(selectedGb)))).reduce((s,f)=>s+Number(f.amount||0),0);
  const totalAmountCollected=adminFeeCollected+shippingCollected+productPayment;
  $('adminFeeCollected').textContent=peso(adminFeeCollected);
  $('shipping').textContent=peso(shippingCollected);

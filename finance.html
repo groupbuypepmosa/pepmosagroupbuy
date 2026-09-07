@@ -7,12 +7,10 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 <main>
 <div class="card"><div class="toolbar"><div><label><b>View finance for</b></label><select id="scope" onchange="loadSales()"><option value="ALL">All Group Buys + Open for All</option><option value="OFA">Open for All only</option></select></div><div><span class="muted">Manufacturer prices are global and reusable for future Group Buys.</span></div></div></div>
 <div class="grid">
-<div class="card stat"><span>Checkout Payments Collected</span><b id="collected">₱0.00</b><div class="muted">Matches Admin • Product Sales + Shipping Collected</div></div>
-<div class="card stat"><span>Product Sales</span><b id="rev">₱0.00</b><div class="muted">Approved products only • excludes shipping</div></div>
-<div class="card stat"><span>Shipping Collected</span><b id="shipping">₱0.00</b><div class="muted">Shipping fees paid by approved customers</div></div>
-<div class="card stat"><span>Product Cost</span><b id="cost">₱0.00</b><div class="muted">Based on your Manufacturer Pricelist</div></div>
-<div class="card stat"><span>Expenses</span><b id="exp">₱0.00</b><div class="muted">Recorded business expenses</div></div>
-<div class="card stat"><span>Net Product Profit</span><b id="profit">₱0.00</b><div class="muted">Product Sales − Product Cost − Expenses</div></div>
+<div class="card stat"><span>ADMIN FEE COLLECTED</span><b id="adminFeeCollected">₱0.00</b><div class="muted" id="adminFeeNote">Approved admin fees</div></div>
+<div class="card stat"><span id="shippingTitle">SHIPPING FEE FOR 0 CUSTOMERS</span><b id="shipping">₱0.00</b><div class="muted">Approved customer shipping fees</div></div>
+<div class="card stat"><span>PRODUCT PAYMENT COLLECTED</span><b id="productCollected">₱0.00</b><div class="muted">Approved product payments • excludes shipping</div></div>
+<div class="card stat"><span>TOTAL AMOUNT COLLECTED</span><b id="totalCollected">₱0.00</b><div class="muted">Admin Fee + Shipping Fee + Product Payment</div></div>
 </div>
 
 <div class="card"><h2>🏭 Manufacturer Pricelist</h2><p class="muted">All products from your catalog are available here — not only products that already have orders. Prices are saved globally and will still work for future Group Buys.</p>
@@ -99,13 +97,24 @@ window.loadSales=function(){
  // Admin's Amount Collected = approved regular checkout totals + approved admin fees.
  // This deliberately excludes Open for All because the current Admin payment center does not include OFA.
  const approvedRegular=(orders||[]).filter(o=>approvedStatus(o.payment_status)&&(scope==='ALL'||(scope!=='OFA'&&o.gb_number===scope.replace('GB:',''))));
- const regularCollected=scope==='OFA'?0:approvedRegular.reduce((s,o)=>s+Number(o.total||0),0);
- const shippingCollected=scope==='OFA'?0:approvedRegular.reduce((s,o)=>s+Number(o.shipping_fee||0),0);
- // Admin currently shows approved checkout totals, so this is intentionally the same number.
- const collected=regularCollected;
- $('collected').textContent=peso(collected);
+ const approvedOfa=(window.ofaOrdersCache||[]).filter(o=>approvedStatus(o.payment_status));
+ const selectedOfa=scope==='ALL'||scope==='OFA'?approvedOfa:[];
+ // Finance collection breakdown:
+ // Product payment = approved checkout total minus shipping.
+ // Shipping is shown separately with the number of customers who paid shipping.
+ const checkoutOrders=scope==='OFA'?approvedOfa:(scope==='ALL'?approvedRegular:approvedRegular);
+ const productPayment=checkoutOrders.reduce((s,o)=>s+Number(o.total||0)-Number(o.shipping_fee||0),0);
+ const shippingCollected=checkoutOrders.reduce((s,o)=>s+Number(o.shipping_fee||0),0);
+ const shippingCustomers=checkoutOrders.filter(o=>Number(o.shipping_fee||0)>0).length;
+ // Admin fees are global in the current database, so they are shown in the overall/all view only.
+ const adminFeeCollected=(scope==='ALL')?(window.adminFeesCache||[]).filter(f=>approvedStatus(f.status)).reduce((s,f)=>s+Number(f.amount||0),0):0;
+ const totalAmountCollected=adminFeeCollected+shippingCollected+productPayment;
+ $('adminFeeCollected').textContent=peso(adminFeeCollected);
  $('shipping').textContent=peso(shippingCollected);
- $('rev').textContent=peso(revenue);$('cost').textContent=peso(cost);$('exp').textContent=peso(exp);$('profit').textContent=peso(revenue-cost-exp);
+ $('shippingTitle').textContent='SHIPPING FEE FOR '+shippingCustomers+' CUSTOMER'+(shippingCustomers===1?'':'S');
+ $('productCollected').textContent=peso(productPayment);
+ $('totalCollected').textContent=peso(totalAmountCollected);
+ /* detailed cost and expense calculations remain available in tables below */
  $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>';
 };
 window.savePrice=async function(){

@@ -1,114 +1,108 @@
 <!doctype html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA Finance</title>
 <style>
-body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{background:#222;color:#fff;padding:18px 24px}main{max-width:1200px;margin:auto;padding:22px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:18px;box-shadow:0 2px 10px #0001}.stat b{font-size:28px;display:block;margin-top:8px}input,select,textarea{width:100%;box-sizing:border-box;padding:10px;margin:5px 0 12px;border:1px solid #ddd;border-radius:8px}button{padding:10px 14px;border:0;border-radius:8px;background:#222;color:#fff;cursor:pointer}.danger{background:#a33}.muted{color:#777;font-size:13px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.right{margin-left:auto}@media(max-width:700px){table{font-size:12px}main{padding:12px}}
-</style></head><body><header><b>PEPMOSA • FINANCE</b><span class="muted" style="color:#ccc">Separate Revenue & Expenses Dashboard</span></header>
+body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{background:#222;color:#fff;padding:18px 24px}main{max-width:1200px;margin:auto;padding:22px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:18px;box-shadow:0 2px 10px #0001}.stat b{font-size:28px;display:block;margin-top:8px}input,select,textarea{width:100%;box-sizing:border-box;padding:10px;margin:5px 0 12px;border:1px solid #ddd;border-radius:8px}button{padding:10px 14px;border:0;border-radius:8px;background:#222;color:#fff;cursor:pointer}.danger{background:#a33}.muted{color:#777;font-size:13px}.toolbar{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.toolbar>div{min-width:220px;flex:1}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}@media(max-width:700px){table{font-size:12px}main{padding:12px}}
+</style></head><body>
+<header><b>PEPMOSA • FINANCE</b><span class="muted" style="color:#ccc">Separate Revenue & Expenses Dashboard</span></header>
 <main>
-<div class="grid">
-<div class="card stat"><span>Total Revenue</span><b id="rev">₱0.00</b></div>
-<div class="card stat"><span>Product Cost</span><b id="cost">₱0.00</b></div>
-<div class="card stat"><span>Expenses</span><b id="exp">₱0.00</b></div>
-<div class="card stat"><span>Net Profit</span><b id="profit">₱0.00</b></div>
-</div>
-<div class="card"><h2>🏭 Manufacturer Pricelist</h2><p class="muted">You control these prices. They are separate from your selling prices.</p>
-<div class="grid"><select id="pname"><option value="">Loading products…</option></select><select id="variant"><option value="">Select variant / strength</option></select><input id="pprice" type="number" step="0.01" placeholder="Manufacturer price"></div>
+<div class="card"><div class="toolbar"><div><label><b>View finance for</b></label><select id="scope" onchange="loadSales()"><option value="ALL">All Group Buys + Open for All</option><option value="OFA">Open for All only</option></select></div><div><span class="muted">Manufacturer prices are global and reusable for future Group Buys.</span></div></div></div>
+<div class="grid"><div class="card stat"><span>Total Revenue</span><b id="rev">₱0.00</b></div><div class="card stat"><span>Product Cost</span><b id="cost">₱0.00</b></div><div class="card stat"><span>Expenses</span><b id="exp">₱0.00</b></div><div class="card stat"><span>Net Profit</span><b id="profit">₱0.00</b></div></div>
+
+<div class="card"><h2>🏭 Manufacturer Pricelist</h2><p class="muted">All products from your catalog are available here — not only products that already have orders. Prices are saved globally and will still work for future Group Buys.</p>
+<div class="grid"><select id="pname"><option value="">Loading all products…</option></select><select id="variant"><option value="">Select product first</option></select><input id="pprice" type="number" step="0.01" placeholder="Manufacturer price"></div>
 <button onclick="savePrice()">ADD / UPDATE PRICE</button><div id="prices"></div></div>
-<div class="card"><h2>💸 Expenses</h2>
-<div class="grid"><input id="edate" type="date"><select id="ecat"><option>Shipping</option><option>Supplier</option><option>Packaging</option><option>Customs</option><option>Operational</option><option>Other</option></select><input id="eamount" type="number" step="0.01" placeholder="Amount"></div>
+
+<div class="card"><h2>💸 Expenses</h2><p class="muted">You can assign an expense to a specific Group Buy, Open for All, or keep it General.</p>
+<div class="grid"><input id="edate" type="date"><select id="escope"><option value="GENERAL">General</option><option value="OFA">Open for All</option></select><select id="ecat"><option>Shipping</option><option>Supplier</option><option>Packaging</option><option>Customs</option><option>Operational</option><option>Other</option></select><input id="eamount" type="number" step="0.01" placeholder="Amount"></div>
 <textarea id="edesc" placeholder="Description / notes"></textarea><button onclick="saveExpense()">ADD EXPENSE</button><div id="expenses"></div></div>
-<div class="card"><h2>📊 Sales & Product Profit</h2><p class="muted">Revenue is calculated from Regular Group Buy orders plus Open for All orders. Product cost uses your Manufacturer Pricelist when a matching product/variant exists.</p><div id="sales">Loading…</div></div>
+
+<div class="card"><h2>📊 Sales & Product Profit</h2><p class="muted">Filter above to see All, Open for All, or any specific Group Buy. New Group Buys automatically appear in the dropdown.</p><div id="sales">Loading…</div></div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script>
 <script>
 (async()=>{
-try{ initSupabase(); await requireAdmin(); }catch(e){ document.body.innerHTML='<main style="padding:30px;font-family:Arial"><h2>Admin access required</h2><p>Please open this page while logged in as the PEPMOSA admin.</p></main>'; return; }
-const $=id=>document.getElementById(id);let prices=[],expenses=[],availableProducts=[];
-const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
-const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+try{initSupabase();await requireAdmin();}catch(e){document.body.innerHTML='<main style="padding:30px;font-family:Arial"><h2>Admin access required</h2><p>Please log in as PEPMOSA admin.</p></main>';return;}
+const $=id=>document.getElementById(id);const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let catalog=[],prices=[],expenses=[],regularItems=[],ofaItems=[],orders=[],groupBuys=[];
 $('edate').value=new Date().toISOString().slice(0,10);
 
-function renderProductDropdown(){
- const p=$('pname'), current=p.value;
- p.innerHTML='<option value="">Select product</option>'+availableProducts.map(x=>'<option value="'+esc(x.name)+'">'+esc(x.name)+'</option>').join('');
- if(current&&availableProducts.some(x=>x.name===current))p.value=current;
- updateVariantDropdown();
+async function init(){
+ const rs=await Promise.all([
+  sb.from('products').select('product_id,product_name,active').order('product_name'),
+  sb.from('product_variants').select('variant_id,product_id,strength,active').order('strength'),
+  sb.from('ofa_products').select('id,name,status').order('name'),
+  sb.from('group_buys').select('gb_number,customer_facing_name,status').order('created_at',{ascending:false}),
+  sb.from('finance_manufacturer_prices').select('*').order('product_name'),
+  sb.from('finance_expenses').select('*').order('expense_date',{ascending:false}),
+  sb.from('orders').select('order_id,gb_number,payment_status'),
+  sb.from('order_items').select('product_id,variant_id,product_name,strength,qty,unit_price,order_id'),
+  sb.from('ofa_order_items').select('product_id,product_name,qty,unit_price,order_id')
+ ]);
+ for(const x of rs)if(x.error)throw x.error;
+ const [prods,vars,ofap,gbs,pr,ex,ord,items,ofi]=rs;
+ const varMap=new Map();(vars.data||[]).forEach(v=>{if(!varMap.has(v.product_id))varMap.set(v.product_id,[]);varMap.get(v.product_id).push(v);});
+ catalog=(prods.data||[]).map(p=>({product_id:p.product_id,product_name:p.product_name,variants:varMap.get(p.product_id)||[],source:'GB'}))
+ .concat((ofap.data||[]).map(p=>({product_id:'OFA:'+p.id,raw_id:p.id,product_name:p.name,variants:[],source:'OFA'})));
+ catalog.sort((a,b)=>a.product_name.localeCompare(b.product_name));
+ prices=pr.data||[];expenses=ex.data||[];orders=ord.data||[];regularItems=items.data||[];ofaItems=ofi.data||[];groupBuys=gbs.data||[];
+ renderScopes();renderCatalog();renderPrices();renderExpenses();loadSales();
 }
-function updateVariantDropdown(){
- const product=$('pname').value;
- const item=availableProducts.find(x=>x.name===product);
- const v=$('variant');
- const variants=item?.variants||[];
- v.innerHTML='<option value="">'+(variants.length?'Select variant / strength':'No variant needed')+'</option>'+variants.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
- if(!variants.length)v.value='';
+function renderScopes(){
+ const s=$('scope'),e=$('escope'),old=s.value,oldE=e.value;
+ const seen=new Set();const all=[...groupBuys.map(g=>g.gb_number),...orders.map(o=>o.gb_number)].filter(Boolean);
+ all.forEach(g=>seen.add(String(g)));
+ const list=[...seen].sort((a,b)=>Number(b)-Number(a));
+ s.innerHTML='<option value="ALL">All Group Buys + Open for All</option><option value="OFA">Open for All only</option>'+list.map(g=>'<option value="GB:'+esc(g)+'">Group Buy '+esc(g)+'</option>').join('');
+ e.innerHTML='<option value="GENERAL">General</option><option value="OFA">Open for All</option>'+list.map(g=>'<option value="GB:'+esc(g)+'">Group Buy '+esc(g)+'</option>').join('');
+ if([...s.options].some(o=>o.value===old))s.value=old;if([...e.options].some(o=>o.value===oldE))e.value=oldE;
 }
-$('pname').addEventListener('change',updateVariantDropdown);
+function renderCatalog(){
+ const p=$('pname'),old=p.value;p.innerHTML='<option value="">Select product</option>'+catalog.map(x=>'<option value="'+esc(x.product_id)+'">'+esc(x.product_name)+(x.source==='OFA'?' (Open for All)':'')+'</option>').join('');if(catalog.some(x=>x.product_id===old))p.value=old;updateVariants();
+}
+function updateVariants(){
+ const id=$('pname').value,c=catalog.find(x=>x.product_id===id),v=$('variant');
+ const vars=c?.variants||[];
+ v.innerHTML='<option value="">'+(vars.length?'Select variant / strength':'No variant needed')+'</option>'+vars.map(x=>'<option value="'+esc(x.variant_id)+'">'+esc(x.strength)+'</option>').join('');
+ if(!vars.length)v.value='';
+}
+$('pname').addEventListener('change',updateVariants);
 
-async function load(){
- try{
-  $('sales').textContent='Loading…';
-  const results=await Promise.all([
-   sb.from('finance_manufacturer_prices').select('*').order('product_name'),
-   sb.from('finance_expenses').select('*').order('expense_date',{ascending:false}),
-   sb.from('order_items').select('product_name,strength,variant_id,qty,unit_price,order_id'),
-   sb.from('orders').select('order_id,payment_status'),
-   sb.from('ofa_order_items').select('product_name,qty,unit_price,order_id')
-  ]);
-  for(const r of results){if(r.error)throw r.error;}
-  const [pr,ex,oi,oo,ofi]=results;
-  prices=pr.data||[]; expenses=ex.data||[];
-  const valid=new Set((oo.data||[]).filter(x=>!['REJECTED','CANCELLED','CANCELED'].includes(String(x.payment_status||'').toUpperCase())).map(x=>x.order_id));
-  const regularItems=(oi.data||[]).filter(x=>valid.has(x.order_id)).map(x=>({...x,variant:x.strength||''}));
-  const ofaItems=(ofi.data||[]).map(x=>({...x,variant:''}));
-  const items=regularItems.concat(ofaItems);
-  const productMap=new Map();
-  items.forEach(x=>{if(!x.product_name)return;if(!productMap.has(x.product_name))productMap.set(x.product_name,new Set());if(x.variant)productMap.get(x.product_name).add(x.variant);});
-  availableProducts=[...productMap.entries()].map(([name,variants])=>({name,variants:[...variants].sort()})).sort((a,b)=>a.name.localeCompare(b.name));
-  renderProductDropdown();
-
-  const map=new Map();
-  items.forEach(x=>{
-   const key=(x.product_name||'')+'||'+(x.variant||'');
-   const row=map.get(key)||{name:x.product_name||'',variant:x.variant||'',qty:0,revenue:0};
-   row.qty+=Number(x.qty||0);
-   row.revenue+=Number(x.qty||0)*Number(x.unit_price||0);
-   map.set(key,row);
-  });
-  let revenue=0,cost=0;
-  const rows=[...map.values()].map(row=>{
-   revenue+=row.revenue;
-   const p=prices.find(x=>String(x.product_name||'').toLowerCase()===String(row.name||'').toLowerCase() && String(x.variant||'').toLowerCase()===String(row.variant||'').toLowerCase());
-   const pc=p?Number(p.manufacturer_price||0)*row.qty:0;
-   cost+=pc;
-   return {...row,pc,profit:row.revenue-pc,hasPrice:!!p};
-  });
-  const exp=expenses.reduce((s,x)=>s+Number(x.amount||0),0);
-  $('rev').textContent=peso(revenue);$('cost').textContent=peso(cost);$('exp').textContent=peso(exp);$('profit').textContent=peso(revenue-cost-exp);
-  $('prices').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Manuf. Price</th><th></th></tr>'+prices.map(x=>'<tr><td>'+esc(x.product_name)+'</td><td>'+esc(x.variant||'—')+'</td><td>'+peso(x.manufacturer_price)+'</td><td><button class="danger" onclick="delPrice(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
-  $('expenses').innerHTML='<table><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr>'+expenses.map(x=>'<tr><td>'+x.expense_date+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.description||'')+'</td><td>'+peso(x.amount)+'</td><td><button class="danger" onclick="delExpense(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
-  $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>';
- }catch(e){
-  console.error(e);
-  $('sales').innerHTML='<div style="color:#a33;padding:12px">Finance error: '+esc(e.message||String(e))+'</div>';
-  $('pname').innerHTML='<option value="">Unable to load products</option>';
+function renderPrices(){
+ $('prices').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Manuf. Price</th><th></th></tr>'+prices.map(x=>'<tr><td>'+esc(x.product_name)+'</td><td>'+esc(x.variant||'—')+'</td><td>'+peso(x.manufacturer_price)+'</td><td><button class="danger" onclick="delPrice(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
+}
+function renderExpenses(){
+ $('expenses').innerHTML='<table><tr><th>Date</th><th>Scope</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr>'+expenses.map(x=>'<tr><td>'+x.expense_date+'</td><td>'+esc(x.scope||'GENERAL')+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.description||'')+'</td><td>'+peso(x.amount)+'</td><td><button class="danger" onclick="delExpense(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
+}
+window.loadSales=function(){
+ const scope=$('scope').value;
+ const valid=new Map(orders.filter(o=>!['REJECTED','CANCELLED','CANCELED'].includes(String(o.payment_status||'').toUpperCase())).map(o=>[o.order_id,o]));
+ let items=[];
+ if(scope!=='OFA'){
+  items=regularItems.filter(i=>{const o=valid.get(i.order_id);if(!o)return false;return scope==='ALL'||o.gb_number===scope.replace('GB:','');}).map(i=>({...i,scope:'GB:'+valid.get(i.order_id).gb_number}));
  }
-}
-
-async function savePrice(){
- const product_name=$('pname').value,variant=$('variant').value,manufacturer_price=Number($('pprice').value);
- if(!product_name||Number.isNaN(manufacturer_price))return alert('Select product and enter manufacturer price.');
- const existing=prices.find(x=>String(x.product_name).toLowerCase()===String(product_name).toLowerCase()&&String(x.variant||'').toLowerCase()===String(variant||'').toLowerCase());
- const payload={product_name,variant,manufacturer_price,updated_at:new Date().toISOString()};
+ if(scope==='ALL'||scope==='OFA')items=items.concat(ofaItems.map(i=>({...i,product_id:'OFA:'+i.product_id,variant_id:'',strength:'',scope:'OFA'})));
+ const map=new Map();items.forEach(i=>{const key=(i.product_id||i.product_name)+'||'+(i.variant_id||'');const row=map.get(key)||{product_id:i.product_id||'',variant_id:i.variant_id||'',name:i.product_name||'',variant:i.strength||'',qty:0,revenue:0};row.qty+=Number(i.qty||0);row.revenue+=Number(i.qty||0)*Number(i.unit_price||0);map.set(key,row);});
+ let revenue=0,cost=0;const rows=[...map.values()].map(row=>{revenue+=row.revenue;const p=prices.find(x=>String(x.product_id||'')===String(row.product_id||'')&&String(x.variant_id||'')===String(row.variant_id||''))||prices.find(x=>String(x.product_name||'').toLowerCase()===String(row.name||'').toLowerCase()&&String(x.variant||'').toLowerCase()===String(row.variant||'').toLowerCase());const pc=p?Number(p.manufacturer_price||0)*row.qty:0;cost+=pc;return {...row,pc,profit:row.revenue-pc,hasPrice:!!p};});
+ const relevantExp=expenses.filter(x=>scope==='ALL'?true:(scope==='OFA'?(x.scope==='OFA'||x.scope==='GENERAL'):(x.scope===scope||x.scope==='GENERAL')));
+ const exp=relevantExp.reduce((s,x)=>s+Number(x.amount||0),0);
+ $('rev').textContent=peso(revenue);$('cost').textContent=peso(cost);$('exp').textContent=peso(exp);$('profit').textContent=peso(revenue-cost-exp);
+ $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>';
+};
+window.savePrice=async function(){
+ const product_id=$('pname').value,variant_id=$('variant').value,manufacturer_price=Number($('pprice').value),c=catalog.find(x=>x.product_id===product_id);
+ if(!c||Number.isNaN(manufacturer_price))return alert('Select product and enter manufacturer price.');
+ if(c.variants.length&&!variant_id)return alert('Please select the variant / strength.');
+ const vv=(c.variants||[]).find(x=>x.variant_id===variant_id);
+ const product_name=c.product_name,variant=vv?.strength||'';
+ const existing=prices.find(x=>String(x.product_id||'')===String(product_id)&&String(x.variant_id||'')===String(variant_id||''));
+ const payload={product_id,variant_id:variant_id||null,product_name,variant,manufacturer_price,updated_at:new Date().toISOString()};
  const q=existing?sb.from('finance_manufacturer_prices').update(payload).eq('id',existing.id):sb.from('finance_manufacturer_prices').insert(payload);
- const r=await q;if(r.error)return alert(r.error.message);
- $('pprice').value='';$('variant').value='';load();
-}
-async function saveExpense(){
- const amount=Number($('eamount').value);if(!amount)return alert('Enter expense amount.');
- const r=await sb.from('finance_expenses').insert({expense_date:$('edate').value,category:$('ecat').value,description:$('edesc').value.trim(),amount});
- if(r.error)return alert(r.error.message);$('eamount').value=$('edesc').value='';load();
-}
-async function delPrice(id){if(confirm('Delete this manufacturer price?')){const r=await sb.from('finance_manufacturer_prices').delete().eq('id',id);if(r.error)alert(r.error.message);else load();}}
-async function delExpense(id){if(confirm('Delete this expense?')){const r=await sb.from('finance_expenses').delete().eq('id',id);if(r.error)alert(r.error.message);else load();}}
-load();
-})();
+ const rr=await q;if(rr.error)return alert(rr.error.message);$('pprice').value='';await refreshFinance();
+};
+window.saveExpense=async function(){const amount=Number($('eamount').value);if(!amount)return alert('Enter expense amount.');const rr=await sb.from('finance_expenses').insert({expense_date:$('edate').value,scope:$('escope').value,category:$('ecat').value,description:$('edesc').value.trim(),amount});if(rr.error)return alert(rr.error.message);$('eamount').value=$('edesc').value='';await refreshFinance();};
+window.delPrice=async function(id){if(confirm('Delete this manufacturer price?')){const rr=await sb.from('finance_manufacturer_prices').delete().eq('id',id);if(rr.error)alert(rr.error.message);else await refreshFinance();}};
+window.delExpense=async function(id){if(confirm('Delete this expense?')){const rr=await sb.from('finance_expenses').delete().eq('id',id);if(rr.error)alert(rr.error.message);else await refreshFinance();}};
+async function refreshFinance(){const [p,e]=await Promise.all([sb.from('finance_manufacturer_prices').select('*').order('product_name'),sb.from('finance_expenses').select('*').order('expense_date',{ascending:false})]);if(p.error)alert(p.error.message);if(e.error)alert(e.error.message);prices=p.data||[];expenses=e.data||[];renderPrices();renderExpenses();loadSales();}
+try{await init();}catch(e){console.error(e);$('sales').innerHTML='<div style="color:#a33;padding:12px">Finance error: '+esc(e.message||String(e))+'</div>';}}
+)();
 </script></body></html>

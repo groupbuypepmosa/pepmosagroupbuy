@@ -27,16 +27,16 @@ async function load(){
  const [pr,ex,oi,oo,ofi]=await Promise.all([
   sb.from('finance_manufacturer_prices').select('*').order('product_name'),
   sb.from('finance_expenses').select('*').order('expense_date',{ascending:false}),
-  sb.from('order_items').select('product_name,strength,variant_id,qty,unit_price,order_id'),
+  sb.from('order_items').select('product_name,qty,unit_price,order_id'),
   sb.from('orders').select('order_id,payment_status'),
-  sb.from('ofa_order_items').select('product_name,strength,variant_id,qty,unit_price,order_id')
+  sb.from('ofa_order_items').select('product_name,qty,unit_price,order_id')
  ]);
  prices=pr.data||[];expenses=ex.data||[];
  const valid=new Set((oo.data||[]).filter(x=>!['REJECTED','CANCELLED','CANCELED'].includes(String(x.payment_status||'').toUpperCase())).map(x=>x.order_id));
  const items=(oi.data||[]).filter(x=>valid.has(x.order_id)).concat(ofi.data||[]);
 
  const productMap=new Map();
- items.forEach(x=>{const name=x.product_name||'';const variant=x.strength||x.variant_id||'';if(name){if(!productMap.has(name))productMap.set(name,new Set());productMap.get(name).add(String(variant));}});
+ items.forEach(x=>{const name=x.product_name||'';const variant='';if(name){if(!productMap.has(name))productMap.set(name,new Set());productMap.get(name).add(String(variant));}});
  availableProducts=[...productMap.entries()].map(([name,variants])=>({name,variants:[...variants]})).sort((a,b)=>a.name.localeCompare(b.name));
  renderProductDropdown();
  const map=new Map();

@@ -12,9 +12,9 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 <div class="card stat"><span>PRODUCT PAYMENT COLLECTED</span><b id="productCollected">₱0.00</b><div class="muted">Approved product payments • excludes shipping</div></div>
 <div class="card stat"><span>TOTAL AMOUNT COLLECTED</span><b id="totalCollected">₱0.00</b><div class="muted">Admin Fee + Shipping Fee + Product Payment</div></div>
 <div class="card stat"><span>REVENUE</span><b id="rev">₱0.00</b><div class="muted">Approved product sales</div></div>
-<div class="card stat"><span>PRODUCT COST</span><b id="cost">₱0.00</b><div class="muted">Based on Manufacturer Pricelist</div></div>
-<div class="card stat"><span>EXPENSES</span><b id="exp">₱0.00</b><div class="muted">Recorded expenses for this view</div></div>
-<div class="card stat"><span>NET PROFIT</span><b id="profit">₱0.00</b><div class="muted">Revenue − Product Cost − Expenses</div></div>
+<div class="card stat"><span>MANUFACTURER COST (REFERENCE)</span><b id="cost">₱0.00</b><div class="muted">Reference only • not automatically deducted</div></div>
+<div class="card stat"><span>EXPENSES PAID</span><b id="exp">₱0.00</b><div class="muted">Only expenses you manually record</div></div>
+<div class="card stat"><span>NET PROFIT</span><b id="profit">₱0.00</b><div class="muted">Revenue − manually recorded expenses</div></div>
 </div>
 
 <div class="card"><h2>🏭 Manufacturer Pricelist</h2><p class="muted">All products from your catalog are available here — not only products that already have orders. Prices are saved globally and will still work for future Group Buys.</p>
@@ -122,7 +122,9 @@ window.loadSales=function(){
  $('rev').textContent=peso(revenue);
  $('cost').textContent=peso(cost);
  $('exp').textContent=peso(exp);
- $('profit').textContent=peso(revenue-cost-exp);
+ // Manufacturer Pricelist is reference only. It is NOT automatically deducted.
+ // Net profit changes only when you manually record an actual expense/payment.
+ $('profit').textContent=peso(revenue-exp);
  $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>';
 };
 window.savePrice=async function(){

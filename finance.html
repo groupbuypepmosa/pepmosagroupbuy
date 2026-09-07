@@ -20,7 +20,8 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script>
 <script>
-initSupabase();
+(async()=>{
+try{ initSupabase(); await requireAdmin(); }catch(e){ document.body.innerHTML='<main style="padding:30px;font-family:Arial"><h2>Admin access required</h2><p>Please open this page while logged in as the PEPMOSA admin.</p></main>'; return; }
 const $=id=>document.getElementById(id);let prices=[],expenses=[],availableProducts=[];
 const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -95,4 +96,5 @@ async function saveExpense(){
 async function delPrice(id){if(confirm('Delete this manufacturer price?')){const r=await sb.from('finance_manufacturer_prices').delete().eq('id',id);if(r.error)alert(r.error.message);else load();}}
 async function delExpense(id){if(confirm('Delete this expense?')){const r=await sb.from('finance_expenses').delete().eq('id',id);if(r.error)alert(r.error.message);else load();}}
 load();
+})();
 </script></body></html>

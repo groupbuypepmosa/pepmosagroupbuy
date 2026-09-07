@@ -7,10 +7,14 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 <main>
 <div class="card"><div class="toolbar"><div><label><b>View finance for</b></label><select id="scope" onchange="loadSales()"><option value="ALL">All Group Buys + Open for All</option><option value="OFA">Open for All only</option></select></div><div><span class="muted">Manufacturer prices are global and reusable for future Group Buys.</span></div></div></div>
 <div class="grid">
-<div class="card stat"><span>ADMIN FEE COLLECTED</span><b id="adminFeeCollected">₱0.00</b><div class="muted" id="adminFeeNote">Approved admin fees</div></div>
+<div class="card stat"><span>ADMIN FEE COLLECTED</span><b id="adminFeeCollected">₱0.00</b><div class="muted">Approved admin fees</div></div>
 <div class="card stat"><span id="shippingTitle">SHIPPING FEE FOR 0 CUSTOMERS</span><b id="shipping">₱0.00</b><div class="muted">Approved customer shipping fees</div></div>
 <div class="card stat"><span>PRODUCT PAYMENT COLLECTED</span><b id="productCollected">₱0.00</b><div class="muted">Approved product payments • excludes shipping</div></div>
 <div class="card stat"><span>TOTAL AMOUNT COLLECTED</span><b id="totalCollected">₱0.00</b><div class="muted">Admin Fee + Shipping Fee + Product Payment</div></div>
+<div class="card stat"><span>REVENUE</span><b id="rev">₱0.00</b><div class="muted">Approved product sales</div></div>
+<div class="card stat"><span>PRODUCT COST</span><b id="cost">₱0.00</b><div class="muted">Based on Manufacturer Pricelist</div></div>
+<div class="card stat"><span>EXPENSES</span><b id="exp">₱0.00</b><div class="muted">Recorded expenses for this view</div></div>
+<div class="card stat"><span>NET PROFIT</span><b id="profit">₱0.00</b><div class="muted">Revenue − Product Cost − Expenses</div></div>
 </div>
 
 <div class="card"><h2>🏭 Manufacturer Pricelist</h2><p class="muted">All products from your catalog are available here — not only products that already have orders. Prices are saved globally and will still work for future Group Buys.</p>
@@ -87,7 +91,7 @@ window.loadSales=function(){
  const validOfa=new Set((window.ofaOrdersCache||[]).filter(o=>approvedStatus(o.payment_status)).map(o=>o.order_id));
  let items=[];
  if(scope!=='OFA'){
-  items=regularItems.filter(i=>{const o=valid.get(i.order_id);if(!o)return false;return scope==='ALL'||o.gb_number===scope.replace('GB:','');}).map(i=>({...i,scope:'GB:'+valid.get(i.order_id).gb_number}));
+  items=regularItems.filter(i=>{const o=valid.get(i.order_id);if(!o)return false;return scope==='ALL'||String(o.gb_number)===String(scope.replace('GB:',''));}).map(i=>({...i,scope:'GB:'+valid.get(i.order_id).gb_number}));
  }
  if(scope==='ALL'||scope==='OFA')items=items.concat(ofaItems.filter(i=>validOfa.has(i.order_id)).map(i=>({...i,product_id:'OFA:'+i.product_id,variant_id:'',strength:'',scope:'OFA'})));
  const map=new Map();items.forEach(i=>{const key=(i.product_id||i.product_name)+'||'+(i.variant_id||'');const row=map.get(key)||{product_id:i.product_id||'',variant_id:i.variant_id||'',name:i.product_name||'',variant:i.strength||'',qty:0,revenue:0};row.qty+=Number(i.qty||0);row.revenue+=Number(i.qty||0)*Number(i.unit_price||0);map.set(key,row);});
@@ -96,7 +100,7 @@ window.loadSales=function(){
  const exp=relevantExp.reduce((s,x)=>s+Number(x.amount||0),0);
  // Admin's Amount Collected = approved regular checkout totals + approved admin fees.
  // This deliberately excludes Open for All because the current Admin payment center does not include OFA.
- const approvedRegular=(orders||[]).filter(o=>approvedStatus(o.payment_status)&&(scope==='ALL'||(scope!=='OFA'&&o.gb_number===scope.replace('GB:',''))));
+ const approvedRegular=(orders||[]).filter(o=>approvedStatus(o.payment_status)&&(scope==='ALL'||(scope!=='OFA'&&String(o.gb_number)===String(scope.replace('GB:','')))));
  const approvedOfa=(window.ofaOrdersCache||[]).filter(o=>approvedStatus(o.payment_status));
  const selectedOfa=scope==='ALL'||scope==='OFA'?approvedOfa:[];
  // Finance collection breakdown:
@@ -114,7 +118,10 @@ window.loadSales=function(){
  $('shippingTitle').textContent='SHIPPING FEE FOR '+shippingCustomers+' CUSTOMER'+(shippingCustomers===1?'':'S');
  $('productCollected').textContent=peso(productPayment);
  $('totalCollected').textContent=peso(totalAmountCollected);
- /* detailed cost and expense calculations remain available in tables below */
+ $('rev').textContent=peso(revenue);
+ $('cost').textContent=peso(cost);
+ $('exp').textContent=peso(exp);
+ $('profit').textContent=peso(revenue-cost-exp);
  $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>';
 };
 window.savePrice=async function(){

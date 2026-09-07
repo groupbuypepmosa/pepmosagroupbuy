@@ -23,38 +23,76 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 initSupabase();
 const $=id=>document.getElementById(id);let prices=[],expenses=[],availableProducts=[];
 const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
-$('edate').value=new Date().toISOString().slice(0,10);
-async function load(){
- const [pr,ex,oi,oo,ofi]=await Promise.all([
-  sb.from('finance_manufacturer_prices').select('*').order('product_name'),
-  sb.from('finance_expenses').select('*').order('expense_date',{ascending:false}),
-  sb.from('order_items').select('product_name,qty,unit_price,order_id'),
-  sb.from('orders').select('order_id,payment_status'),
-  sb.from('ofa_order_items').select('product_name,qty,unit_price,order_id')
- ]);
- prices=pr.data||[];expenses=ex.data||[];
- const valid=new Set((oo.data||[]).filter(x=>!['REJECTED','CANCELLED','CANCELED'].includes(String(x.payment_status||'').toUpperCase())).map(x=>x.order_id));
- const items=(oi.data||[]).filter(x=>valid.has(x.order_id)).concat(ofi.data||[]);
-
- const productMap=new Map();
- items.forEach(x=>{const name=x.product_name||'';const variant='';if(name){if(!productMap.has(name))productMap.set(name,new Set());productMap.get(name).add(String(variant));}});
- availableProducts=[...productMap.entries()].map(([name,variants])=>({name,variants:[...variants]})).sort((a,b)=>a.name.localeCompare(b.name));
- renderProductDropdown();
- const map=new Map();
- items.forEach(x=>{const key=[x.product_name||'',''].join('::');const r=map.get(key)||{name:x.product_name||'',variant:'',qty:0,revenue:0};r.qty+=Number(x.qty||0);r.revenue+=Number(x.qty||0)*Number(x.unit_price||0);map.set(key,r)});
- let revenue=0,cost=0;const rows=[...map.values()].map(r=>{revenue+=r.revenue;const p=prices.find(x=>x.product_name.toLowerCase()===r.name.toLowerCase()&&String(x.variant||'').toLowerCase()===String(r.variant||'').toLowerCase());const pc=p?Number(p.manufacturer_price||0)*r.qty:0;cost+=pc;return {...r,pc,profit:r.revenue-pc,hasPrice:!!p}});
- const exp=expenses.reduce((s,x)=>s+Number(x.amount||0),0);$('rev').textContent=peso(revenue);$('cost').textContent=peso(cost);$('exp').textContent=peso(exp);$('profit').textContent=peso(revenue-cost-exp);
- $('prices').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Manuf. Price</th><th></th></tr>'+prices.map(x=>'<tr><td>'+esc(x.product_name)+'</td><td>'+esc(x.variant||'—')+'</td><td>'+peso(x.manufacturer_price)+'</td><td><button class="danger" onclick="delPrice(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
- $('expenses').innerHTML='<table><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr>'+expenses.map(x=>'<tr><td>'+x.expense_date+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.description||'')+'</td><td>'+peso(x.amount)+'</td><td><button class="danger" onclick="delExpense(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
- $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(r=>'<tr><td>'+esc(r.name)+'</td><td>'+esc(r.variant||'—')+(r.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+r.qty+'</td><td>'+peso(r.revenue)+'</td><td>'+peso(r.pc)+'</td><td>'+peso(r.profit)+'</td></tr>').join('')+'</table>';
-}
-function renderProductDropdown(){const p=$('pname');const current=p.value;p.innerHTML='<option value="">Select product</option>'+availableProducts.map(x=>'<option value="'+esc(x.name)+'">'+esc(x.name)+'</option>').join('');if(current)p.value=current;updateVariantDropdown()}
-function updateVariantDropdown(){const product=$('pname').value;const found=availableProducts.find(x=>x.name===product);const v=$('variant');v.innerHTML='<option value="">'+(found&&found.variants.length?'Select variant / strength':'No variant')+'</option>'+((found?.variants||[]).filter(Boolean).map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join(''));}
-$('pname').addEventListener('change',updateVariantDropdown);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-async function savePrice(){const product_name=$('pname').value.trim(),variant=$('variant').value.trim(),manufacturer_price=Number($('pprice').value);if(!product_name||isNaN(manufacturer_price))return alert('Enter product and manufacturer price.');const r=await sb.from('finance_manufacturer_prices').upsert({product_name,variant,manufacturer_price,updated_at:new Date().toISOString()},{onConflict:'product_name,variant'});if(r.error)return alert(r.error.message);$('pname').value=$('variant').value=$('pprice').value='';load()}
-async function saveExpense(){const amount=Number($('eamount').value);if(!amount)return alert('Enter expense amount.');const r=await sb.from('finance_expenses').insert({expense_date:$('edate').value,category:$('ecat').value,description:$('edesc').value.trim(),amount});if(r.error)return alert(r.error.message);$('eamount').value=$('edesc').value='';load()}
-async function delPrice(id){if(confirm('Delete this manufacturer price?')){const r=await sb.from('finance_manufacturer_prices').delete().eq('id',id);if(r.error)alert(r.error.message);else load()}}
-async function delExpense(id){if(confirm('Delete this expense?')){const r=await sb.from('finance_expenses').delete().eq('id',id);if(r.error)alert(r.error.message);else load()}}
-load().catch(e=>{console.error(e);$('sales').innerHTML='<div style="color:#a33">Error loading Finance: '+esc(e.message||String(e))+'</div>';$('pname').innerHTML='<option value="">Unable to load products</option>';});
+$('edate').value=new Date().toISOString().slice(0,10);
+
+function renderProductDropdown(){
+ const p=$('pname'), current=p.value;
+ p.innerHTML='<option value="">Select product</option>'+availableProducts.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
+ if(current&&availableProducts.includes(current))p.value=current;
+}
+
+async function load(){
+ try{
+  $('sales').textContent='Loading…';
+  const results=await Promise.all([
+   sb.from('finance_manufacturer_prices').select('*').order('product_name'),
+   sb.from('finance_expenses').select('*').order('expense_date',{ascending:false}),
+   sb.from('order_items').select('product_name,qty,unit_price,order_id'),
+   sb.from('orders').select('order_id,payment_status'),
+   sb.from('ofa_order_items').select('product_name,qty,unit_price,order_id')
+  ]);
+  for(const r of results){if(r.error)throw r.error;}
+  const [pr,ex,oi,oo,ofi]=results;
+  prices=pr.data||[]; expenses=ex.data||[];
+  const valid=new Set((oo.data||[]).filter(x=>!['REJECTED','CANCELLED','CANCELED'].includes(String(x.payment_status||'').toUpperCase())).map(x=>x.order_id));
+  const items=(oi.data||[]).filter(x=>valid.has(x.order_id)).concat(ofi.data||[]);
+  availableProducts=[...new Set(items.map(x=>x.product_name).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  renderProductDropdown();
+
+  const map=new Map();
+  items.forEach(x=>{
+   const key=x.product_name||'';
+   const row=map.get(key)||{name:key,qty:0,revenue:0};
+   row.qty+=Number(x.qty||0);
+   row.revenue+=Number(x.qty||0)*Number(x.unit_price||0);
+   map.set(key,row);
+  });
+  let revenue=0,cost=0;
+  const rows=[...map.values()].map(row=>{
+   revenue+=row.revenue;
+   const p=prices.find(x=>String(x.product_name||'').toLowerCase()===String(row.name||'').toLowerCase());
+   const pc=p?Number(p.manufacturer_price||0)*row.qty:0;
+   cost+=pc;
+   return {...row,pc,profit:row.revenue-pc,hasPrice:!!p};
+  });
+  const exp=expenses.reduce((s,x)=>s+Number(x.amount||0),0);
+  $('rev').textContent=peso(revenue);$('cost').textContent=peso(cost);$('exp').textContent=peso(exp);$('profit').textContent=peso(revenue-cost-exp);
+  $('prices').innerHTML='<table><tr><th>Product</th><th>Manuf. Price</th><th></th></tr>'+prices.map(x=>'<tr><td>'+esc(x.product_name)+'</td><td>'+peso(x.manufacturer_price)+'</td><td><button class="danger" onclick="delPrice(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
+  $('expenses').innerHTML='<table><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr>'+expenses.map(x=>'<tr><td>'+x.expense_date+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.description||'')+'</td><td>'+peso(x.amount)+'</td><td><button class="danger" onclick="delExpense(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
+  $('sales').innerHTML='<table><tr><th>Product</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>';
+ }catch(e){
+  console.error(e);
+  $('sales').innerHTML='<div style="color:#a33;padding:12px">Finance error: '+esc(e.message||String(e))+'</div>';
+  $('pname').innerHTML='<option value="">Unable to load products</option>';
+ }
+}
+
+async function savePrice(){
+ const product_name=$('pname').value,manufacturer_price=Number($('pprice').value);
+ if(!product_name||Number.isNaN(manufacturer_price))return alert('Select product and enter manufacturer price.');
+ const existing=prices.find(x=>String(x.product_name).toLowerCase()===String(product_name).toLowerCase());
+ const payload={product_name,variant:'',manufacturer_price,updated_at:new Date().toISOString()};
+ const q=existing?sb.from('finance_manufacturer_prices').update(payload).eq('id',existing.id):sb.from('finance_manufacturer_prices').insert(payload);
+ const r=await q;if(r.error)return alert(r.error.message);
+ $('pprice').value='';load();
+}
+async function saveExpense(){
+ const amount=Number($('eamount').value);if(!amount)return alert('Enter expense amount.');
+ const r=await sb.from('finance_expenses').insert({expense_date:$('edate').value,category:$('ecat').value,description:$('edesc').value.trim(),amount});
+ if(r.error)return alert(r.error.message);$('eamount').value=$('edesc').value='';load();
+}
+async function delPrice(id){if(confirm('Delete this manufacturer price?')){const r=await sb.from('finance_manufacturer_prices').delete().eq('id',id);if(r.error)alert(r.error.message);else load();}}
+async function delExpense(id){if(confirm('Delete this expense?')){const r=await sb.from('finance_expenses').delete().eq('id',id);if(r.error)alert(r.error.message);else load();}}
+load();
 </script></body></html>

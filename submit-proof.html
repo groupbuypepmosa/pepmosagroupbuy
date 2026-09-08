@@ -1,1 +1,53 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Submit Your Proof • PEPMOSA</title><link rel="stylesheet" href="style.css"><style>body{background:#fff9fc;color:#251a27}.wrap{width:min(560px,92%);margin:28px auto 60px}.card{background:#fff;border:1px solid #ead9e5;border-radius:22px;padding:24px}.field{margin:15px 0}.field label{display:block;font-weight:800;margin-bottom:7px}.field input,.field textarea{box-sizing:border-box;width:100%;padding:14px;border:1px solid #ddd;border-radius:12px;font-size:16px}.field textarea{min-height:120px}.btn{display:block;width:100%;padding:15px;border:0;border-radius:13px;font-size:16px;font-weight:900;cursor:pointer}.primary{background:#d72b91;color:#fff}.msg{margin-top:15px;font-weight:700}.back{display:inline-block;margin-bottom:18px;text-decoration:none;font-weight:800;color:#a53a76}</style></head><body><header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a></header><main class="wrap"><a class="back" href="buyers-proof.html">← Back to Buyers' Proof</a><section class="card"><div class="eyebrow">PEPMOSA COMMUNITY</div><h1>♥ Submit Your Proof</h1><p>Your proof will stay private until reviewed by an admin. Your email will never be shown publicly.</p><form id="proofForm" novalidate><div class="field"><label>Proof Image *</label><input id="file" type="file" accept="image/jpeg,image/png,image/webp" required></div><div class="field"><label>Display Name (optional)</label><input id="name" placeholder="Example: Maria"></div><div class="field"><label>Email Address *</label><input id="email" type="email" placeholder="Private — never shown publicly" required></div><div class="field"><label>Leave a Comment / Experience *</label><textarea id="comment" placeholder="Tell us about your experience..." required></textarea></div><button id="submitBtn" class="btn primary" type="button">SUBMIT FOR REVIEW ♥</button><div id="msg" class="msg"></div></form></section></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script><script>const sb=initSupabase(),btn=document.getElementById('submitBtn'),msg=document.getElementById('msg');btn.addEventListener('click',async()=>{const f=document.getElementById('file').files[0],email=document.getElementById('email').value.trim(),comment=document.getElementById('comment').value.trim(),name=document.getElementById('name').value.trim();if(!f)return fail('Please choose your proof image.');if(!email)return fail('Please enter your email address.');if(!/^\S+@\S+\.\S+$/.test(email))return fail('Please enter a valid email address.');if(!comment)return fail('Please leave your comment or experience.');if(f.size>10*1024*1024)return fail('Image must be 10MB or smaller.');btn.disabled=true;btn.textContent='UPLOADING...';msg.textContent='Uploading your proof...';msg.style.color='#555';try{const ext=(f.name.split('.').pop()||'jpg').toLowerCase(),path='pending/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;const up=await sb.storage.from('buyer-proofs').upload(path,f,{contentType:f.type});if(up.error)throw up.error;const q=await sb.from('buyer_proofs').insert({image_path:path,caption:comment,submitter_display_name:name||null,submitter_email:email,is_published:false,status:'pending'});if(q.error){await sb.storage.from('buyer-proofs').remove([path]);throw q.error}msg.textContent='♥ Thank you! Your proof was submitted for admin review.';msg.style.color='#23834d';document.getElementById('proofForm').reset();}catch(e){console.error(e);fail('Submission failed: '+(e.message||'Please try again.'));}finally{btn.disabled=false;btn.textContent='SUBMIT FOR REVIEW ♥';}});function fail(t){msg.textContent=t;msg.style.color='#c22';}</script></body></html>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Submit Your Proof • PEPMOSA</title><link rel="stylesheet" href="style.css"><style>body{background:#fff9fc;color:#251a27}.wrap{width:min(560px,92%);margin:28px auto 60px}.card{background:#fff;border:1px solid #ead9e5;border-radius:22px;padding:24px}.field{margin:15px 0}.field label{display:block;font-weight:800;margin-bottom:7px}.field input,.field textarea{box-sizing:border-box;width:100%;padding:14px;border:1px solid #ddd;border-radius:12px;font-size:16px}.field textarea{min-height:120px}.btn{display:block;width:100%;padding:15px;border:0;border-radius:13px;font-size:16px;font-weight:900;cursor:pointer}.primary{background:#d72b91;color:#fff}.msg{margin-top:15px;font-weight:700}.back{display:inline-block;margin-bottom:18px;text-decoration:none;font-weight:800;color:#a53a76}</style></head><body><header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a></header><main class="wrap"><a class="back" href="buyers-proof.html">← Back to Buyers' Proof</a><section class="card"><div class="eyebrow">PEPMOSA COMMUNITY</div><h1>♥ Submit Your Proof</h1><p>Your proof will stay private until reviewed by an admin. Your email will never be shown publicly.</p><form id="proofForm" novalidate><div class="field"><label>Proof Image *</label><input id="file" type="file" accept="image/jpeg,image/png,image/webp" required></div><div class="field"><label>Display Name (optional)</label><input id="name" placeholder="Example: Maria"></div><div class="field"><label>Email Address *</label><input id="email" type="email" placeholder="Private — never shown publicly" required></div><div class="field"><label>Leave a Comment / Experience *</label><textarea id="comment" placeholder="Tell us about your experience..." required></textarea></div><button id="submitBtn" class="btn primary" type="button" onclick="submitProofNow()">SUBMIT FOR REVIEW ♥</button><div id="msg" class="msg"></div></form></section></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+let proofSb=null;
+function showMsg(text,color){const m=document.getElementById('msg');m.textContent=text;m.style.color=color||'#555';}
+async function getProofSb(){
+  if(proofSb) return proofSb;
+  if(!window.supabase){
+    await new Promise((resolve,reject)=>{
+      const s=document.createElement('script');
+      s.src='https://unpkg.com/@supabase/supabase-js@2';
+      s.onload=resolve;s.onerror=()=>reject(new Error('Could not load secure upload service.'));
+      document.head.appendChild(s);
+    });
+  }
+  const c=window.PEPMOSA_CONFIG;
+  if(!window.supabase||!c?.SUPABASE_URL||!c?.SUPABASE_ANON_KEY) throw new Error('Upload service is not ready. Please refresh and try again.');
+  proofSb=window.supabase.createClient(c.SUPABASE_URL,c.SUPABASE_ANON_KEY);
+  return proofSb;
+}
+async function submitProofNow(){
+  const btn=document.getElementById('submitBtn');
+  const f=document.getElementById('file').files[0];
+  const email=document.getElementById('email').value.trim();
+  const comment=document.getElementById('comment').value.trim();
+  const name=document.getElementById('name').value.trim();
+  if(!f){showMsg('Please choose your proof image.','#c22');return;}
+  if(!email){showMsg('Please enter your email address.','#c22');return;}
+  if(!/^\S+@\S+\.\S+$/.test(email)){showMsg('Please enter a valid email address.','#c22');return;}
+  if(!comment){showMsg('Please leave your comment or experience.','#c22');return;}
+  if(f.size>10*1024*1024){showMsg('Image must be 10MB or smaller.','#c22');return;}
+  btn.disabled=true;btn.style.opacity='.7';btn.textContent='UPLOADING...';
+  showMsg('Preparing your submission...','#555');
+  try{
+    const sb=await getProofSb();
+    const ext=(f.name.split('.').pop()||'jpg').toLowerCase();
+    const path='pending/'+Date.now()+'-'+crypto.getRandomValues(new Uint32Array(1))[0]+'.'+ext;
+    showMsg('Uploading your proof...','#555');
+    const up=await sb.storage.from('buyer-proofs').upload(path,f,{contentType:f.type,upsert:false});
+    if(up.error) throw up.error;
+    showMsg('Saving your submission...','#555');
+    const q=await sb.from('buyer_proofs').insert({image_path:path,caption:comment,submitter_display_name:name||null,submitter_email:email,is_published:false,status:'pending'});
+    if(q.error){await sb.storage.from('buyer-proofs').remove([path]);throw q.error;}
+    showMsg('♥ Submitted successfully! Your proof is now pending admin review.','#23834d');
+    document.getElementById('proofForm').reset();
+  }catch(e){
+    console.error(e);
+    showMsg('Submission failed: '+(e?.message||'Please try again.'),'#c22');
+  }finally{
+    btn.disabled=false;btn.style.opacity='1';btn.textContent='SUBMIT FOR REVIEW ♥';
+  }
+}
+</script></body></html>

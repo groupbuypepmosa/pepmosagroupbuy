@@ -87,8 +87,8 @@ function renderExpenses(){
 function renderManufTally(rows,scope){
  const box=$('manufTally'); if(!box)return;
  const priced=rows.filter(r=>r.hasPrice);
- const storageKey='pepmosa_manuf_assignment_'+scope;
- const assigned=JSON.parse(localStorage.getItem(storageKey)||'{}');
+ const assigned={};
+ manufacturerAssignments.filter(a=>String(a.scope)===String(scope)).forEach(a=>{assigned[String(a.product_id)+'||'+String(a.variant_id||'')]=a.manufacturer;});
  const key=r=>String(r.product_id||r.name)+'||'+String(r.variant_id||r.variant||'');
  const money=n=>peso(n);
  const tableFor=(manuf)=>{
@@ -105,8 +105,19 @@ function renderManufTally(rows,scope){
  (unassigned.length?'<table><tr><th>Product</th><th>Qty Ordered</th><th>Manuf Price</th><th>Subtotal</th><th>Order From</th></tr>'+
  unassigned.map(r=>'<tr><td>'+esc(r.name)+'<br><span class="muted">'+esc(r.variant||'—')+'</span></td><td>'+r.qty+'</td><td>'+money(Number(r.pc||0)/Number(r.qty||1))+'</td><td>'+money(r.pc)+'</td><td><select onchange="assignManuf(\''+encodeURIComponent(key(r))+'\',this.value)"><option value="">🔽 Select</option><option value="BBG">MANUF 1 — BBG</option><option value="KERUN">MANUF 2 — KERUN</option></select></td></tr>').join('')+'</table>':'<div class="muted" style="padding:12px 0">All ordered products have been assigned to a manufacturer.</div>')+'</div>'+
  (!priced.length?'<div class="muted" style="padding:12px;color:#a33">No approved ordered products with manufacturer prices were found for this view.</div>':'');
- window.assignManuf=function(encoded,m){if(!m)return;const data=JSON.parse(localStorage.getItem(storageKey)||'{}');data[decodeURIComponent(encoded)]=m;localStorage.setItem(storageKey,JSON.stringify(data));renderManufTally(rows,scope);};
- window.unassignManuf=function(encoded){const data=JSON.parse(localStorage.getItem(storageKey)||'{}');delete data[decodeURIComponent(encoded)];localStorage.setItem(storageKey,JSON.stringify(data));renderManufTally(rows,scope);};
+ window.assignManuf=async function(encoded,m){
+   if(!m)return;
+   const raw=decodeURIComponent(encoded),parts=raw.split('||'),product_id=parts[0],variant_id=parts.slice(1).join('||');
+   const rr=await sb.from('finance_manufacturer_orders').upsert({scope,product_id,variant_id:variant_id||'',manufacturer:m,updated_at:new Date().toISOString()},{onConflict:'scope,product_id,variant_id'});
+   if(rr.error){alert('Could not save manufacturer assignment: '+rr.error.message);return;}
+   await refreshFinance();
+ };
+ window.unassignManuf=async function(encoded){
+   const raw=decodeURIComponent(encoded),parts=raw.split('||'),product_id=parts[0],variant_id=parts.slice(1).join('||');
+   const rr=await sb.from('finance_manufacturer_orders').delete().eq('scope',scope).eq('product_id',product_id).eq('variant_id',variant_id||'');
+   if(rr.error){alert('Could not remove assignment: '+rr.error.message);return;}
+   await refreshFinance();
+ };
 }
 
 window.loadSales=function(){
@@ -175,7 +186,16 @@ window.savePrice=async function(){
 window.saveExpense=async function(){const amount=Number($('eamount').value);if(!amount)return alert('Enter expense amount.');const rr=await sb.from('finance_expenses').insert({expense_date:$('edate').value,scope:$('escope').value,category:$('ecat').value,description:$('edesc').value.trim(),amount});if(rr.error)return alert(rr.error.message);$('eamount').value=$('edesc').value='';await refreshFinance();};
 window.delPrice=async function(id){if(confirm('Delete this manufacturer price?')){const rr=await sb.from('finance_manufacturer_prices').delete().eq('id',id);if(rr.error)alert(rr.error.message);else await refreshFinance();}};
 window.delExpense=async function(id){if(confirm('Delete this expense?')){const rr=await sb.from('finance_expenses').delete().eq('id',id);if(rr.error)alert(rr.error.message);else await refreshFinance();}};
-async function refreshFinance(){const [p,e]=await Promise.all([sb.from('finance_manufacturer_prices').select('*').order('product_name'),sb.from('finance_expenses').select('*').order('expense_date',{ascending:false})]);if(p.error)alert(p.error.message);if(e.error)alert(e.error.message);prices=p.data||[];expenses=e.data||[];renderPrices();renderExpenses();loadSales();}
+async function refreshFinance(){
+ const [p,e,a]=await Promise.all([
+  sb.from('finance_manufacturer_prices').select('*').order('product_name'),
+  sb.from('finance_expenses').select('*').order('expense_date',{ascending:false}),
+  sb.from('finance_manufacturer_orders').select('*')
+ ]);
+ if(p.error)alert(p.error.message);if(e.error)alert(e.error.message);if(a.error)alert(a.error.message);
+ prices=p.data||[];expenses=e.data||[];manufacturerAssignments=a.data||[];
+ renderPrices();renderExpenses();loadSales();
+}
 try{await init();}catch(e){console.error(e);$('sales').innerHTML='<div style="color:#a33;padding:12px">Finance error: '+esc(e.message||String(e))+'</div>';}}
 )();
 </script></body></html>

@@ -15,7 +15,7 @@ table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;borde
 </style></head><body>
 <header><div><b>👥 ADMIN ORDERS</b><div style="margin-top:5px;color:#d9cfd9;font-size:13px">PEPMOSA • Shared Admin Order Tracker</div></div><span class="muted" style="color:#ddd">VICKY • JOYCE • RHEA • ANNE</span></header>
 <main>
-<div class="stats" id="stats"></div>
+<div class="stats" id="stats"></div><div id="kitCompletion"></div>
 <div class="card"><h2 style="margin-top:0">➕ Add New Admin Order</h2><p class="muted">Select the admin and product. Manufacturer price is automatically pulled from Finance.</p><div class="grid"><div><label>Admin</label><select id="admin"></select></div><div><label>Product</label><select id="product" onchange="fillVariants()"><option value="">Select product</option></select></div><div><label>Variant / Strength</label><select id="variant" onchange="updatePrice()"><option value="">Select product first</option></select></div><div><label>Quantity</label><input id="qty" type="number" min="1" step="1"></div><div><label>Manufacturer Price</label><input id="price" readonly></div></div><button onclick="addOrder()">ADD ORDER</button><div class="muted" style="margin-top:8px">Manufacturer price is automatically taken from Finance → Manufacturer Pricelist.</div></div>
 <div id="consolidated"></div><div class="card"><h2 style="margin-top:0">📋 All Admin Orders</h2><div id="rows">Loading…</div></div>
 </main>
@@ -23,21 +23,65 @@ table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;borde
 const cfg=window.PEPMOSA_CONFIG;const sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
-const admins=['VICKY','JOYCE','RHEA','ANNE'];let catalog=[],prices=[],orders=[];
+const admins=['VICKY','JOYCE','RHEA','ANNE'];let catalog=[],prices=[],orders=[],customerRows=[];
 async function init(){
  const r=await Promise.all([
   sb.from('products').select('product_id,product_name,active').order('product_name'),
   sb.from('product_variants').select('variant_id,product_id,strength,active').order('strength'),
   sb.from('finance_manufacturer_prices').select('*'),
-  sb.from('admin_orders').select('*').order('created_at',{ascending:false})
+  sb.from('admin_orders').select('*').order('created_at',{ascending:false}),
+  sb.from('orders').select('*').order('created_at',{ascending:false})
  ]);
  for(const x of r)if(x.error)throw x.error;
  const vm=new Map();(r[1].data||[]).forEach(v=>{if(!vm.has(v.product_id))vm.set(v.product_id,[]);vm.get(v.product_id).push(v)});
  catalog=(r[0].data||[]).filter(x=>x.active!==false).map(p=>({...p,variants:(vm.get(p.product_id)||[]).filter(v=>v.active!==false)}));
- prices=r[2].data||[];orders=r[3].data||[];
+ prices=r[2].data||[];orders=r[3].data||[];customerRows=r[4].data||[];
  render();
 }
+function renderKitCompletion(){
+ const box=document.getElementById('kitCompletion'); if(!box)return;
+ const customerMap={};
+ customerRows.forEach(o=>{
+   const status=String(o.status||'').toLowerCase();
+   if(['cancelled','canceled','refunded'].includes(status))return;
+   const pid=String(o.product_id||o.product||o.product_name||'');
+   const vid=String(o.variant_id||o.variant||o.strength||'');
+   const k=pid+'||'+vid;
+   const qty=Number(o.qty||o.quantity||0);
+   if(!qty)return;
+   if(!customerMap[k])customerMap[k]={pid,vid,name:o.product_name||o.product||pid,variant:o.variant||o.strength||vid,qty:0};
+   customerMap[k].qty+=qty;
+ });
+ const adminMap={};
+ orders.forEach(o=>{const k=String(o.product_id||o.product_name)+'||'+String(o.variant_id||o.variant||'');adminMap[k]=(adminMap[k]||0)+Number(o.qty||0)});
+ const items=Object.values(customerMap).map(x=>{
+   const p=catalog.find(a=>String(a.product_id)===String(x.pid)||a.product_name===x.name);
+   const kit=10;
+   const adminQty=adminMap[x.pid+'||'+x.vid]||adminMap[String(p?.product_id||x.pid)+'||'+String(x.vid)]||0;
+   const customer=x.qty;
+   const remainder=customer%kit;
+   const need=remainder===0?0:kit-remainder;
+   const remaining=Math.max(0,need-adminQty);
+   return {...x,kit,adminQty,need,remaining};
+ }).filter(x=>x.remaining>0);
+ box.innerHTML='<div class="card"><h2 style="margin-top:0">🧩 Complete Incomplete Kits</h2><p class="muted">Customer orders are grouped automatically. Admins can claim the remaining quantity needed to complete a 10-vial kit.</p>'+
+ (items.length?'<div style="overflow:auto"><table><tr><th>Product</th><th>Customer Qty</th><th>Kit Size</th><th>Needed</th><th>Already Claimed</th><th>Still Available</th><th>Claim</th></tr>'+
+ items.map((x,i)=>'<tr><td><b>'+esc(x.name)+'</b><br><span class="muted">'+esc(x.variant||'—')+'</span></td><td>'+x.qty+'</td><td>'+x.kit+'</td><td>'+x.need+'</td><td>'+x.adminQty+'</td><td><b style="color:#b33">'+x.remaining+'</b></td><td><select id="kitAdmin'+i+'">'+admins.map((a,j)=>'<option value="'+j+'">'+esc(a)+'</option>').join('')+'</select><input id="kitQty'+i+'" type="number" min="1" max="'+x.remaining+'" value="'+x.remaining+'" style="max-width:90px"><button onclick="claimKit('+i+')">CLAIM</button></td></tr>').join('')+'</table></div>':'<div class="muted" style="padding:14px 0">🎉 No incomplete kits to complete right now.</div>')+'</div>';
+ window.__kitItems=items;
+ window.claimKit=async function(i){
+   const x=window.__kitItems[i], ai=Number(document.getElementById('kitAdmin'+i).value), qty=Number(document.getElementById('kitQty'+i).value);
+   if(!qty||qty<1||qty>x.remaining)return alert('Invalid quantity.');
+   const p=catalog.find(a=>String(a.product_id)===String(x.pid)||a.product_name===x.name);
+   const v=(p?.variants||[]).find(a=>String(a.variant_id)===String(x.vid)||String(a.strength)===String(x.variant));
+   const pr=prices.find(a=>String(a.product_id)===String(p?.product_id||x.pid)&&String(a.variant_id||'')===String(v?.variant_id||x.vid));
+   const {data,error}=await sb.from('admin_orders').insert({admin_index:ai,product_id:p?.product_id||x.pid,variant_id:v?.variant_id||x.vid,product_name:p?.product_name||x.name,variant:v?.strength||x.variant,qty,manufacturer_price:Number(pr?.manufacturer_price||0)}).select().single();
+   if(error)return alert(error.message);
+   orders.unshift(data);render();alert('Kit completion claimed by '+admins[ai]+'!');
+ };
+}
+
 function render(){
+ renderKitCompletion();
  document.getElementById('admin').innerHTML=admins.map((a,i)=>'<option value="'+i+'">'+esc(a)+'</option>').join('');
  document.getElementById('product').innerHTML='<option value="">Select product</option>'+catalog.map(p=>'<option value="'+p.product_id+'">'+esc(p.product_name)+'</option>').join('');
  const totals=admins.map((a,i)=>orders.filter(o=>o.admin_index===i).reduce((s,o)=>s+Number(o.qty)*Number(o.manufacturer_price),0));

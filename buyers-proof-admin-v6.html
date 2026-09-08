@@ -1,0 +1,110 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PEPMOSA • Manage Buyers Proof • v6</title><link rel="stylesheet" href="style.css">
+<style>
+body{background:#fff9fc}.wrap{width:min(1050px,94%);margin:28px auto}.card{background:#fff;border:1px solid #ead9e5;border-radius:20px;padding:22px;margin-bottom:18px}.tabs{display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap}.tab{padding:12px 16px;border-radius:12px;border:1px solid #ead9e5;background:#fff;font-weight:900;cursor:pointer}.tab.active{background:#d72b91;color:#fff}.count{font-size:12px;background:#eee;padding:3px 8px;border-radius:10px;color:#333}.tab.active .count{background:rgba(255,255,255,.25);color:#fff}.item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #eee;align-items:flex-start}.item:last-child{border-bottom:0}.item img{width:115px;height:115px;object-fit:cover;border-radius:12px;background:#f4edf2}.meta{flex:1;min-width:0}.meta b{font-size:16px}.small{font-size:13px;color:#777;margin-top:4px;word-break:break-word}.status{display:inline-block;font-size:12px;padding:5px 8px;border-radius:8px;background:#f6e5ef;margin-top:7px}.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.btn{padding:10px 14px;border:0;border-radius:10px;font-weight:800;cursor:pointer}.success{background:#2f9e62;color:#fff}.danger{background:#eee;color:#333}.msg{margin-top:10px;font-weight:700}.error{color:#b42318}.ok{color:#16803c}.empty{padding:35px;text-align:center;color:#777}.email{font-size:13px;color:#777}@media(max-width:600px){.item{flex-direction:column}.item img{width:100%;height:240px}.tabs .tab{flex:1}.wrap{width:92%}}
+</style></head>
+<body><header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a></header>
+<main class="wrap">
+<div class="card"><div class="eyebrow">ADMIN ONLY</div><h1>♥ Manage Buyers' Proof</h1><p class="muted">Review buyer submissions before publishing. Check and protect personal information first.</p><div id="msg" class="msg">Loading pending submissions...</div></div>
+<div class="tabs">
+<button class="tab active" data-tab="pending">📥 PENDING <span id="pendingCount" class="count">0</span></button>
+<button class="tab" data-tab="published">♥ PUBLISHED</button>
+<button class="tab" data-tab="comments">💬 COMMENTS <span id="commentCount" class="count">0</span></button>
+</div>
+<div class="card"><div id="list" class="empty">Loading submissions...</div></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script>
+<script>
+let sb;const msg=document.getElementById('msg'),list=document.getElementById('list');
+let tab='pending';
+function say(t,kind=''){msg.textContent=t;msg.className='msg '+kind;}
+function safeText(v){return String(v??'');}
+async function signed(path){if(!path)return '';const {data,error}=await sb.storage.from('buyer-proofs').createSignedUrl(path,3600);return error?'':(data?.signedUrl||'');}
+async function refreshCounts(){
+ const p=await sb.rpc('admin_buyer_proofs',{p_tab:'pending'});
+ if(p.error) throw p.error;
+ document.getElementById('pendingCount').textContent=(p.data||[]).length;
+ sb.from('buyer_proof_comments').select('id',{count:'exact',head:true}).eq('is_approved',false)
+   .then(c=>{document.getElementById('commentCount').textContent=c.error?'0':(c.count||0);})
+   .catch(()=>{document.getElementById('commentCount').textContent='0';});
+}
+function setTab(t){
+ tab=t;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));load();
+}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
+async function load(){
+ list.className='empty';list.textContent='Loading...';
+ try{
+  if(tab==='comments') return await loadComments();
+  const {data,error}=await sb.rpc('admin_buyer_proofs',{p_tab:tab==='pending'?'pending':'published'});if(error)throw error;
+  if(!data?.length){list.textContent='Nothing here yet.';return;}
+  list.className='';list.innerHTML='';
+  for(const p of data){
+   const d=document.createElement('div');d.className='item';
+   const img=document.createElement('img');img.alt='Buyer proof';img.style.display='none';
+   const imgBox=document.createElement('div');imgBox.className='small';imgBox.textContent='Loading proof image...';
+   const meta=document.createElement('div');meta.className='meta';
+   const title=document.createElement('b');title.textContent=p.caption||'Buyers proof';
+   const name=document.createElement('div');name.className='small';name.textContent='Display name: '+(p.submitter_display_name||'Anonymous');
+   const email=document.createElement('div');email.className='email';email.textContent='Email (private): '+(p.submitter_email||'Not provided');
+   const st=document.createElement('span');st.className='status';st.textContent=(p.status||'pending').toUpperCase();
+   const actions=document.createElement('div');actions.className='row';
+   if(tab==='pending'){
+    const pub=document.createElement('button');pub.className='btn success';pub.textContent='✓ PUBLISH';pub.onclick=()=>publishProof(p,pub);
+    const rej=document.createElement('button');rej.className='btn danger';rej.textContent='REJECT';rej.onclick=()=>rejectProof(p,rej);
+    actions.append(pub,rej);
+   }else{
+    const del=document.createElement('button');del.className='btn danger';del.textContent='DELETE';del.onclick=()=>deleteProof(p,del);actions.append(del);
+   }
+   meta.append(title,name,email,st,actions);d.append(imgBox,img,meta);list.appendChild(d);
+   signed(p.image_path).then(url=>{if(url){img.src=url;img.style.display='block';imgBox.remove();}else imgBox.textContent='Proof image saved, but preview could not load.';}).catch(()=>{imgBox.textContent='Proof image saved, but preview could not load.';});
+  }
+ }catch(e){console.error(e);list.className='empty error';list.textContent='Could not load: '+(e.message||e);}
+}
+async function publishProof(p,btn){
+ if(!confirm('Publish this proof publicly? Make sure sensitive information in the image is hidden first.'))return;
+ btn.disabled=true;
+ try{
+  const np='published/'+p.image_path.split('/').pop();
+  const cp=await sb.storage.from('buyer-proofs').copy(p.image_path,np);if(cp.error)throw cp.error;
+  const u=await sb.from('buyer_proofs').update({image_path:np,status:'published',is_published:true}).eq('id',p.id);if(u.error)throw u.error;
+  await sb.storage.from('buyer-proofs').remove([p.image_path]);await refreshCounts();await load();
+ }catch(e){alert(e.message||'Publish failed.');btn.disabled=false;}
+}
+async function rejectProof(p,btn){
+ if(!confirm('Reject this submission?'))return;btn.disabled=true;
+ try{await sb.storage.from('buyer-proofs').remove([p.image_path]);const r=await sb.from('buyer_proofs').update({status:'rejected',is_published:false}).eq('id',p.id);if(r.error)throw r.error;await refreshCounts();await load();}catch(e){alert(e.message||'Reject failed.');btn.disabled=false;}
+}
+async function deleteProof(p,btn){
+ if(!confirm('Delete this published proof?'))return;btn.disabled=true;
+ try{await sb.storage.from('buyer-proofs').remove([p.image_path]);const r=await sb.from('buyer_proofs').delete().eq('id',p.id);if(r.error)throw r.error;await load();}catch(e){alert(e.message||'Delete failed.');btn.disabled=false;}
+}
+async function loadComments(){
+ const {data,error}=await sb.from('buyer_proof_comments').select('*,buyer_proofs(caption)').order('created_at',{ascending:false});if(error)throw error;
+ if(!data?.length){list.className='empty';list.textContent='No comments yet.';return;}
+ list.className='';list.innerHTML='';
+ data.forEach(c=>{const d=document.createElement('div');d.className='item';const m=document.createElement('div');m.className='meta';const b=document.createElement('b');b.textContent=c.display_name||'Buyer';const t=document.createElement('div');t.textContent=c.comment||'';const s=document.createElement('div');s.className='small';s.textContent='On: '+(c.buyer_proofs?.caption||'Buyers proof');const a=document.createElement('div');a.className='row';if(!c.is_approved){const ok=document.createElement('button');ok.className='btn success';ok.textContent='✓ APPROVE';ok.onclick=async()=>{const r=await sb.from('buyer_proof_comments').update({is_approved:true}).eq('id',c.id);if(r.error)return alert(r.error.message);await refreshCounts();await load();};a.append(ok)}const del=document.createElement('button');del.className='btn danger';del.textContent='DELETE';del.onclick=async()=>{const r=await sb.from('buyer_proof_comments').delete().eq('id',c.id);if(r.error)return alert(r.error.message);await refreshCounts();await load();};a.append(del);m.append(b,t,s,a);d.append(m);list.append(d);});
+}
+function withTimeout(promise,label,ms=10000){
+ return Promise.race([
+  promise,
+  new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+' timed out.')),ms))
+ ]);
+}
+async function boot(){
+ try{
+  sb=initSupabase();
+  say('Loading pending submissions...');
+  await withTimeout(refreshCounts(),'Loading pending count');
+  await withTimeout(load(),'Loading submissions');
+  say('Loaded successfully.','ok');
+ }catch(e){
+  console.error(e);
+  say('Could not load Buyers’ Proof: '+(e.message||e),'error');
+  list.className='empty error';
+  list.textContent='ERROR: '+(e.message||e);
+ }
+}
+boot();
+</script></body></html>

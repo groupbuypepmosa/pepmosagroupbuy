@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PEPMOSA • Buyers' Proof</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body{background:#fff9fc;color:#251a27}.proofWrap{width:min(1100px,94%);margin:28px auto 70px}.proofHero{text-align:center;padding:30px 15px}.proofHero h1{margin:6px 0;font-size:clamp(28px,5vw,46px)}.proofHero p{color:#786d77;max-width:650px;margin:0 auto}.proofGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}.proofCard{background:#fff;border:1px solid #ead9e5;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(150,80,130,.08)}.proofCard img{width:100%;height:280px;object-fit:cover;display:block;cursor:zoom-in}.proofCaption{padding:12px 14px;font-weight:700}.empty{padding:45px;text-align:center;background:#fff;border:1px dashed #e3bfd4;border-radius:18px;color:#786d77}.privacy{margin:18px auto 24px;max-width:700px;padding:13px 16px;background:#fff;border:1px solid #ead9e5;border-radius:14px;text-align:center;color:#786d77}.modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000}.modal.show{display:flex}.modal img{max-width:95vw;max-height:90vh;border-radius:10px}.modal button{position:absolute;top:18px;right:20px;border:0;background:#fff;border-radius:50%;width:42px;height:42px;font-size:24px}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a><nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a></nav></header>
+<main class="proofWrap">
+<section class="proofHero"><div class="eyebrow">PEPMOSA COMMUNITY</div><h1>♥ BUYERS' PROOF</h1><p>Real buyer feedback and successful order proofs shared with personal information protected.</p></section>
+<div class="privacy">🔒 For buyer privacy, names, emails, phone numbers, addresses and sensitive details are hidden before publication.</div>
+<div id="proofGrid" class="proofGrid"><div class="empty">No buyers' proofs published yet.</div></div>
+</main>
+<div id="viewer" class="modal" onclick="closeViewer()"><button type="button" onclick="closeViewer()">×</button><img id="viewerImg" alt="Buyers proof"></div>
+<script type="module">
+import { supabase } from './supabase.js';
+const grid=document.getElementById('proofGrid');
+async function loadProofs(){
+ const {data,error}=await supabase.from('buyer_proofs').select('id,image_path,caption,created_at').eq('is_published',true).order('created_at',{ascending:false});
+ if(error||!data?.length)return;
+ grid.innerHTML='';
+ for(const p of data){
+   const {data:signed}=await supabase.storage.from('buyer-proofs').createSignedUrl(p.image_path,60*60);
+   if(!signed?.signedUrl)continue;
+   const card=document.createElement('article');card.className='proofCard';
+   card.innerHTML='<img alt="Buyers proof"><div class="proofCaption"></div>';
+   card.querySelector('img').src=signed.signedUrl;card.querySelector('.proofCaption').textContent=p.caption||'Verified buyer proof';
+   card.querySelector('img').onclick=()=>openViewer(signed.signedUrl);grid.appendChild(card);
+ }
+ if(!grid.children.length)grid.innerHTML='<div class="empty">No buyers’ proofs published yet.</div>';
+}
+window.openViewer=u=>{document.getElementById('viewerImg').src=u;document.getElementById('viewer').classList.add('show')};
+window.closeViewer=()=>document.getElementById('viewer').classList.remove('show');
+loadProofs();
+</script>
+</body></html>

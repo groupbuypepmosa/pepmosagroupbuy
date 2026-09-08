@@ -32,7 +32,7 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 (async()=>{
 try{initSupabase();await requireAdmin();}catch(e){document.body.innerHTML='<main style="padding:30px;font-family:Arial"><h2>Admin access required</h2><p>Please log in as PEPMOSA admin.</p></main>';return;}
 const $=id=>document.getElementById(id);const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let catalog=[],prices=[],expenses=[],regularItems=[],ofaItems=[],orders=[],groupBuys=[];
+let catalog=[],prices=[],expenses=[],regularItems=[],ofaItems=[],orders=[],groupBuys=[],manufacturerAssignments=[];
 $('edate').value=new Date().toISOString().slice(0,10);
 
 async function init(){
@@ -43,6 +43,7 @@ async function init(){
   sb.from('group_buys').select('gb_number,customer_facing_name,status').order('created_at',{ascending:false}),
   sb.from('finance_manufacturer_prices').select('*').order('product_name'),
   sb.from('finance_expenses').select('*').order('expense_date',{ascending:false}),
+  sb.from('finance_manufacturer_orders').select('*'),
   sb.from('orders').select('order_id,gb_number,payment_status,total,shipping_fee'),
   sb.from('order_items').select('product_id,variant_id,product_name,strength,qty,unit_price,order_id'),
   sb.from('ofa_order_items').select('product_id,product_name,qty,unit_price,order_id'),
@@ -55,7 +56,7 @@ async function init(){
  window.ofaOrdersCache=ofaOrders.data||[];window.adminFeesCache=adminFees.data||[];catalog=(prods.data||[]).map(p=>({product_id:p.product_id,product_name:p.product_name,variants:varMap.get(p.product_id)||[],source:'GB'}))
  .concat((ofap.data||[]).map(p=>({product_id:'OFA:'+p.id,raw_id:p.id,product_name:p.name,variants:[],source:'OFA'})));
  catalog.sort((a,b)=>a.product_name.localeCompare(b.product_name));
- prices=pr.data||[];expenses=ex.data||[];orders=ord.data||[];regularItems=items.data||[];ofaItems=ofi.data||[];groupBuys=gbs.data||[];
+ prices=pr.data||[];expenses=ex.data||[];manufacturerAssignments=(rs[rs.length-1]?.data)||[];orders=ord.data||[];regularItems=items.data||[];ofaItems=ofi.data||[];groupBuys=gbs.data||[];
  renderScopes();renderCatalog();renderPrices();renderExpenses();loadSales();
 }
 function renderScopes(){

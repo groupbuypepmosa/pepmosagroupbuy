@@ -13,6 +13,17 @@
       "source": "/index.html",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/buyers-proof.html",
+      "destination": "/buyers-proof",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/buyers-proof",
+      "destination": "/buyers-proof.html"
     }
   ]
 }

@@ -1,0 +1,48 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA • Admin Orders</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script>
+<style>
+body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{background:#222;color:#fff;padding:18px 24px;display:flex;justify-content:space-between;gap:12px;align-items:center}main{max-width:1200px;margin:auto;padding:22px}.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:18px;box-shadow:0 2px 10px #0001}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}input,select{width:100%;box-sizing:border-box;padding:11px;margin:5px 0 12px;border:1px solid #ddd;border-radius:8px;font:inherit}button{padding:10px 14px;border:0;border-radius:8px;background:#222;color:#fff;cursor:pointer;font-weight:bold}.danger{background:#a33}.muted{color:#777;font-size:13px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{background:#f5f5f7;border-radius:12px;padding:14px}.stat b{display:block;font-size:22px;margin-top:5px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}#rows{overflow:auto}@media(max-width:700px){main{padding:12px}.stats{grid-template-columns:repeat(2,1fr)}table{font-size:12px}}
+</style></head><body>
+<header><b>👥 PEPMOSA • ADMIN ORDERS</b><span class="muted" style="color:#ccc">Separate admin order tracker</span></header>
+<main>
+<div class="card"><h2 style="margin-top:0">✏️ Admin Names</h2><p class="muted">Palitan anytime ang names ng 4 admins. Shared ito, so makikita rin ng ibang admins.</p><div class="grid"><input id="name0"><input id="name1"><input id="name2"><input id="name3"></div><button onclick="saveNames()">SAVE ADMIN NAMES</button></div>
+<div class="stats" id="stats"></div>
+<div class="card"><h2 style="margin-top:0">➕ Add Admin Order</h2><div class="grid"><div><label>Admin</label><select id="admin"></select></div><div><label>Product</label><select id="product" onchange="fillVariants()"><option value="">Select product</option></select></div><div><label>Variant / Strength</label><select id="variant" onchange="updatePrice()"><option value="">Select product first</option></select></div><div><label>Quantity</label><input id="qty" type="number" min="1" step="1"></div><div><label>Manufacturer Price</label><input id="price" readonly></div></div><button onclick="addOrder()">ADD ORDER</button><div class="muted" style="margin-top:8px">Manufacturer price is automatically taken from Finance → Manufacturer Pricelist.</div></div>
+<div class="card"><h2 style="margin-top:0">📋 All Admin Orders</h2><div id="rows">Loading…</div></div>
+</main>
+<script>
+const cfg=window.PEPMOSA_CONFIG;const sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
+let admins=['Admin 1','Admin 2','Admin 3','Admin 4'],catalog=[],prices=[],orders=[];
+async function init(){
+ const r=await Promise.all([
+  sb.from('admin_order_settings').select('*').eq('id','default').single(),
+  sb.from('products').select('product_id,product_name,active').order('product_name'),
+  sb.from('product_variants').select('variant_id,product_id,strength,active').order('strength'),
+  sb.from('finance_manufacturer_prices').select('*'),
+  sb.from('admin_orders').select('*').order('created_at',{ascending:false})
+ ]);
+ for(const x of r)if(x.error)throw x.error;
+ admins=Array.isArray(r[0].data.admin_names)?r[0].data.admin_names:admins;
+ const vm=new Map();(r[2].data||[]).forEach(v=>{if(!vm.has(v.product_id))vm.set(v.product_id,[]);vm.get(v.product_id).push(v)});
+ catalog=(r[1].data||[]).filter(x=>x.active!==false).map(p=>({...p,variants:(vm.get(p.product_id)||[]).filter(v=>v.active!==false)}));
+ prices=r[3].data||[];orders=r[4].data||[];
+ render();
+}
+function render(){
+ admins.forEach((a,i)=>document.getElementById('name'+i).value=a);
+ document.getElementById('admin').innerHTML=admins.map((a,i)=>'<option value="'+i+'">'+esc(a)+'</option>').join('');
+ document.getElementById('product').innerHTML='<option value="">Select product</option>'+catalog.map(p=>'<option value="'+p.product_id+'">'+esc(p.product_name)+'</option>').join('');
+ const totals=admins.map((a,i)=>orders.filter(o=>o.admin_index===i).reduce((s,o)=>s+Number(o.qty)*Number(o.manufacturer_price),0));
+ document.getElementById('stats').innerHTML=admins.map((a,i)=>'<div class="stat"><span>'+esc(a)+'</span><b>'+peso(totals[i])+'</b><small>'+orders.filter(o=>o.admin_index===i).length+' order item(s)</small></div>').join('');
+ document.getElementById('rows').innerHTML=orders.length?'<table><tr><th>Admin</th><th>Product</th><th>Variant</th><th>Qty</th><th>Manuf Price</th><th>Total</th><th></th></tr>'+orders.map(o=>'<tr><td>'+esc(admins[o.admin_index]||'Admin')+'</td><td>'+esc(o.product_name)+'</td><td>'+esc(o.variant||'—')+'</td><td>'+o.qty+'</td><td>'+peso(o.manufacturer_price)+'</td><td>'+peso(Number(o.qty)*Number(o.manufacturer_price))+'</td><td><button class="danger" onclick="delOrder(\''+o.id+'\')">Delete</button></td></tr>').join('')+'</table>':'<div class="muted">No admin orders yet.</div>';
+}
+function fillVariants(){const p=catalog.find(x=>x.product_id===document.getElementById('product').value);document.getElementById('variant').innerHTML='<option value="">Select variant</option>'+((p?.variants)||[]).map(v=>'<option value="'+v.variant_id+'">'+esc(v.strength)+'</option>').join('');document.getElementById('price').value='';}
+function updatePrice(){const p=catalog.find(x=>x.product_id===document.getElementById('product').value),v=(p?.variants||[]).find(x=>x.variant_id===document.getElementById('variant').value);const pr=prices.find(x=>String(x.product_id)===String(p?.product_id)&&String(x.variant_id||'')===String(v?.variant_id||''));document.getElementById('price').value=pr?Number(pr.manufacturer_price):0;}
+async function saveNames(){admins=[0,1,2,3].map(i=>document.getElementById('name'+i).value.trim()||'Admin '+(i+1));const {error}=await sb.from('admin_order_settings').upsert({id:'default',admin_names:admins,updated_at:new Date().toISOString()});if(error)return alert(error.message);render();alert('Admin names saved!');}
+async function addOrder(){const ai=Number(document.getElementById('admin').value),p=catalog.find(x=>x.product_id===document.getElementById('product').value),v=(p?.variants||[]).find(x=>x.variant_id===document.getElementById('variant').value),qty=Number(document.getElementById('qty').value),price=Number(document.getElementById('price').value);if(!p||!v||!qty)return alert('Please select admin, product, variant and quantity.');const {data,error}=await sb.from('admin_orders').insert({admin_index:ai,product_id:p.product_id,variant_id:v.variant_id,product_name:p.product_name,variant:v.strength,qty,manufacturer_price:price}).select().single();if(error)return alert(error.message);orders.unshift(data);document.getElementById('qty').value='';render();document.getElementById('product').value='';fillVariants();}
+async function delOrder(id){if(!confirm('Delete this admin order?'))return;const {error}=await sb.from('admin_orders').delete().eq('id',id);if(error)return alert(error.message);orders=orders.filter(x=>x.id!==id);render();}
+init().catch(e=>{document.getElementById('rows').innerHTML='<div style="color:#a33">'+esc(e.message)+'</div>';console.error(e)});
+</script></body></html>

@@ -51,12 +51,12 @@ async function init(){
   sb.from('admin_fee_payments').select('amount,status,gb_number')
  ]);
  for(const x of rs)if(x.error)throw x.error;
- const [prods,vars,ofap,gbs,pr,ex,ord,items,ofi,ofaOrders,adminFees]=rs;
+ const [prods,vars,ofap,gbs,pr,ex,assignments,ord,items,ofi,ofaOrders,adminFees]=rs;
  const varMap=new Map();(vars.data||[]).forEach(v=>{if(!varMap.has(v.product_id))varMap.set(v.product_id,[]);varMap.get(v.product_id).push(v);});
  window.ofaOrdersCache=ofaOrders.data||[];window.adminFeesCache=adminFees.data||[];catalog=(prods.data||[]).map(p=>({product_id:p.product_id,product_name:p.product_name,variants:varMap.get(p.product_id)||[],source:'GB'}))
  .concat((ofap.data||[]).map(p=>({product_id:'OFA:'+p.id,raw_id:p.id,product_name:p.name,variants:[],source:'OFA'})));
  catalog.sort((a,b)=>a.product_name.localeCompare(b.product_name));
- prices=pr.data||[];expenses=ex.data||[];manufacturerAssignments=(rs[rs.length-1]?.data)||[];orders=ord.data||[];regularItems=items.data||[];ofaItems=ofi.data||[];groupBuys=gbs.data||[];
+ prices=pr.data||[];expenses=ex.data||[];manufacturerAssignments=assignments.data||[];orders=ord.data||[];regularItems=items.data||[];ofaItems=ofi.data||[];groupBuys=gbs.data||[];
  renderScopes();renderCatalog();renderPrices();renderExpenses();loadSales();
 }
 function renderScopes(){

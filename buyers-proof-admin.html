@@ -1,6 +1,6 @@
 <!doctype html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PEPMOSA • Manage Buyers Proof • v4</title><link rel="stylesheet" href="style.css">
+<title>PEPMOSA • Manage Buyers Proof • v5</title><link rel="stylesheet" href="style.css">
 <style>
 body{background:#fff9fc}.wrap{width:min(1050px,94%);margin:28px auto}.card{background:#fff;border:1px solid #ead9e5;border-radius:20px;padding:22px;margin-bottom:18px}.tabs{display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap}.tab{padding:12px 16px;border-radius:12px;border:1px solid #ead9e5;background:#fff;font-weight:900;cursor:pointer}.tab.active{background:#d72b91;color:#fff}.count{font-size:12px;background:#eee;padding:3px 8px;border-radius:10px;color:#333}.tab.active .count{background:rgba(255,255,255,.25);color:#fff}.item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #eee;align-items:flex-start}.item:last-child{border-bottom:0}.item img{width:115px;height:115px;object-fit:cover;border-radius:12px;background:#f4edf2}.meta{flex:1;min-width:0}.meta b{font-size:16px}.small{font-size:13px;color:#777;margin-top:4px;word-break:break-word}.status{display:inline-block;font-size:12px;padding:5px 8px;border-radius:8px;background:#f6e5ef;margin-top:7px}.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.btn{padding:10px 14px;border:0;border-radius:10px;font-weight:800;cursor:pointer}.success{background:#2f9e62;color:#fff}.danger{background:#eee;color:#333}.msg{margin-top:10px;font-weight:700}.error{color:#b42318}.ok{color:#16803c}.empty{padding:35px;text-align:center;color:#777}.email{font-size:13px;color:#777}@media(max-width:600px){.item{flex-direction:column}.item img{width:100%;height:240px}.tabs .tab{flex:1}.wrap{width:92%}}
 </style></head>
@@ -23,9 +23,11 @@ function safeText(v){return String(v??'');}
 async function signed(path){if(!path)return '';const {data,error}=await sb.storage.from('buyer-proofs').createSignedUrl(path,3600);return error?'':(data?.signedUrl||'');}
 async function refreshCounts(){
  const p=await sb.rpc('admin_buyer_proofs',{p_tab:'pending'});
- document.getElementById('pendingCount').textContent=p.error?'!':((p.data||[]).length);
- const c=await sb.from('buyer_proof_comments').select('id',{count:'exact',head:true}).eq('is_approved',false);
- document.getElementById('commentCount').textContent=c.error?'!':(c.count||0);
+ if(p.error) throw p.error;
+ document.getElementById('pendingCount').textContent=(p.data||[]).length;
+ sb.from('buyer_proof_comments').select('id',{count:'exact',head:true}).eq('is_approved',false)
+   .then(c=>{document.getElementById('commentCount').textContent=c.error?'0':(c.count||0);})
+   .catch(()=>{document.getElementById('commentCount').textContent='0';});
 }
 function setTab(t){
  tab=t;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));load();
@@ -84,29 +86,24 @@ async function loadComments(){
  list.className='';list.innerHTML='';
  data.forEach(c=>{const d=document.createElement('div');d.className='item';const m=document.createElement('div');m.className='meta';const b=document.createElement('b');b.textContent=c.display_name||'Buyer';const t=document.createElement('div');t.textContent=c.comment||'';const s=document.createElement('div');s.className='small';s.textContent='On: '+(c.buyer_proofs?.caption||'Buyers proof');const a=document.createElement('div');a.className='row';if(!c.is_approved){const ok=document.createElement('button');ok.className='btn success';ok.textContent='✓ APPROVE';ok.onclick=async()=>{const r=await sb.from('buyer_proof_comments').update({is_approved:true}).eq('id',c.id);if(r.error)return alert(r.error.message);await refreshCounts();await load();};a.append(ok)}const del=document.createElement('button');del.className='btn danger';del.textContent='DELETE';del.onclick=async()=>{const r=await sb.from('buyer_proof_comments').delete().eq('id',c.id);if(r.error)return alert(r.error.message);await refreshCounts();await load();};a.append(del);m.append(b,t,s,a);d.append(m);list.append(d);});
 }
-function withTimeout(promise,label,ms=12000){
+function withTimeout(promise,label,ms=10000){
  return Promise.race([
   promise,
-  new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+' timed out. Please refresh and try again.')),ms))
+  new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+' timed out.')),ms))
  ]);
 }
 async function boot(){
  try{
   sb=initSupabase();
-  say('Checking admin access...');
-  const sessionResult=await withTimeout(sb.auth.getSession(),'Checking your login');
-  if(sessionResult.error) throw sessionResult.error;
-  const user=sessionResult.data?.session?.user;
-  if(!user) throw new Error('Please log in with the admin account first.');
-  say('Admin session found. Loading submissions...','ok');
-  await withTimeout(refreshCounts(),'Loading counts');
+  say('Loading pending submissions...');
+  await withTimeout(refreshCounts(),'Loading pending count');
   await withTimeout(load(),'Loading submissions');
-  say('Admin access verified.','ok');
+  say('Loaded successfully.','ok');
  }catch(e){
   console.error(e);
-  say(e.message||'Admin access failed.','error');
+  say('Could not load Buyers’ Proof: '+(e.message||e),'error');
   list.className='empty error';
-  list.textContent='Could not load Buyers’ Proof: '+(e.message||e);
+  list.textContent='ERROR: '+(e.message||e);
  }
 }
 boot();

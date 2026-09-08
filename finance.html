@@ -84,6 +84,31 @@ function renderPrices(){
 function renderExpenses(){
  $('expenses').innerHTML='<table><tr><th>Date</th><th>Scope</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr>'+expenses.map(x=>'<tr><td>'+x.expense_date+'</td><td>'+esc(x.scope||'GENERAL')+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.description||'')+'</td><td>'+peso(x.amount)+'</td><td><button class="danger" onclick="delExpense(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
 }
+function renderManufTally(rows,scope){
+ const box=$('manufTally'); if(!box)return;
+ const priced=rows.filter(r=>r.hasPrice);
+ const storageKey='pepmosa_manuf_assignment_'+scope;
+ const assigned=JSON.parse(localStorage.getItem(storageKey)||'{}');
+ const key=r=>String(r.product_id||r.name)+'||'+String(r.variant_id||r.variant||'');
+ const money=n=>peso(n);
+ const tableFor=(manuf)=>{
+   const list=priced.filter(r=>assigned[key(r)]===manuf);
+   const total=list.reduce((s,r)=>s+Number(r.pc||0),0);
+   return '<div class="card" style="margin:0"><h3>🏭 '+manuf+'</h3><div class="muted">'+(manuf==='BBG'?'MANUF 1':'MANUF 2')+'</div>'+
+   (list.length?'<table><tr><th>Product</th><th>Qty Ordered</th><th>Manuf Price</th><th>Subtotal</th><th></th></tr>'+
+   list.map(r=>'<tr><td>'+esc(r.name)+'<br><span class="muted">'+esc(r.variant||'—')+'</span></td><td>'+r.qty+'</td><td>'+money(Number(r.pc||0)/Number(r.qty||1))+'</td><td>'+money(r.pc)+'</td><td><button class="danger" onclick="unassignManuf(\''+encodeURIComponent(key(r))+'\')">Remove</button></td></tr>').join('')+'</table>':'<div class="muted" style="padding:14px 0">No products assigned yet.</div>')+
+   '<div style="margin-top:14px;font-weight:bold">TOTAL TO PAY '+manuf+': <span style="font-size:22px">'+money(total)+'</span></div></div>';
+ };
+ const unassigned=priced.filter(r=>!assigned[key(r)]);
+ box.innerHTML='<div class="grid">'+tableFor('BBG')+tableFor('KERUN')+'</div>'+
+ '<div class="card" style="margin-top:16px"><h3>📋 Ordered Products — Choose Manufacturer</h3><p class="muted">Only products with actual approved orders are listed. Manufacturer price is taken from the Manufacturer Pricelist above.</p>'+
+ (unassigned.length?'<table><tr><th>Product</th><th>Qty Ordered</th><th>Manuf Price</th><th>Subtotal</th><th>Order From</th></tr>'+
+ unassigned.map(r=>'<tr><td>'+esc(r.name)+'<br><span class="muted">'+esc(r.variant||'—')+'</span></td><td>'+r.qty+'</td><td>'+money(Number(r.pc||0)/Number(r.qty||1))+'</td><td>'+money(r.pc)+'</td><td><select onchange="assignManuf(\''+encodeURIComponent(key(r))+'\',this.value)"><option value="">🔽 Select</option><option value="BBG">MANUF 1 — BBG</option><option value="KERUN">MANUF 2 — KERUN</option></select></td></tr>').join('')+'</table>':'<div class="muted" style="padding:12px 0">All ordered products have been assigned to a manufacturer.</div>')+'</div>'+
+ (!priced.length?'<div class="muted" style="padding:12px;color:#a33">No approved ordered products with manufacturer prices were found for this view.</div>':'');
+ window.assignManuf=function(encoded,m){if(!m)return;const data=JSON.parse(localStorage.getItem(storageKey)||'{}');data[decodeURIComponent(encoded)]=m;localStorage.setItem(storageKey,JSON.stringify(data));renderManufTally(rows,scope);};
+ window.unassignManuf=function(encoded){const data=JSON.parse(localStorage.getItem(storageKey)||'{}');delete data[decodeURIComponent(encoded)];localStorage.setItem(storageKey,JSON.stringify(data));renderManufTally(rows,scope);};
+}
+
 window.loadSales=function(){
  const scope=$('scope').value;
  const approvedStatus=s=>['PAID','PAYMENT APPROVED','APPROVED'].includes(String(s||'').toUpperCase());
@@ -125,7 +150,7 @@ window.loadSales=function(){
  // Manufacturer Pricelist is reference only. It is NOT automatically deducted.
  // Net profit changes only when you manually record an actual expense/payment.
  $('profit').textContent=peso(revenue-exp);
- $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>';;renderManufTally(rows,scope)
+ $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>';renderManufTally(rows,scope)
 };
 window.editPrice=function(id){
  const x=prices.find(p=>String(p.id)===String(id));if(!x)return;

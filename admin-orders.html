@@ -6,42 +6,40 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 </style></head><body>
 <header><b>👥 PEPMOSA • ADMIN ORDERS</b><span class="muted" style="color:#ccc">Separate admin order tracker</span></header>
 <main>
-<div class="card"><h2 style="margin-top:0">✏️ Admin Names</h2><p class="muted">Palitan anytime ang names ng 4 admins. Shared ito, so makikita rin ng ibang admins.</p><div class="grid"><input id="name0"><input id="name1"><input id="name2"><input id="name3"></div><button onclick="saveNames()">SAVE ADMIN NAMES</button></div>
 <div class="stats" id="stats"></div>
 <div class="card"><h2 style="margin-top:0">➕ Add Admin Order</h2><div class="grid"><div><label>Admin</label><select id="admin"></select></div><div><label>Product</label><select id="product" onchange="fillVariants()"><option value="">Select product</option></select></div><div><label>Variant / Strength</label><select id="variant" onchange="updatePrice()"><option value="">Select product first</option></select></div><div><label>Quantity</label><input id="qty" type="number" min="1" step="1"></div><div><label>Manufacturer Price</label><input id="price" readonly></div></div><button onclick="addOrder()">ADD ORDER</button><div class="muted" style="margin-top:8px">Manufacturer price is automatically taken from Finance → Manufacturer Pricelist.</div></div>
-<div class="card"><h2 style="margin-top:0">📋 All Admin Orders</h2><div id="rows">Loading…</div></div>
+<div id="consolidated"></div><div class="card"><h2 style="margin-top:0">📋 All Admin Orders</h2><div id="rows">Loading…</div></div>
 </main>
 <script>
 const cfg=window.PEPMOSA_CONFIG;const sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
-let admins=['Admin 1','Admin 2','Admin 3','Admin 4'],catalog=[],prices=[],orders=[];
+const admins=['VICKY','JOYCE','RHEA','ANNE'];let catalog=[],prices=[],orders=[];
 async function init(){
  const r=await Promise.all([
-  sb.from('admin_order_settings').select('*').eq('id','default').single(),
   sb.from('products').select('product_id,product_name,active').order('product_name'),
   sb.from('product_variants').select('variant_id,product_id,strength,active').order('strength'),
   sb.from('finance_manufacturer_prices').select('*'),
   sb.from('admin_orders').select('*').order('created_at',{ascending:false})
  ]);
  for(const x of r)if(x.error)throw x.error;
- admins=Array.isArray(r[0].data.admin_names)?r[0].data.admin_names:admins;
- const vm=new Map();(r[2].data||[]).forEach(v=>{if(!vm.has(v.product_id))vm.set(v.product_id,[]);vm.get(v.product_id).push(v)});
- catalog=(r[1].data||[]).filter(x=>x.active!==false).map(p=>({...p,variants:(vm.get(p.product_id)||[]).filter(v=>v.active!==false)}));
- prices=r[3].data||[];orders=r[4].data||[];
+ const vm=new Map();(r[1].data||[]).forEach(v=>{if(!vm.has(v.product_id))vm.set(v.product_id,[]);vm.get(v.product_id).push(v)});
+ catalog=(r[0].data||[]).filter(x=>x.active!==false).map(p=>({...p,variants:(vm.get(p.product_id)||[]).filter(v=>v.active!==false)}));
+ prices=r[2].data||[];orders=r[3].data||[];
  render();
 }
 function render(){
- admins.forEach((a,i)=>document.getElementById('name'+i).value=a);
  document.getElementById('admin').innerHTML=admins.map((a,i)=>'<option value="'+i+'">'+esc(a)+'</option>').join('');
  document.getElementById('product').innerHTML='<option value="">Select product</option>'+catalog.map(p=>'<option value="'+p.product_id+'">'+esc(p.product_name)+'</option>').join('');
  const totals=admins.map((a,i)=>orders.filter(o=>o.admin_index===i).reduce((s,o)=>s+Number(o.qty)*Number(o.manufacturer_price),0));
- document.getElementById('stats').innerHTML=admins.map((a,i)=>'<div class="stat"><span>'+esc(a)+'</span><b>'+peso(totals[i])+'</b><small>'+orders.filter(o=>o.admin_index===i).length+' order item(s)</small></div>').join('');
+ document.getElementById('stats').innerHTML=admins.map((a,i)=>'<div class="stat"><span>'+esc(a)+'</span><b>'+peso(totals[i])+'</b><small>'+orders.filter(o=>o.admin_index===i).length+' line item(s)</small></div>').join('');
+ const grouped=admins.map((a,i)=>{const mine=orders.filter(o=>o.admin_index===i);const map={};mine.forEach(o=>{const k=o.product_name+'||'+(o.variant||'');if(!map[k])map[k]={product:o.product_name,variant:o.variant,qty:0,price:Number(o.manufacturer_price||0)};map[k].qty+=Number(o.qty||0)});return {name:a,items:Object.values(map)}}).filter(g=>g.items.length);
+ const consolidated='<div class="card"><h2 style="margin-top:0">📦 Consolidated Orders per Admin</h2>'+ (grouped.length?grouped.map(g=>'<div style="margin-bottom:22px"><h3>👤 '+esc(g.name)+'</h3><table><tr><th>Product</th><th>Variant</th><th>Total Qty</th><th>Manuf Price</th><th>Subtotal</th></tr>'+g.items.map(x=>'<tr><td>'+esc(x.product)+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.price)+'</td><td>'+peso(x.qty*x.price)+'</td></tr>').join('')+'<tr><th colspan="4">TOTAL '+esc(g.name)+'</th><th>'+peso(g.items.reduce((s,x)=>s+x.qty*x.price,0))+'</th></tr></table></div>').join(''):'<div class="muted">No admin orders yet.</div>')+'</div>';
+ document.getElementById('consolidated').innerHTML=consolidated;
  document.getElementById('rows').innerHTML=orders.length?'<table><tr><th>Admin</th><th>Product</th><th>Variant</th><th>Qty</th><th>Manuf Price</th><th>Total</th><th></th></tr>'+orders.map(o=>'<tr><td>'+esc(admins[o.admin_index]||'Admin')+'</td><td>'+esc(o.product_name)+'</td><td>'+esc(o.variant||'—')+'</td><td>'+o.qty+'</td><td>'+peso(o.manufacturer_price)+'</td><td>'+peso(Number(o.qty)*Number(o.manufacturer_price))+'</td><td><button class="danger" onclick="delOrder(\''+o.id+'\')">Delete</button></td></tr>').join('')+'</table>':'<div class="muted">No admin orders yet.</div>';
 }
 function fillVariants(){const p=catalog.find(x=>x.product_id===document.getElementById('product').value);document.getElementById('variant').innerHTML='<option value="">Select variant</option>'+((p?.variants)||[]).map(v=>'<option value="'+v.variant_id+'">'+esc(v.strength)+'</option>').join('');document.getElementById('price').value='';}
 function updatePrice(){const p=catalog.find(x=>x.product_id===document.getElementById('product').value),v=(p?.variants||[]).find(x=>x.variant_id===document.getElementById('variant').value);const pr=prices.find(x=>String(x.product_id)===String(p?.product_id)&&String(x.variant_id||'')===String(v?.variant_id||''));document.getElementById('price').value=pr?Number(pr.manufacturer_price):0;}
-async function saveNames(){admins=[0,1,2,3].map(i=>document.getElementById('name'+i).value.trim()||'Admin '+(i+1));const {error}=await sb.from('admin_order_settings').upsert({id:'default',admin_names:admins,updated_at:new Date().toISOString()});if(error)return alert(error.message);render();alert('Admin names saved!');}
 async function addOrder(){const ai=Number(document.getElementById('admin').value),p=catalog.find(x=>x.product_id===document.getElementById('product').value),v=(p?.variants||[]).find(x=>x.variant_id===document.getElementById('variant').value),qty=Number(document.getElementById('qty').value),price=Number(document.getElementById('price').value);if(!p||!v||!qty)return alert('Please select admin, product, variant and quantity.');const {data,error}=await sb.from('admin_orders').insert({admin_index:ai,product_id:p.product_id,variant_id:v.variant_id,product_name:p.product_name,variant:v.strength,qty,manufacturer_price:price}).select().single();if(error)return alert(error.message);orders.unshift(data);document.getElementById('qty').value='';render();document.getElementById('product').value='';fillVariants();}
 async function delOrder(id){if(!confirm('Delete this admin order?'))return;const {error}=await sb.from('admin_orders').delete().eq('id',id);if(error)return alert(error.message);orders=orders.filter(x=>x.id!==id);render();}
 init().catch(e=>{document.getElementById('rows').innerHTML='<div style="color:#a33">'+esc(e.message)+'</div>';console.error(e)});

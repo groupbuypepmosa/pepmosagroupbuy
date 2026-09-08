@@ -28,9 +28,13 @@ async function loadProofs(){
    const {data:signed}=await supabase.storage.from('buyer-proofs').createSignedUrl(p.image_path,60*60);
    if(!signed?.signedUrl)continue;
    const card=document.createElement('article');card.className='proofCard';
-   card.innerHTML='<img alt="Buyers proof"><div class="proofCaption"></div>';
+   card.innerHTML='<img alt="Buyers proof"><div class="proofCaption"></div><div style="padding:0 14px 14px"><button class="btn" style="padding:7px 10px" type="button">💬 Leave a comment</button><div class="comments" style="margin-top:10px;font-size:13px"></div></div>';
    card.querySelector('img').src=signed.signedUrl;card.querySelector('.proofCaption').textContent=p.caption||'Verified buyer proof';
-   card.querySelector('img').onclick=()=>openViewer(signed.signedUrl);grid.appendChild(card);
+   card.querySelector('img').onclick=()=>openViewer(signed.signedUrl);
+   const commentsBox=card.querySelector('.comments');
+   const {data:comments}=await supabase.from('buyer_proof_comments').select('display_name,comment,created_at').eq('proof_id',p.id).eq('is_approved',true).order('created_at',{ascending:true});
+   commentsBox.innerHTML=(comments||[]).map(x=>'<div style="margin:5px 0"><b>'+((x.display_name||'Buyer').replace(/[&<>]/g,''))+'</b>: '+x.comment.replace(/[&<>]/g,'')+'</div>').join('');
+   card.querySelector('button').onclick=async()=>{const name=prompt('Your display name (optional):')||'';const comment=prompt('Leave your comment:');if(!comment?.trim())return;const {error}=await supabase.from('buyer_proof_comments').insert({proof_id:p.id,display_name:name.trim()||null,comment:comment.trim(),is_approved:false});alert(error?error.message:'Thank you! Your comment is pending admin review. ♥')};grid.appendChild(card);
  }
  if(!grid.children.length)grid.innerHTML='<div class="empty">No buyers’ proofs published yet.</div>';
 }

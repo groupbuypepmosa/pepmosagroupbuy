@@ -1,48 +1,34 @@
 <!doctype html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PEPMOSA • Buyers' Proof</title>
 <link rel="stylesheet" href="style.css">
-<style>.btn{padding:10px 14px;border:0;border-radius:10px;font-weight:800;cursor:pointer}.primary{background:#d72b91;color:#fff}.modal{z-index:9999!important}.modal .card{position:relative!important;z-index:10000!important;max-height:88vh!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch}</style><style>
-body{background:#fff9fc;color:#251a27}.proofWrap{width:min(1100px,94%);margin:28px auto 70px}.proofHero{text-align:center;padding:30px 15px}.proofHero h1{margin:6px 0;font-size:clamp(28px,5vw,46px)}.proofHero p{color:#786d77;max-width:650px;margin:0 auto}.proofGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}.proofCard{background:#fff;border:1px solid #ead9e5;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(150,80,130,.08)}.proofCard img{width:100%;height:280px;object-fit:cover;display:block;cursor:zoom-in}.proofCaption{padding:12px 14px;font-weight:700}.empty{padding:45px;text-align:center;background:#fff;border:1px dashed #e3bfd4;border-radius:18px;color:#786d77}.privacy{margin:18px auto 24px;max-width:700px;padding:13px 16px;background:#fff;border:1px solid #ead9e5;border-radius:14px;text-align:center;color:#786d77}.modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000}.modal.show{display:flex}.modal img{max-width:95vw;max-height:90vh;border-radius:10px}.modal button{position:absolute;top:18px;right:20px;border:0;background:#fff;border-radius:50%;width:42px;height:42px;font-size:24px}
-</style>
-</head>
+<style>
+body{background:#fff9fc;color:#251a27}.proofWrap{width:min(1100px,94%);margin:28px auto 70px}.proofHero{text-align:center;padding:30px 15px}.proofHero h1{margin:6px 0;font-size:clamp(28px,5vw,46px)}.proofHero p{color:#786d77}.privacy{margin:18px auto 24px;max-width:700px;padding:13px 16px;background:#fff;border:1px solid #ead9e5;border-radius:14px;text-align:center;color:#786d77}.proofGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}.proofCard{background:#fff;border:1px solid #ead9e5;border-radius:18px;overflow:hidden}.proofCard img{width:100%;height:280px;object-fit:cover;display:block;cursor:zoom-in}.proofCaption{padding:12px 14px;font-weight:700}.empty{padding:45px;text-align:center;background:#fff;border:1px dashed #e3bfd4;border-radius:18px;color:#786d77}.submitArea{text-align:center;margin:32px 0 12px}.btn{padding:12px 18px;border:0;border-radius:12px;font-weight:800;cursor:pointer;font-size:15px}.primary{background:#d72b91;color:#fff}.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:16px;z-index:99999}.modal.show{display:flex}.modalCard{width:min(520px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:22px;padding:24px;box-sizing:border-box}.modalCard h2{margin-top:0}.field{margin:12px 0}.field label{display:block;font-weight:700;margin-bottom:6px}.field input,.field textarea{box-sizing:border-box;width:100%;padding:13px;border:1px solid #ddd;border-radius:12px;font-size:16px}.field textarea{min-height:100px;resize:vertical}.submitBtn{width:100%;min-height:52px;margin-top:8px}.closeBtn{float:right;background:#eee;color:#333}.msg{margin-top:12px;font-weight:700}.modal img{max-width:95vw;max-height:90vh;border-radius:10px}.viewerClose{position:absolute;top:18px;right:20px;border:0;background:#fff;border-radius:50%;width:42px;height:42px;font-size:24px}
+</style></head>
 <body>
-<header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a><nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a></nav></header>
+<header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a></header>
 <main class="proofWrap">
 <section class="proofHero"><div class="eyebrow">PEPMOSA COMMUNITY</div><h1>♥ BUYERS' PROOF</h1><p>Real buyer feedback and successful order proofs shared with personal information protected.</p></section>
-<div style="text-align:center;margin:0 0 18px"><button class="btn primary" onclick="openSubmit()">＋ SUBMIT YOUR PROOF ♥</button></div><div class="privacy">🔒 For buyer privacy, names, emails, phone numbers, addresses and sensitive details are hidden before publication.</div>
+<div class="privacy">🔒 Buyer information is kept private. Names, emails, phone numbers and addresses are not shown publicly.</div>
 <div id="proofGrid" class="proofGrid"><div class="empty">No buyers' proofs published yet.</div></div>
+<div class="submitArea"><p><b>Have you received your order?</b></p><button id="openSubmitBtn" class="btn primary" type="button">＋ SUBMIT YOUR PROOF ♥</button></div>
 </main>
-<div id="submitModal" class="modal"><div class="card" style="max-width:520px;width:100%;background:white;color:#222;position:relative"><button onclick="closeSubmit()" style="position:absolute;right:12px;top:12px">×</button><h2>Submit Your Proof ♥</h2><p>Your submission will stay private until reviewed by an admin.</p><input id="submitFile" type="file" accept="image/jpeg,image/png,image/webp" style="margin:10px 0;width:100%"><input id="submitName" placeholder="Display name (optional)" style="margin:8px 0;width:100%;padding:10px"><input id="submitEmail" type="email" required placeholder="Email address (required — kept private)" style="margin:8px 0;width:100%;padding:10px"><textarea id="submitCaption" placeholder="Tell us about your experience (required)" required style="margin:8px 0;width:100%;padding:10px"></textarea><button class="btn primary" onclick="submitProof()" style="width:100%;margin-top:8px;min-height:48px">SUBMIT FOR REVIEW ♥</button><div id="submitMsg" style="margin-top:10px"></div></div></div><div id="viewer" class="modal" onclick="closeViewer()"><button type="button" onclick="closeViewer()">×</button><img id="viewerImg" alt="Buyers proof"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
-<script src="supabase.js"></script>
+<div id="submitModal" class="modal"><div class="modalCard"><button id="closeSubmitBtn" class="btn closeBtn" type="button">×</button><h2>Submit Your Proof ♥</h2><p>Your submission stays private until an admin reviews it.</p><form id="proofForm">
+<div class="field"><label>Proof Image *</label><input id="submitFile" type="file" accept="image/jpeg,image/png,image/webp" required></div>
+<div class="field"><label>Display Name (optional)</label><input id="submitName" placeholder="Example: Maria"></div>
+<div class="field"><label>Email Address *</label><input id="submitEmail" type="email" placeholder="Your email — private, never shown publicly" required></div>
+<div class="field"><label>Leave a Comment / Experience *</label><textarea id="submitCaption" placeholder="Tell us about your experience..." required></textarea></div>
+<button id="submitBtn" class="btn primary submitBtn" type="submit">SUBMIT FOR REVIEW ♥</button>
+<div id="submitMsg" class="msg"></div></form></div></div>
+<div id="viewer" class="modal"><button id="closeViewerBtn" class="viewerClose" type="button">×</button><img id="viewerImg" alt="Buyers proof"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script>
 <script>
-const grid=document.getElementById('proofGrid');
-async function loadProofs(){
- const {data,error}=await supabase.from('buyer_proofs').select('id,image_path,caption,created_at').eq('is_published',true).order('created_at',{ascending:false});
- if(error||!data?.length)return;
- grid.innerHTML='';
- for(const p of data){
-   const {data:signed}=await supabase.storage.from('buyer-proofs').createSignedUrl(p.image_path,60*60);
-   if(!signed?.signedUrl)continue;
-   const card=document.createElement('article');card.className='proofCard';
-   card.innerHTML='<img alt="Buyers proof"><div class="proofCaption"></div><div style="padding:0 14px 14px"><button class="btn" style="padding:7px 10px" type="button">💬 Leave a comment</button><div class="comments" style="margin-top:10px;font-size:13px"></div></div>';
-   card.querySelector('img').src=signed.signedUrl;card.querySelector('.proofCaption').textContent=p.caption||'Verified buyer proof';
-   card.querySelector('img').onclick=()=>openViewer(signed.signedUrl);
-   const commentsBox=card.querySelector('.comments');
-   const {data:comments}=await supabase.from('buyer_proof_comments').select('display_name,comment,created_at').eq('proof_id',p.id).eq('is_approved',true).order('created_at',{ascending:true});
-   commentsBox.innerHTML=(comments||[]).map(x=>'<div style="margin:5px 0"><b>'+((x.display_name||'Buyer').replace(/[&<>]/g,''))+'</b>: '+x.comment.replace(/[&<>]/g,'')+'</div>').join('');
-   card.querySelector('button').onclick=async()=>{const name=prompt('Your display name (optional):')||'';const comment=prompt('Leave your comment:');if(!comment?.trim())return;const {error}=await supabase.from('buyer_proof_comments').insert({proof_id:p.id,display_name:name.trim()||null,comment:comment.trim(),is_approved:false});alert(error?error.message:'Thank you! Your comment is pending admin review. ♥')};grid.appendChild(card);
- }
- if(!grid.children.length)grid.innerHTML='<div class="empty">No buyers’ proofs published yet.</div>';
-}
-window.openViewer=u=>{document.getElementById('viewerImg').src=u;document.getElementById('viewer').classList.add('show')};
-window.closeViewer=()=>document.getElementById('viewer').classList.remove('show');
-loadProofs();
-window.openSubmit=()=>{const el=document.getElementById('submitModal');if(el){el.classList.add('show');}else alert('Submit form is loading. Please refresh.');};window.closeSubmit=()=>document.getElementById('submitModal').classList.remove('show');window.submitProof=async()=>{const f=document.getElementById('submitFile').files[0],email=document.getElementById('submitEmail').value.trim(),caption=document.getElementById('submitCaption').value.trim(),m=document.getElementById('submitMsg');if(!f){m.textContent='Please choose an image.';return}if(!caption){m.textContent='Please leave a comment about your experience.';return}if(!email||!email.includes('@')){m.textContent='Please enter a valid email address.';return}m.textContent='Submitting...';const path='pending/'+Date.now()+'-'+crypto.randomUUID()+'.'+(f.name.split('.').pop()||'jpg');const up=await supabase.storage.from('buyer-proofs').upload(path,f,{contentType:f.type});if(up.error){m.textContent='Upload failed: '+up.error.message;console.error(up.error);return}const q=await supabase.from('buyer_proofs').insert({image_path:path,caption:caption,submitter_display_name:document.getElementById('submitName').value.trim()||null,submitter_email:email,is_published:false,status:'pending'});if(q.error){m.textContent='Submission failed: '+q.error.message;console.error(q.error);return}m.textContent='Thank you! Your proof was submitted for admin review. ♥';};
-
-</script>
-</body></html>
+const supabase=initSupabase(),grid=document.getElementById('proofGrid'),modal=document.getElementById('submitModal'),form=document.getElementById('proofForm'),msg=document.getElementById('submitMsg');
+document.getElementById('openSubmitBtn').onclick=()=>modal.classList.add('show');
+document.getElementById('closeSubmitBtn').onclick=()=>modal.classList.remove('show');
+modal.onclick=e=>{if(e.target===modal)modal.classList.remove('show')};
+async function loadProofs(){const {data,error}=await supabase.from('buyer_proofs').select('id,image_path,caption,created_at,submitter_display_name').eq('is_published',true).eq('status','published').order('created_at',{ascending:false});if(error||!data?.length)return;grid.innerHTML='';for(const p of data){const {data:signed}=await supabase.storage.from('buyer-proofs').createSignedUrl(p.image_path,3600);if(!signed?.signedUrl)continue;const card=document.createElement('article');card.className='proofCard';card.innerHTML='<img><div class="proofCaption"></div>';card.querySelector('img').src=signed.signedUrl;card.querySelector('img').onclick=()=>{document.getElementById('viewerImg').src=signed.signedUrl;document.getElementById('viewer').classList.add('show')};card.querySelector('.proofCaption').textContent=p.caption||'Verified buyer proof';grid.appendChild(card)}}
+document.getElementById('closeViewerBtn').onclick=()=>document.getElementById('viewer').classList.remove('show');
+form.addEventListener('submit',async e=>{e.preventDefault();const f=document.getElementById('submitFile').files[0],email=document.getElementById('submitEmail').value.trim(),caption=document.getElementById('submitCaption').value.trim(),name=document.getElementById('submitName').value.trim(),btn=document.getElementById('submitBtn');if(!f||!email||!caption)return;if(f.size>10*1024*1024){msg.textContent='Image must be 10MB or smaller.';msg.style.color='#c22';return}btn.disabled=true;btn.textContent='SUBMITTING...';msg.textContent='Uploading your proof...';msg.style.color='#555';try{const ext=(f.name.split('.').pop()||'jpg').toLowerCase();const path='pending/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;const up=await supabase.storage.from('buyer-proofs').upload(path,f,{contentType:f.type,upsert:false});if(up.error)throw up.error;msg.textContent='Saving submission...';const q=await supabase.from('buyer_proofs').insert({image_path:path,caption:caption,submitter_display_name:name||null,submitter_email:email,is_published:false,status:'pending'});if(q.error){await supabase.storage.from('buyer-proofs').remove([path]);throw q.error}msg.textContent='♥ Thank you! Your proof was submitted for admin review.';msg.style.color='#23834d';form.reset();setTimeout(()=>modal.classList.remove('show'),1800)}catch(err){console.error(err);msg.textContent='Submission failed: '+(err.message||'Please try again.');msg.style.color='#c22'}finally{btn.disabled=false;btn.textContent='SUBMIT FOR REVIEW ♥'}});loadProofs();
+</script></body></html>

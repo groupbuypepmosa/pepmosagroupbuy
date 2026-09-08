@@ -16,9 +16,10 @@ body{background:#fff9fc;color:#251a27}.proofWrap{width:min(1100px,94%);margin:28
 <div id="proofGrid" class="proofGrid"><div class="empty">No buyers' proofs published yet.</div></div>
 </main>
 <div id="submitModal" class="modal"><div class="card" style="max-width:520px;width:100%;background:white;color:#222;position:relative"><button onclick="closeSubmit()" style="position:absolute;right:12px;top:12px">×</button><h2>Submit Your Proof ♥</h2><p>Your submission will stay private until reviewed by an admin.</p><input id="submitFile" type="file" accept="image/jpeg,image/png,image/webp" style="margin:10px 0;width:100%"><input id="submitName" placeholder="Display name (optional)" style="margin:8px 0;width:100%;padding:10px"><input id="submitEmail" type="email" required placeholder="Email address (required — kept private)" style="margin:8px 0;width:100%;padding:10px"><textarea id="submitCaption" placeholder="Caption (optional)" style="margin:8px 0;width:100%;padding:10px"></textarea><button class="btn primary" onclick="submitProof()">SUBMIT FOR REVIEW</button><div id="submitMsg" style="margin-top:10px"></div></div></div><div id="viewer" class="modal" onclick="closeViewer()"><button type="button" onclick="closeViewer()">×</button><img id="viewerImg" alt="Buyers proof"></div>
-<script type="module">
-import { initSupabase } from './supabase.js';
-const supabase = initSupabase();
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="supabase.js"></script>
+<script>
 const grid=document.getElementById('proofGrid');
 async function loadProofs(){
  const {data,error}=await supabase.from('buyer_proofs').select('id,image_path,caption,created_at').eq('is_published',true).order('created_at',{ascending:false});

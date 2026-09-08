@@ -21,7 +21,7 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 <div class="grid"><select id="pname"><option value="">Loading all products…</option></select><select id="variant"><option value="">Select product first</option></select><input id="pprice" type="number" step="0.01" placeholder="Manufacturer price"></div>
 <button onclick="savePrice()">ADD / UPDATE PRICE</button><div id="prices"></div></div></details>
 
-<div class="card"><h2>👥 Admin Orders</h2><p class="muted">Track orders of the 4 admins separately. Admin names can be changed anytime. Product prices come from the Manufacturer Pricelist.</p><div id="adminOrders"></div></div><div class="card"><h2>📦 Manufacturer Order Tally</h2><div id="manufTally"></div></div><div class="card"><h2>💸 Expenses</h2><p class="muted">You can assign an expense to a specific Group Buy, Open for All, or keep it General.</p>
+<div class="card"><h2>📦 Manufacturer Order Tally</h2><div id="manufTally"></div></div><div class="card"><h2>💸 Expenses</h2><p class="muted">You can assign an expense to a specific Group Buy, Open for All, or keep it General.</p>
 <div class="grid"><input id="edate" type="date"><select id="escope"><option value="GENERAL">General</option><option value="OFA">Open for All</option></select><select id="ecat"><option>Shipping</option><option>Supplier</option><option>Packaging</option><option>Customs</option><option>Operational</option><option>Other</option></select><input id="eamount" type="number" step="0.01" placeholder="Amount"></div>
 <textarea id="edesc" placeholder="Description / notes"></textarea><button onclick="saveExpense()">ADD EXPENSE</button><div id="expenses"></div></div>
 
@@ -84,23 +84,6 @@ function renderPrices(){
 function renderExpenses(){
  $('expenses').innerHTML='<table><tr><th>Date</th><th>Scope</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr>'+expenses.map(x=>'<tr><td>'+x.expense_date+'</td><td>'+esc(x.scope||'GENERAL')+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.description||'')+'</td><td>'+peso(x.amount)+'</td><td><button class="danger" onclick="delExpense(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
 }
-function renderAdminOrders(){
- const box=$('adminOrders');if(!box)return;
- let admins=JSON.parse(localStorage.getItem('pepmosa_admin_names')||'["Admin 1","Admin 2","Admin 3","Admin 4"]');
- let orders=JSON.parse(localStorage.getItem('pepmosa_admin_orders')||'[]');
- const adminPrices=(typeof prices!=='undefined'&&Array.isArray(prices))?prices:[];
- const products=[...new Set(adminPrices.map(p=>p.product||p.product_name).filter(Boolean))];
- const priceFor=(product,variant)=>{const p=adminPrices.find(x=>(x.product||x.product_name)===product&&String(x.variant||x.variant_name||'')===String(variant||''));return Number(p?.price||p?.manufacturer_price||0)};
- const total=orders.reduce((s,o)=>s+Number(o.qty||0)*Number(o.price||0),0);
- box.innerHTML='<div class="grid">'+admins.map((a,i)=>'<div><label>Admin '+(i+1)+'</label><input value="'+esc(a)+'" onchange="renameAdmin('+i+',this.value)"></div>').join('')+'</div>'+
- '<div class="grid" style="margin-top:14px"><select id="aoAdmin">'+admins.map((a,i)=>'<option value="'+i+'">'+esc(a)+'</option>').join('')+'</select><select id="aoProduct" onchange="adminVariantOptions()"><option value="">Select ordered product</option>'+products.map(p=>'<option>'+esc(p)+'</option>').join('')+'</select><select id="aoVariant"><option value="">Select product first</option></select><input id="aoQty" type="number" min="1" placeholder="Qty"></div><button onclick="addAdminOrder()">ADD ADMIN ORDER</button>'+
- '<div style="margin-top:16px"><b>Total Admin Orders: '+peso(total)+'</b></div><table><tr><th>Admin</th><th>Product</th><th>Variant</th><th>Qty</th><th>Manuf Price</th><th>Total</th><th></th></tr>'+orders.map((o,i)=>'<tr><td>'+esc(admins[o.admin]||'Unknown')+'</td><td>'+esc(o.product)+'</td><td>'+esc(o.variant||'—')+'</td><td>'+o.qty+'</td><td>'+peso(o.price)+'</td><td>'+peso(o.qty*o.price)+'</td><td><button class="danger" onclick="deleteAdminOrder('+i+')">Delete</button></td></tr>').join('')+'</table>';
- window.renameAdmin=(i,v)=>{admins[i]=v||('Admin '+(i+1));localStorage.setItem('pepmosa_admin_names',JSON.stringify(admins));renderAdminOrders()};
- window.adminVariantOptions=()=>{const p=$('aoProduct').value;const vars=adminPrices.filter(x=>(x.product||x.product_name)===p).map(x=>x.variant||x.variant_name||'');$('aoVariant').innerHTML='<option value="">Select variant</option>'+[...new Set(vars)].map(v=>'<option>'+esc(v)+'</option>').join('')};
- window.addAdminOrder=()=>{const admin=Number($('aoAdmin').value),product=$('aoProduct').value,variant=$('aoVariant').value,qty=Number($('aoQty').value);if(!product||!variant||!qty){alert('Select admin, product, variant and quantity.');return}orders.push({admin,product,variant,qty,price:priceFor(product,variant)});localStorage.setItem('pepmosa_admin_orders',JSON.stringify(orders));renderAdminOrders()};
- window.deleteAdminOrder=i=>{orders.splice(i,1);localStorage.setItem('pepmosa_admin_orders',JSON.stringify(orders));renderAdminOrders()};
-}
-
 function renderManufTally(rows,scope){
  const box=$('manufTally'); if(!box)return;
  const priced=rows.filter(r=>r.hasPrice);
@@ -122,7 +105,7 @@ function renderManufTally(rows,scope){
  (unassigned.length?'<table><tr><th>Product</th><th>Qty Ordered</th><th>Manuf Price</th><th>Subtotal</th><th>Order From</th></tr>'+
  unassigned.map(r=>'<tr><td>'+esc(r.name)+'<br><span class="muted">'+esc(r.variant||'—')+'</span></td><td>'+r.qty+'</td><td>'+money(Number(r.pc||0)/Number(r.qty||1))+'</td><td>'+money(r.pc)+'</td><td><select onchange="assignManuf(\''+encodeURIComponent(key(r))+'\',this.value)"><option value="">🔽 Select</option><option value="BBG">MANUF 1 — BBG</option><option value="KERUN">MANUF 2 — KERUN</option></select></td></tr>').join('')+'</table>':'<div class="muted" style="padding:12px 0">All ordered products have been assigned to a manufacturer.</div>')+'</div>'+
  (!priced.length?'<div class="muted" style="padding:12px;color:#a33">No approved ordered products with manufacturer prices were found for this view.</div>':'');
- window.assignManuf=function(encoded,m){if(!m)return;const data=JSON.parse(localStorage.getItem(storageKey)||'{}');data[decodeURIComponent(encoded)]=m;localStorage.setItem(storageKey,JSON.stringify(data));renderManufTally(rows,scope);renderAdminOrders();};
+ window.assignManuf=function(encoded,m){if(!m)return;const data=JSON.parse(localStorage.getItem(storageKey)||'{}');data[decodeURIComponent(encoded)]=m;localStorage.setItem(storageKey,JSON.stringify(data));renderManufTally(rows,scope);};
  window.unassignManuf=function(encoded){const data=JSON.parse(localStorage.getItem(storageKey)||'{}');delete data[decodeURIComponent(encoded)];localStorage.setItem(storageKey,JSON.stringify(data));renderManufTally(rows,scope);};
 }
 
@@ -167,7 +150,7 @@ window.loadSales=function(){
  // Manufacturer Pricelist is reference only. It is NOT automatically deducted.
  // Net profit changes only when you manually record an actual expense/payment.
  $('profit').textContent=peso(revenue-exp);
- $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>';renderManufTally(rows,scope);renderAdminOrders();
+ $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>';renderManufTally(rows,scope);
 };
 window.editPrice=function(id){
  const x=prices.find(p=>String(p.id)===String(id));if(!x)return;

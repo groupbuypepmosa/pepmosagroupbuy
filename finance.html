@@ -17,9 +17,9 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 <div class="card stat profit-highlight"><span>NET PROFIT ✦</span><b id="profit">₱0.00</b><div class="muted">Revenue − manually recorded expenses</div></div>
 </div>
 
-<div class="card"><h2>🏭 Manufacturer Pricelist</h2><p class="muted">All products from your catalog are available here — not only products that already have orders. Prices are saved globally and will still work for future Group Buys.</p>
+<details class="card" style="padding:0;overflow:hidden"><summary style="padding:18px;cursor:pointer;font-weight:bold;font-size:20px;list-style:none">🏭 Manufacturer Pricelist <span class="muted" style="font-size:13px;font-weight:normal">Click to open / close</span></summary><div style="padding:0 18px 18px"><p class="muted">All products from your catalog are available here. Prices are saved globally for future Group Buys.</p>
 <div class="grid"><select id="pname"><option value="">Loading all products…</option></select><select id="variant"><option value="">Select product first</option></select><input id="pprice" type="number" step="0.01" placeholder="Manufacturer price"></div>
-<button onclick="savePrice()">ADD / UPDATE PRICE</button><div id="prices"></div></div>
+<button onclick="savePrice()">ADD / UPDATE PRICE</button><div id="prices"></div></div></details>
 
 <div class="card"><h2>📦 Manufacturer Order Tally</h2><div id="manufTally"></div></div><div class="card"><h2>💸 Expenses</h2><p class="muted">You can assign an expense to a specific Group Buy, Open for All, or keep it General.</p>
 <div class="grid"><input id="edate" type="date"><select id="escope"><option value="GENERAL">General</option><option value="OFA">Open for All</option></select><select id="ecat"><option>Shipping</option><option>Supplier</option><option>Packaging</option><option>Customs</option><option>Operational</option><option>Other</option></select><input id="eamount" type="number" step="0.01" placeholder="Amount"></div>

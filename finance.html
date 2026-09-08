@@ -108,9 +108,15 @@ function renderManufTally(rows,scope){
  window.assignManuf=async function(encoded,m){
    if(!m)return;
    const raw=decodeURIComponent(encoded),parts=raw.split('||'),product_id=parts[0],variant_id=parts.slice(1).join('||');
-   const rr=await sb.from('finance_manufacturer_orders').upsert({scope,product_id,variant_id:variant_id||'',manufacturer:m,updated_at:new Date().toISOString()},{onConflict:'scope,product_id,variant_id'});
-   if(rr.error){alert('Could not save manufacturer assignment: '+rr.error.message);return;}
-   await refreshFinance();
+   const payload={scope,product_id,variant_id:variant_id||'',manufacturer:m,updated_at:new Date().toISOString()};
+   let existing=manufacturerAssignments.find(a=>String(a.scope)===String(scope)&&String(a.product_id)===String(product_id)&&String(a.variant_id||'')===String(variant_id||''));
+   let rr;
+   if(existing) rr=await sb.from('finance_manufacturer_orders').update(payload).eq('id',existing.id);
+   else rr=await sb.from('finance_manufacturer_orders').insert(payload);
+   if(rr.error){console.error(rr.error);alert('Could not save manufacturer assignment: '+rr.error.message);return;}
+   existing={...(existing||{}),...payload};
+   if(existing.id){manufacturerAssignments=manufacturerAssignments.map(a=>a.id===existing.id?existing:a);}else{await refreshFinance();return;}
+   renderManufTally(rows,scope);
  };
  window.unassignManuf=async function(encoded){
    const raw=decodeURIComponent(encoded),parts=raw.split('||'),product_id=parts[0],variant_id=parts.slice(1).join('||');

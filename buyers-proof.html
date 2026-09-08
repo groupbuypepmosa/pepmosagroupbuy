@@ -12,10 +12,10 @@ body{background:#fff9fc;color:#251a27}.proofWrap{width:min(1100px,94%);margin:28
 <header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a><nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a></nav></header>
 <main class="proofWrap">
 <section class="proofHero"><div class="eyebrow">PEPMOSA COMMUNITY</div><h1>♥ BUYERS' PROOF</h1><p>Real buyer feedback and successful order proofs shared with personal information protected.</p></section>
-<div class="privacy">🔒 For buyer privacy, names, emails, phone numbers, addresses and sensitive details are hidden before publication.</div>
+<div style="text-align:center;margin:0 0 18px"><button class="btn primary" onclick="openSubmit()">＋ SUBMIT YOUR PROOF ♥</button></div><div class="privacy">🔒 For buyer privacy, names, emails, phone numbers, addresses and sensitive details are hidden before publication.</div>
 <div id="proofGrid" class="proofGrid"><div class="empty">No buyers' proofs published yet.</div></div>
 </main>
-<div id="viewer" class="modal" onclick="closeViewer()"><button type="button" onclick="closeViewer()">×</button><img id="viewerImg" alt="Buyers proof"></div>
+<div id="submitModal" class="modal"><div class="card" style="max-width:520px;width:100%;background:white;color:#222;position:relative"><button onclick="closeSubmit()" style="position:absolute;right:12px;top:12px">×</button><h2>Submit Your Proof ♥</h2><p>Your submission will stay private until reviewed by an admin.</p><input id="submitFile" type="file" accept="image/jpeg,image/png,image/webp" style="margin:10px 0;width:100%"><input id="submitName" placeholder="Display name (optional)" style="margin:8px 0;width:100%;padding:10px"><textarea id="submitCaption" placeholder="Caption (optional)" style="margin:8px 0;width:100%;padding:10px"></textarea><button class="btn primary" onclick="submitProof()">SUBMIT FOR REVIEW</button><div id="submitMsg" style="margin-top:10px"></div></div></div><div id="viewer" class="modal" onclick="closeViewer()"><button type="button" onclick="closeViewer()">×</button><img id="viewerImg" alt="Buyers proof"></div>
 <script type="module">
 import { initSupabase } from './supabase.js';
 const supabase = initSupabase();
@@ -37,5 +37,7 @@ async function loadProofs(){
 window.openViewer=u=>{document.getElementById('viewerImg').src=u;document.getElementById('viewer').classList.add('show')};
 window.closeViewer=()=>document.getElementById('viewer').classList.remove('show');
 loadProofs();
+window.openSubmit=()=>document.getElementById('submitModal').classList.add('show');window.closeSubmit=()=>document.getElementById('submitModal').classList.remove('show');window.submitProof=async()=>{const f=document.getElementById('submitFile').files[0],m=document.getElementById('submitMsg');if(!f){m.textContent='Please choose an image.';return}m.textContent='Submitting...';const path='pending/'+Date.now()+'-'+crypto.randomUUID()+'.'+(f.name.split('.').pop()||'jpg');const up=await supabase.storage.from('buyer-proofs').upload(path,f,{contentType:f.type});if(up.error){m.textContent=up.error.message;return}const q=await supabase.from('buyer_proofs').insert({image_path:path,caption:document.getElementById('submitCaption').value.trim()||null,submitter_display_name:document.getElementById('submitName').value.trim()||null,is_published:false,status:'pending'});if(q.error){m.textContent=q.error.message;return}m.textContent='Thank you! Your proof was submitted for admin review. ♥';};
+
 </script>
 </body></html>

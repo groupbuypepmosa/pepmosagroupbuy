@@ -16,7 +16,7 @@ body{background:#fff9fc}.wrap{width:min(1050px,94%);margin:28px auto}.card{backg
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script>
 <script>
-const sb=initSupabase(),msg=document.getElementById('msg'),list=document.getElementById('list');
+let sb;const msg=document.getElementById('msg'),list=document.getElementById('list');
 let tab='pending';
 function say(t,kind=''){msg.textContent=t;msg.className='msg '+kind;}
 function safeText(v){return String(v??'');}
@@ -83,7 +83,7 @@ async function loadComments(){
  data.forEach(c=>{const d=document.createElement('div');d.className='item';const m=document.createElement('div');m.className='meta';const b=document.createElement('b');b.textContent=c.display_name||'Buyer';const t=document.createElement('div');t.textContent=c.comment||'';const s=document.createElement('div');s.className='small';s.textContent='On: '+(c.buyer_proofs?.caption||'Buyers proof');const a=document.createElement('div');a.className='row';if(!c.is_approved){const ok=document.createElement('button');ok.className='btn success';ok.textContent='✓ APPROVE';ok.onclick=async()=>{const r=await sb.from('buyer_proof_comments').update({is_approved:true}).eq('id',c.id);if(r.error)return alert(r.error.message);await refreshCounts();await load();};a.append(ok)}const del=document.createElement('button');del.className='btn danger';del.textContent='DELETE';del.onclick=async()=>{const r=await sb.from('buyer_proof_comments').delete().eq('id',c.id);if(r.error)return alert(r.error.message);await refreshCounts();await load();};a.append(del);m.append(b,t,s,a);d.append(m);list.append(d);});
 }
 async function boot(){
- try{say('Checking admin access...');const a=await requireAdmin();say('Admin access verified: '+(a.profile.email||'admin'),'ok');await refreshCounts();await load();}
+ try{sb=initSupabase();say('Checking admin access...');const a=await requireAdmin();say('Admin access verified: '+(a.profile.email||'admin'),'ok');await refreshCounts();await load();}
  catch(e){console.error(e);say(e.message||'Admin access failed.','error');list.className='empty error';list.textContent='Admin page could not load: '+(e.message||e);}
 }
 boot();

@@ -396,19 +396,32 @@ async function verifyAdmin(user){
 }
 async function logout(){await sb.auth.signOut();$("adminApp").style.display="none";$("loginScreen").style.display="flex";$("loginPassword").value="";showLoginMessage("You have been logged out.","success")}
 async function checkExistingSession(){
+  const loginScreen=$("loginScreen"),adminApp=$("adminApp");
+  if(loginScreen)loginScreen.style.display="none";
+  if(adminApp)adminApp.style.display="none";
   try{
     if(typeof sb==="undefined"||!sb?.auth){
-      if(typeof initSupabase==="function") initSupabase();
+      if(typeof initSupabase==="function")initSupabase();
     }
-    const loginScreen=$("loginScreen"),adminApp=$("adminApp");
+    if(typeof sb==="undefined"||!sb?.auth)throw new Error("Admin authentication is unavailable.");
+    // Give Supabase a moment to restore the persisted session after returning
+    // from Finance / Buyers' Proof / Admin Orders.
+    for(const wait of [0,300,900]){
+      if(wait)await new Promise(r=>setTimeout(r,wait));
+      const {data,error}=await sb.auth.getSession();
+      if(error)throw error;
+      const user=data?.session?.user;
+      if(user){
+        await verifyAdmin(user);
+        try{localStorage.removeItem("pepmosa_admin_return")}catch(e){}
+        return;
+      }
+    }
     if(loginScreen)loginScreen.style.display="flex";
-    if(adminApp)adminApp.style.display="none";
-    if(typeof sb==="undefined"||!sb?.auth)return;
-    const {data,error}=await sb.auth.getSession();
-    if(error)throw error;
-    const user=data?.session?.user;
-    if(user)await verifyAdmin(user);
-  }catch(e){console.error("Admin startup error:",e)}
+  }catch(e){
+    console.error("Admin startup error:",e);
+    if(loginScreen)loginScreen.style.display="flex";
+  }
 }
 
 /* ================= SITE NOTICE ================= */

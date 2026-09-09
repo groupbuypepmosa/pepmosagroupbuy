@@ -4,7 +4,7 @@
   function addStyles(){
     if($('pepCustomerExperienceStyle'))return;
     const s=document.createElement('style');s.id='pepCustomerExperienceStyle';s.textContent=`
-.pepFloatingCart{position:fixed!important;right:18px!important;bottom:18px!important;z-index:9999!important;border-radius:999px!important;padding:13px 18px!important}.pepCustomerHeroActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.pepCustomerHeroActions a{flex:1;min-width:170px;text-decoration:none}
+.pepFloatingCart{display:none!important}.pepFloatingCartButton{position:fixed!important;right:16px!important;bottom:92px!important;z-index:2147483000!important;width:76px!important;height:76px!important;border:0!important;border-radius:50%!important;background:linear-gradient(135deg,#e52b8b,#b93bb6)!important;color:#fff!important;box-shadow:0 16px 34px rgba(190,43,130,.38)!important;font-size:30px!important;display:grid!important;place-items:center!important;cursor:pointer!important}.pepFloatingCartBadge{position:absolute;right:-4px;top:-4px;min-width:30px;height:30px;padding:0 7px;border-radius:999px;background:#fff;color:#c62d7e;border:1px solid #f0d6e2;font-size:13px;font-weight:950;display:grid;place-items:center}.pepFloatingCartLabel{display:none}.pepCustomerHeroActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.pepCustomerHeroActions a{flex:1;min-width:170px;text-decoration:none}
 .pepLiveMoq{margin:22px 0 4px;padding:20px 22px;border:1px solid #f0d6e2;border-radius:24px;background:linear-gradient(135deg,#fff,#fff1f7 55%,#f8efff);box-shadow:0 14px 34px rgba(164,72,121,.08)}
 .pepMoqHeader{display:flex;justify-content:space-between;gap:16px;align-items:center}.pepLiveMoq h3{margin:5px 0;color:#3b2b34;font-size:22px}.pepLiveMoq p{margin:6px 0 0;color:#79636f;font-size:12px}.pepLiveMoq .label{font-size:10px;font-weight:950;letter-spacing:.14em;color:#c55b91}.pepMoqOpenBtn{white-space:nowrap}.pepMoqCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:18px}.pepMoqProduct{display:flex;gap:12px;align-items:center;text-decoration:none;color:inherit;background:#fff;border:1px solid #f0d9e4;border-radius:18px;padding:10px;transition:.2s}.pepMoqProduct:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(164,72,121,.1)}.pepMoqImage{width:82px;height:82px;flex:0 0 82px;border-radius:14px;overflow:hidden;background:#fff3f8;display:grid;place-items:center}.pepMoqImage img{width:100%;height:100%;object-fit:contain}.pepMoqPlaceholder{font-size:30px}.pepMoqInfo{min-width:0;flex:1}.pepMoqInfo b{display:block;font-size:15px;color:#3b2b34;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pepMoqBadge{display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;background:#fff0f7;color:#c62d7e;font-size:10px;font-weight:900}.pepMoqProgress{height:7px;background:#f2dce6;border-radius:999px;overflow:hidden;margin-top:9px}.pepMoqProgress div{height:100%;background:linear-gradient(90deg,#ef8bb4,#d72b91,#a847b5);border-radius:999px}.pepMoqInfo small{display:block;margin-top:6px;color:#7b6570;font-size:10px}
 .pepTrust{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}.pepTrust div{background:#fff;border:1px solid #f0dce6;border-radius:18px;padding:15px;text-align:center;font-size:11px;color:#755e6a}.pepTrust b{display:block;color:#4a303c;margin-bottom:4px}
@@ -16,11 +16,20 @@
     addStyles();
     const existingCart=document.querySelector('button.cart');
     if(existingCart) existingCart.classList.add('pepFloatingCart');
-    const hero=document.querySelector('.gbPanel');
-    if(hero&&!$('pepCustomerHeroActions')){
-      const d=document.createElement('div');d.id='pepCustomerHeroActions';d.className='pepCustomerHeroActions';
-      d.innerHTML='<a class="pepHeroBtn pepHeroPrimary" href="#products">SHOP AVAILABLE PRODUCTS</a><a class="pepHeroBtn pepHeroSecondary" href="track.html">TRACK MY ORDER</a>';
-      hero.appendChild(d);
+    const oldHeroActions=$('pepCustomerHeroActions');
+    if(oldHeroActions) oldHeroActions.remove();
+    if(!$('pepFloatingCartButton')){
+      const b=document.createElement('button');
+      b.id='pepFloatingCartButton';
+      b.className='pepFloatingCartButton';
+      b.type='button';
+      b.setAttribute('aria-label','Open cart');
+      b.innerHTML='🛒<span id="pepFloatingCartBadge" class="pepFloatingCartBadge">0</span>';
+      b.onclick=function(){ if(typeof window.openCart==='function') window.openCart(); else if(existingCart) existingCart.click(); };
+      document.body.appendChild(b);
+      const syncCart=function(){const count=$('cartCount');const badge=$('pepFloatingCartBadge');if(badge)badge.textContent=(count&&count.textContent)||'0';};
+      syncCart();
+      const count=$('cartCount');if(count)new MutationObserver(syncCart).observe(count,{childList:true,characterData:true,subtree:true});
     }
     const products=document.getElementById('products');
     if(products&&!$('pepLiveMoq')){

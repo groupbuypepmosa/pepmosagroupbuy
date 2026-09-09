@@ -60,6 +60,23 @@
         t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);
       });
     }
+    // Hook into the existing Add to Cart function without changing its logic.
+    const hookAddToCart=()=>{
+      const fn=window.addToCart;
+      if(typeof fn==='function'&&!fn.__pepWrapped){
+        const wrapped=function(){
+          const result=fn.apply(this,arguments);
+          setTimeout(()=>window.dispatchEvent(new Event('pepmosa-cart-updated')),80);
+          return result;
+        };
+        wrapped.__pepWrapped=true;
+        window.addToCart=wrapped;
+      }
+    };
+    hookAddToCart();
+    setTimeout(hookAddToCart,800);
+    setTimeout(hookAddToCart,2000);
+
     if(!$('pepBackTop')){
       const top=document.createElement('button');top.id='pepBackTop';top.className='pepBackTop';top.type='button';top.setAttribute('aria-label','Back to top');top.textContent='↑';top.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});document.body.appendChild(top);
       window.addEventListener('scroll',()=>top.classList.toggle('show',window.scrollY>700),{passive:true});

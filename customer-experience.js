@@ -6,10 +6,10 @@
     const s=document.createElement('style');s.id='pepCustomerExperienceStyle';s.textContent=`
 .pepFloatingCart{position:fixed!important;right:18px!important;bottom:18px!important;z-index:9999!important;border-radius:999px!important;padding:13px 18px!important}.pepCustomerHeroActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.pepCustomerHeroActions a{flex:1;min-width:170px;text-decoration:none}
 .pepLiveMoq{margin:22px 0 4px;padding:20px 22px;border:1px solid #f0d6e2;border-radius:24px;background:linear-gradient(135deg,#fff,#fff1f7 55%,#f8efff);box-shadow:0 14px 34px rgba(164,72,121,.08)}
-.pepLiveMoqTop{display:flex;justify-content:space-between;gap:16px;align-items:center}.pepLiveMoq h3{margin:5px 0;color:#3b2b34;font-size:22px}.pepLiveMoq .label{font-size:10px;font-weight:950;letter-spacing:.14em;color:#c55b91}.pepMoqCount{font-weight:950;color:#c62d7e;white-space:nowrap}.pepMoqBar{height:11px;background:#f3dce7;border-radius:999px;overflow:hidden;margin-top:15px}.pepMoqFill{height:100%;border-radius:999px;background:linear-gradient(90deg,#ef8bb4,#d72b91,#a847b5);transition:width .6s ease}.pepMoqMsg{margin:10px 0 0;color:#79636f;font-size:12px}
+.pepMoqHeader{display:flex;justify-content:space-between;gap:16px;align-items:center}.pepLiveMoq h3{margin:5px 0;color:#3b2b34;font-size:22px}.pepLiveMoq p{margin:6px 0 0;color:#79636f;font-size:12px}.pepLiveMoq .label{font-size:10px;font-weight:950;letter-spacing:.14em;color:#c55b91}.pepMoqOpenBtn{white-space:nowrap}.pepMoqCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:18px}.pepMoqProduct{display:flex;gap:12px;align-items:center;text-decoration:none;color:inherit;background:#fff;border:1px solid #f0d9e4;border-radius:18px;padding:10px;transition:.2s}.pepMoqProduct:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(164,72,121,.1)}.pepMoqImage{width:82px;height:82px;flex:0 0 82px;border-radius:14px;overflow:hidden;background:#fff3f8;display:grid;place-items:center}.pepMoqImage img{width:100%;height:100%;object-fit:contain}.pepMoqPlaceholder{font-size:30px}.pepMoqInfo{min-width:0;flex:1}.pepMoqInfo b{display:block;font-size:15px;color:#3b2b34;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pepMoqBadge{display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;background:#fff0f7;color:#c62d7e;font-size:10px;font-weight:900}.pepMoqProgress{height:7px;background:#f2dce6;border-radius:999px;overflow:hidden;margin-top:9px}.pepMoqProgress div{height:100%;background:linear-gradient(90deg,#ef8bb4,#d72b91,#a847b5);border-radius:999px}.pepMoqInfo small{display:block;margin-top:6px;color:#7b6570;font-size:10px}
 .pepTrust{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}.pepTrust div{background:#fff;border:1px solid #f0dce6;border-radius:18px;padding:15px;text-align:center;font-size:11px;color:#755e6a}.pepTrust b{display:block;color:#4a303c;margin-bottom:4px}
 .pepFaq{margin:34px 0;padding:28px;border-radius:28px;background:#fff;border:1px solid #eedce6}.pepFaqHead{text-align:center;margin-bottom:16px}.pepFaqHead h2{margin:5px 0}.pepFaq details{border-top:1px solid #f0e1e8;padding:15px 4px}.pepFaq summary{cursor:pointer;font-weight:850;color:#4a303c}.pepFaq p{color:#7c6973;font-size:13px;line-height:1.6;margin:10px 0 0}
-@media(max-width:650px){.pepLiveMoq{padding:18px}.pepLiveMoqTop{align-items:flex-start;flex-direction:column}.pepTrust{grid-template-columns:1fr}.pepFaq{padding:22px 17px}.pepStickyTrack{right:12px;bottom:12px}}
+@media(max-width:650px){.pepLiveMoq{padding:18px}.pepMoqHeader{align-items:flex-start;flex-direction:column}.pepMoqOpenBtn{width:100%;text-align:center}.pepMoqCards{grid-template-columns:1fr}.pepTrust{grid-template-columns:1fr}.pepFaq{padding:22px 17px}}
 `;document.head.appendChild(s);
   }
   function insertUI(){
@@ -39,22 +39,30 @@
       products.parentNode.insertBefore(d,products.nextSibling);
     }
   }
-  async function loadProgress(){
-    const sb=window.sb||window.__sb;if(!sb||!window.currentGB)return;
-    const gb=window.currentGB;const title=$('pepMoqTitle'),count=$('pepMoqCount'),fill=$('pepMoqFill'),msg=$('pepMoqMsg');
-    if(title)title.textContent=gb.customer_facing_name||gb.gb_number||'Current Group Buy';
+  async function loadMOQProducts(){
+    const sb=window.sb||window.__sb;
+    const wrap=$('pepLiveMoq');
+    if(!sb||!wrap)return;
     try{
-      const r=await sb.from('orders').select('order_id,payment_status').eq('gb_number',gb.gb_number);
-      if(r.error)throw r.error;
-      const valid=(r.data||[]).filter(o=>!['REJECTED','CANCELLED','CANCELED'].includes(String(o.payment_status||'').toUpperCase()));
-      const ids=valid.map(o=>o.order_id).filter(Boolean);
-      let total=0;if(ids.length){const q=await sb.from('order_items').select('qty').in('order_id',ids);if(q.error)throw q.error;total=(q.data||[]).reduce((a,x)=>a+Number(x.qty||0),0)}
-      const target=Number(gb.moq||gb.moq_target||gb.target_qty||50)||50;const pct=Math.min(100,Math.round(total/target*100));
-      if(count)count.textContent=total+' / '+target;
-      if(fill)fill.style.width=pct+'%';
-      if(msg)msg.textContent=total>=target?'🎉 MOQ target reached! Watch for the next update.':(target-total)+' more item'+(target-total===1?'':'s')+' to reach the displayed target.';
-    }catch(e){if(count)count.textContent='Live';if(msg)msg.textContent='Check current Group Buy status and updates above.'}
+      const [productsRes,totalsRes]=await Promise.all([
+        sb.from('ofa_products').select('*').eq('status','AVAILABLE'),
+        sb.rpc('ofa_public_product_totals')
+      ]);
+      if(productsRes.error)throw productsRes.error;
+      const totals=new Map((totalsRes.data||[]).map(x=>[String(x.product_id),Number(x.total_qty)||0]));
+      const items=productsRes.data||[];
+      if(!items.length){wrap.remove();return;}
+      wrap.innerHTML='<div class="pepMoqHeader"><div><div class="label">MOQ AVAILABLE NOW</div><h3>🌐 WHAT’S OPEN FOR MOQ</h3><p>See the products currently available so you don’t have to search for them.</p></div><a href="open-for-all.html" class="btn primary pepMoqOpenBtn">VIEW ALL MOQ</a></div><div class="pepMoqCards">'+items.map(x=>{
+        const total=totals.get(String(x.id))||0;
+        const target=Number(x.moq)||0;
+        const pct=target?Math.min(100,Math.round(total/target*100)):0;
+        const image=x.image_url?'<img src="'+String(x.image_url).replace(/"/g,'&quot;')+'" alt="'+String(x.name||'MOQ product').replace(/"/g,'&quot;')+'">':'<div class="pepMoqPlaceholder">🧪</div>';
+        return '<a class="pepMoqProduct" href="open-for-all.html"><div class="pepMoqImage">'+image+'</div><div class="pepMoqInfo"><b>'+String(x.name||'MOQ PRODUCT')+'</b><span class="pepMoqBadge">MOQ '+(target||'—')+'</span><div class="pepMoqProgress"><div style="width:'+pct+'%"></div></div><small>'+total+' ordered'+(target?' • target '+target:'')+'</small></div></a>';
+      }).join('')+'</div>';
+    }catch(e){
+      wrap.innerHTML='<div class="pepMoqHeader"><div><div class="label">MOQ AVAILABLE NOW</div><h3>🌐 WHAT’S OPEN FOR MOQ</h3><p>Open MOQ to see the currently available products.</p></div><a href="open-for-all.html" class="btn primary pepMoqOpenBtn">OPEN MOQ</a></div>';
+    }
   }
-  function boot(){insertUI();setTimeout(loadProgress,1200);setTimeout(loadProgress,3000)}
+  function boot(){insertUI();setTimeout(loadMOQProducts,900);setTimeout(loadMOQProducts,2500)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();

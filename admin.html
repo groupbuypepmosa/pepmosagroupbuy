@@ -965,65 +965,39 @@ async function showCancelKitOrders(productId,variantId){try{
  }}
  if(!matches.length){showMessage("No matching client orders found.","error");return;}
  window.__cancelKitMatches=matches;
- const lines=matches.map((x,n)=>'<div class="item" style="margin:8px 0"><div class="itemHead"><div><b>'+esc(x.o.email||"No email")+'</b><div class="small">Order: '+esc(x.o.order_id)+' • Qty: '+Number(x.i.qty||0)+'</div></div><div class="actions"><button class="btn secondary kit-view-btn" type="button" data-kit-index="'+n+'">👁 VIEW</button></div></div></div>').join("");
- const box=$("cancelledKitsResults");
- box.innerHTML='<div class="eyebrow" style="margin:24px 0 10px">👁 ORDERS IN THIS INCOMPLETE KIT</div><div class="small" style="margin-bottom:10px">Viewing these orders does not cancel anything.</div>'+lines+'<div id="kitOrderDetails"></div><div id="cancelledKitsList"></div>';
- showMessage("You are only viewing the orders. Nothing has been cancelled.","info");
- await loadCancelledKits();
- setTimeout(()=>{document.querySelectorAll(".kit-view-btn").forEach(btn=>{btn.onclick=()=>viewKitOrder(Number(btn.dataset.kitIndex));});},0);
+ openKitOrdersModal();
 }catch(e){showMessage(e.message||"Unable to load matching orders.","error");}}
-function viewKitOrder(n){
- const x=window.__cancelKitMatches && window.__cancelKitMatches[n];
- if(!x){showMessage("Order details could not be found. Please tap VIEW ORDERS again.","error");return;}
- const i=x.i||{},o=x.o||{};
- const old=document.getElementById("kitOrderModal"); if(old)old.remove();
 
- const modal=document.createElement("div");
- modal.id="kitOrderModal";
- modal.style.cssText="position:fixed;inset:0;background:rgba(20,16,24,.58);z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:16px;";
-
- const card=document.createElement("div");
- card.style.cssText="background:#fff;color:#2d2630;width:100%;max-width:560px;max-height:85vh;overflow:auto;border-radius:24px;padding:24px;box-sizing:border-box;box-shadow:0 20px 60px rgba(0,0,0,.32);";
-
- const top=document.createElement("div");
- top.style.cssText="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;";
- const title=document.createElement("div");
- title.innerHTML='<div class="eyebrow">ORDER DETAILS</div><h2 style="margin:6px 0 0">👁 View Order</h2>';
- const closeTop=document.createElement("button");
- closeTop.type="button"; closeTop.className="btn secondary"; closeTop.textContent="✕";
- closeTop.addEventListener("click",()=>modal.remove());
- top.append(title,closeTop);
-
- const details=document.createElement("div");
- details.style.marginTop="18px";
- const email=document.createElement("b"); email.textContent=o.email||"No email";
- const meta=document.createElement("div"); meta.className="small"; meta.style.marginTop="6px";
- meta.textContent="Order: "+(o.order_id||"—")+" • Group Buy: "+(o.gb_number||"—");
- details.append(email,meta);
-
- const itemCard=document.createElement("div"); itemCard.className="pepKitCard"; itemCard.style.marginTop="16px";
- const product=document.createElement("b"); product.textContent=i.product_name||"Item";
- const qty=document.createElement("div"); qty.className="small"; qty.textContent=(i.strength||"—")+" • Qty: "+Number(i.qty||0);
- itemCard.append(product,qty);
-
- const note=document.createElement("div"); note.className="small"; note.style.marginTop="16px"; note.textContent="Viewing this order does not change anything.";
-
- const actions=document.createElement("div"); actions.className="actions"; actions.style.marginTop="20px";
- const cancelBtn=document.createElement("button"); cancelBtn.type="button"; cancelBtn.className="btn danger"; cancelBtn.textContent="❌ CANCEL THIS ORDER";
- cancelBtn.addEventListener("click",()=>{
-   if(!confirm("Cancel this order item? This will not delete the original order."))return;
-   modal.remove();
-   cancelKitLine(o.order_id,i,{email:o.email,gb_number:o.gb_number});
+function openKitOrdersModal(){
+ const old=document.getElementById("kitOrdersModal");if(old)old.remove();
+ const modal=document.createElement("div");modal.id="kitOrdersModal";
+ modal.style.cssText="position:fixed!important;inset:0!important;z-index:2147483647!important;background:rgba(20,16,24,.58)!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:16px!important;";
+ const card=document.createElement("div");card.style.cssText="background:#fff!important;color:#2d2630!important;width:100%!important;max-width:620px!important;max-height:85vh!important;overflow:auto!important;border-radius:24px!important;padding:24px!important;box-sizing:border-box!important;";
+ const head=document.createElement("div");head.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:12px;";
+ const title=document.createElement("div");title.innerHTML='<div class="eyebrow">INCOMPLETE KIT</div><h2 style="margin:6px 0 0">Orders in this kit</h2><div class="small">Viewing only — nothing is cancelled automatically.</div>';
+ const close=document.createElement("button");close.type="button";close.className="btn secondary";close.textContent="✕";close.onclick=()=>modal.remove();head.append(title,close);card.appendChild(head);
+ (window.__cancelKitMatches||[]).forEach((x,n)=>{
+   const row=document.createElement("div");row.style.cssText="margin-top:12px;padding:14px;border:1px solid #ead9e5;border-radius:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;";
+   const info=document.createElement("div");const em=document.createElement("b");em.textContent=x.o.email||"No email";const meta=document.createElement("div");meta.className="small";meta.textContent="Order: "+(x.o.order_id||"—")+" • "+(x.i.product_name||"Item")+" "+(x.i.strength||"")+" • Qty: "+Number(x.i.qty||0);info.append(em,meta);
+   const btn=document.createElement("button");btn.type="button";btn.className="btn secondary";btn.textContent="👁 VIEW";btn.onclick=()=>openSingleKitOrderModal(n);
+   row.append(info,btn);card.appendChild(row);
  });
- const closeBtn=document.createElement("button"); closeBtn.type="button"; closeBtn.className="btn secondary"; closeBtn.textContent="CLOSE";
- closeBtn.addEventListener("click",()=>modal.remove());
- actions.append(cancelBtn,closeBtn);
-
- card.append(top,details,itemCard,note,actions);
- modal.appendChild(card);
- modal.addEventListener("click",ev=>{if(ev.target===modal)modal.remove()});
- document.body.appendChild(modal);
+ modal.appendChild(card);modal.onclick=e=>{if(e.target===modal)modal.remove()};document.body.appendChild(modal);
 }
+function openSingleKitOrderModal(n){
+ const x=(window.__cancelKitMatches||[])[n];if(!x)return;const i=x.i||{},o=x.o||{};
+ const parent=document.getElementById("kitOrdersModal");if(parent)parent.remove();
+ const modal=document.createElement("div");modal.id="kitOrderModal";modal.style.cssText="position:fixed!important;inset:0!important;z-index:2147483647!important;background:rgba(20,16,24,.58)!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:16px!important;";
+ const card=document.createElement("div");card.style.cssText="background:#fff!important;color:#2d2630!important;width:100%!important;max-width:560px!important;border-radius:24px!important;padding:24px!important;box-sizing:border-box!important;";
+ const title=document.createElement("h2");title.textContent="👁 Order Details";title.style.margin="0 0 16px";
+ const email=document.createElement("b");email.textContent=o.email||"No email";
+ const meta=document.createElement("div");meta.className="small";meta.style.marginTop="6px";meta.textContent="Order: "+(o.order_id||"—")+" • Group Buy: "+(o.gb_number||"—");
+ const item=document.createElement("div");item.className="pepKitCard";item.style.marginTop="16px";item.textContent=(i.product_name||"Item")+" "+(i.strength||"")+" • Qty: "+Number(i.qty||0);
+ const actions=document.createElement("div");actions.className="actions";actions.style.marginTop="20px";
+ const cancel=document.createElement("button");cancel.type="button";cancel.className="btn danger";cancel.textContent="❌ CANCEL THIS ORDER";cancel.onclick=()=>{if(confirm("Cancel this order item?")){modal.remove();cancelKitLine(o.order_id,i,{email:o.email,gb_number:o.gb_number});}};
+ const back=document.createElement("button");back.type="button";back.className="btn secondary";back.textContent="BACK";back.onclick=()=>{modal.remove();openKitOrdersModal();};actions.append(cancel,back);card.append(title,email,meta,item,actions);modal.appendChild(card);modal.onclick=e=>{if(e.target===modal)modal.remove()};document.body.appendChild(modal);
+}
+function viewKitOrder(n){openSingleKitOrderModal(n);}
 async function loadCancelledKits(){
  const box=$("cancelledKitsList")||$("cancelledKitsResults");if(!box)return;
  const gb=$("vialTrackerGB")?.value||"";

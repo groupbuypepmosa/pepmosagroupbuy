@@ -716,13 +716,15 @@ async function loadOrders(){const{data,error}=await sb.from("orders").select("*,
 
 async function loadOrdersCenter(){
   const list=$("ordersClientList");
+  const selectedGB=String(window.activeGroupBuyNumber||$("vialTrackerGB")?.value||"").trim();
+  if(!selectedGB){console.warn("No active Group Buy selected for Orders Center");}
   if(list)list.innerHTML='<div class="notice">Loading client orders and quantities...</div>';
   try{
     const [or,cr,fr,kr]=await Promise.all([
-      sb.from("orders").select("*,order_items(*)").eq("gb_number",window.activeGroupBuyNumber||"").order("created_at",{ascending:false}),
+      sb.from("orders").select("*,order_items(*)").eq("gb_number",selectedGB).order("created_at",{ascending:false}),
       sb.from("customers").select("customer_id,email,customer_name,contact,address"),
-      sb.from("admin_fee_payments").select("*").order("created_at",{ascending:false}),
-      sb.from("cancelled_kits").select("gb_number,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status").eq("gb_number",window.activeGroupBuyNumber||"")
+      sb.from("admin_fee_payments").select("*").eq("gb_number",selectedGB).order("created_at",{ascending:false}),
+      sb.from("cancelled_kits").select("gb_number,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status").eq("gb_number",selectedGB)
     ]);
     if(or.error)throw or.error;
     if(cr.error)console.warn("Customer details warning:",cr.error);
@@ -863,7 +865,15 @@ function renderOrdersCenter(){
             const manualNote=String(o.admin_note||"").replace(/^MANUAL \/ LATE ORDER •\s*/,"").trim();
             const status=orderIsApproved(o)?"PAID":orderIsRejected(o)?"REJECTED":"PENDING";
             const statusClass=status.toLowerCase();
-            const items=(o.order_items||[]).map((i,itemIndex)=>'<div class="orderItemChip" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0;padding:8px 10px"><span>'+esc(i.product_name||"Product")+' '+esc(i.strength||"")+' × '+Number(i.qty||0)+'</span><button class="btn danger" type="button" style="padding:6px 10px;font-size:11px" onclick="cancelKitFromCachedOrder('+index+','+r.orders.indexOf(o)+','+itemIndex+')">❌ CANCEL KIT</button></div>').join("");
+            const items=(o.order_items||[]).map((i,itemIndex)=>{
+              const refundedQty=refundedRows.filter(x=>String(x.order_id||"")===String(o.order_id||"")&&(
+                ((x.product_id&&String(x.product_id)===String(i.product_id||""))&&(x.variant_id&&String(x.variant_id)===String(i.variant_id||"")))||
+                (String(x.product_name||"").trim().toLowerCase()===String(i.product_name||"").trim().toLowerCase()&&String(x.strength||"").trim().toLowerCase()===String(i.strength||"").trim().toLowerCase())
+              )).reduce((s,x)=>s+Number(x.qty||0),0);
+              const activeQty=Math.max(0,Number(i.qty||0)-refundedQty);
+              const refunded=activeQty===0&&refundedQty>0;
+              return '<div class="orderItemChip" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0;padding:8px 10px'+(refunded?';opacity:.6;text-decoration:line-through;background:#fff1f5':'')+'"><span>'+esc(i.product_name||"Product")+' '+esc(i.strength||"")+' × '+(refunded?Number(i.qty||0):activeQty)+(refunded?' <em style="text-decoration:none;color:#b51f61;font-style:normal;font-weight:900">REFUNDED</em>':'')+'</span>'+(!refunded&&activeQty?'<button class="btn danger" type="button" style="padding:6px 10px;font-size:11px" onclick="cancelKitFromCachedOrder('+index+','+r.orders.indexOf(o)+','+itemIndex+')">❌ CANCEL KIT</button>':'')+'</div>';
+            }).join("");
             return '<div class="ordersDetailRow ordersCleanRow">'+
               '<div class="orderRowTop"><div><b>'+esc(o.order_id||"Order")+'</b><div class="small">'+esc(o.gb_number||"GB")+' • '+new Date(o.created_at||Date.now()).toLocaleString("en-PH")+'</div></div><div class="orderRowBadges">'+(isManual?'<span class="orderStatusChip manual">MANUAL / LATE</span>':'')+'<span class="orderStatusChip '+statusClass+'">'+status+'</span><b>'+peso(o.total)+'</b></div></div>'+
               '<div class="orderItemChips">'+items+'</div>'+
@@ -977,7 +987,7 @@ async function markCancelledKitRefunded(id){
  if(!confirm("Mark this cancelled kit as REFUNDED? This should only be done after you actually sent the refund."))return;
  const {error}=await sb.from("cancelled_kits").update({status:"REFUNDED",refunded_at:new Date().toISOString()}).eq("id",id);
  if(error){showMessage(error.message||"Unable to update refund.","error");return;}
- showMessage("Marked as refunded.","success");await Promise.all([loadVialTracker(),typeof loadOrdersCenter==="function"?loadOrdersCenter():Promise.resolve(),typeof loadWaybillCenter==="function"?loadWaybillCenter():Promise.resolve()]);
+ showMessage("Marked as refunded.","success");await Promise.all([loadVialTracker(),loadOrdersCenter(),typeof loadWaybillCenter==="function"?loadWaybillCenter():Promise.resolve()]);
 }
 async function undoCancelledKit(id){
  const {data:row,error:readError}=await sb.from("cancelled_kits").select("*").eq("id",id).single();

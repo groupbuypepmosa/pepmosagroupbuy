@@ -90,7 +90,8 @@
   grid.innerHTML=list.map(p=>{
     const variants=(p.product_variants||[]).filter(v=>v.active!==false);
     const lowest=variants.length?Math.min(...variants.map(v=>Number(v.price)||0)):0;
-    return `<article class="card pepStoreCard" data-product-id="${esc(p.product_id)}">
+    const keepOriginalPhoto=['LIPOVELA','LIPOVELA V','LUTHIONE','GTT FUAN'].includes(String(p.product_name||'').trim().toUpperCase());
+    return `<article class="card pepStoreCard ${keepOriginalPhoto?'pepKeepOriginal':'pepPinkStudio'}" data-product-id="${esc(p.product_id)}">
       <div class="productImg">${p.image_url?'<img src="'+esc(p.image_url)+'" alt="'+esc(p.product_name)+'">':''}</div>
       <div class="pepStoreBody">
         <h3>${esc(p.product_name)}</h3>

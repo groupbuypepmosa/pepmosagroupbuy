@@ -4,7 +4,7 @@
   function addStyles(){
     if($('pepCustomerExperienceStyle'))return;
     const s=document.createElement('style');s.id='pepCustomerExperienceStyle';s.textContent=`
-.pepCustomerHeroActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.pepCustomerHeroActions a{flex:1;min-width:170px;text-decoration:none}
+.pepFloatingCart{position:fixed!important;right:18px!important;bottom:18px!important;z-index:9999!important;border-radius:999px!important;padding:13px 18px!important}.pepCustomerHeroActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.pepCustomerHeroActions a{flex:1;min-width:170px;text-decoration:none}
 .pepLiveMoq{margin:22px 0 4px;padding:20px 22px;border:1px solid #f0d6e2;border-radius:24px;background:linear-gradient(135deg,#fff,#fff1f7 55%,#f8efff);box-shadow:0 14px 34px rgba(164,72,121,.08)}
 .pepLiveMoqTop{display:flex;justify-content:space-between;gap:16px;align-items:center}.pepLiveMoq h3{margin:5px 0;color:#3b2b34;font-size:22px}.pepLiveMoq .label{font-size:10px;font-weight:950;letter-spacing:.14em;color:#c55b91}.pepMoqCount{font-weight:950;color:#c62d7e;white-space:nowrap}.pepMoqBar{height:11px;background:#f3dce7;border-radius:999px;overflow:hidden;margin-top:15px}.pepMoqFill{height:100%;border-radius:999px;background:linear-gradient(90deg,#ef8bb4,#d72b91,#a847b5);transition:width .6s ease}.pepMoqMsg{margin:10px 0 0;color:#79636f;font-size:12px}
 .pepTrust{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}.pepTrust div{background:#fff;border:1px solid #f0dce6;border-radius:18px;padding:15px;text-align:center;font-size:11px;color:#755e6a}.pepTrust b{display:block;color:#4a303c;margin-bottom:4px}
@@ -14,6 +14,8 @@
   }
   function insertUI(){
     addStyles();
+    const existingCart=document.querySelector('button.cart');
+    if(existingCart) existingCart.classList.add('pepFloatingCart');
     const hero=document.querySelector('.gbPanel');
     if(hero&&!$('pepCustomerHeroActions')){
       const d=document.createElement('div');d.id='pepCustomerHeroActions';d.className='pepCustomerHeroActions';

@@ -295,7 +295,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
     </div>
   </div>
 </section>
-<section id="vialTrackerPanel" class="panel"><div class="card"><div class="itemHead"><div><h2>Vial / Order Tracker</h2><p class="muted">Consolidated by product + variant. 10 vials = 1 kit, with remaining vials needed to complete the next kit.</p></div><button class="btn primary" type="button" onclick="printTotalVials()">🖨 PRINT TOTAL VIALS</button></div><div class="grid"><div class="field"><label>Group Buy</label><select id="vialTrackerGB" onchange="loadVialTracker()"><option value="">All Group Buys</option></select></div><div class="field"><label>Search Product / Variant</label><input id="vialTrackerSearch" placeholder="Search..." oninput="renderVialTracker()"></div></div><div id="vialTrackerResults" style="margin-top:18px">Select a Group Buy or use All Group Buys.</div></div></section>
+<section id="vialTrackerPanel" class="panel"><div class="card"><div class="itemHead"><div><h2>Vial / Order Tracker</h2><p class="muted">Consolidated by product + variant. 10 vials = 1 kit, with remaining vials needed to complete the next kit.</p></div><button class="btn primary" type="button" onclick="printTotalVials()">🖨 PRINT TOTAL VIALS</button></div><div class="grid"><div class="field"><label>Group Buy</label><select id="vialTrackerGB" onchange="loadVialTracker()"><option value="">All Group Buys</option></select></div><div class="field"><label>Search Product / Variant</label><input id="vialTrackerSearch" placeholder="Search..." oninput="renderVialTracker()"></div></div><div id="vialTrackerResults" style="margin-top:18px">Select a Group Buy or use All Group Buys.</div><div id="cancelledKitsResults" style="margin-top:24px"></div></div></section>
 <section id="documentsPanel" class="panel"><div class="card"><h2>COA & Protocol Library</h2><p class="muted">Upload files directly from your device. No URL required.</p><div class="grid"><div class="field"><label>Document Type *</label><select id="docType"><option value="COA">COA</option><option value="PROTOCOL">PROTOCOL</option></select></div><div class="field"><label>Title *</label><input id="docTitle"></div><div class="field full"><label>Product / Reference</label><input id="docProduct"></div><div class="field full"><label>Upload File *</label><input id="docFile" type="file" accept=".pdf,image/png,image/jpeg,image/webp"></div></div><div class="actions"><button class="btn primary" type="button" onclick="uploadLibraryDocument()">UPLOAD DOCUMENT</button></div></div><div class="card"><h2>Uploaded Documents</h2><div id="documentAdminList">Loading...</div></div></section>
 <div id="productEditModal" class="editModal" onclick="if(event.target===this)closeProductEdit()"><div class="editModalCard"><div class="itemHead"><div><div class="eyebrow">PEPMOSA ADMIN</div><h2>Edit Product</h2><div class="small">Update product details and prices.</div></div><button class="btn secondary" type="button" onclick="closeProductEdit()">CLOSE</button></div><div class="grid" style="margin-top:18px"><div class="field"><label>Product Name *</label><input id="editProductName"></div><div class="field"><label>Category *</label><select id="editProductCategory"></select></div><div class="field full"><label>Description</label><textarea id="editProductDescription"></textarea></div></div><div style="margin-top:18px"><h3 style="margin-bottom:6px">Variants & Prices</h3><div class="small">You can update prices directly here.</div><div id="editProductVariants"></div></div><div class="actions"><button class="btn primary" type="button" onclick="saveProductEdit()">SAVE CHANGES</button><button class="btn secondary" type="button" onclick="closeProductEdit()">CANCEL</button></div></div></div>
 <section id="siteNoticePanel" class="panel">
@@ -912,7 +912,7 @@ async function loadVialTracker(){
     const qty=Number(r.qty||0),totalKits=Math.floor(qty/10),inCurrent=qty%10;
     return {...r,category:pc.get(r.product_id)||"",totalKits,inCurrent,remainingToComplete:(10-inCurrent)%10};
   });
-  renderVialTracker();
+  renderVialTracker();await loadCancelledKits();
  }catch(e){console.error(e);$("vialTrackerResults").innerHTML='<div class="notice error">'+esc(e.message||"Unable to load vial tracker.")+'</div>';}
 }
 function printTotalVials(){
@@ -933,6 +933,32 @@ function printTotalVials(){
  w.document.open();w.document.write(html);w.document.close();
 }
 
+async function cancelKitLine(orderId,item,order){
+ const reason=prompt("Reason for cancellation (optional):")||"";
+ const unit=Number(item.line_total||0)||0;
+ const amount=Number(item.qty||0)*unit;
+ if(!confirm("Cancel "+item.product_name+" "+(item.strength||"")+" for "+(order.email||"this client")+"? This will NOT delete the order."))return;
+ const {error}=await sb.from("cancelled_kits").insert({gb_number:order.gb_number||null,order_id:orderId,email:order.email||null,product_id:item.product_id||null,variant_id:item.variant_id||null,product_name:item.product_name||"",strength:item.strength||"",qty:Number(item.qty||0),refund_amount:amount,reason,status:"REFUND_PENDING"});
+ if(error){showMessage(error.message||"Unable to cancel kit.","error");return;}
+ showMessage("Kit cancelled. Refund is pending until you mark it refunded.","success");await loadVialTracker();
+}
+async function markCancelledKitRefunded(id){
+ if(!confirm("Mark this cancelled kit as REFUNDED? This should only be done after you actually sent the refund."))return;
+ const {error}=await sb.from("cancelled_kits").update({status:"REFUNDED",refunded_at:new Date().toISOString()}).eq("id",id);
+ if(error){showMessage(error.message||"Unable to update refund.","error");return;}
+ showMessage("Marked as refunded.","success");await loadVialTracker();
+}
+async function loadCancelledKits(){
+ const box=$("cancelledKitsResults");if(!box)return;
+ const gb=$("vialTrackerGB")?.value||"";
+ let q=sb.from("cancelled_kits").select("*").order("cancelled_at",{ascending:false});
+ if(gb)q=q.eq("gb_number",gb);
+ const {data,error}=await q;
+ if(error){box.innerHTML='<div class="notice error">'+esc(error.message)+'</div>';return;}
+ const rows=data||[];
+ if(!rows.length){box.innerHTML='<div class="eyebrow" style="margin:24px 0 10px">❌ CANCELLED KITS</div><div class="empty">No cancelled kits.</div>';return;}
+ box.innerHTML='<div class="eyebrow" style="margin:24px 0 10px">❌ CANCELLED KITS</div><div class="pepKitCards">'+rows.map(r=>'<div class="pepKitCard"><div class="pepKitTop"><div><b>'+esc(r.product_name||"Cancelled item")+'</b><div class="small">'+esc(r.strength||"")+' • '+esc(r.email||"No email")+'</div><div class="small">Order: '+esc(r.order_id||"—")+' • Qty: '+Number(r.qty||0)+'</div></div><b>'+esc(r.status||"CANCELLED")+'</b></div><div class="small" style="margin-top:10px">Refund amount: '+peso(Number(r.refund_amount||0))+(r.reason?' • Reason: '+esc(r.reason):'')+'</div>'+(r.status==="REFUNDED"?'<div class="small" style="margin-top:10px">💸 Refunded: '+new Date(r.refunded_at).toLocaleString()+'</div>':'<div class="actions" style="margin-top:12px"><button class="btn primary" type="button" onclick="markCancelledKitRefunded(\''+esc(r.id)+'\')">MARK AS REFUNDED</button></div>')+'</div>').join("")+'</div>';
+}
 function renderVialTracker(){
  const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase();
  const rows=vialTrackerRows.filter(r=>(r.product_name+" "+r.strength+" "+r.variant_id+" "+r.category).toLowerCase().includes(q));

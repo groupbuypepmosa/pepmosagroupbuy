@@ -111,7 +111,8 @@
       const totals=new Map((totalsRes.data||[]).map(x=>[String(x.product_id),Number(x.total_qty)||0]));
       const items=productsRes.data||[];
       if(!items.length){wrap.remove();return;}
-      wrap.innerHTML='<div class="pepMoqHeader"><div><div class="label">MOQ AVAILABLE NOW</div><h3>🌐 WHAT’S OPEN FOR MOQ</h3><p>See the products currently available so you don’t have to search for them.</p></div><a href="open-for-all.html" class="btn primary pepMoqOpenBtn">VIEW ALL MOQ</a></div><div class="pepMoqCards">'+items.map(x=>{
+      const round=Number(localStorage.getItem('pepmosaMoqRound')||1)||1;
+      wrap.innerHTML='<div class="pepMoqHeader"><div><div class="label">MOQ '+round+' • AVAILABLE NOW</div><h3>🌐 WHAT’S OPEN FOR MOQ '+round+'</h3><p>See the products currently available so you don’t have to search for them.</p></div><a href="open-for-all.html" class="btn primary pepMoqOpenBtn">VIEW ALL MOQ '+round+'</a></div><div class="pepMoqCards">'+items.map(x=>{
         const total=totals.get(String(x.id))||0;
         const target=Number(x.moq)||0;
         const pct=target?Math.min(100,Math.round(total/target*100)):0;

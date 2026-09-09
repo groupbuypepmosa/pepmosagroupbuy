@@ -111,10 +111,10 @@
       const totals=new Map((totalsRes.data||[]).map(x=>[String(x.product_id),Number(x.total_qty)||0]));
       const items=productsRes.data||[];
       if(!items.length){wrap.remove();return;}
-      let moqName='',round=1;
+      let moqName='',round='1';
       try{
         const roundRes=await sb.from('ofa_settings').select('moq_name,moq_number').eq('id',true).single();
-        if(roundRes.data){moqName=String(roundRes.data.moq_name||'').trim();round=Math.max(1,Number(roundRes.data.moq_number||1));}
+        if(roundRes.data){moqName=String(roundRes.data.moq_name||'').trim();round=String(roundRes.data.moq_number||'1').trim()||'1';}
       }catch(e){console.warn('MOQ round settings unavailable',e);}
       const moqLabel=(moqName?moqName+' ':'')+'MOQ '+round;
       wrap.innerHTML='<div class="pepMoqHeader"><div><div class="label">'+moqLabel+' • AVAILABLE NOW</div><h3>🌐 WHAT’S OPEN FOR '+moqLabel+'</h3><p>See the products currently available so you don’t have to search for them.</p></div><a href="open-for-all.html" class="btn primary pepMoqOpenBtn">VIEW '+moqLabel+'</a></div><div class="pepMoqCards">'+items.map(x=>{

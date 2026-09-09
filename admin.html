@@ -1116,7 +1116,8 @@ async function loadWaybillCenter(){
       g.orders.push(o);
       for(const i of (o.order_items||[])){
         const itemKey=String(o.order_id||"")+"||"+String(i.product_id||"")+"||"+String(i.variant_id||"");
-        if(!refundedKeys.has(itemKey))g.items.push(i);
+        const refundRow=refundedCancelled.find(x=>refundedKey(x)===itemKey);
+        g.items.push({...i,is_refunded:!!refundRow,refund_amount:Number(refundRow?.refund_amount||0)});
       }
       g.total+=Number(o.total||0);g.shipping+=Number(o.shipping_fee||0);
     }
@@ -1132,9 +1133,9 @@ async function loadWaybillCenter(){
       const shipment=shipmentsByEmail.get(g.email)||{};
       const merged=new Map();
       for(const i of g.items){
-        const key=[i.product_name||"Product",i.strength||"",Number(i.unit_price||0)].join("||");
-        const old=merged.get(key)||{product_name:i.product_name||"Product",strength:i.strength||"",qty:0,unit_price:Number(i.unit_price||0),line_total:0};
-        old.qty+=Number(i.qty||0);old.line_total+=Number(i.line_total||0);merged.set(key,old);
+        const key=[i.product_name||"Product",i.strength||"",Number(i.unit_price||0),i.is_refunded?"REFUNDED":"ACTIVE"].join("||");
+        const old=merged.get(key)||{product_name:i.product_name||"Product",strength:i.strength||"",qty:0,unit_price:Number(i.unit_price||0),line_total:0,is_refunded:!!i.is_refunded,refund_amount:0};
+        old.qty+=Number(i.qty||0);old.line_total+=Number(i.line_total||0);old.refund_amount+=Number(i.refund_amount||0);merged.set(key,old);
       }
       return {...g,
         customer_name:customer.customer_name||latest.full_name||g.email,
@@ -1191,9 +1192,12 @@ function renderSelectedWaybill(){
         '<div class="waybillBlock"><div class="waybillLabel">SHIP TO</div><b>'+esc(r.customer_name)+'</b><div>'+esc(r.contact||"Contact not set")+'<br>'+esc(r.address||"Address not set")+'</div></div>'+
       '</div><div class="waybillBarcodeWrap"><div class="waybillBarcode"><span>'+esc(barcode)+'</span></div></div>'+
       '<div class="waybillBlock" style="margin-bottom:12px"><div class="waybillLabel">CONSOLIDATED SHIPPING DETAILS</div><div><b>Courier:</b> '+esc(r.courier||"To be assigned")+' &nbsp; • &nbsp; <b>Waybill / Tracking:</b> '+esc(r.waybill_number||"To be assigned")+'<br><b>Orders:</b> '+esc(r.orders.map(o=>o.order_id).join(", "))+'<br><b>Payment:</b> '+esc(r.payment)+' &nbsp; • &nbsp; <b>Consolidated Total:</b> '+peso(r.total)+'</div></div>'+
-      ((r.refunded||[]).length?'<div class="waybillBlock" style="margin-bottom:12px;border-color:#efb6c9;background:#fff7fa"><div class="waybillLabel">REFUNDED / CANCELLED ITEMS</div>'+r.refunded.map(x=>'<div><b>'+esc(x.product_name||"Item")+'</b> '+esc(x.strength||"")+' • Qty '+Number(x.qty||0)+' • REFUNDED '+peso(Number(x.refund_amount||0))+'</div>').join('')+'</div>':'')+
+
       '<table class="waybillTable"><thead><tr><th>Qty</th><th>Product</th><th>Variant</th><th>Price</th><th>Total</th></tr></thead><tbody>'+
-        r.products.map(p=>'<tr><td>'+Number(p.qty||0)+'</td><td>'+esc(p.product_name)+'</td><td>'+esc(p.strength||"—")+'</td><td>'+peso(p.unit_price)+'</td><td>'+peso(p.line_total)+'</td></tr>').join("")+
+        r.products.map(p=>p.is_refunded
+          ?'<tr style="opacity:.58;text-decoration:line-through;background:#fff4f7"><td>'+Number(p.qty||0)+'</td><td>'+esc(p.product_name)+' <span style="display:inline-block;text-decoration:none;color:#b51f61;font-size:9px;font-weight:900;margin-left:5px">REFUNDED</span></td><td>'+esc(p.strength||"—")+'</td><td>'+peso(p.unit_price)+'</td><td>'+peso(p.line_total)+'</td></tr>'
+          :'<tr><td>'+Number(p.qty||0)+'</td><td>'+esc(p.product_name)+'</td><td>'+esc(p.strength||"—")+'</td><td>'+peso(p.unit_price)+'</td><td>'+peso(p.line_total)+'</td></tr>'
+        ).join("")+
       '</tbody></table></div><div class="waybillFoot"><span>Prepared '+esc(date)+' • PEPMOSA GROUP BUY</span><span>Handle with care ♡</span></div></div>';
 }
 function printSelectedWaybill(){

@@ -1022,7 +1022,8 @@ function viewKitOrder(n){
  modal.appendChild(card);
  modal.addEventListener("click",ev=>{if(ev.target===modal)modal.remove()});
  document.body.appendChild(modal);
-}\nasync function loadCancelledKits(){
+}
+async function loadCancelledKits(){
  const box=$("cancelledKitsList")||$("cancelledKitsResults");if(!box)return;
  const gb=$("vialTrackerGB")?.value||"";
  let q=sb.from("cancelled_kits").select("*").order("cancelled_at",{ascending:false});

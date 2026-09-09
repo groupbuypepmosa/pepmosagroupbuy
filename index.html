@@ -641,8 +641,11 @@ header{
 }
 </style>
 <style id="pep-no-crop-product-images">
-#productGrid .pepStoreCard .productImg img{width:100%!important;height:100%!important;object-fit:contain!important;display:block!important}
-@media(max-width:620px){#productGrid .pepStoreCard .productImg{height:145px!important}}
+/* Full-width product photos: no side gutters */
+#productGrid .pepStoreCard .productImg{padding:0!important;overflow:hidden!important}
+#productGrid .pepStoreCard .productImg img{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center!important;display:block!important;margin:0!important}
+#productGrid .pepStoreCard .productImg:after{display:none!important}
+@media(max-width:620px){#productGrid .pepStoreCard .productImg{height:220px!important}}
 </style>
 
 

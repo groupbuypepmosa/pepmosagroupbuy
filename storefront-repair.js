@@ -104,6 +104,10 @@
     </article>`;
   }).join('');
 }
+  // Keep the same boutique renderer active when the search input calls renderProducts().
+  // The base page also defines an older renderer, so explicitly expose this one globally.
+  window.renderProducts=renderProducts;
+
   document.addEventListener('click',function(e){
     const btn=e.target.closest('.pepSelectVariant');
     if(!btn)return;

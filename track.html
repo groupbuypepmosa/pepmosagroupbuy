@@ -205,7 +205,8 @@ function normalizeTrackingPayload(raw){
   return {
     orders:asArray(data.orders||data.customer_orders),
     shipments:asArray(data.shipments||data.consolidated_shipments),
-    order_items:asArray(data.order_items||data.items)
+    order_items:asArray(data.order_items||data.items),
+    refunded_items:asArray(data.refunded_items||data.refunds||data.cancelled_items)
   };
 }
 function itemLabel(i){
@@ -308,7 +309,7 @@ async function track(){
 
   try{
     const data=await loadTrackingData(email);
-    const orders=asArray(data.orders),rawShipments=asArray(data.shipments),allItems=asArray(data.order_items);
+    const orders=asArray(data.orders),rawShipments=asArray(data.shipments),allItems=asArray(data.order_items),refundedItems=asArray(data.refunded_items);
 
     // HARD SAFETY RULE: tracking must never appear unless this email has an
     // actual order in the currently active Group Buy. Old/deleted GB shipment
@@ -324,17 +325,30 @@ async function track(){
     const rawIndex=STATUSES.indexOf(status),ci=rawIndex>=0?rawIndex:0;
 
     const summary=new Map(),orderCards=[],notes=[];
+    const normText=v=>String(v||'').trim().toLowerCase().replace(/\s+/g,'');
     orders.forEach((o,idx)=>{
       const oid=o.order_id??o.id??('ORDER '+(idx+1));
       const grouped=new Map();
-      itemsFor(o,allItems).forEach(i=>{
-        const name=itemLabel(i).toUpperCase(),q=itemQty(i);
-        grouped.set(name,(grouped.get(name)||0)+q);
-        summary.set(name,(summary.get(name)||0)+q);
+      const orderItems=itemsFor(o,allItems).slice();
+      const orderRefunds=refundedItems.filter(r=>String(r.order_id??'')===String(oid));
+      // Keep every refunded kit visible, even if a legacy order item is missing.
+      orderRefunds.forEach(r=>{
+        const exists=orderItems.some(i=>
+          !!i.is_refunded &&
+          normText(i.product_name||i.name)===normText(r.product_name||r.name) &&
+          normText(i.strength||i.variant_name)===normText(r.strength||r.variant_name)
+        );
+        if(!exists) orderItems.push({...r,is_refunded:true});
+      });
+      orderItems.forEach(i=>{
+        const name=itemLabel(i).toUpperCase(),q=itemQty(i),refunded=!!i.is_refunded;
+        const key=name+'||'+(refunded?'REFUNDED':'ACTIVE');
+        grouped.set(key,{name,qty:(grouped.get(key)?.qty||0)+q,refunded});
+        summary.set(key,{name,qty:(summary.get(key)?.qty||0)+q,refunded});
       });
       const n=noteFor(o);if(n)notes.push(n);
-      const rows=[...grouped.entries()].map(([name,q])=>
-        '<div class="product"><b>'+esc(name)+'</b><span class="qty">QTY '+q+'</span></div>'
+      const rows=[...grouped.values()].map(row=>
+        '<div class="product"'+(row.refunded?' style="opacity:.62;text-decoration:line-through;background:#fff1f5"':'')+'><b>'+esc(row.name)+(row.refunded?' <span style="display:inline-block;text-decoration:none;color:#b51f61;font-size:9px;font-weight:950;margin-left:6px">REFUNDED</span>':'')+'</b><span class="qty">QTY '+row.qty+'</span></div>'
       ).join('')||'<div class="product"><span style="color:#8b7a83;font-size:12px">No products attached to this order yet.</span></div>';
       orderCards.push(
         '<article class="orderCard"><div class="orderTop"><div><div class="orderRef">ORDER # '+esc(oid)+'</div>'+
@@ -345,13 +359,14 @@ async function track(){
     });
 
     if(!summary.size)allItems.forEach(i=>{
-      const name=itemLabel(i).toUpperCase(),q=itemQty(i);
-      summary.set(name,(summary.get(name)||0)+q);
+      const name=itemLabel(i).toUpperCase(),q=itemQty(i),refunded=!!i.is_refunded;
+      const key=name+'||'+(refunded?'REFUNDED':'ACTIVE');
+      summary.set(key,{name,qty:(summary.get(key)?.qty||0)+q,refunded});
     });
 
-    const totalItems=[...summary.values()].reduce((a,b)=>a+b,0);
-    const summaryRows=[...summary.entries()].map(([name,q])=>
-      '<div class="product"><b>'+esc(name)+'</b><span class="qty">TOTAL QTY '+q+'</span></div>'
+    const totalItems=[...summary.values()].filter(x=>!x.refunded).reduce((a,b)=>a+b.qty,0);
+    const summaryRows=[...summary.values()].map(row=>
+      '<div class="product"'+(row.refunded?' style="opacity:.62;text-decoration:line-through;background:#fff1f5"':'')+'><b>'+esc(row.name)+(row.refunded?' <span style="display:inline-block;text-decoration:none;color:#b51f61;font-size:9px;font-weight:950;margin-left:6px">REFUNDED</span>':'')+'</b><span class="qty">'+(row.refunded?'REFUNDED QTY ':'TOTAL QTY ')+row.qty+'</span></div>'
     ).join('');
 
     const summaryCard=summaryRows?

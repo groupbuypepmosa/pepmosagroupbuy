@@ -32,7 +32,7 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 (async()=>{
 try{initSupabase();await requireAdmin();}catch(e){document.body.innerHTML='<main style="padding:30px;font-family:Arial"><h2>Admin access required</h2><p>Please log in as PEPMOSA admin.</p></main>';return;}
 const $=id=>document.getElementById(id);const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let catalog=[],prices=[],expenses=[],regularItems=[],ofaItems=[],orders=[],groupBuys=[],manufacturerAssignments=[];
+let catalog=[],prices=[],expenses=[],regularItems=[],ofaItems=[],orders=[],groupBuys=[],manufacturerAssignments=[],cancelledKits=[];
 $('edate').value=new Date().toISOString().slice(0,10);
 
 async function init(){
@@ -48,15 +48,16 @@ async function init(){
   sb.from('order_items').select('product_id,variant_id,product_name,strength,qty,unit_price,order_id'),
   sb.from('ofa_order_items').select('product_id,product_name,qty,unit_price,order_id'),
   sb.from('ofa_orders').select('order_id,total,subtotal,shipping_fee,payment_status'),
-  sb.from('admin_fee_payments').select('amount,status,gb_number')
+  sb.from('admin_fee_payments').select('amount,status,gb_number'),
+  sb.from('cancelled_kits').select('id,gb_number,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status,refunded_at')
  ]);
  for(const x of rs)if(x.error)throw x.error;
- const [prods,vars,ofap,gbs,pr,ex,assignments,ord,items,ofi,ofaOrders,adminFees]=rs;
+ const [prods,vars,ofap,gbs,pr,ex,assignments,ord,items,ofi,ofaOrders,adminFees,cancelled]=rs;
  const varMap=new Map();(vars.data||[]).forEach(v=>{if(!varMap.has(v.product_id))varMap.set(v.product_id,[]);varMap.get(v.product_id).push(v);});
  window.ofaOrdersCache=ofaOrders.data||[];window.adminFeesCache=adminFees.data||[];catalog=(prods.data||[]).map(p=>({product_id:p.product_id,product_name:p.product_name,variants:varMap.get(p.product_id)||[],source:'GB'}))
  .concat((ofap.data||[]).map(p=>({product_id:'OFA:'+p.id,raw_id:p.id,product_name:p.name,variants:[],source:'OFA'})));
  catalog.sort((a,b)=>a.product_name.localeCompare(b.product_name));
- prices=pr.data||[];expenses=ex.data||[];manufacturerAssignments=assignments.data||[];orders=ord.data||[];regularItems=items.data||[];ofaItems=ofi.data||[];groupBuys=gbs.data||[];
+ prices=pr.data||[];expenses=ex.data||[];manufacturerAssignments=assignments.data||[];orders=ord.data||[];regularItems=items.data||[];ofaItems=ofi.data||[];groupBuys=gbs.data||[];cancelledKits=cancelled.data||[];
  renderScopes();renderCatalog();renderPrices();renderExpenses();loadSales();
 }
 function renderScopes(){
@@ -132,9 +133,16 @@ window.loadSales=function(){
  const approvedStatus=s=>['PAID','PAYMENT APPROVED','APPROVED'].includes(String(s||'').toUpperCase());
  const valid=new Map(orders.filter(o=>approvedStatus(o.payment_status)).map(o=>[o.order_id,o]));
  const validOfa=new Set((window.ofaOrdersCache||[]).filter(o=>approvedStatus(o.payment_status)).map(o=>o.order_id));
+ const refundedRows=(cancelledKits||[]).filter(r=>String(r.status||'').toUpperCase()==='REFUNDED');
+ const refundKey=r=>String(r.order_id||'')+'||'+String(r.product_id||'')+'||'+String(r.variant_id||'');
+ const refundedKeys=new Set(refundedRows.map(refundKey));
  let items=[];
  if(scope!=='OFA'){
-  items=regularItems.filter(i=>{const o=valid.get(i.order_id);if(!o)return false;return scope==='ALL'||String(o.gb_number)===String(scope.replace('GB:',''));}).map(i=>({...i,scope:'GB:'+valid.get(i.order_id).gb_number}));
+  items=regularItems.filter(i=>{
+    const o=valid.get(i.order_id);if(!o)return false;
+    if(!(scope==='ALL'||String(o.gb_number)===String(scope.replace('GB:',''))))return false;
+    return !refundedKeys.has(String(i.order_id||'')+'||'+String(i.product_id||'')+'||'+String(i.variant_id||''));
+  }).map(i=>({...i,scope:'GB:'+valid.get(i.order_id).gb_number}));
  }
  if(scope==='ALL'||scope==='OFA')items=items.concat(ofaItems.filter(i=>validOfa.has(i.order_id)).map(i=>({...i,product_id:'OFA:'+i.product_id,variant_id:'',strength:'',scope:'OFA'})));
  const map=new Map();items.forEach(i=>{const key=(i.product_id||i.product_name)+'||'+(i.variant_id||'');const row=map.get(key)||{product_id:i.product_id||'',variant_id:i.variant_id||'',name:i.product_name||'',variant:i.strength||'',qty:0,revenue:0};row.qty+=Number(i.qty||0);row.revenue+=Number(i.qty||0)*Number(i.unit_price||0);map.set(key,row);});
@@ -156,11 +164,13 @@ window.loadSales=function(){
  // Admin fees are global in the current database, so they are shown in the overall/all view only.
  const selectedGb=scope.startsWith('GB:')?scope.slice(3):null;
  const adminFeeCollected=(window.adminFeesCache||[]).filter(f=>approvedStatus(f.status)&&(scope==='ALL'||(selectedGb!==null&&String(f.gb_number)===String(selectedGb)))).reduce((s,f)=>s+Number(f.amount||0),0);
- const totalAmountCollected=adminFeeCollected+shippingCollected+productPayment;
+ const refundedAmount=refundedRows.filter(r=>scope==='ALL'||(scope!=='OFA'&&String(r.gb_number)===String(scope.replace('GB:','')))).reduce((s,r)=>s+Number(r.refund_amount||0),0);
+ const adjustedProductPayment=Math.max(0,productPayment-refundedAmount);
+ const totalAmountCollected=adminFeeCollected+shippingCollected+adjustedProductPayment;
  $('adminFeeCollected').textContent=peso(adminFeeCollected);
  $('shipping').textContent=peso(shippingCollected);
  $('shippingTitle').textContent='SHIPPING FEE FOR '+shippingCustomers+' CUSTOMER'+(shippingCustomers===1?'':'S');
- $('productCollected').textContent=peso(productPayment);
+ $('productCollected').textContent=peso(adjustedProductPayment);
  $('totalCollected').textContent=peso(totalAmountCollected);
  $('rev').textContent=peso(revenue);
  $('cost').textContent=peso(cost);
@@ -168,7 +178,7 @@ window.loadSales=function(){
  // Manufacturer Pricelist is reference only. It is NOT automatically deducted.
  // Net profit changes only when you manually record an actual expense/payment.
  $('profit').textContent=peso(revenue-exp);
- $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>';renderManufTally(rows,scope);
+ $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>'+(refundedAmount?'<div class="muted" style="margin-top:10px">💸 Refunded cancellations deducted: '+peso(refundedAmount)+'</div>':'');renderManufTally(rows,scope);
 };
 window.editPrice=function(id){
  const x=prices.find(p=>String(p.id)===String(id));if(!x)return;

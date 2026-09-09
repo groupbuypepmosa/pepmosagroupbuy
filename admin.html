@@ -719,10 +719,10 @@ async function loadOrdersCenter(){
   if(list)list.innerHTML='<div class="notice">Loading client orders and quantities...</div>';
   try{
     const [or,cr,fr,kr]=await Promise.all([
-      sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false}),
+      sb.from("orders").select("*,order_items(*)").eq("gb_number",window.activeGroupBuyNumber||"").order("created_at",{ascending:false}),
       sb.from("customers").select("customer_id,email,customer_name,contact,address"),
       sb.from("admin_fee_payments").select("*").order("created_at",{ascending:false}),
-      sb.from("cancelled_kits").select("order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status")
+      sb.from("cancelled_kits").select("gb_number,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status").eq("gb_number",window.activeGroupBuyNumber||"")
     ]);
     if(or.error)throw or.error;
     if(cr.error)console.warn("Customer details warning:",cr.error);
@@ -815,11 +815,13 @@ function renderOrdersCenter(){
   const totalProducts=rows.reduce((a,r)=>a+r.products.reduce((b,p)=>b+Number(p.qty||0),0),0);
   const totalOrders=rows.reduce((a,r)=>a+r.orders.length,0);
   const totalManual=rows.reduce((a,r)=>a+r.manualCount,0);
+  const totalRefunded=refundedRows.reduce((a,x)=>a+Number(x.refund_amount||0),0);
+  const adjustedTotal=rows.reduce((a,r)=>a+r.customerGrandTotal,0);
   if($("ordersClientSummary"))$("ordersClientSummary").innerHTML=
     '<div class="summaryCard pink"><div class="summaryLabel">Clients</div><div class="summaryValue">'+rows.length+'</div><div class="small">Unique buyers</div></div>'+
     '<div class="summaryCard"><div class="summaryLabel">Orders</div><div class="summaryValue">'+totalOrders+'</div><div class="small">'+totalManual+' manual / late</div></div>'+
-    '<div class="summaryCard"><div class="summaryLabel">Vials / Items</div><div class="summaryValue">'+totalProducts+'</div><div class="small">All quantities combined</div></div>'+
-    '<div class="summaryCard"><div class="summaryLabel">Total Payments</div><div class="summaryValue">'+peso(rows.reduce((a,r)=>a+r.customerGrandTotal,0))+'</div><div class="small">Orders + shipping + admin fees</div></div>';
+    '<div class="summaryCard"><div class="summaryLabel">Vials / Items</div><div class="summaryValue">'+totalProducts+'</div><div class="small">After refunded kits</div></div>'+
+    '<div class="summaryCard"><div class="summaryLabel">Total Payments</div><div class="summaryValue">'+peso(adjustedTotal)+'</div><div class="small">'+(totalRefunded?'Refunded deducted: '+peso(totalRefunded):'Orders + shipping + admin fees')+'</div></div>';
 
   list.innerHTML=filtered.length?
     '<div class="ordersClientGrid">'+filtered.map((r,index)=>{

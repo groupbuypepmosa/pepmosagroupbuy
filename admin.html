@@ -979,7 +979,7 @@ function viewKitOrder(n){
  d.scrollIntoView({behavior:"smooth",block:"nearest"});
 }
 async function loadCancelledKits(){
- const box=$("cancelledKitsResults");if(!box)return;
+ const box=$("cancelledKitsList")||$("cancelledKitsResults");if(!box)return;
  const gb=$("vialTrackerGB")?.value||"";
  let q=sb.from("cancelled_kits").select("*").order("cancelled_at",{ascending:false});
  if(gb)q=q.eq("gb_number",gb);

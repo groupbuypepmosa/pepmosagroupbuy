@@ -72,6 +72,15 @@
     const productRows=(r.products||[]).map(p=>{
       const qty=Number(p.qty||0);
       const line=Number(p.line_total||0);
+      const refunded=!!p.is_refunded;
+      if(refunded){
+        return '<tr class="pwRefundedRow" style="opacity:.62;text-decoration:line-through;background:#fff1f5">'+
+          '<td>'+esc(p.product_name||'Product')+' <span style="display:inline-block;text-decoration:none;color:#b51f61;font-size:9px;font-weight:950;margin-left:5px">REFUNDED</span></td>'+
+          '<td>'+esc(p.strength||'—')+'</td>'+
+          '<td class="num">'+qty+'</td>'+
+          '<td class="num">'+peso(line)+'</td>'+
+        '</tr>';
+      }
       return '<tr><td>'+esc(p.product_name||'Product')+'</td><td>'+esc(p.strength||'—')+'</td><td class="num">'+qty+'</td><td class="num">'+peso(line)+'</td></tr>';
     }).join('') || '<tr><td colspan="4">No product details available.</td></tr>';
 

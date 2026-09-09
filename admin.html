@@ -965,11 +965,12 @@ async function showCancelKitOrders(productId,variantId){try{
  }}
  if(!matches.length){showMessage("No matching client orders found.","error");return;}
  window.__cancelKitMatches=matches;
- const lines=matches.map((x,n)=>'<div class="item" style="margin:8px 0"><div class="itemHead"><div><b>'+esc(x.o.email||"No email")+'</b><div class="small">Order: '+esc(x.o.order_id)+' • Qty: '+Number(x.i.qty||0)+'</div></div><div class="actions"><button class="btn secondary" type="button" onclick="viewKitOrder('+n+')">👁 VIEW</button></div></div></div>').join("");
+ const lines=matches.map((x,n)=>'<div class="item" style="margin:8px 0"><div class="itemHead"><div><b>'+esc(x.o.email||"No email")+'</b><div class="small">Order: '+esc(x.o.order_id)+' • Qty: '+Number(x.i.qty||0)+'</div></div><div class="actions"><button class="btn secondary kit-view-btn" type="button" data-kit-index="'+n+'">👁 VIEW</button></div></div></div>').join("");
  const box=$("cancelledKitsResults");
  box.innerHTML='<div class="eyebrow" style="margin:24px 0 10px">👁 ORDERS IN THIS INCOMPLETE KIT</div><div class="small" style="margin-bottom:10px">Viewing these orders does not cancel anything.</div>'+lines+'<div id="kitOrderDetails"></div><div id="cancelledKitsList"></div>';
  showMessage("You are only viewing the orders. Nothing has been cancelled.","info");
  await loadCancelledKits();
+ setTimeout(()=>{document.querySelectorAll(".kit-view-btn").forEach(btn=>{btn.onclick=()=>viewKitOrder(Number(btn.dataset.kitIndex));});},0);
 }catch(e){showMessage(e.message||"Unable to load matching orders.","error");}}
 function viewKitOrder(n){
  const x=window.__cancelKitMatches && window.__cancelKitMatches[n];

@@ -1026,6 +1026,7 @@ async function loadCancelledKits(){
    const rid=JSON.stringify(String(r.id||"")).replace(/"/g,"&quot;");
    const refundBtn=refunded?'':'<button class="btn primary" type="button" onclick="markCancelledKitRefunded('+rid+')">MARK AS REFUNDED</button>';
    const undoBtn='<button class="btn secondary" type="button" onclick="undoCancelledKit('+rid+')">↩ UNDO CANCELLATION</button>';
+   return '<div class="pepKitCard"><div class="pepKitTop"><div><b>'+esc(r.product_name||"Cancelled item")+'</b><div class="small">'+esc(r.strength||"")+' • '+esc(r.email||"No email")+'</div><div class="small">Order: '+esc(r.order_id||"—")+' • Qty: '+Number(r.qty||0)+'</div></div><b>'+esc(r.status||"CANCELLED")+'</b></div><div class="small" style="margin-top:10px">Refund amount: '+peso(Number(r.refund_amount||0))+(r.reason?' • Reason: '+esc(r.reason):'')+'</div>'+statusHtml+'<div class="actions" style="margin-top:12px">'+refundBtn+undoBtn+'</div></div>';
  }).join("")+'</div>';
 }
 function renderVialTracker(){

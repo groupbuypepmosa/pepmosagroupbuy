@@ -30,16 +30,19 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script>
 <script>
-document.getElementById('backToAdminBtn')?.addEventListener('click',function(event){
+document.getElementById('backToAdminBtn')?.addEventListener('click',async function(event){
   event.preventDefault();
-  try{localStorage.setItem('pepmosa_admin_return','1')}catch(e){}
-  const ref=document.referrer||'';
-  const sameAdmin=ref.includes('/admin.html');
-  if(sameAdmin && history.length>1){
-    history.back();
-  }else{
-    location.href='admin.html';
-  }
+  try{
+    localStorage.setItem('pepmosa_admin_return','1');
+    if(typeof sb!=='undefined'&&sb?.auth){
+      const {data}=await sb.auth.getSession();
+      const session=data?.session;
+      if(session?.access_token&&session?.refresh_token){
+        sessionStorage.setItem('pepmosa_admin_session_backup',JSON.stringify({access_token:session.access_token,refresh_token:session.refresh_token}));
+      }
+    }
+  }catch(e){console.warn('Admin return backup failed',e)}
+  location.href='admin.html?return=finance';
 });
 (async()=>{
 try{initSupabase();await requireAdmin();}catch(e){document.body.innerHTML='<main style="padding:30px;font-family:Arial"><h2>Admin access required</h2><p>Please log in as PEPMOSA admin.</p></main>';return;}

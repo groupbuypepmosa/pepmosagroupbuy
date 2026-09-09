@@ -9,7 +9,10 @@
 .pepMoqHeader{display:flex;justify-content:space-between;gap:16px;align-items:center}.pepLiveMoq h3{margin:5px 0;color:#3b2b34;font-size:22px}.pepLiveMoq p{margin:6px 0 0;color:#79636f;font-size:12px}.pepLiveMoq .label{font-size:10px;font-weight:950;letter-spacing:.14em;color:#c55b91}.pepMoqOpenBtn{white-space:nowrap}.pepMoqCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:18px}.pepMoqProduct{display:flex;gap:12px;align-items:center;text-decoration:none;color:inherit;background:#fff;border:1px solid #f0d9e4;border-radius:18px;padding:10px;transition:.2s}.pepMoqProduct:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(164,72,121,.1)}.pepMoqImage{width:82px;height:82px;flex:0 0 82px;border-radius:14px;overflow:hidden;background:#fff3f8;display:grid;place-items:center}.pepMoqImage img{width:100%;height:100%;object-fit:contain}.pepMoqPlaceholder{font-size:30px}.pepMoqInfo{min-width:0;flex:1}.pepMoqInfo b{display:block;font-size:15px;color:#3b2b34;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pepMoqBadge{display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;background:#fff0f7;color:#c62d7e;font-size:10px;font-weight:900}.pepMoqProgress{height:7px;background:#f2dce6;border-radius:999px;overflow:hidden;margin-top:9px}.pepMoqProgress div{height:100%;background:linear-gradient(90deg,#ef8bb4,#d72b91,#a847b5);border-radius:999px}.pepMoqInfo small{display:block;margin-top:6px;color:#7b6570;font-size:10px}
 .pepTrust{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}.pepTrust div{background:#fff;border:1px solid #f0dce6;border-radius:18px;padding:15px;text-align:center;font-size:11px;color:#755e6a}.pepTrust b{display:block;color:#4a303c;margin-bottom:4px}
 .pepFaq{margin:34px 0;padding:28px;border-radius:28px;background:#fff;border:1px solid #eedce6}.pepFaqHead{text-align:center;margin-bottom:16px}.pepFaqHead h2{margin:5px 0}.pepFaq details{border-top:1px solid #f0e1e8;padding:15px 4px}.pepFaq summary{cursor:pointer;font-weight:850;color:#4a303c}.pepFaq p{color:#7c6973;font-size:13px;line-height:1.6;margin:10px 0 0}
-@media(max-width:650px){.pepLiveMoq{padding:18px}.pepMoqHeader{align-items:flex-start;flex-direction:column}.pepMoqOpenBtn{width:100%;text-align:center}.pepMoqCards{grid-template-columns:1fr}.pepTrust{grid-template-columns:1fr}.pepFaq{padding:22px 17px}}
+.pepTrust a{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid #f0dce6;border-radius:18px;padding:15px;text-align:center;font-size:11px;color:#755e6a;transition:transform .18s ease,box-shadow .18s ease}.pepTrust a:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(160,80,120,.1)}.pepTrust a b{display:block;color:#4a303c;margin-bottom:4px}
+.pepCartToast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:2147483500;opacity:0;pointer-events:none;padding:13px 18px;border-radius:16px;background:linear-gradient(135deg,#e52b8b,#a93fb6);color:#fff;font-size:13px;font-weight:900;box-shadow:0 18px 40px rgba(170,38,120,.28);transition:.24s ease}.pepCartToast.show{opacity:1;transform:translate(-50%,0)}.pepCartPulse{animation:pepCartPulse .55s ease}@keyframes pepCartPulse{0%{transform:scale(1)}45%{transform:scale(1.12) rotate(-3deg)}100%{transform:scale(1)}}
+.pepBackTop{position:fixed;left:16px;bottom:92px;width:48px;height:48px;border:1px solid rgba(213,43,135,.16);border-radius:17px;background:rgba(255,255,255,.92);color:#bf397c;font-size:24px;font-weight:900;display:grid;place-items:center;z-index:2147482900;box-shadow:0 12px 28px rgba(105,55,85,.13);opacity:0;pointer-events:none;transform:translateY(10px);transition:.2s}.pepBackTop.show{opacity:1;pointer-events:auto;transform:none}
+@media(max-width:650px){.pepLiveMoq{padding:18px}.pepMoqHeader{align-items:flex-start;flex-direction:column}.pepMoqOpenBtn{width:100%;text-align:center}.pepMoqCards{grid-template-columns:1fr}.pepTrust{grid-template-columns:1fr;margin:18px 0}.pepFaq{padding:22px 17px;margin:24px 0}.pepFloatingCartButton{bottom:calc(88px + env(safe-area-inset-bottom))!important}.pepBackTop{bottom:calc(88px + env(safe-area-inset-bottom))!important}.pepCartToast{bottom:calc(22px + env(safe-area-inset-bottom))}}
 `;document.head.appendChild(s);
   }
   function insertUI(){
@@ -48,6 +51,19 @@
         }
       }
     }
+    if(!$('pepCartToast')){
+      const t=document.createElement('div');t.id='pepCartToast';t.className='pepCartToast';t.textContent='✓ Added to cart';document.body.appendChild(t);
+      let toastTimer;
+      window.addEventListener('pepmosa-cart-updated',()=>{
+        const fb=$('pepFloatingCartButton');
+        if(fb){fb.classList.remove('pepCartPulse');void fb.offsetWidth;fb.classList.add('pepCartPulse');}
+        t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);
+      });
+    }
+    if(!$('pepBackTop')){
+      const top=document.createElement('button');top.id='pepBackTop';top.className='pepBackTop';top.type='button';top.setAttribute('aria-label','Back to top');top.textContent='↑';top.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});document.body.appendChild(top);
+      window.addEventListener('scroll',()=>top.classList.toggle('show',window.scrollY>700),{passive:true});
+    }
     const products=document.getElementById('products');
     if(products&&!$('pepLiveMoq')){
       const d=document.createElement('section');d.id='pepLiveMoq';d.className='pepLiveMoq';
@@ -56,7 +72,7 @@
     }
     if(products&&!$('pepTrust')){
       const d=document.createElement('section');d.id='pepTrust';d.className='pepTrust';
-      d.innerHTML='<div><b>🔒 PRIVATE & SECURE</b>Your information stays protected.</div><div><b>📦 ORDER UPDATES</b>Track your order anytime.</div><div><b>♥ BUYER PROOF</b>See community feedback and proofs.</div>';
+      d.innerHTML='<a href="coa.html"><b>🔒 PRIVATE & SECURE</b>Your information stays protected.</a><a href="track.html"><b>📦 ORDER UPDATES</b>Track your order anytime.</a><a href="buyers-proof"><b>♥ BUYER PROOF</b>See community feedback and proofs.</a>';
       products.parentNode.insertBefore(d,products);
     }
     if(products&&!$('pepFaq')){
@@ -83,7 +99,9 @@
         const target=Number(x.moq)||0;
         const pct=target?Math.min(100,Math.round(total/target*100)):0;
         const image=x.image_url?'<img src="'+String(x.image_url).replace(/"/g,'&quot;')+'" alt="'+String(x.name||'MOQ product').replace(/"/g,'&quot;')+'">':'<div class="pepMoqPlaceholder">🧪</div>';
-        return '<a class="pepMoqProduct" href="open-for-all.html"><div class="pepMoqImage">'+image+'</div><div class="pepMoqInfo"><b>'+String(x.name||'MOQ PRODUCT')+'</b><span class="pepMoqBadge">MOQ '+(target||'—')+'</span><div class="pepMoqProgress"><div style="width:'+pct+'%"></div></div><small>'+total+' ordered'+(target?' • target '+target:'')+'</small></div></a>';
+        const remaining=target?Math.max(0,target-total):0;
+        const progressText=target?(remaining===0?'MOQ target reached!':' • '+remaining+' remaining'):'';
+        return '<a class="pepMoqProduct" href="open-for-all.html"><div class="pepMoqImage">'+image+'</div><div class="pepMoqInfo"><b>'+String(x.name||'MOQ PRODUCT')+'</b><span class="pepMoqBadge">MOQ '+(target||'—')+'</span><div class="pepMoqProgress"><div style="width:'+pct+'%"></div></div><small>'+total+' ordered'+(target?' • target '+target+progressText:'')+'</small></div></a>';
       }).join('')+'</div>';
     }catch(e){
       wrap.innerHTML='<div class="pepMoqHeader"><div><div class="label">MOQ AVAILABLE NOW</div><h3>🌐 WHAT’S OPEN FOR MOQ</h3><p>Open MOQ to see the currently available products.</p></div><a href="open-for-all.html" class="btn primary pepMoqOpenBtn">OPEN MOQ</a></div>';

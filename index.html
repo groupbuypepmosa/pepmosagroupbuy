@@ -987,8 +987,9 @@ header{
     <div class="actions">
 
       <button
+        id="checkoutBtn"
         class="btn primary wide"
-        onclick="closeModal('cartModal'); checkout();"
+        onclick="checkout()"
       >
         CHECKOUT
       </button>
@@ -1175,6 +1176,18 @@ function $(id){
 
 }
 
+function syncOrderingControls(){
+  const isOpen=!!(currentGB && ["OPEN","KIT_COMPLETION"].includes(String(currentGB.status||"").toUpperCase()));
+  const btn=$("checkoutBtn");
+  if(btn){
+    btn.disabled=!isOpen;
+    btn.textContent=isOpen ? "CHECKOUT" : "ORDERING CLOSED";
+    btn.style.opacity=isOpen ? "" : ".45";
+    btn.style.cursor=isOpen ? "" : "not-allowed";
+    btn.style.pointerEvents=isOpen ? "" : "none";
+  }
+}
+
 
 
 /* =========================================================
@@ -1221,6 +1234,7 @@ async function load(){
     const gb=activeGB||closedGB||null;
 
     currentGB = gb;
+    syncOrderingControls();
 
     // Tracking is explicitly tied to this exact Group Buy.
     const trackLink=$("trackLink");
@@ -2136,7 +2150,8 @@ function checkout(){
 
   // Closed Group Buys are pricelist/browse only.
   if(!currentGB || !["OPEN","KIT_COMPLETION"].includes(String(currentGB.status||"").toUpperCase())){
-    return alert("Ordering is currently closed. You can browse the pricelist, but checkout is unavailable.");
+    syncOrderingControls();
+    return alert("Ordering is currently closed. Checkout is unavailable.");
   }
 
   // Use the latest cart saved by Add to Cart before checking out.

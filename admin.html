@@ -1121,10 +1121,31 @@ async function loadWaybillCenter(){
       }
       g.total+=Number(o.total||0);g.shipping+=Number(o.shipping_fee||0);
     }
-    for(const [email,rows] of refundedByEmail){
-      const g=grouped.get(email);if(!g)continue;
-      g.refunded.push(...rows);
-      g.total=Math.max(0,g.total-rows.reduce((s,x)=>s+Number(x.refund_amount||0),0));
+    // Attach refunded records by email OR original order ID. Some older cancelled-kit
+    // rows may not have a perfectly normalized email, so order_id is a safe fallback.
+    for(const g of grouped.values()){
+      const orderIds=new Set(g.orders.map(o=>String(o.order_id||"")).filter(Boolean));
+      const rows=refundedCancelled.filter(x=>{
+        const sameEmail=normEmail(x.email)===g.email;
+        const sameOrder=orderIds.has(String(x.order_id||""));
+        return sameEmail||sameOrder;
+      });
+      g.refunded=rows;
+      if(rows.length){
+        g.total=Math.max(0,g.total-rows.reduce((s,x)=>s+Number(x.refund_amount||0),0));
+      }
+      // Mark matching original lines as refunded even when legacy product/variant IDs differ.
+      for(const item of g.items){
+        if(item.is_refunded)continue;
+        const rr=rows.find(x=>
+          String(x.product_name||"").trim().toUpperCase()===String(item.product_name||"").trim().toUpperCase() &&
+          String(x.strength||"").replace(/\s/g,"").toUpperCase()===String(item.strength||"").replace(/\s/g,"").toUpperCase()
+        );
+        if(rr){
+          item.is_refunded=true;
+          item.refund_amount=Number(rr.refund_amount||0);
+        }
+      }
     }
 
     waybillRows=[...grouped.values()].map(g=>{
@@ -1204,10 +1225,15 @@ function renderSelectedWaybill(){
       '<div class="waybillBlock" style="margin-bottom:12px"><div class="waybillLabel">CONSOLIDATED SHIPPING DETAILS</div><div><b>Courier:</b> '+esc(r.courier||"To be assigned")+' &nbsp; • &nbsp; <b>Waybill / Tracking:</b> '+esc(r.waybill_number||"To be assigned")+'<br><b>Orders:</b> '+esc(r.orders.map(o=>o.order_id).join(", "))+'<br><b>Payment:</b> '+esc(r.payment)+' &nbsp; • &nbsp; <b>Consolidated Total:</b> '+peso(r.total)+'</div></div>'+
 
       '<table class="waybillTable"><thead><tr><th>Qty</th><th>Product</th><th>Variant</th><th>Price</th><th>Total</th></tr></thead><tbody>'+
-        r.products.map(p=>p.is_refunded
-          ?'<tr style="opacity:.58;text-decoration:line-through;background:#fff4f7"><td>'+Number(p.qty||0)+'</td><td>'+esc(p.product_name)+' <span style="display:inline-block;text-decoration:none;color:#b51f61;font-size:9px;font-weight:900;margin-left:5px">REFUNDED</span></td><td>'+esc(p.strength||"—")+'</td><td>'+peso(p.unit_price)+'</td><td>'+peso(p.line_total)+'</td></tr>'
-          :'<tr><td>'+Number(p.qty||0)+'</td><td>'+esc(p.product_name)+'</td><td>'+esc(p.strength||"—")+'</td><td>'+peso(p.unit_price)+'</td><td>'+peso(p.line_total)+'</td></tr>'
-        ).join("")+
+        r.products.map(p=>{
+          const refunded=!!p.is_refunded || (r.refunded||[]).some(x=>
+            String(x.product_name||"").trim().toUpperCase()===String(p.product_name||"").trim().toUpperCase() &&
+            String(x.strength||"").replace(/\s/g,"").toUpperCase()===String(p.strength||"").replace(/\s/g,"").toUpperCase()
+          );
+          return refunded
+            ?'<tr class="waybillRefundedRow" style="opacity:.62;text-decoration:line-through;background:#fff1f5"><td>'+Number(p.qty||0)+'</td><td>'+esc(p.product_name)+' <span style="display:inline-block;text-decoration:none;color:#b51f61;font-size:9px;font-weight:900;margin-left:5px">REFUNDED</span></td><td>'+esc(p.strength||"—")+'</td><td>'+peso(p.unit_price)+'</td><td>'+peso(p.line_total)+'</td></tr>'
+            :'<tr><td>'+Number(p.qty||0)+'</td><td>'+esc(p.product_name)+'</td><td>'+esc(p.strength||"—")+'</td><td>'+peso(p.unit_price)+'</td><td>'+peso(p.line_total)+'</td></tr>';
+        }).join("")+
       '</tbody></table></div><div class="waybillFoot"><span>Prepared '+esc(date)+' • PEPMOSA GROUP BUY</span><span>Handle with care ♡</span></div></div>';
 }
 function printSelectedWaybill(){

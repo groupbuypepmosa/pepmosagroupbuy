@@ -82,9 +82,11 @@
       window.addEventListener('scroll',()=>top.classList.toggle('show',window.scrollY>700),{passive:true});
     }
     const products=document.getElementById('products');
-    // Old live Group Buy progress is intentionally removed.
-    const oldLive=$('pepLiveMoq');
-    if(oldLive) oldLive.remove();
+    if(products&&!$('pepLiveMoq')){
+      const d=document.createElement('section');d.id='pepLiveMoq';d.className='pepLiveMoq';
+      d.innerHTML='<div class="pepMoqHeader"><div><div class="label">MOQ AVAILABLE NOW</div><h3>🌐 WHAT’S OPEN FOR MOQ</h3><p>Loading available MOQ products…</p></div><a href="open-for-all.html" class="btn primary pepMoqOpenBtn">VIEW ALL MOQ</a></div>';
+      products.parentNode.insertBefore(d,products);
+    }
     if(products&&!$('pepTrust')){
       const d=document.createElement('section');d.id='pepTrust';d.className='pepTrust';
       d.innerHTML='<a href="coa.html"><b>🔒 PRIVATE & SECURE</b>Your information stays protected.</a><a href="track.html"><b>📦 ORDER UPDATES</b>Track your order anytime.</a><a href="buyers-proof"><b>♥ BUYER PROOF</b>See community feedback and proofs.</a>';

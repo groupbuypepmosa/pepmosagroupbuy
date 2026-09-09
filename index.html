@@ -2134,6 +2134,11 @@ function closeModal(id){
 
 function checkout(){
 
+  // Closed Group Buys are pricelist/browse only.
+  if(!currentGB || !["OPEN","KIT_COMPLETION"].includes(String(currentGB.status||"").toUpperCase())){
+    return alert("Ordering is currently closed. You can browse the pricelist, but checkout is unavailable.");
+  }
+
   // Use the latest cart saved by Add to Cart before checking out.
   cart = JSON.parse(localStorage.pepmosaCart || "[]");
 
@@ -2178,8 +2183,8 @@ async function placeOrder(){
 
   try{
 
-    if(!currentGB){
-      return alert("No active Group Buy.");
+    if(!currentGB || !["OPEN","KIT_COMPLETION"].includes(String(currentGB.status||"").toUpperCase())){
+      return alert("Ordering is currently closed for this Group Buy.");
     }
 
     // Always read the latest shared cart. Add to Cart does NOT change inventory.

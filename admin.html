@@ -1070,14 +1070,26 @@ async function loadWaybillCenter(){
        because OPEN orders + KIT COMPLETION orders must print together. */
     let ordersQuery=sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});
 
-    const [or,cr,sr]=await Promise.all([
+    const [or,cr,sr,kr]=await Promise.all([
       ordersQuery,
       sb.from("customers").select("customer_id,email,customer_name,contact,address"),
-      sb.from("consolidated_shipments").select("shipment_id,email,courier,tracking_number,waybill_number,status,updated_at").order("updated_at",{ascending:false})
+      sb.from("consolidated_shipments").select("shipment_id,email,courier,tracking_number,waybill_number,status,updated_at").order("updated_at",{ascending:false}),
+      sb.from("cancelled_kits").select("id,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status,refunded_at")
     ]);
     if(or.error)throw or.error;
     if(cr.error)console.warn("Customers load warning:",cr.error);
     if(sr.error)console.warn("Shipments load warning:",sr.error);
+    if(kr.error)console.warn("Cancelled kits load warning:",kr.error);
+
+    const refundedCancelled=(kr.data||[]).filter(x=>String(x.status||"").toUpperCase()==="REFUNDED");
+    const refundedKey=x=>String(x.order_id||"")+"||"+String(x.product_id||"")+"||"+String(x.variant_id||"");
+    const refundedKeys=new Set(refundedCancelled.map(refundedKey));
+    const refundedByEmail=new Map();
+    for(const x of refundedCancelled){
+      const key=normEmail(x.email);if(!key)continue;
+      if(!refundedByEmail.has(key))refundedByEmail.set(key,[]);
+      refundedByEmail.get(key).push(x);
+    }
 
     const customersByEmail=new Map((cr.data||[]).map(x=>[normEmail(x.email),x]));
     const shipmentIdsByEmail=new Map();
@@ -1099,10 +1111,19 @@ async function loadWaybillCenter(){
     for(const o of (or.data||[])){
       if(!isPaidForWaybill(o))continue;
       const key=normEmail(o.email);if(!key)continue;
-      if(!grouped.has(key))grouped.set(key,{email:key,orders:[],items:[],total:0,shipping:0});
+      if(!grouped.has(key))grouped.set(key,{email:key,orders:[],items:[],total:0,shipping:0,refunded:[]});
       const g=grouped.get(key);
-      g.orders.push(o);g.items.push(...(o.order_items||[]));
+      g.orders.push(o);
+      for(const i of (o.order_items||[])){
+        const itemKey=String(o.order_id||"")+"||"+String(i.product_id||"")+"||"+String(i.variant_id||"");
+        if(!refundedKeys.has(itemKey))g.items.push(i);
+      }
       g.total+=Number(o.total||0);g.shipping+=Number(o.shipping_fee||0);
+    }
+    for(const [email,rows] of refundedByEmail){
+      const g=grouped.get(email);if(!g)continue;
+      g.refunded.push(...rows);
+      g.total=Math.max(0,g.total-rows.reduce((s,x)=>s+Number(x.refund_amount||0),0));
     }
 
     waybillRows=[...grouped.values()].map(g=>{
@@ -1124,7 +1145,7 @@ async function loadWaybillCenter(){
         waybill_number:shipment.waybill_number||shipment.tracking_number||"",
         tracking_number:shipment.tracking_number||shipment.waybill_number||"",
         shipment_status:shipment.status||"READY TO PRINT",
-        products:[...merged.values()],payment:"PAID"
+        products:[...merged.values()],refunded:g.refunded||[],payment:(g.refunded&&g.refunded.length?"PAID • REFUND ADJUSTED":"PAID")
       };
     }).sort((x,y)=>x.customer_name.localeCompare(y.customer_name));
 
@@ -1170,6 +1191,7 @@ function renderSelectedWaybill(){
         '<div class="waybillBlock"><div class="waybillLabel">SHIP TO</div><b>'+esc(r.customer_name)+'</b><div>'+esc(r.contact||"Contact not set")+'<br>'+esc(r.address||"Address not set")+'</div></div>'+
       '</div><div class="waybillBarcodeWrap"><div class="waybillBarcode"><span>'+esc(barcode)+'</span></div></div>'+
       '<div class="waybillBlock" style="margin-bottom:12px"><div class="waybillLabel">CONSOLIDATED SHIPPING DETAILS</div><div><b>Courier:</b> '+esc(r.courier||"To be assigned")+' &nbsp; • &nbsp; <b>Waybill / Tracking:</b> '+esc(r.waybill_number||"To be assigned")+'<br><b>Orders:</b> '+esc(r.orders.map(o=>o.order_id).join(", "))+'<br><b>Payment:</b> '+esc(r.payment)+' &nbsp; • &nbsp; <b>Consolidated Total:</b> '+peso(r.total)+'</div></div>'+
+      ((r.refunded||[]).length?'<div class="waybillBlock" style="margin-bottom:12px;border-color:#efb6c9;background:#fff7fa"><div class="waybillLabel">REFUNDED / CANCELLED ITEMS</div>'+r.refunded.map(x=>'<div><b>'+esc(x.product_name||"Item")+'</b> '+esc(x.strength||"")+' • Qty '+Number(x.qty||0)+' • REFUNDED '+peso(Number(x.refund_amount||0))+'</div>').join('')+'</div>':'')+
       '<table class="waybillTable"><thead><tr><th>Qty</th><th>Product</th><th>Variant</th><th>Price</th><th>Total</th></tr></thead><tbody>'+
         r.products.map(p=>'<tr><td>'+Number(p.qty||0)+'</td><td>'+esc(p.product_name)+'</td><td>'+esc(p.strength||"—")+'</td><td>'+peso(p.unit_price)+'</td><td>'+peso(p.line_total)+'</td></tr>').join("")+
       '</tbody></table></div><div class="waybillFoot"><span>Prepared '+esc(date)+' • PEPMOSA GROUP BUY</span><span>Handle with care ♡</span></div></div>';

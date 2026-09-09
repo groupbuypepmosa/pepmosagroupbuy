@@ -9,7 +9,6 @@
 .pepLiveMoqTop{display:flex;justify-content:space-between;gap:16px;align-items:center}.pepLiveMoq h3{margin:5px 0;color:#3b2b34;font-size:22px}.pepLiveMoq .label{font-size:10px;font-weight:950;letter-spacing:.14em;color:#c55b91}.pepMoqCount{font-weight:950;color:#c62d7e;white-space:nowrap}.pepMoqBar{height:11px;background:#f3dce7;border-radius:999px;overflow:hidden;margin-top:15px}.pepMoqFill{height:100%;border-radius:999px;background:linear-gradient(90deg,#ef8bb4,#d72b91,#a847b5);transition:width .6s ease}.pepMoqMsg{margin:10px 0 0;color:#79636f;font-size:12px}
 .pepTrust{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}.pepTrust div{background:#fff;border:1px solid #f0dce6;border-radius:18px;padding:15px;text-align:center;font-size:11px;color:#755e6a}.pepTrust b{display:block;color:#4a303c;margin-bottom:4px}
 .pepFaq{margin:34px 0;padding:28px;border-radius:28px;background:#fff;border:1px solid #eedce6}.pepFaqHead{text-align:center;margin-bottom:16px}.pepFaqHead h2{margin:5px 0}.pepFaq details{border-top:1px solid #f0e1e8;padding:15px 4px}.pepFaq summary{cursor:pointer;font-weight:850;color:#4a303c}.pepFaq p{color:#7c6973;font-size:13px;line-height:1.6;margin:10px 0 0}
-.pepStickyTrack{position:fixed;right:18px;bottom:18px;z-index:9990;text-decoration:none;padding:13px 17px;border-radius:999px;background:linear-gradient(135deg,#e52b8b,#b93bb6);color:#fff;font-size:11px;font-weight:950;box-shadow:0 14px 30px rgba(190,43,130,.28)}
 @media(max-width:650px){.pepLiveMoq{padding:18px}.pepLiveMoqTop{align-items:flex-start;flex-direction:column}.pepTrust{grid-template-columns:1fr}.pepFaq{padding:22px 17px}.pepStickyTrack{right:12px;bottom:12px}}
 `;document.head.appendChild(s);
   }
@@ -36,9 +35,6 @@
       const d=document.createElement('section');d.id='pepFaq';d.className='pepFaq';
       d.innerHTML='<div class="pepFaqHead"><div class="eyebrow">NEED HELP?</div><h2>FREQUENTLY ASKED QUESTIONS</h2></div><details><summary>How does Group Buy work?</summary><p>Secure your access, choose your available products, add them to your cart, and submit your order. Updates are reflected through PEPMOSA.</p></details><details><summary>How do I check my order?</summary><p>Use TRACK MY ORDER and enter the same details used for your order.</p></details><details><summary>What happens after I submit my order?</summary><p>Your order enters processing and you can check updates and delivery progress from the tracking page.</p></details><details><summary>Where can I see buyer feedback?</summary><p>Open BUYERS’ PROOF to view published customer proofs and feedback.</p></details>';
       products.parentNode.insertBefore(d,products.nextSibling);
-    }
-    if(!$('pepStickyTrack')){
-      const a=document.createElement('a');a.id='pepStickyTrack';a.className='pepStickyTrack';a.href='track.html';a.textContent='⌁ TRACK MY ORDER';document.body.appendChild(a);
     }
   }
   async function loadProgress(){

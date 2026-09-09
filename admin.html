@@ -732,7 +732,12 @@ async function loadOrdersCenter(){
     if(kr.error)console.warn("Cancelled kits warning:",kr.error);
     // Filter client-side so numeric/string Group Buy values and legacy records still match.
     window.refundedCancelledKits=(kr.data||[]).filter(x=>{
-      const sameGB=String(x.gb_number??"").trim()===String(selectedGB??"").trim();
+      const normGB=v=>{
+        const s=String(v??"").trim();
+        const m=s.match(/^\d+/);
+        return m?m[0]:s;
+      };
+      const sameGB=normGB(x.gb_number)===normGB(selectedGB);
       const refunded=String(x.status||"").trim().toUpperCase()==="REFUNDED";
       return sameGB&&refunded;
     });

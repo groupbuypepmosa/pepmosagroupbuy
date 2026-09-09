@@ -82,11 +82,9 @@
       window.addEventListener('scroll',()=>top.classList.toggle('show',window.scrollY>700),{passive:true});
     }
     const products=document.getElementById('products');
-    if(products&&!$('pepLiveMoq')){
-      const d=document.createElement('section');d.id='pepLiveMoq';d.className='pepLiveMoq';
-      d.innerHTML='<div class="pepLiveMoqTop"><div><div class="label">LIVE GROUP BUY PROGRESS</div><h3 id="pepMoqTitle">Current Group Buy</h3></div><div class="pepMoqCount" id="pepMoqCount">Loading…</div></div><div class="pepMoqBar"><div class="pepMoqFill" id="pepMoqFill" style="width:0%"></div></div><p class="pepMoqMsg" id="pepMoqMsg">Live order totals are loading.</p>';
-      products.parentNode.insertBefore(d,products);
-    }
+    // Old live Group Buy progress is intentionally removed.
+    const oldLive=$('pepLiveMoq');
+    if(oldLive) oldLive.remove();
     if(products&&!$('pepTrust')){
       const d=document.createElement('section');d.id='pepTrust';d.className='pepTrust';
       d.innerHTML='<a href="coa.html"><b>🔒 PRIVATE & SECURE</b>Your information stays protected.</a><a href="track.html"><b>📦 ORDER UPDATES</b>Track your order anytime.</a><a href="buyers-proof"><b>♥ BUYER PROOF</b>See community feedback and proofs.</a>';

@@ -972,17 +972,57 @@ async function showCancelKitOrders(productId,variantId){try{
  await loadCancelledKits();
 }catch(e){showMessage(e.message||"Unable to load matching orders.","error");}}
 function viewKitOrder(n){
- const x=window.__cancelKitMatches?.[n];if(!x)return;
- const i=x.i,o=x.o;
- const old=document.getElementById("kitOrderModal");if(old)old.remove();
+ const x=window.__cancelKitMatches && window.__cancelKitMatches[n];
+ if(!x){showMessage("Order details could not be found. Please tap VIEW ORDERS again.","error");return;}
+ const i=x.i||{},o=x.o||{};
+ const old=document.getElementById("kitOrderModal"); if(old)old.remove();
+
  const modal=document.createElement("div");
  modal.id="kitOrderModal";
- modal.style.cssText="position:fixed;inset:0;background:rgba(20,16,24,.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;";
- modal.innerHTML='<div style="background:#fff;width:min(560px,100%);max-height:85vh;overflow:auto;border-radius:24px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)"><div class="itemHead"><div><div class="eyebrow">ORDER DETAILS</div><h2 style="margin:6px 0 0">👁 View Order</h2></div><button class="btn secondary" type="button" onclick="document.getElementById(\'kitOrderModal\').remove()">✕</button></div><div style="margin-top:18px"><b>'+esc(o.email||"No email")+'</b><div class="small" style="margin-top:6px">Order: '+esc(o.order_id)+' • Group Buy: '+esc(o.gb_number||"—")+'</div></div><div class="pepKitCard" style="margin-top:16px"><b>'+esc(i.product_name||"Item")+'</b><div class="small">'+esc(i.strength||"")+' • Qty: '+Number(i.qty||0)+'</div></div><div class="small" style="margin-top:16px">Viewing this order does not change anything.</div><div class="actions" style="margin-top:20px"><button class="btn danger" type="button" onclick="if(confirm(\'Cancel this order item? This will not delete the original order.\')){cancelKitLine(window.__cancelKitMatches['+n+'].o.order_id,window.__cancelKitMatches['+n+'].i,{email:window.__cancelKitMatches['+n+'].o.email,gb_number:window.__cancelKitMatches['+n+'].o.gb_number});document.getElementById(\'kitOrderModal\').remove()}">❌ CANCEL THIS ORDER</button><button class="btn secondary" type="button" onclick="document.getElementById(\'kitOrderModal\').remove()">CLOSE</button></div></div>';
- document.body.appendChild(modal);
+ modal.style.cssText="position:fixed;inset:0;background:rgba(20,16,24,.58);z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:16px;";
+
+ const card=document.createElement("div");
+ card.style.cssText="background:#fff;color:#2d2630;width:100%;max-width:560px;max-height:85vh;overflow:auto;border-radius:24px;padding:24px;box-sizing:border-box;box-shadow:0 20px 60px rgba(0,0,0,.32);";
+
+ const top=document.createElement("div");
+ top.style.cssText="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;";
+ const title=document.createElement("div");
+ title.innerHTML='<div class="eyebrow">ORDER DETAILS</div><h2 style="margin:6px 0 0">👁 View Order</h2>';
+ const closeTop=document.createElement("button");
+ closeTop.type="button"; closeTop.className="btn secondary"; closeTop.textContent="✕";
+ closeTop.addEventListener("click",()=>modal.remove());
+ top.append(title,closeTop);
+
+ const details=document.createElement("div");
+ details.style.marginTop="18px";
+ const email=document.createElement("b"); email.textContent=o.email||"No email";
+ const meta=document.createElement("div"); meta.className="small"; meta.style.marginTop="6px";
+ meta.textContent="Order: "+(o.order_id||"—")+" • Group Buy: "+(o.gb_number||"—");
+ details.append(email,meta);
+
+ const itemCard=document.createElement("div"); itemCard.className="pepKitCard"; itemCard.style.marginTop="16px";
+ const product=document.createElement("b"); product.textContent=i.product_name||"Item";
+ const qty=document.createElement("div"); qty.className="small"; qty.textContent=(i.strength||"—")+" • Qty: "+Number(i.qty||0);
+ itemCard.append(product,qty);
+
+ const note=document.createElement("div"); note.className="small"; note.style.marginTop="16px"; note.textContent="Viewing this order does not change anything.";
+
+ const actions=document.createElement("div"); actions.className="actions"; actions.style.marginTop="20px";
+ const cancelBtn=document.createElement("button"); cancelBtn.type="button"; cancelBtn.className="btn danger"; cancelBtn.textContent="❌ CANCEL THIS ORDER";
+ cancelBtn.addEventListener("click",()=>{
+   if(!confirm("Cancel this order item? This will not delete the original order."))return;
+   modal.remove();
+   cancelKitLine(o.order_id,i,{email:o.email,gb_number:o.gb_number});
+ });
+ const closeBtn=document.createElement("button"); closeBtn.type="button"; closeBtn.className="btn secondary"; closeBtn.textContent="CLOSE";
+ closeBtn.addEventListener("click",()=>modal.remove());
+ actions.append(cancelBtn,closeBtn);
+
+ card.append(top,details,itemCard,note,actions);
+ modal.appendChild(card);
  modal.addEventListener("click",ev=>{if(ev.target===modal)modal.remove()});
-}
-async function loadCancelledKits(){
+ document.body.appendChild(modal);
+}\nasync function loadCancelledKits(){
  const box=$("cancelledKitsList")||$("cancelledKitsResults");if(!box)return;
  const gb=$("vialTrackerGB")?.value||"";
  let q=sb.from("cancelled_kits").select("*").order("cancelled_at",{ascending:false});

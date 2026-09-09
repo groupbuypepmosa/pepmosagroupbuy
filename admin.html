@@ -818,12 +818,13 @@ function renderOrdersCenter(){
   const totalOrders=rows.reduce((a,r)=>a+r.orders.length,0);
   const totalManual=rows.reduce((a,r)=>a+r.manualCount,0);
   const totalRefunded=refundedRows.reduce((a,x)=>a+Number(x.refund_amount||0),0);
-  const adjustedTotal=rows.reduce((a,r)=>a+r.customerGrandTotal,0);
+  const totalPayments=rows.reduce((a,r)=>a+r.customerGrandTotal,0);
   if($("ordersClientSummary"))$("ordersClientSummary").innerHTML=
     '<div class="summaryCard pink"><div class="summaryLabel">Clients</div><div class="summaryValue">'+rows.length+'</div><div class="small">Unique buyers</div></div>'+
     '<div class="summaryCard"><div class="summaryLabel">Orders</div><div class="summaryValue">'+totalOrders+'</div><div class="small">'+totalManual+' manual / late</div></div>'+
-    '<div class="summaryCard"><div class="summaryLabel">Vials / Items</div><div class="summaryValue">'+totalProducts+'</div><div class="small">After refunded kits</div></div>'+
-    '<div class="summaryCard"><div class="summaryLabel">Total Payments</div><div class="summaryValue">'+peso(adjustedTotal)+'</div><div class="small">'+(totalRefunded?'Refunded deducted: '+peso(totalRefunded):'Orders + shipping + admin fees')+'</div></div>';
+    '<div class="summaryCard"><div class="summaryLabel">Vials / Items</div><div class="summaryValue">'+totalProducts+'</div><div class="small">Active quantities shown separately</div></div>'+
+    '<div class="summaryCard"><div class="summaryLabel">Total Payments</div><div class="summaryValue">'+peso(totalPayments)+'</div><div class="small">Gross recorded payments</div></div>'+
+    '<div class="summaryCard"><div class="summaryLabel">Refunded Total</div><div class="summaryValue">'+peso(totalRefunded)+'</div><div class="small">REFUNDED kits only</div></div>';
 
   list.innerHTML=filtered.length?
     '<div class="ordersClientGrid">'+filtered.map((r,index)=>{

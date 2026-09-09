@@ -397,14 +397,17 @@ async function verifyAdmin(user){
 async function logout(){await sb.auth.signOut();$("adminApp").style.display="none";$("loginScreen").style.display="flex";$("loginPassword").value="";showLoginMessage("You have been logged out.","success")}
 async function checkExistingSession(){
   try{
-    // Keep the login page stable on first load. Do NOT force sign-out here,
-    // because a forced sign-out can race with a password login in mobile Safari.
     if(typeof sb==="undefined"||!sb?.auth){
       if(typeof initSupabase==="function") initSupabase();
     }
     const loginScreen=$("loginScreen"),adminApp=$("adminApp");
     if(loginScreen)loginScreen.style.display="flex";
     if(adminApp)adminApp.style.display="none";
+    if(typeof sb==="undefined"||!sb?.auth)return;
+    const {data,error}=await sb.auth.getSession();
+    if(error)throw error;
+    const user=data?.session?.user;
+    if(user)await verifyAdmin(user);
   }catch(e){console.error("Admin startup error:",e)}
 }
 
@@ -715,14 +718,17 @@ async function loadOrdersCenter(){
   const list=$("ordersClientList");
   if(list)list.innerHTML='<div class="notice">Loading client orders and quantities...</div>';
   try{
-    const [or,cr,fr]=await Promise.all([
+    const [or,cr,fr,kr]=await Promise.all([
       sb.from("orders").select("*,order_items(*)").order("created_at",{ascending:false}),
       sb.from("customers").select("customer_id,email,customer_name,contact,address"),
-      sb.from("admin_fee_payments").select("*").order("created_at",{ascending:false})
+      sb.from("admin_fee_payments").select("*").order("created_at",{ascending:false}),
+      sb.from("cancelled_kits").select("order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status")
     ]);
     if(or.error)throw or.error;
     if(cr.error)console.warn("Customer details warning:",cr.error);
     if(fr.error)console.warn("Admin fee details warning:",fr.error);
+    if(kr.error)console.warn("Cancelled kits warning:",kr.error);
+    window.refundedCancelledKits=(kr.data||[]).filter(x=>String(x.status||"").toUpperCase()==="REFUNDED");
     ordersCache=or.data||[];
     orderItemsCache=ordersCache.flatMap(o=>o.order_items||[]);
     customersCache=cr.data||[];
@@ -749,42 +755,55 @@ function renderOrdersCenter(){
     if(!grouped.has(key))grouped.set(key,{key,email,orders:[],items:[],total:0,shippingTotal:0});
     const g=grouped.get(key);
     g.orders.push(o);
-    g.items.push(...(o.order_items||[]));
+    g.items.push(...(o.order_items||[]).map(i=>({...i,__order_id:o.order_id})));
     g.total+=Number(o.total||0);
     g.shippingTotal+=Number(o.shipping_fee||0);
   }
 
+  const refundedRows=Array.isArray(window.refundedCancelledKits)?window.refundedCancelledKits:[];
   const rows=[...grouped.values()].map(g=>{
     const customer=customersByEmail.get(g.email)||{};
+    const orderIds=new Set(g.orders.map(o=>String(o.order_id||"")));
+    const customerRefunds=refundedRows.filter(x=>orderIds.has(String(x.order_id||""))||String(x.email||"").trim().toLowerCase()===g.email);
+    const refundQtyForItem=i=>customerRefunds.filter(x=>{
+      if(String(x.order_id||"")!==String(i.__order_id||""))return false;
+      const exact=(x.product_id&&String(x.product_id)===String(i.product_id||""))&&(x.variant_id&&String(x.variant_id)===String(i.variant_id||""));
+      if(exact)return true;
+      return String(x.product_name||"").trim().toLowerCase()===String(i.product_name||"").trim().toLowerCase()&&String(x.strength||"").trim().toLowerCase()===String(i.strength||"").trim().toLowerCase();
+    }).reduce((s,x)=>s+Number(x.qty||0),0);
     const merged=new Map();
     for(const i of g.items){
       const name=i.product_name||"Product";
       const strength=i.strength||"";
       const price=Number(i.unit_price||0);
+      const activeQty=Math.max(0,Number(i.qty||0)-refundQtyForItem(i));
+      if(!activeQty)continue;
       const k=[name,strength,price].join("||");
       const old=merged.get(k)||{product_name:name,strength,unit_price:price,qty:0,line_total:0};
-      old.qty+=Number(i.qty||0);
-      old.line_total+=Number(i.line_total||price*Number(i.qty||0));
+      old.qty+=activeQty;
+      old.line_total+=price*activeQty;
       merged.set(k,old);
     }
     const name=customer.customer_name||g.orders.find(o=>o.full_name)?.full_name||g.email||"Customer";
     const manualCount=g.orders.filter(o=>String(o.payment_reference||"").toUpperCase()==="MANUAL ADMIN ORDER"||String(o.admin_note||"").toUpperCase().includes("MANUAL / LATE ORDER")).length;
 
     // Product categories exclude shipping so the breakdown never double-counts it.
-    const netOrder=o=>Math.max(0,Number(o.total||0)-Number(o.shipping_fee||0));
+    const refundForOrder=o=>customerRefunds.filter(x=>String(x.order_id||"")===String(o.order_id||"")).reduce((s,x)=>s+Number(x.refund_amount||0),0);
+    const netOrder=o=>Math.max(0,Number(o.total||0)-Number(o.shipping_fee||0)-refundForOrder(o));
     const bucket=(filter)=>g.orders.filter(filter).reduce((sum,o)=>sum+netOrder(o),0);
     const openTotal=bucket(o=>String(o.order_type||o.order_source||"").toUpperCase().includes("OPEN"));
     const kitTotal=bucket(o=>String(o.order_type||o.order_source||"").toUpperCase().includes("KIT"));
     const manualTotal=g.orders.filter(isManualOrder).reduce((sum,o)=>sum+netOrder(o),0);
-    const productTotal=Math.max(0,g.total-Number(g.shippingTotal||0));
+    const refundTotal=customerRefunds.reduce((sum,x)=>sum+Number(x.refund_amount||0),0);
+    const productTotal=Math.max(0,g.total-Number(g.shippingTotal||0)-refundTotal);
     const otherTotal=Math.max(0,productTotal-openTotal-kitTotal-manualTotal);
 
     // Admin fees live in their own table, so match them by the same customer email.
     const adminFeeRows=(fees||[]).filter(x=>String(x.email||"").trim().toLowerCase()===g.email&&!feeIsRejected(x));
     const adminFeeTotal=adminFeeRows.reduce((sum,x)=>sum+Number(x.amount||0),0);
-    const customerGrandTotal=Number(g.total||0)+adminFeeTotal;
+    const customerGrandTotal=Math.max(0,Number(g.total||0)-refundTotal)+adminFeeTotal;
 
-    return {...g,customer_name:name,contact:customer.contact||g.orders.find(o=>o.contact_number)?.contact_number||"",products:[...merged.values()],manualCount,openTotal,kitTotal,manualTotal,otherTotal,productTotal,adminFeeTotal,customerGrandTotal};
+    return {...g,customer_name:name,contact:customer.contact||g.orders.find(o=>o.contact_number)?.contact_number||"",products:[...merged.values()],manualCount,openTotal,kitTotal,manualTotal,otherTotal,productTotal,adminFeeTotal,refundTotal,customerGrandTotal};
   }).sort((a,b)=>String(a.customer_name).localeCompare(String(b.customer_name)));
 
   window.__ordersRendered=rows;
@@ -899,8 +918,8 @@ async function loadVialTracker(){
   let q=sb.from("orders").select("order_id,gb_number,payment_status,email,total,created_at,order_items(*)").order("created_at",{ascending:true});
   if(gb)q=q.eq("gb_number",gb);
   const{data:orders,error:oe}=await q;if(oe)throw oe;
-  const {data:cancelledRows}=await sb.from("cancelled_kits").select("order_id,product_id,variant_id,product_name,strength,qty");
-  const cancelledMap=new Map();for(const x of cancelledRows||[]){const k=[x.order_id,x.product_id||x.product_name,x.variant_id||x.strength||""].join("::");cancelledMap.set(k,(cancelledMap.get(k)||0)+Number(x.qty||0));}
+  const {data:cancelledRows}=await sb.from("cancelled_kits").select("order_id,product_id,variant_id,product_name,strength,qty,status");
+  const cancelledMap=new Map();for(const x of (cancelledRows||[]).filter(x=>String(x.status||"").toUpperCase()==="REFUNDED")){const k=[x.order_id,x.product_id||x.product_name,x.variant_id||x.strength||""].join("::");cancelledMap.set(k,(cancelledMap.get(k)||0)+Number(x.qty||0));}
   const valid=(orders||[]).filter(o=>!["REJECTED","CANCELLED","CANCELED"].includes(String(o.payment_status||"").toUpperCase()));
   const ids=valid.map(o=>o.order_id);
   if(!ids.length){vialTrackerRows=[];return renderVialTracker();}
@@ -956,7 +975,7 @@ async function markCancelledKitRefunded(id){
  if(!confirm("Mark this cancelled kit as REFUNDED? This should only be done after you actually sent the refund."))return;
  const {error}=await sb.from("cancelled_kits").update({status:"REFUNDED",refunded_at:new Date().toISOString()}).eq("id",id);
  if(error){showMessage(error.message||"Unable to update refund.","error");return;}
- showMessage("Marked as refunded.","success");await loadVialTracker();
+ showMessage("Marked as refunded.","success");await Promise.all([loadVialTracker(),typeof loadOrdersCenter==="function"?loadOrdersCenter():Promise.resolve(),typeof loadWaybillCenter==="function"?loadWaybillCenter():Promise.resolve()]);
 }
 async function undoCancelledKit(id){
  const {data:row,error:readError}=await sb.from("cancelled_kits").select("*").eq("id",id).single();

@@ -117,7 +117,8 @@
         if(roundRes.data){moqName=String(roundRes.data.moq_name||'').trim();round=String(roundRes.data.moq_number||'1').trim()||'1';}
       }catch(e){console.warn('MOQ round settings unavailable',e);}
       const moqLabel=(moqName?moqName+' ':'')+'MOQ '+round;
-      wrap.innerHTML='<div class="pepMoqHeader"><div><div class="label">'+moqLabel+' • AVAILABLE NOW</div><h3>🌐 WHAT’S OPEN FOR '+moqLabel+'</h3><p>See the products currently available so you don’t have to search for them.</p></div><a href="open-for-all.html" class="btn primary pepMoqOpenBtn">VIEW '+moqLabel+'</a></div><div class="pepMoqCards">'+items.map(x=>{
+      const displayRound=(moqName?moqName+' ':'')+'RAWND '+round;
+      wrap.innerHTML='<div class="pepMoqHeader"><div><div class="label">AVAILABLE NOW</div><h3>🌐 WHAT’S OPEN FOR MOQ</h3><div class="pepMoqRoundTitle">'+displayRound+'</div><p>See the products currently available so you don’t have to search for them.</p></div><a href="open-for-all.html" class="btn primary pepMoqOpenBtn">VIEW '+displayRound+'</a></div><div class="pepMoqCards">'+items.map(x=>{
         const total=totals.get(String(x.id))||0;
         const target=Number(x.moq)||0;
         const pct=target?Math.min(100,Math.round(total/target*100)):0;

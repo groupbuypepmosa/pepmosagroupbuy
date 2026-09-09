@@ -404,16 +404,29 @@ async function checkExistingSession(){
       if(typeof initSupabase==="function")initSupabase();
     }
     if(typeof sb==="undefined"||!sb?.auth)throw new Error("Admin authentication is unavailable.");
-    // Give Supabase a moment to restore the persisted session after returning
+
+    // Finance return fallback: restore the same authenticated session if iOS/browser
+    // did not restore Supabase local storage quickly enough.
+    try{
+      const returningFromFinance=new URLSearchParams(location.search).get("return")==="finance"||localStorage.getItem("pepmosa_admin_return")==="1";
+      if(returningFromFinance){
+        const backup=JSON.parse(sessionStorage.getItem("pepmosa_admin_session_backup")||"null");
+        if(backup?.access_token&&backup?.refresh_token){
+          await sb.auth.setSession({access_token:backup.access_token,refresh_token:backup.refresh_token});
+        }
+      }
+    }catch(e){console.warn("Admin return session restore skipped",e)}
+
+    // Give Supabase enough time to restore the persisted session after returning
     // from Finance / Buyers' Proof / Admin Orders.
-    for(const wait of [0,300,900]){
+    for(const wait of [0,300,900,1800,3000]){
       if(wait)await new Promise(r=>setTimeout(r,wait));
       const {data,error}=await sb.auth.getSession();
       if(error)throw error;
       const user=data?.session?.user;
       if(user){
         await verifyAdmin(user);
-        try{localStorage.removeItem("pepmosa_admin_return")}catch(e){}
+        try{localStorage.removeItem("pepmosa_admin_return");sessionStorage.removeItem("pepmosa_admin_session_backup");history.replaceState(null,"",location.pathname)}catch(e){}
         return;
       }
     }

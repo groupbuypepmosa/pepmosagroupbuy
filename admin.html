@@ -941,10 +941,13 @@ function printTotalVials(){
 
 async function cancelKitLine(orderId,item,order){
  const reason=prompt("Reason for cancellation (optional):")||"";
- const unit=Number(item.line_total||0)||0;
- const amount=Number(item.qty||0)*unit;
+ const qty=Number(item.qty||0);
+ const lineTotal=Number(item.line_total||0);
+ const unitPrice=Number(item.unit_price||0);
+ /* line_total is already the total for the whole cancelled line. */
+ const amount=lineTotal>0?lineTotal:(qty*unitPrice);
  if(!confirm("Cancel "+item.product_name+" "+(item.strength||"")+" for "+(order.email||"this client")+"? This will NOT delete the order."))return;
- const {error}=await sb.from("cancelled_kits").insert({gb_number:order.gb_number||null,order_id:orderId,email:order.email||null,product_id:item.product_id||null,variant_id:item.variant_id||null,product_name:item.product_name||"",strength:item.strength||"",qty:Number(item.qty||0),refund_amount:amount,reason,status:"REFUND_PENDING"});
+ const {error}=await sb.from("cancelled_kits").insert({gb_number:order.gb_number||null,order_id:orderId,email:order.email||null,product_id:item.product_id||null,variant_id:item.variant_id||null,product_name:item.product_name||"",strength:item.strength||"",qty,refund_amount:amount,reason,status:"REFUND_PENDING"});
  if(error){showMessage(error.message||"Unable to cancel kit.","error");return;}
  showMessage("Kit cancelled. Refund is pending until you mark it refunded.","success");await loadVialTracker();
 }
@@ -953,6 +956,16 @@ async function markCancelledKitRefunded(id){
  const {error}=await sb.from("cancelled_kits").update({status:"REFUNDED",refunded_at:new Date().toISOString()}).eq("id",id);
  if(error){showMessage(error.message||"Unable to update refund.","error");return;}
  showMessage("Marked as refunded.","success");await loadVialTracker();
+}
+async function undoCancelledKit(id){
+ const {data:row,error:readError}=await sb.from("cancelled_kits").select("*").eq("id",id).single();
+ if(readError){showMessage(readError.message||"Unable to read cancelled kit.","error");return;}
+ const extra=String(row?.status||"").toUpperCase()==="REFUNDED"?"\n\n⚠️ This was already marked REFUNDED. Undoing the cancellation only restores the order item in the system; it cannot reverse a real-world refund you already sent.":"";
+ if(!confirm("UNDO this cancellation? The item will return to the active order and vial totals."+extra))return;
+ const {error}=await sb.from("cancelled_kits").delete().eq("id",id);
+ if(error){showMessage(error.message||"Unable to undo cancellation.","error");return;}
+ showMessage("Cancellation undone. The item is active again.","success");
+ await Promise.all([loadVialTracker(),typeof loadOrdersCenter==="function"?loadOrdersCenter():Promise.resolve(),typeof loadWaybillCenter==="function"?loadWaybillCenter():Promise.resolve()]);
 }
 async function showCancelKitOrders(productId,variantId){try{
  const gb=$("vialTrackerGB")?.value||"";
@@ -1007,7 +1020,13 @@ async function loadCancelledKits(){
  if(error){box.innerHTML='<div class="notice error">'+esc(error.message)+'</div>';return;}
  const rows=data||[];
  if(!rows.length){box.innerHTML='<div class="eyebrow" style="margin:24px 0 10px">❌ CANCELLED KITS</div><div class="empty">No cancelled kits.</div>';return;}
- box.innerHTML='<div class="eyebrow" style="margin:24px 0 10px">❌ CANCELLED KITS</div><div class="pepKitCards">'+rows.map(r=>'<div class="pepKitCard"><div class="pepKitTop"><div><b>'+esc(r.product_name||"Cancelled item")+'</b><div class="small">'+esc(r.strength||"")+' • '+esc(r.email||"No email")+'</div><div class="small">Order: '+esc(r.order_id||"—")+' • Qty: '+Number(r.qty||0)+'</div></div><b>'+esc(r.status||"CANCELLED")+'</b></div><div class="small" style="margin-top:10px">Refund amount: '+peso(Number(r.refund_amount||0))+(r.reason?' • Reason: '+esc(r.reason):'')+'</div>'+(r.status==="REFUNDED"?'<div class="small" style="margin-top:10px">💸 Refunded: '+new Date(r.refunded_at).toLocaleString()+'</div>':'<div class="actions" style="margin-top:12px"><button class="btn primary" type="button" onclick="markCancelledKitRefunded(\''+esc(r.id)+'\')">MARK AS REFUNDED</button></div>')+'</div>').join("")+'</div>';
+ box.innerHTML='<div class="eyebrow" style="margin:24px 0 10px">❌ CANCELLED KITS</div><div class="pepKitCards">'+rows.map(r=>{
+   const refunded=String(r.status||"").toUpperCase()==="REFUNDED";
+   const statusHtml=refunded?'<div class="small" style="margin-top:10px">💸 Refunded: '+new Date(r.refunded_at).toLocaleString()+'</div>':'<div class="small" style="margin-top:10px">Refund pending — do not deduct from finance until actually refunded.</div>';
+   const refundBtn=refunded?'':'<button class="btn primary" type="button" onclick="markCancelledKitRefunded(\\''+esc(r.id)+'\\')">MARK AS REFUNDED</button>';
+   const undoBtn='<button class="btn secondary" type="button" onclick="undoCancelledKit(\\''+esc(r.id)+'\\')">↩ UNDO CANCELLATION</button>';
+   return '<div class="pepKitCard"><div class="pepKitTop"><div><b>'+esc(r.product_name||"Cancelled item")+'</b><div class="small">'+esc(r.strength||"")+' • '+esc(r.email||"No email")+'</div><div class="small">Order: '+esc(r.order_id||"—")+' • Qty: '+Number(r.qty||0)+'</div></div><b>'+esc(r.status||"CANCELLED")+'</b></div><div class="small" style="margin-top:10px">Refund amount: '+peso(Number(r.refund_amount||0))+(r.reason?' • Reason: '+esc(r.reason):'')+'</div>'+statusHtml+'<div class="actions" style="margin-top:12px">'+refundBtn+undoBtn+'</div></div>';
+ }).join("")+'</div>';
 }
 function renderVialTracker(){
  const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase();

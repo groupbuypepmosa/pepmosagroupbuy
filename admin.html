@@ -734,6 +734,7 @@ async function loadOrdersCenter(){
   }
 }
 
+function cancelKitFromCachedOrder(clientIndex,orderIndex,itemIndex){const r=window.__ordersRendered?.[clientIndex];const o=r?.orders?.[orderIndex];const i=o?.order_items?.[itemIndex];if(!o||!i){showMessage("Order item not found. Please refresh and try again.","error");return;}cancelKitLine(o.order_id,i,{email:o.email,gb_number:o.gb_number});}
 function renderOrdersCenter(){
   const list=$("ordersClientList");
   if(!list)return;
@@ -785,6 +786,7 @@ function renderOrdersCenter(){
     return {...g,customer_name:name,contact:customer.contact||g.orders.find(o=>o.contact_number)?.contact_number||"",products:[...merged.values()],manualCount,openTotal,kitTotal,manualTotal,otherTotal,productTotal,adminFeeTotal,customerGrandTotal};
   }).sort((a,b)=>String(a.customer_name).localeCompare(String(b.customer_name)));
 
+  window.__ordersRendered=rows;
   const filtered=rows.filter(r=>{
     const hay=[r.customer_name,r.email,r.contact,...r.orders.map(o=>o.gb_number+" "+o.order_id+" "+o.payment_status),...r.products.map(p=>p.product_name+" "+p.strength)].join(" ").toLowerCase();
     return !q||hay.includes(q);
@@ -839,7 +841,7 @@ function renderOrdersCenter(){
             const manualNote=String(o.admin_note||"").replace(/^MANUAL \/ LATE ORDER •\s*/,"").trim();
             const status=orderIsApproved(o)?"PAID":orderIsRejected(o)?"REJECTED":"PENDING";
             const statusClass=status.toLowerCase();
-            const items=(o.order_items||[]).map(i=>'<div class="orderItemChip" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0;padding:8px 10px"><span>'+esc(i.product_name||"Product")+' '+esc(i.strength||"")+' × '+Number(i.qty||0)+'</span><button class="btn danger" type="button" style="padding:6px 10px;font-size:11px" onclick='cancelKitLine('+JSON.stringify(o.order_id)+','+JSON.stringify(i).replace(/'/g,"&#39;")+','+JSON.stringify({email:o.email,gb_number:o.gb_number}).replace(/'/g,"&#39;")+')'>❌ CANCEL KIT</button></div>').join("");
+            const items=(o.order_items||[]).map((i,itemIndex)=>'<div class="orderItemChip" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0;padding:8px 10px"><span>'+esc(i.product_name||"Product")+' '+esc(i.strength||"")+' × '+Number(i.qty||0)+'</span><button class="btn danger" type="button" style="padding:6px 10px;font-size:11px" onclick="cancelKitFromCachedOrder('+index+','+r.orders.indexOf(o)+','+itemIndex+')">❌ CANCEL KIT</button></div>').join("");
             return '<div class="ordersDetailRow ordersCleanRow">'+
               '<div class="orderRowTop"><div><b>'+esc(o.order_id||"Order")+'</b><div class="small">'+esc(o.gb_number||"GB")+' • '+new Date(o.created_at||Date.now()).toLocaleString("en-PH")+'</div></div><div class="orderRowBadges">'+(isManual?'<span class="orderStatusChip manual">MANUAL / LATE</span>':'')+'<span class="orderStatusChip '+statusClass+'">'+status+'</span><b>'+peso(o.total)+'</b></div></div>'+
               '<div class="orderItemChips">'+items+'</div>'+

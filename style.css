@@ -31,3 +31,26 @@ header{background:rgba(255,255,255,.97)!important;border-bottom-color:#f1d8e5!im
   #cartModal .actions{padding:16px 19px 20px!important}
   .pepCartItem{padding:12px}.pepCartItemSide{grid-template-columns:auto 28px;gap:7px}.pepCartQty{grid-column:1/2}.pepCartItemSide b{grid-column:1/2}.pepCartRemove{grid-column:2;grid-row:1/3}
 }
+
+
+/* =========================================================
+   CUSTOMER STOREFRONT — SOFT PINK PREMIUM VISUAL REFRESH
+   Design-only layer: no IDs, logic, forms, or interactions changed.
+   ========================================================= */
+:root{--pep-ink:#392b33;--pep-muted:#8d7882;--pep-pink:#e98caf;--pep-pink-strong:#d95f91;--pep-blush:#fff6f9;--pep-line:#f1dce5}
+body{background:radial-gradient(circle at 10% 0%,rgba(255,211,227,.55),transparent 30%),radial-gradient(circle at 92% 8%,rgba(255,231,240,.75),transparent 28%),linear-gradient(180deg,#fffafb 0%,#fff7fa 48%,#fffafd 100%)!important;color:var(--pep-ink)!important}
+body:before{opacity:.55!important;background-image:radial-gradient(rgba(238,177,202,.20) 1px,transparent 1px)!important;background-size:26px 26px!important}
+header{padding:13px 30px!important;background:rgba(255,255,255,.88)!important;border-bottom:1px solid rgba(234,205,217,.72)!important;box-shadow:0 8px 30px rgba(183,112,143,.08)!important}
+.nav{gap:7px!important}.nav a{padding:9px 14px!important;color:#705c66!important;transition:.2s ease!important}.nav a:hover{background:#fff0f5!important;color:var(--pep-pink-strong)!important;transform:translateY(-1px)}
+.cart,.btn.primary,.pepVariantAdd{background:linear-gradient(135deg,#ef9fbc 0%,#de79a1 100%)!important;box-shadow:0 10px 24px rgba(217,95,145,.20)!important;transition:transform .2s ease,box-shadow .2s ease!important}.cart:hover,.btn.primary:hover,.pepVariantAdd:hover{transform:translateY(-2px);box-shadow:0 15px 30px rgba(217,95,145,.27)!important}
+.wrap{max-width:1280px!important;padding-top:30px!important}.hero{border-radius:34px!important;border:1px solid rgba(237,211,223,.95)!important;background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(255,242,247,.94) 58%,rgba(255,248,251,.96))!important;box-shadow:0 28px 80px rgba(176,105,137,.10)!important}
+.hero:before{background:radial-gradient(circle,rgba(245,159,193,.18),rgba(245,159,193,0) 68%)!important}.hero:after{color:rgba(229,135,174,.10)!important}
+.eyebrow{color:#d9799d!important;letter-spacing:.2em!important}.gbPanel h1,.hero h1{color:#382a32!important}.gbPanel h1 span,.hero h1 span{color:#d96e99!important}.muted{color:var(--pep-muted)!important}
+#gbStatus{background:rgba(255,255,255,.55);padding:10px 14px;backdrop-filter:blur(8px)}
+.sectionHead{margin-top:36px!important}.sectionHead h2{color:#3b2b34!important;font-size:32px!important}.search{background:rgba(255,255,255,.88)!important;border-color:#eed9e2!important;border-radius:16px!important;box-shadow:0 10px 28px rgba(172,103,132,.07)!important}
+.card,.pepProductCard{border:1px solid rgba(238,218,227,.95)!important;border-radius:25px!important;background:rgba(255,255,255,.90)!important;box-shadow:0 14px 38px rgba(171,101,132,.075)!important;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease!important}.card:hover,.pepProductCard:hover{transform:translateY(-4px);box-shadow:0 22px 48px rgba(171,101,132,.13)!important;border-color:#ecc5d5!important}
+.productImg,.pepProductImage{background:linear-gradient(145deg,#fff8fa,#fff0f5)!important;border-color:#f1dde5!important;border-radius:20px!important}.card h3,.pepProductName{color:#392b33!important}.card .muted,.pepProductDesc{color:#8d7882!important}
+.variant,.pepVariantRow{border-color:#f0dce4!important;background:linear-gradient(135deg,#fff,#fff8fb)!important;border-radius:16px!important}.secondary{background:#fff4f8!important;border-color:#eed3df!important;color:#5b434e!important}
+.modal{backdrop-filter:blur(8px)!important;background:rgba(71,42,56,.36)!important}.modalbox{border-color:#f0dce5!important;background:linear-gradient(145deg,#fff,#fff8fb)!important;box-shadow:0 30px 90px rgba(95,53,73,.22)!important}
+.footer{color:#aa929e!important}
+@media(max-width:620px){header{background:rgba(255,255,255,.93)!important}.wrap{padding-top:16px!important}.hero{border-radius:26px!important;box-shadow:0 18px 50px rgba(176,105,137,.10)!important}.sectionHead h2{font-size:29px!important}.card:hover,.pepProductCard:hover{transform:none!important}}

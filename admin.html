@@ -356,11 +356,12 @@ function enterAdmin(user){
   });
 }
 async function login(){
-  const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
+  const email=$("loginEmail").value.trim().toLowerCase(),password=$("loginPassword").value;
   if(!email||!password)return showLoginMessage("Email and password are required.");
   const btn=document.querySelector('#loginScreen button[onclick*="login"]');
   try{
     if(btn){btn.disabled=true;btn.textContent="LOGGING IN...";}
+    if((typeof sb==="undefined"||!sb?.auth)&&typeof initSupabase==="function")initSupabase();
     if(typeof sb==="undefined"||!sb?.auth)throw new Error("Supabase is not initialized. Please refresh the page and try again.");
     const{data,error}=await sb.auth.signInWithPassword({email,password});
     if(error)throw error;
@@ -395,14 +396,15 @@ async function verifyAdmin(user){
 async function logout(){await sb.auth.signOut();$("adminApp").style.display="none";$("loginScreen").style.display="flex";$("loginPassword").value="";showLoginMessage("You have been logged out.","success")}
 async function checkExistingSession(){
   try{
-    // Always start on the password screen. Do not silently reuse a previous admin session.
-    if(typeof sb==="undefined"||!sb?.auth)return;
-    await sb.auth.signOut();
+    // Keep the login page stable on first load. Do NOT force sign-out here,
+    // because a forced sign-out can race with a password login in mobile Safari.
+    if(typeof sb==="undefined"||!sb?.auth){
+      if(typeof initSupabase==="function") initSupabase();
+    }
     const loginScreen=$("loginScreen"),adminApp=$("adminApp");
     if(loginScreen)loginScreen.style.display="flex";
     if(adminApp)adminApp.style.display="none";
-    if($("loginPassword"))$("loginPassword").value="";
-  }catch(e){console.error("Session reset error:",e)}
+  }catch(e){console.error("Admin startup error:",e)}
 }
 
 /* ================= SITE NOTICE ================= */
@@ -1419,8 +1421,8 @@ const __baseLoadWaybillCenter=loadWaybillCenter;
 document.addEventListener("DOMContentLoaded",()=>{
   renderGBCategoryPicker();
   if($("variantEditorRows")&&!$("variantEditorRows").children.length)resetVariantEditor();
-  const loginButton=document.querySelector('#loginScreen button[onclick*="login"]');
-  if(loginButton) loginButton.addEventListener("click",(e)=>{e.preventDefault();login();});
+  // LOGIN already uses the button's inline onclick. Do not attach a second
+  // click handler, which can submit the same credentials twice.
 });
 checkExistingSession();
 </script>

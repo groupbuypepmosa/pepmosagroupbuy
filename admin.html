@@ -1168,6 +1168,24 @@ async function loadWaybillCenter(){
         );
         if(rr){p.is_refunded=true;p.refund_amount=Number(rr.refund_amount||0);}
       }
+      // GUARANTEE: every REFUNDED cancelled-kit record must remain visible on the
+      // customer's waybill, even if the original order item uses legacy/mismatched IDs.
+      for(const rr of (g.refunded||[])){
+        const product=String(rr.product_name||"").trim();
+        const strength=String(rr.strength||"").trim();
+        if(!product)continue;
+        const exists=[...merged.values()].some(p=>
+          p.is_refunded &&
+          String(p.product_name||"").trim().toLowerCase()===product.toLowerCase() &&
+          String(p.strength||"").trim().toLowerCase()===strength.toLowerCase()
+        );
+        if(!exists){
+          const qty=Math.max(1,Number(rr.qty||1));
+          const amount=Number(rr.refund_amount||0);
+          const key=[product,strength,amount/qty,"REFUNDED"].join("||");
+          merged.set(key,{product_name:product,strength,qty,unit_price:amount/qty,line_total:amount,is_refunded:true,refund_amount:amount});
+        }
+      }
       return {...g,
         customer_name:customer.customer_name||latest.full_name||g.email,
         contact:customer.contact||latest.contact_number||"",

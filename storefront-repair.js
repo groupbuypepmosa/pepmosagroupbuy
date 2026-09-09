@@ -9,14 +9,14 @@
   let gb=null,products=[],minimums=[],categoryMinimums=[],feePayment=null,verifiedEmail=localStorage.getItem('pepmosa_verified_email')||'',lastFeeStatus=null,noticeLoaded=false;
 
   function styles(){if($('pepStableStoreStyles'))return;const s=document.createElement('style');s.id='pepStableStoreStyles';s.textContent=`
-    #productGrid .pepStoreCard{padding:0!important;overflow:hidden;border-radius:18px!important}
-    #productGrid .pepStoreCard .productImg{height:145px!important;background:#fff7fb!important;display:flex!important;align-items:center!important;justify-content:center!important}
-    #productGrid .pepStoreCard .productImg img{width:100%!important;height:100%!important;object-fit:contain!important}
+    #productGrid .pepStoreCard{padding:0!important;overflow:hidden;border-radius:26px!important;min-height:100%!important}
+    #productGrid .pepStoreCard .productImg{height:245px!important;padding:10px!important;box-sizing:border-box!important;background:radial-gradient(circle at 20% 15%,rgba(255,255,255,.98),transparent 30%),radial-gradient(circle at 85% 88%,rgba(246,190,213,.20),transparent 36%),linear-gradient(145deg,#fffafb,#fff1f6)!important;display:flex!important;align-items:center!important;justify-content:center!important}
+    #productGrid .pepStoreCard .productImg img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;display:block!important;margin:auto!important}
     #productGrid .pepStoreBody{padding:13px 14px!important}
     #productGrid .pepStoreBody h3{font-size:19px!important;margin:0 0 6px!important}
     #productGrid .pepStoreBottom{margin-top:10px!important;padding-top:10px!important}
     #productGrid .pepSelectVariant{position:relative;z-index:2!important}
-    @media(max-width:620px){#productGrid{gap:12px!important}#productGrid .pepStoreCard .productImg{height:135px!important}#productGrid .pepStoreBody>.muted{display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important;font-size:13px!important}}
+    @media(max-width:620px){#productGrid{gap:14px!important}#productGrid .pepStoreCard .productImg{height:205px!important;padding:7px!important}#productGrid .pepStoreBody>.muted{display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important;font-size:13px!important}}
 
     .pepFallbackModal{position:fixed;inset:0;background:rgba(30,15,25,.45);z-index:99999;display:flex;align-items:flex-end;justify-content:center;padding:18px}
     .pepFallbackPanel{position:relative;width:min(520px,100%);background:#fff;border-radius:24px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.2)}

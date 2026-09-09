@@ -11,6 +11,7 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 <div class="card stat"><span id="shippingTitle">SHIPPING FEE FOR 0 CUSTOMERS</span><b id="shipping">₱0.00</b><div class="muted">Approved customer shipping fees</div></div>
 <div class="card stat"><span>PRODUCT PAYMENT COLLECTED</span><b id="productCollected">₱0.00</b><div class="muted">Approved product payments • excludes shipping</div></div>
 <div class="card stat"><span>TOTAL AMOUNT COLLECTED</span><b id="totalCollected">₱0.00</b><div class="muted">Admin Fee + Shipping Fee + Product Payment</div></div>
+<div class="card stat"><span>REFUNDED TOTAL</span><b id="refundedTotal">₱0.00</b><div class="muted">REFUNDED kits only</div></div>
 <div class="card stat"><span>REVENUE</span><b id="rev">₱0.00</b><div class="muted">Approved product sales</div></div>
 <div class="card stat"><span>MANUFACTURER COST (REFERENCE)</span><b id="cost">₱0.00</b><div class="muted">Reference only • not automatically deducted</div></div>
 <div class="card stat"><span>EXPENSES PAID</span><b id="exp">₱0.00</b><div class="muted">Only expenses you manually record</div></div>
@@ -172,6 +173,7 @@ window.loadSales=function(){
  $('shippingTitle').textContent='SHIPPING FEE FOR '+shippingCustomers+' CUSTOMER'+(shippingCustomers===1?'':'S');
  $('productCollected').textContent=peso(adjustedProductPayment);
  $('totalCollected').textContent=peso(totalAmountCollected);
+ $('refundedTotal').textContent=peso(refundedAmount);
  $('rev').textContent=peso(revenue);
  $('cost').textContent=peso(cost);
  $('exp').textContent=peso(exp);

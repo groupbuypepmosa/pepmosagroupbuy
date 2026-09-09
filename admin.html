@@ -834,7 +834,7 @@ function renderOrdersCenter(){
     '<div class="summaryCard"><div class="summaryLabel">Orders</div><div class="summaryValue">'+totalOrders+'</div><div class="small">'+totalManual+' manual / late</div></div>'+
     '<div class="summaryCard"><div class="summaryLabel">Vials / Items</div><div class="summaryValue">'+totalProducts+'</div><div class="small">Active quantities shown separately</div></div>'+
     '<div class="summaryCard"><div class="summaryLabel">Total Payments</div><div class="summaryValue">'+peso(totalPayments)+'</div><div class="small">Gross recorded payments</div></div>'+
-    '<div class="summaryCard"><div class="summaryLabel">Refunded Total</div><div class="summaryValue">'+peso(totalRefunded)+'</div><div class="small">REFUNDED kits only</div></div>';
+    '';
 
   list.innerHTML=filtered.length?
     '<div class="ordersClientGrid">'+filtered.map((r,index)=>{

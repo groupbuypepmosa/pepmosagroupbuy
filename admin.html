@@ -724,13 +724,18 @@ async function loadOrdersCenter(){
       sb.from("orders").select("*,order_items(*)").eq("gb_number",selectedGB).order("created_at",{ascending:false}),
       sb.from("customers").select("customer_id,email,customer_name,contact,address"),
       sb.from("admin_fee_payments").select("*").eq("gb_number",selectedGB).order("created_at",{ascending:false}),
-      sb.from("cancelled_kits").select("gb_number,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status").eq("gb_number",selectedGB)
+      sb.from("cancelled_kits").select("gb_number,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status")
     ]);
     if(or.error)throw or.error;
     if(cr.error)console.warn("Customer details warning:",cr.error);
     if(fr.error)console.warn("Admin fee details warning:",fr.error);
     if(kr.error)console.warn("Cancelled kits warning:",kr.error);
-    window.refundedCancelledKits=(kr.data||[]).filter(x=>String(x.status||"").toUpperCase()==="REFUNDED");
+    // Filter client-side so numeric/string Group Buy values and legacy records still match.
+    window.refundedCancelledKits=(kr.data||[]).filter(x=>{
+      const sameGB=String(x.gb_number??"").trim()===String(selectedGB??"").trim();
+      const refunded=String(x.status||"").trim().toUpperCase()==="REFUNDED";
+      return sameGB&&refunded;
+    });
     ordersCache=or.data||[];
     orderItemsCache=ordersCache.flatMap(o=>o.order_items||[]);
     customersCache=cr.data||[];

@@ -1023,9 +1023,9 @@ async function loadCancelledKits(){
  box.innerHTML='<div class="eyebrow" style="margin:24px 0 10px">❌ CANCELLED KITS</div><div class="pepKitCards">'+rows.map(r=>{
    const refunded=String(r.status||"").toUpperCase()==="REFUNDED";
    const statusHtml=refunded?'<div class="small" style="margin-top:10px">💸 Refunded: '+new Date(r.refunded_at).toLocaleString()+'</div>':'<div class="small" style="margin-top:10px">Refund pending — do not deduct from finance until actually refunded.</div>';
-   const refundBtn=refunded?'':'<button class="btn primary" type="button" onclick="markCancelledKitRefunded(\\''+esc(r.id)+'\\')">MARK AS REFUNDED</button>';
-   const undoBtn='<button class="btn secondary" type="button" onclick="undoCancelledKit(\\''+esc(r.id)+'\\')">↩ UNDO CANCELLATION</button>';
-   return '<div class="pepKitCard"><div class="pepKitTop"><div><b>'+esc(r.product_name||"Cancelled item")+'</b><div class="small">'+esc(r.strength||"")+' • '+esc(r.email||"No email")+'</div><div class="small">Order: '+esc(r.order_id||"—")+' • Qty: '+Number(r.qty||0)+'</div></div><b>'+esc(r.status||"CANCELLED")+'</b></div><div class="small" style="margin-top:10px">Refund amount: '+peso(Number(r.refund_amount||0))+(r.reason?' • Reason: '+esc(r.reason):'')+'</div>'+statusHtml+'<div class="actions" style="margin-top:12px">'+refundBtn+undoBtn+'</div></div>';
+   const rid=JSON.stringify(String(r.id||"")).replace(/"/g,"&quot;");
+   const refundBtn=refunded?'':'<button class="btn primary" type="button" onclick="markCancelledKitRefunded('+rid+')">MARK AS REFUNDED</button>';
+   const undoBtn='<button class="btn secondary" type="button" onclick="undoCancelledKit('+rid+')">↩ UNDO CANCELLATION</button>';
  }).join("")+'</div>';
 }
 function renderVialTracker(){

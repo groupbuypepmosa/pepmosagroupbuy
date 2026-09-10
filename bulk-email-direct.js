@@ -18,16 +18,11 @@
     return {orders,shipments};
   }
 
-  async function sendDirect(client,shipment,status,gb){
-    if(typeof window.sendBuyerTrackingUpdateEmail==='function'){
-      return window.sendBuyerTrackingUpdateEmail(shipment.shipment_id,status);
-    }
-    throw new Error('Buyer email hook is not loaded.');
-  }
-
   async function install(){
     if(typeof window.saveBulkTracking!=='function')return false;
-    if(window.saveBulkTracking.__gbScoped && window.saveBulkTracking.__directEmailBridge)return true;
+    // The GB-scoped implementation already calls the buyer email hook itself.
+    // Only bridge the legacy/base UPDATE ALL function if the GB-safe override is absent.
+    if(window.saveBulkTracking.__gbScoped)return true;
     if(window.saveBulkTracking.__directEmailBridge)return true;
 
     const original=window.saveBulkTracking;

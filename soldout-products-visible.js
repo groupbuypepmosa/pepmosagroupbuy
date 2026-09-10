@@ -1,16 +1,18 @@
-/* PEPMOSA storefront — keep SOLD OUT products visible. */
+/* PEPMOSA storefront — SOLD OUT products stay visible outside the rerendered product grid. */
 (function(){
   'use strict';
   const $=id=>document.getElementById(id);
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const peso=v=>'₱'+Number(v||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
+  let soldOutRows=[];
+  let loading=false;
 
   function styles(){
     if($('pepSoldOutStyles'))return;
     const s=document.createElement('style');
     s.id='pepSoldOutStyles';
     s.textContent=`
-      #pepSoldOutSection{margin-top:26px}
+      #pepSoldOutSection{display:block!important;clear:both;margin-top:26px!important}
       #pepSoldOutSection .pepSoldOutHead{margin:0 0 14px}
       #pepSoldOutSection .pepSoldOutHead .eyebrow{font-size:10px;letter-spacing:.16em;font-weight:950;color:#9b7c89}
       #pepSoldOutSection .pepSoldOutHead h3{margin:5px 0 0;font-size:22px;color:#4b3b43}
@@ -29,49 +31,79 @@
     document.head.appendChild(s)
   }
 
-  function ensureSection(){
+  function getHost(){
     const grid=$('productGrid');
-    if(!grid||!grid.parentNode)return null;
+    return grid&&grid.parentNode?grid.parentNode:null;
+  }
+
+  function ensureSection(){
+    const host=getHost();
+    if(!host)return null;
     let section=$('pepSoldOutSection');
-    if(!section){
+    if(!section || section.parentNode!==host){
+      if(section)section.remove();
       section=document.createElement('section');
       section.id='pepSoldOutSection';
       section.innerHTML='<div class="pepSoldOutHead"><div class="eyebrow">CURRENTLY UNAVAILABLE</div><h3>Sold Out Products</h3></div><div id="pepSoldOutGrid"></div>';
-      grid.parentNode.insertBefore(section,grid.nextSibling);
+      host.appendChild(section);
     }
     return $('pepSoldOutGrid');
   }
 
-  async function load(){
-    const s=window.sb||window.__sb;
+  function render(){
     const grid=ensureSection();
-    const gb=window.currentGB;
-    if(!s||!grid||!gb)return;
-    const gbn=String(gb.gb_number||'');
-    if(!gbn)return;
-
-    const r=await s.from('ofa_products').select('id,name,amount,moq,image_url,status').eq('status','SOLD_OUT');
-    if(r.error){console.warn('SOLD OUT products unavailable:',r.error.message);return}
-
+    if(!grid)return;
     styles();
-    (r.data||[]).forEach(p=>{
+    const existing=new Set(Array.from(grid.querySelectorAll('[data-pepmosa-soldout-id]')).map(x=>String(x.dataset.pepmosaSoldoutId)));
+    soldOutRows.forEach(p=>{
       const id=String(p.id||'');
-      if(!id||grid.querySelector('[data-pepmosa-soldout-id="'+CSS.escape(id)+'"]'))return;
+      if(!id||existing.has(id))return;
       const card=document.createElement('article');
       card.className='card pepStoreCard pepSoldOutCard';
       card.dataset.pepmosaSoldoutId=id;
       card.innerHTML=`<div class="productImg pepSoldOutImg"><img src="${esc(p.image_url||'')}" alt="${esc(p.name||'Product')}" loading="lazy"></div><div class="pepStoreBody"><h3>${esc(p.name||'Product')}</h3><span class="pepSoldOutBadge">SOLD OUT</span><p class="muted">This product is currently sold out and is shown for reference only.</p><div class="pepSoldOutPrice">${peso(p.amount)}</div><div class="pepStoreBottom"><button type="button" class="btn pepSoldOutDisabled" disabled>SOLD OUT</button></div></div>`;
-      grid.appendChild(card)
+      grid.appendChild(card);
     });
+  }
+
+  async function load(){
+    const s=window.sb||window.__sb;
+    if(!s)return;
+    if(loading)return;
+    loading=true;
+    try{
+      const r=await s.from('ofa_products').select('id,name,amount,moq,image_url,status').eq('status','SOLD_OUT');
+      if(r.error){console.warn('SOLD OUT products unavailable:',r.error.message);return}
+      soldOutRows=r.data||[];
+      render();
+    }finally{loading=false}
   }
 
   function boot(){
     let tries=0;
     const timer=setInterval(()=>{
       tries++;
-      if($('productGrid')&&window.currentGB){load();if(tries>20)clearInterval(timer)}
-      if(tries>160)clearInterval(timer)
+      if($('productGrid')){
+        render();
+        load();
+      }
+      if(tries>80)clearInterval(timer);
     },250);
+
+    const watch=new MutationObserver(()=>{
+      if($('productGrid')){
+        const section=$('pepSoldOutSection');
+        const host=getHost();
+        if(!section||section.parentNode!==host||!section.querySelector('[data-pepmosa-soldout-id]')){
+          render();
+        }
+      }
+    });
+    watch.observe(document.body,{childList:true,subtree:true});
+
+    setInterval(()=>{
+      if($('productGrid')){load();render()}
+    },10000);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});

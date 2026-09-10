@@ -1,6 +1,6 @@
 window.PEPMOSA_CONFIG = {
   SUPABASE_URL: "https://pnetzdggtlbuhuxdzzak.supabase.co",
-  SUPABASE_ANON_KEY: "sb_publishable_f-FUnzjqozjjeB-KIIml-A_i9zFvQ2U"
+  SUPABASE_ANON_KEY: "sb_publishable_f-UnzjqozjjeB-KIIml-A_i9zFvQ2U"
 };
 
 /* PEPMOSA loader guard.
@@ -8,7 +8,7 @@ window.PEPMOSA_CONFIG = {
    races and inconsistent behavior between fresh browser profiles. */
 (function(){
   'use strict';
-  const VERSION = '20260910-buyer-email-v4';
+  const VERSION = '20260910-buyer-email-v5';
 
   function hasScript(file){
     return Array.from(document.scripts).some(s=>{

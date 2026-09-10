@@ -8,7 +8,7 @@ window.PEPMOSA_CONFIG = {
    races and inconsistent behavior between fresh browser profiles. */
 (function(){
   'use strict';
-  const VERSION = '20260910-buyer-email-v10';
+  const VERSION = '20260910-buyer-email-v11';
 
   function hasScript(file){
     return Array.from(document.scripts).some(s=>{
@@ -30,6 +30,7 @@ window.PEPMOSA_CONFIG = {
     const path=(window.location.pathname||'').toLowerCase();
     const isStorefront=path==='/'||path.endsWith('/index.html')||path.endsWith('index.html');
     const isAdmin=path.endsWith('/admin')||path.endsWith('/admin.html')||path==='/admin';
+    const isTracker=path.endsWith('/track')||path.endsWith('/track.html');
 
     if(isStorefront){
       loadOnce('storefront-repair.js');
@@ -44,6 +45,11 @@ window.PEPMOSA_CONFIG = {
       loadOnce('tracking-gb-scope-fix.js');
       loadOnce('bulk-email-direct.js');
       loadOnce('bulk-email-button-final.js');
+      return;
+    }
+
+    if(isTracker){
+      loadOnce('tracking-ui-polish.js');
     }
   }
 

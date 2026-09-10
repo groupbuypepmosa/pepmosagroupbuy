@@ -8,7 +8,7 @@ window.PEPMOSA_CONFIG = {
    races and inconsistent behavior between fresh browser profiles. */
 (function(){
   'use strict';
-  const VERSION = '20260910-buyer-email-v9';
+  const VERSION = '20260910-buyer-email-v10';
 
   function hasScript(file){
     return Array.from(document.scripts).some(s=>{
@@ -43,6 +43,7 @@ window.PEPMOSA_CONFIG = {
       loadOnce('buyer-order-email-hook.js');
       loadOnce('tracking-gb-scope-fix.js');
       loadOnce('bulk-email-direct.js');
+      loadOnce('bulk-email-button-final.js');
     }
   }
 

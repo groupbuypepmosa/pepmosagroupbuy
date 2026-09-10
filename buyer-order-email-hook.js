@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const GAS_URL='https://script.google.com/macros/s/AKfycbwD-e-Wv9NloaVlcOsZlfYR3KU81SvO9jLQ8lFpaNOh6XNY1ZRGJX6Yvs1UbP0EEBRM/exec';
+  const GAS_URL='https://script.google.com/macros/s/AKfycby_PRzoiFSzMhWkqmWMat8IsH7wvEqPPiWe7WFuw4HZBNPyefzDI4-XETnr400waavo/exec';
 
   function toast(msg,ok){
     const old=document.getElementById('buyerEmailHookToast');if(old)old.remove();

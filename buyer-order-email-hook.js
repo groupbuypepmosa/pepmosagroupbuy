@@ -15,15 +15,23 @@
   }
 
   async function buildPayload(client,shipment,status){
-    const gb=await client.from('orders').select('order_id,customer_id,email,total,shipping_method,shipping_fee,gb_number').eq('shipment_id',shipment.shipment_id);
+    // For a Group Buy shipment, only use orders from that same Group Buy.
+    // Never fall back to unrelated MOQ orders for a GB shipment.
+    const gbQuery=client.from('orders').select('order_id,customer_id,email,total,shipping_method,shipping_fee,gb_number').eq('shipment_id',shipment.shipment_id);
+    if(shipment.gb_number)gbQuery.eq('gb_number',shipment.gb_number);
+    const gb=await gbQuery;
     if(gb.error)throw gb.error;
 
-    let source='GROUP BUY';let orders=gb.data||[];let items=[];
+    let source=shipment.gb_number?'GROUP BUY':'GROUP BUY';
+    let orders=gb.data||[];
+    let items=[];
+
     if(orders.length){
       const ids=orders.map(x=>x.order_id);
       const oi=await client.from('order_items').select('order_id,product_name,strength,qty,unit_price,line_total').in('order_id',ids);
       if(oi.error)throw oi.error;items=oi.data||[];
-    }else{
+    }else if(!shipment.gb_number){
+      // Only a shipment with no GB number may use the legacy MOQ fallback.
       source='MOQ';
       const mo=await client.from('ofa_orders').select('order_id,customer_name,email,total,shipping_method,shipping_fee').eq('email',shipment.email);
       if(mo.error)throw mo.error;orders=mo.data||[];
@@ -44,8 +52,16 @@
     const subtotal=[...map.values()].reduce((s,x)=>s+x.lineTotal,0);
     const shippingFee=orders.reduce((s,x)=>s+Number(x.shipping_fee||0),0);
     const total=orders.reduce((s,x)=>s+Number(x.total||0),0)||subtotal+shippingFee;
-    const customerName=(orders.find(x=>x.customer_name)?.customer_name)||'';
-    const round=[...new Set(orders.map(x=>x.gb_number).filter(Boolean))].join(', ');
+
+    // Group Buy orders do not carry customer_name in the current schema,
+    // so use the customers table as the greeting fallback when available.
+    let customerName=(orders.find(x=>x.customer_name)?.customer_name)||'';
+    if(!customerName){
+      const cr=await client.from('customers').select('customer_name,email').eq('email',shipment.email).maybeSingle();
+      if(!cr.error)customerName=cr.data?.customer_name||'';
+    }
+
+    const round=[...new Set(orders.map(x=>x.gb_number).filter(Boolean))].join(', ')||String(shipment.gb_number||'');
 
     return {
       action:'sendTrackingUpdateEmail',to:shipment.email,customerName,source,round,status,
@@ -55,15 +71,35 @@
     };
   }
 
+  // Bulk UPDATE ALL calls this repeatedly. Give every request its own iframe
+  // target so one buyer's POST can never cancel/replace another buyer's POST.
   function postToGas(payload){
     return new Promise(function(resolve){
+      let settled=false;
+      const stamp=Date.now()+'_'+Math.random().toString(36).slice(2);
+      const frameId='pepmosaEmailFrame_'+stamp;
+      const formId='pepmosaEmailForm_'+stamp;
+      const cleanup=function(){
+        const f=document.getElementById(formId);if(f)f.remove();
+        const frame=document.getElementById(frameId);if(frame)setTimeout(()=>frame.remove(),1000);
+      };
+      const finish=function(ok){if(settled)return;settled=true;cleanup();resolve(ok);};
       try{
-        const form=document.createElement('form');form.method='POST';form.action=GAS_URL;form.target='pepmosaEmailFrame';form.style.display='none';
+        const frame=document.createElement('iframe');
+        frame.name=frameId;frame.id=frameId;frame.style.display='none';
+        frame.onload=function(){finish(true);};
+        document.body.appendChild(frame);
+
+        const form=document.createElement('form');
+        form.id=formId;form.method='POST';form.action=GAS_URL;form.target=frameId;form.style.display='none';
         const input=document.createElement('input');input.type='hidden';input.name='payload';input.value=JSON.stringify(payload);form.appendChild(input);
-        let frame=document.getElementById('pepmosaEmailFrame');
-        if(!frame){frame=document.createElement('iframe');frame.name='pepmosaEmailFrame';frame.id='pepmosaEmailFrame';frame.style.display='none';document.body.appendChild(frame);}
-        document.body.appendChild(form);form.submit();form.remove();resolve(true);
-      }catch(e){console.error('PEPMOSA EMAIL',e);resolve(false);}
+        document.body.appendChild(form);
+        form.submit();
+
+        // The iframe load is the normal completion signal. This fallback only
+        // prevents the UI from hanging if Google never fires a load event.
+        setTimeout(()=>finish(true),15000);
+      }catch(e){console.error('PEPMOSA EMAIL',e);finish(false);}
     });
   }
 
@@ -73,6 +109,7 @@
       if(!window.supabase?.createClient)throw new Error('Supabase client unavailable');
       const client=window.__pepmosaEmailClient||(window.__pepmosaEmailClient=window.supabase.createClient(c.SUPABASE_URL,c.SUPABASE_ANON_KEY));
       const shipment=await getShipment(client,shipmentId);
+      if(!shipment?.email)throw new Error('Buyer email is missing.');
       const payload=await buildPayload(client,shipment,status);
       const ok=await postToGas(payload);
       if(ok)toast('Buyer email queued for '+shipment.email,true);else toast('Buyer email could not be queued',false);

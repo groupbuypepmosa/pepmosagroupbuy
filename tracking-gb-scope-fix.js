@@ -120,7 +120,10 @@
   }
 
   function install(){
-    if(typeof window.openBulkTrackingModal!=='function'||typeof window.saveBulkTracking!=='function')return false;
+    // IMPORTANT: wait for BOTH the bulk tracker and buyer-email hook before
+    // replacing saveBulkTracking. This prevents UPDATE ALL from running before
+    // sendBuyerTrackingUpdateEmail has been installed.
+    if(typeof window.openBulkTrackingModal!=='function'||typeof window.saveBulkTracking!=='function'||typeof window.sendBuyerTrackingUpdateEmail!=='function')return false;
     if(!window.openBulkTrackingModal.__gbScoped){
       window.openBulkTrackingModal=async function(){
         const modal=document.getElementById('bulkTrackingModal');if(!modal)return;
@@ -163,8 +166,11 @@
             changed++;
             const h=await client().from('shipment_status_history').insert({shipment_id:shipment.shipment_id,status,courier:payload.courier||shipment.courier||null,tracking_number:shipment.tracking_number||null,changed_by:user.data?.user?.id||null});
             if(h.error)console.warn(h.error);
-            // Keep the already-working buyer email flow intact.
-            if(typeof window.sendBuyerTrackingUpdateEmail==='function')await window.sendBuyerTrackingUpdateEmail(shipment.shipment_id,status);
+            if(typeof window.sendBuyerTrackingUpdateEmail==='function'){
+              await window.sendBuyerTrackingUpdateEmail(shipment.shipment_id,status);
+            }else{
+              console.error('PEPMOSA EMAIL HOOK NOT INSTALLED');
+            }
           }else unchanged++;
           const ids=clientOrders.map(o=>o.order_id).filter(Boolean);
           if(ids.length){const ou=await client().from('orders').update({shipment_id:shipment.shipment_id}).in('order_id',ids).eq('gb_number',gb);if(ou.error)throw ou.error;}
@@ -177,8 +183,6 @@
     };
     window.saveBulkTracking.__gbScoped=true;
 
-    // Existing individual tracking remains untouched; only the shipment itself
-    // is now guaranteed to be tied to the selected GB by the bulk/create flow.
     if(typeof window.createTrackingShipment==='function'&&!window.createTrackingShipment.__gbScoped){
       window.createTrackingShipment=async function(emailValue){
         try{
@@ -187,7 +191,7 @@
           if(!clientOrders.length)throw new Error('No orders found for '+e+' in '+gb+'.');
           const shipment=await ensureGBShipment(gb,e,clientOrders,shipments);
           const ids=clientOrders.map(o=>o.order_id).filter(Boolean);
-          if(ids.length){const up=await client().from('orders').update({shipment_id:shipment.shipment_id}).in('order_id',ids).eq('gb_number',gb);if(up.error)throw up.error;}
+          if(ids.length){const up=await client().from('orders').update({shipment_id:shipment.shipment_id}).in('order_id',ids).eq('order_id',clientOrders.map(o=>o.order_id));if(up.error)throw up.error;}
           toast('Client shipment created for '+gb+'.','success');
           if(typeof loadTrackingDashboard==='function')await loadTrackingDashboard();
         }catch(e){console.error('GB CREATE SHIPMENT',e);toast(e.message||'Unable to create shipment.','error');}
@@ -195,8 +199,6 @@
       window.createTrackingShipment.__gbScoped=true;
     }
 
-    // Waybill center was still loading ALL Group Buys. Replace only that loader;
-    // the existing print design in admin-waybill.js remains unchanged.
     window.loadWaybillCenter=loadWaybillScoped;
     return true;
   }

@@ -8,7 +8,7 @@ window.PEPMOSA_CONFIG = {
    races and inconsistent behavior between fresh browser profiles. */
 (function(){
   'use strict';
-  const VERSION = '20260910-buyer-email-v1';
+  const VERSION = '20260910-buyer-email-v2';
 
   function hasScript(file){
     return Array.from(document.scripts).some(s=>{
@@ -31,8 +31,6 @@ window.PEPMOSA_CONFIG = {
     const isStorefront=path==='/'||path.endsWith('/index.html')||path.endsWith('index.html');
     const isAdmin=path.endsWith('/admin')||path.endsWith('/admin.html')||path==='/admin';
 
-    /* index.html already includes these storefront files directly.
-       Only inject a file if a future storefront page does not include it. */
     if(isStorefront){
       loadOnce('storefront-repair.js');
       loadOnce('checkout-polish.js');

@@ -8,7 +8,7 @@ window.PEPMOSA_CONFIG = {
    races and inconsistent behavior between fresh browser profiles. */
 (function(){
   'use strict';
-  const VERSION = '20260910-buyer-email-v3';
+  const VERSION = '20260910-buyer-email-v4';
 
   function hasScript(file){
     return Array.from(document.scripts).some(s=>{
@@ -41,6 +41,7 @@ window.PEPMOSA_CONFIG = {
     if(isAdmin){
       loadOnce('admin-waybill.js');
       loadOnce('buyer-order-email-hook.js');
+      loadOnce('tracking-gb-scope-fix.js');
     }
   }
 

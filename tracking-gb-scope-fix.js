@@ -17,17 +17,12 @@
     return {gb,orders:or.data||[],shipments:sr.data||[]};
   }
 
-  // A consolidated shipment is now strictly owned by ONE Group Buy.
-  // Never reuse a shipment that already belongs to another GB.
   async function ensureGBShipment(gb,emailValue,clientOrders,shipments){
     const e=email(emailValue);
     const ids=[...new Set((clientOrders||[]).map(o=>o.shipment_id).filter(Boolean))];
     const rows=(shipments||[]).filter(s=>ids.includes(s.shipment_id));
-
     const sameGB=rows.find(s=>String(s.gb_number||'')===gb);
     if(sameGB)return sameGB;
-
-    // Legacy shipment with no GB number can safely be claimed by this GB.
     const legacy=rows.find(s=>!s.gb_number);
     if(legacy){
       const up=await client().from('consolidated_shipments').update({gb_number:gb,updated_at:new Date().toISOString()}).eq('shipment_id',legacy.shipment_id);
@@ -35,7 +30,6 @@
       legacy.gb_number=gb;
       return legacy;
     }
-
     const ins=await client().from('consolidated_shipments').insert({email:e,status:'ORDER RECEIVED',gb_number:gb}).select().single();
     if(ins.error)throw ins.error;
     const h=await client().from('shipment_status_history').insert({shipment_id:ins.data.shipment_id,status:'ORDER RECEIVED'});
@@ -59,7 +53,6 @@
     const customersByEmail=new Map((cr.data||[]).map(x=>[email(x.email),x]));
     const shipmentsById=new Map((sr.data||[]).map(x=>[x.shipment_id,x]));
     const refunded=(kr.data||[]).filter(x=>String(x.status||'').toUpperCase()==='REFUNDED');
-
     const grouped=new Map();
     for(const o of (or.data||[])){
       const approved=['PAID','PAYMENT APPROVED','APPROVED'].includes(String(o.payment_status||'').toUpperCase());
@@ -71,7 +64,6 @@
       for(const i of (o.order_items||[]))g.items.push({...i,is_refunded:false,refund_amount:0});
       for(const r of refunded.filter(x=>String(x.order_id||'')===String(o.order_id||'')))g.refunded.push(r);
     }
-
     const rows=[...grouped.values()].map(g=>{
       const customer=customersByEmail.get(g.email)||{};
       const latest=g.orders.slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))[0]||{};
@@ -88,21 +80,8 @@
         if(p){p.is_refunded=true;p.refund_amount=Number(r.refund_amount||0);}
       }
       const total=Math.max(0,g.total-g.refunded.reduce((s,x)=>s+Number(x.refund_amount||0),0));
-      return {
-        email:g.email,gb_number:gb,orders:g.orders,items:g.items,total,shipping:g.shipping,
-        customer_name:customer.customer_name||latest.full_name||g.email,
-        contact:customer.contact||latest.contact_number||'',
-        address:customer.address||latest.address||'Address not yet saved',
-        shipping_method:latest.shipping_method||'',
-        courier:shipment.courier||latest.shipping_method||'To be assigned',
-        waybill_number:shipment.waybill_number||shipment.tracking_number||'',
-        tracking_number:shipment.tracking_number||shipment.waybill_number||'',
-        shipment_status:shipment.status||'READY TO PRINT',
-        products:[...merged.values()],refunded:g.refunded,
-        payment:g.refunded.length?'PAID • REFUND ADJUSTED':'PAID'
-      };
+      return {email:g.email,gb_number:gb,orders:g.orders,items:g.items,total,shipping:g.shipping,customer_name:customer.customer_name||latest.full_name||g.email,contact:customer.contact||latest.contact_number||'',address:customer.address||latest.address||'Address not yet saved',shipping_method:latest.shipping_method||'',courier:shipment.courier||latest.shipping_method||'To be assigned',waybill_number:shipment.waybill_number||shipment.tracking_number||'',tracking_number:shipment.tracking_number||shipment.waybill_number||'',shipment_status:shipment.status||'READY TO PRINT',products:[...merged.values()],refunded:g.refunded,payment:g.refunded.length?'PAID • REFUND ADJUSTED':'PAID'};
     });
-
     return rows.sort((a,b)=>a.customer_name.localeCompare(b.customer_name));
   }
 
@@ -120,9 +99,8 @@
   }
 
   function install(){
-    // IMPORTANT: wait for BOTH the bulk tracker and buyer-email hook before
-    // replacing saveBulkTracking. This prevents UPDATE ALL from running before
-    // sendBuyerTrackingUpdateEmail has been installed.
+    // Do not install the bulk override until the buyer email hook exists.
+    // This avoids UPDATE ALL running with no email callback on a fresh page.
     if(typeof window.openBulkTrackingModal!=='function'||typeof window.saveBulkTracking!=='function'||typeof window.sendBuyerTrackingUpdateEmail!=='function')return false;
     if(!window.openBulkTrackingModal.__gbScoped){
       window.openBulkTrackingModal=async function(){
@@ -166,11 +144,7 @@
             changed++;
             const h=await client().from('shipment_status_history').insert({shipment_id:shipment.shipment_id,status,courier:payload.courier||shipment.courier||null,tracking_number:shipment.tracking_number||null,changed_by:user.data?.user?.id||null});
             if(h.error)console.warn(h.error);
-            if(typeof window.sendBuyerTrackingUpdateEmail==='function'){
-              await window.sendBuyerTrackingUpdateEmail(shipment.shipment_id,status);
-            }else{
-              console.error('PEPMOSA EMAIL HOOK NOT INSTALLED');
-            }
+            await window.sendBuyerTrackingUpdateEmail(shipment.shipment_id,status);
           }else unchanged++;
           const ids=clientOrders.map(o=>o.order_id).filter(Boolean);
           if(ids.length){const ou=await client().from('orders').update({shipment_id:shipment.shipment_id}).in('order_id',ids).eq('gb_number',gb);if(ou.error)throw ou.error;}
@@ -191,7 +165,7 @@
           if(!clientOrders.length)throw new Error('No orders found for '+e+' in '+gb+'.');
           const shipment=await ensureGBShipment(gb,e,clientOrders,shipments);
           const ids=clientOrders.map(o=>o.order_id).filter(Boolean);
-          if(ids.length){const up=await client().from('orders').update({shipment_id:shipment.shipment_id}).in('order_id',ids).eq('order_id',clientOrders.map(o=>o.order_id));if(up.error)throw up.error;}
+          if(ids.length){const up=await client().from('orders').update({shipment_id:shipment.shipment_id}).in('order_id',ids).eq('gb_number',gb);if(up.error)throw up.error;}
           toast('Client shipment created for '+gb+'.','success');
           if(typeof loadTrackingDashboard==='function')await loadTrackingDashboard();
         }catch(e){console.error('GB CREATE SHIPMENT',e);toast(e.message||'Unable to create shipment.','error');}

@@ -8,7 +8,7 @@ window.PEPMOSA_CONFIG = {
    races and inconsistent behavior between fresh browser profiles. */
 (function(){
   'use strict';
-  const VERSION = '20260910-buyer-email-v5';
+  const VERSION = '20260910-buyer-email-v6';
 
   function hasScript(file){
     return Array.from(document.scripts).some(s=>{

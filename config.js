@@ -8,7 +8,7 @@ window.PEPMOSA_CONFIG = {
    races and inconsistent behavior between fresh browser profiles. */
 (function(){
   'use strict';
-  const VERSION = '20260910-buyer-email-v8';
+  const VERSION = '20260910-buyer-email-v9';
 
   function hasScript(file){
     return Array.from(document.scripts).some(s=>{
@@ -39,10 +39,9 @@ window.PEPMOSA_CONFIG = {
     }
 
     if(isAdmin){
-      // GB scope first, then email hook, then the explicit UPDATE ALL bridge.
       loadOnce('admin-waybill.js');
-      loadOnce('tracking-gb-scope-fix.js');
       loadOnce('buyer-order-email-hook.js');
+      loadOnce('tracking-gb-scope-fix.js');
       loadOnce('bulk-email-direct.js');
     }
   }

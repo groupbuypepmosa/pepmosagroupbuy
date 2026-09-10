@@ -19,10 +19,7 @@
   }
 
   async function install(){
-    if(typeof window.saveBulkTracking!=='function')return false;
-    // The GB-scoped implementation already calls the buyer email hook itself.
-    // Only bridge the legacy/base UPDATE ALL function if the GB-safe override is absent.
-    if(window.saveBulkTracking.__gbScoped)return true;
+    if(typeof window.saveBulkTracking!=='function'||typeof window.sendBuyerTrackingUpdateEmail!=='function')return false;
     if(window.saveBulkTracking.__directEmailBridge)return true;
 
     const original=window.saveBulkTracking;
@@ -34,25 +31,44 @@
 
       let before=null;
       try{before=await snapshot(client,gb);}catch(e){console.warn('Bulk email snapshot failed',e);}
-      const result=await original.apply(this,arguments);
+
+      // Observe calls made by the GB-scoped UPDATE ALL implementation.
+      // If it already sent an email, the fallback below will not send a duplicate.
+      const originalSend=window.sendBuyerTrackingUpdateEmail;
+      const sentByOriginal=new Set();
+      window.sendBuyerTrackingUpdateEmail=async function(shipmentId,newStatus){
+        sentByOriginal.add(String(shipmentId)+'|'+String(newStatus));
+        return originalSend.apply(this,arguments);
+      };
+
+      let result;
+      try{
+        result=await original.apply(this,arguments);
+      }finally{
+        window.sendBuyerTrackingUpdateEmail=originalSend;
+      }
 
       try{
         const after=await snapshot(client,gb);
         const beforeById=new Map((before?.shipments||[]).map(s=>[s.shipment_id,s]));
         const emails=[...new Set((after.orders||[]).map(o=>email(o.email)).filter(Boolean))];
-        let sent=0;
+        let fallbackSent=0;
+
         for(const e of emails){
           const buyerOrders=(after.orders||[]).filter(o=>email(o.email)===e);
-          const shipment=buyerOrders.map(o=>(after.shipments||[]).find(s=>s.shipment_id===o.shipment_id)).find(Boolean);
+          const shipment=buyerOrders
+            .map(o=>(after.shipments||[]).find(s=>s.shipment_id===o.shipment_id && String(s.gb_number||'')===gb))
+            .find(Boolean);
           if(!shipment||String(shipment.status||'')!==String(status))continue;
+
           const old=beforeById.get(shipment.shipment_id);
           if(old&&String(old.status||'')===String(status))continue;
-          if(typeof window.sendBuyerTrackingUpdateEmail==='function'){
-            await window.sendBuyerTrackingUpdateEmail(shipment.shipment_id,status);
-            sent++;
-          }
+          if(sentByOriginal.has(String(shipment.shipment_id)+'|'+String(status)))continue;
+
+          await originalSend(shipment.shipment_id,status);
+          fallbackSent++;
         }
-        if(sent)toast('Buyer emails queued: '+sent+' client'+(sent===1?'':'s'),'success');
+        if(fallbackSent)toast('Buyer emails queued: '+fallbackSent+' client'+(fallbackSent===1?'':'s'),'success');
       }catch(e){console.error('DIRECT BULK EMAIL BRIDGE',e);}
       return result;
     };

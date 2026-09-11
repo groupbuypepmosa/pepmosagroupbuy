@@ -2680,13 +2680,28 @@ load();
 
     /* Always use the live catalog populated by the storefront repair layer.
        The base page and repair layer have separate `products` variables. */
-    const liveProducts=Array.isArray(window.products)&&window.products.length
-      ? window.products
-      : (Array.isArray(products)?products:[]);
-    const list=liveProducts;
+    const liveProducts=
+      (Array.isArray(window.products)&&window.products.length ? window.products : null) ||
+      (Array.isArray(window.__pepBaseProducts)&&window.__pepBaseProducts.length ? window.__pepBaseProducts : null) ||
+      (Array.isArray(products)&&products.length ? products : []);
     const input=document.getElementById('search');
     const q=String(input?.value||'').toLowerCase().trim();
 
+    /* If the repair loader has not finished yet, NEVER replace the already
+       visible product cards with "No products found". Filter those existing
+       cards in place until the live catalog is ready. */
+    if(!liveProducts.length){
+      const existing=[...grid.querySelectorAll('.pepStoreCard')];
+      if(existing.length){
+        existing.forEach(card=>{
+          const hay=(card.innerText||'').toLowerCase();
+          card.style.display=(!q || hay.includes(q))?'':'none';
+        });
+        return;
+      }
+    }
+
+    const list=liveProducts;
     const filtered=list.filter(p=>{
       const hay=(String(p.product_name||'')+' '+String(p.description||'')).toLowerCase();
       return !q || hay.includes(q);

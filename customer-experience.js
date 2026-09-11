@@ -130,10 +130,10 @@
         const remaining=target?Math.max(0,target-total):0;
         const soldOut=/^SOLD[ _]OUT$/i.test(String(x.status||''));
         const progressText=soldOut?' • SOLD OUT':(target?(remaining===0?'MOQ target reached!':' • '+remaining+' remaining'):'');
-        return '<a class="pepMoqProduct" href="open-for-all.html"'+(soldOut?' style="opacity:.82"':'')+'><div class="pepMoqImage">'+image+'</div><div class="pepMoqInfo"><b>'+String(x.name||'MOQ PRODUCT')+'</b><span class="pepMoqBadge">'+(soldOut?'SOLD OUT':'MOQ '+(target||'—'))+'</span>'+(soldOut?'<strong class="pepMoqSoldLabel">CURRENTLY UNAVAILABLE</strong><strong class="pepMoqSoldPrice">'+ofaPeso(x.amount)+'</strong>':'')+'<div class="pepMoqProgress"><div style="width:'+pct+'%"></div></div><small>'+total+' ordered'+(target?' • target '+target+progressText:'')+'</small></div></a>';
+        return '<a class="pepMoqProduct" href="open-for-all.html"'+(soldOut?' style="opacity:.82"':'')+'><div class="pepMoqImage">'+image+'</div><div class="pepMoqInfo"><b>'+String(x.name||'MOQ PRODUCT')+'</b><span class="pepMoqBadge">'+(soldOut?'SOLD OUT':'MOQ '+(target||'—'))+'</span>'+(soldOut?'<strong class="pepMoqSoldLabel">CURRENTLY UNAVAILABLE</strong><strong class="pepMoqSoldPrice">'₱'+Number(x.amount||0).toLocaleString('en-PH',{minimumFractionDigits:0,maximumFractionDigits:2})+'</strong>':'')+'<div class="pepMoqProgress"><div style="width:'+pct+'%"></div></div><small>'+total+' ordered'+(target?' • target '+target+progressText:'')+'</small></div></a>';
       }).join('')+'</div>';
     }catch(e){
-      wrap.innerHTML='<div class="pepMoqHeader"><div><div class="label">MOQ AVAILABLE NOW</div><h3>🌐 WHAT’S OPEN FOR MOQ</h3><p>Open MOQ to see the currently available products.</p></div><a href="open-for-all.html" class="btn primary pepMoqOpenBtn">OPEN MOQ</a></div>';
+      console.warn('MOQ storefront render failed',e);
     }
   }
   function boot(){insertUI();setTimeout(loadMOQProducts,900);setTimeout(loadMOQProducts,2500)}

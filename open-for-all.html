@@ -56,17 +56,24 @@ async function load(){
   try{
     const s=S();
     const [a,b,t]=await Promise.all([
-      s.from('ofa_products').select('*').eq('status','AVAILABLE'),
+      s.from('ofa_products').select('*').in('status',['AVAILABLE','SOLD OUT','SOLD_OUT']),
       s.from('ofa_settings').select('*').eq('id',true).single(),
       s.rpc('ofa_public_product_totals')
     ]);
     if(a.error) throw a.error;
-    P=a.data||[];
+    P=(a.data||[]).sort((x,y)=>{
+      const xs=String(x.status||'').toUpperCase().replace('_',' ')==='SOLD OUT';
+      const ys=String(y.status||'').toUpperCase().replace('_',' ')==='SOLD OUT';
+      return Number(xs)-Number(ys);
+    });
     SET=b.data||{};
     const totalsById=new Map((t.data||[]).map(x=>[x.product_id,+x.total_qty||0]));
     const list=document.getElementById('list');
     list.innerHTML=P.length
-      ? P.map(x=>`<div class="card">${x.image_url?`<img class="pic" src="${x.image_url}">`:'<div class="placeholder">🧪</div>'}<h3 class="product-name">${x.name}</h3><div class="meta"><span class="badge">MOQ ${x.moq}</span><span>Available Now</span></div><div class="order-count" title="Total quantity ordered across all Open for All checkouts"><span class="count-icon">📦</span><span class="count-num">${totalsById.get(x.id)||0}</span><span class="count-copy"><span class="count-label">TOTAL UNITS ORDERED</span><span class="count-sub"><b>All customer checkouts combined</b> ♡</span></span></div><div class="price">${ofaPeso(x.amount)}</div><div class="qtyrow"><input id="q${x.id}" type="number" min="${x.moq}" value="${x.moq}"><button class="btn" onclick="add('${x.id}')">ADD TO CART</button></div></div>`).join('')
+      ? P.map(x=>{
+        const sold=String(x.status||'').toUpperCase().replace('_',' ')==='SOLD OUT';
+        return `<div class="card" style="${sold?'opacity:.9':''}">${x.image_url?`<img class="pic" src="${x.image_url}" style="${sold?'filter:grayscale(.15);opacity:.78':''}">`:'<div class="placeholder">🧪</div>'}<h3 class="product-name">${x.name}</h3><div class="meta"><span class="badge">MOQ ${x.moq}</span><span style="${sold?'color:#a15b7e;font-weight:900':'color:#3b8a68;font-weight:900'}">${sold?'SOLD OUT':'Available Now'}</span></div>${sold?'<div class="notice" style="margin-top:12px;text-align:center;font-weight:900">SOLD OUT • FOR REFERENCE ONLY</div>':'<div class="order-count" title="Total quantity ordered across all Open for All checkouts"><span class="count-icon">📦</span><span class="count-num">'+(totalsById.get(x.id)||0)+'</span><span class="count-copy"><span class="count-label">TOTAL UNITS ORDERED</span><span class="count-sub"><b>All customer checkouts combined</b> ♡</span></span></div><div class="price">'+ofaPeso(x.amount)+'</div><div class="qtyrow"><input id="q'+x.id+'" type="number" min="'+x.moq+'" value="'+x.moq+'"><button class="btn" onclick="add(\''+x.id+'\')">ADD TO CART</button></div>'}</div>`;
+      }).join('')
       : '<div class="card" style="grid-column:1/-1;text-align:center;padding:30px"><h3>No products available yet</h3><p>Please check back soon.</p></div>';
     draw();
   }catch(err){

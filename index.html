@@ -2595,14 +2595,7 @@ load();
 #pepKitCompletionCard .pepKitFooter{position:relative!important;margin-top:16px!important;padding:14px 16px!important;border-radius:15px!important;background:linear-gradient(90deg,rgba(229,43,139,.10),rgba(255,255,255,.78))!important;color:#784e65!important;font-size:13px!important;font-weight:800!important}
 @media(max-width:760px){#pepKitCompletionCard{padding:22px 18px!important;border-radius:23px!important}#pepKitCompletionCard h3{font-size:31px!important}#pepKitCompletionCard .pepKitRules{grid-template-columns:1fr!important}}
 </style>
-<script id="pepmosa-kit-completion-force-script">
-(function(){
-  // storefront-repair.js already owns Kit Completion UI. Do not observe the whole DOM.
-  function boot(){ return; }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
-  else boot();
-})();
-</script>
+<!-- Kit Completion is owned by storefront-repair.js; redundant no-op observer removed. -->
 
 
 <style id="pepmosa-popup-unified-style">

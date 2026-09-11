@@ -704,32 +704,15 @@ header{
 #productGrid .pepSelectVariant{cursor:pointer!important}
 </style>
 
-<style id="pep-index-soldout-cleanup">
-/* Index must never show the legacy duplicate sold-out product block. */
-#pepSoldOutSection{display:none!important}
-</style>
-
 <style id="pep-hide-legacy-soldout-section">
-/* Hide the legacy large sold-out section. Sold-out items are already shown
-   in the MOQ area, so the duplicate section should not appear below products. */
+/* Sold-out items are represented in the current product/MOQ UI.
+   Keep the legacy large duplicate block hidden. */
 #pepSoldOutSection{display:none!important}
 </style>
 </head>
 
 
 <body>
-<script id="pep-index-soldout-runtime-cleanup">
-(function(){
-  // CSS already hides the legacy sold-out block. One targeted cleanup is enough.
-  function removeLegacySoldOut(){
-    const el=document.getElementById('pepSoldOutSection');
-    if(el) el.remove();
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',removeLegacySoldOut,{once:true});
-  else removeLegacySoldOut();
-})();
-</script>
-
 
 <div class="pepAnnouncement" role="status"><span>🌸</span><b>PEPMOSA GROUP BUY</b><em>•</em><span id="pepAnnouncementText">Choose your favorites and secure your slot.</span></div>
 

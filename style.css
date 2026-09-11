@@ -283,3 +283,48 @@ body::after{
 @media(prefers-reduced-motion:reduce){
   body::after,.pepStoreCard::after,.card::after{animation:none}
 }
+
+
+/* PEPMOSA GLITTER V3 — denser sparkle field */
+body::before{
+  z-index:9998!important;
+  opacity:.78!important;
+  background-image:
+    radial-gradient(circle at 3% 8%,#fff 0 1.7px,transparent 3px),
+    radial-gradient(circle at 8% 38%,#ffd8eb 0 1.1px,transparent 2.6px),
+    radial-gradient(circle at 13% 17%,#fff 0 1.4px,transparent 2.8px),
+    radial-gradient(circle at 17% 84%,#ffc9e3 0 1.2px,transparent 2.8px),
+    radial-gradient(circle at 22% 53%,#fff 0 1.8px,transparent 3.2px),
+    radial-gradient(circle at 28% 12%,#ffe0ef 0 1px,transparent 2.5px),
+    radial-gradient(circle at 33% 67%,#fff 0 1.3px,transparent 2.8px),
+    radial-gradient(circle at 39% 29%,#ffcbe5 0 1.5px,transparent 3px),
+    radial-gradient(circle at 44% 92%,#fff 0 1.2px,transparent 2.7px),
+    radial-gradient(circle at 49% 45%,#ffd7eb 0 1.1px,transparent 2.6px),
+    radial-gradient(circle at 55% 9%,#fff 0 1.8px,transparent 3.2px),
+    radial-gradient(circle at 60% 73%,#ffc9e3 0 1.2px,transparent 2.8px),
+    radial-gradient(circle at 66% 34%,#fff 0 1.4px,transparent 2.8px),
+    radial-gradient(circle at 71% 88%,#ffe0ef 0 1px,transparent 2.5px),
+    radial-gradient(circle at 77% 18%,#fff 0 1.7px,transparent 3.1px),
+    radial-gradient(circle at 82% 57%,#ffcbe5 0 1.1px,transparent 2.7px),
+    radial-gradient(circle at 88% 31%,#fff 0 1.5px,transparent 3px),
+    radial-gradient(circle at 93% 68%,#ffd7eb 0 1.2px,transparent 2.8px),
+    radial-gradient(circle at 98% 11%,#fff 0 1.8px,transparent 3.2px),
+    radial-gradient(circle at 96% 94%,#ffc9e3 0 1.1px,transparent 2.7px);
+  background-size:100% 100%;
+  animation:pepDenseSparkle 3.5s ease-in-out infinite;
+  filter:drop-shadow(0 0 6px rgba(238,100,174,.7));
+}
+@keyframes pepDenseSparkle{
+  0%,100%{opacity:.25}
+  15%{opacity:.9}
+  28%{opacity:.4}
+  42%{opacity:1}
+  57%{opacity:.3}
+  71%{opacity:.92}
+  86%{opacity:.45}
+}
+body::after{
+  z-index:9999!important;
+  opacity:.9!important;
+  animation:pepGlitterV2 3.2s ease-in-out infinite!important;
+}

@@ -2777,39 +2777,39 @@ load();
 })();
 </script>
 
-<!-- PEPMOSA V8 — individual sparkle motion only -->
-<style id="pepmosa-v8-glitter">
+<!-- PEPMOSA CLEAN GLITTER — true falling sparkle rain -->
+<style id="pepmosa-clean-glitter">
 #pepGlitterField{position:fixed;inset:0;z-index:9990;pointer-events:none;overflow:hidden}
-.pepSpark{position:absolute;display:block;width:28px;height:28px;transform:translate(-50%,-50%);opacity:0;color:#fff;font-family:Georgia,serif;font-size:18px;line-height:28px;text-align:center;text-shadow:0 0 4px #fff,0 0 10px #ff9bcf,0 0 20px #e94b9e;animation:pepIndividual var(--dur) ease-in-out var(--delay) infinite}
-.pepSpark.big{width:42px;height:42px;font-size:32px;line-height:42px;text-shadow:0 0 5px #fff,0 0 12px #ffadd8,0 0 26px #e83e98,0 0 42px rgba(232,62,152,.5)}
-.pepSpark:before,.pepSpark:after{content:"";position:absolute;left:50%;top:50%;background:linear-gradient(to right,transparent,#fff,transparent);border-radius:999px;opacity:.9}
-.pepSpark:before{width:34px;height:1.5px;transform:translate(-50%,-50%);box-shadow:0 0 8px #ff9dcc}
-.pepSpark:after{width:1.5px;height:34px;transform:translate(-50%,-50%);box-shadow:0 0 8px #ff9dcc}
-@keyframes pepIndividual{
-0%,100%{opacity:0;transform:translate(-50%,-50%) scale(.55) rotate(0deg)}
-30%{opacity:.18;transform:translate(-50%,-50%) scale(.7) rotate(8deg)}
-48%{opacity:.9;transform:translate(-50%,-50%) scale(1.15) rotate(45deg)}
-56%{opacity:1;transform:translate(-50%,-50%) scale(1.3) rotate(45deg)}
-66%{opacity:.28;transform:translate(-50%,-50%) scale(.82) rotate(70deg)}
-100%{opacity:0;transform:translate(-50%,-50%) scale(.55) rotate(90deg)}
+.pepStar{position:absolute;top:-28px;left:var(--x);font-family:Georgia,serif;font-size:var(--size);line-height:1;color:#fff;opacity:0;text-shadow:0 0 4px #fff,0 0 10px rgba(255,170,215,.95),0 0 20px rgba(235,75,157,.65);animation:pepFallStraight var(--time) linear var(--delay) infinite}
+.pepStar::before,.pepStar::after{content:"";position:absolute;left:50%;top:50%;background:#fff;border-radius:50%;box-shadow:0 0 8px rgba(255,170,215,.9)}
+.pepStar::before{width:26px;height:1px;transform:translate(-50%,-50%)}
+.pepStar::after{width:1px;height:26px;transform:translate(-50%,-50%)}
+@keyframes pepFallStraight{
+0%{top:-28px;opacity:0}
+10%{opacity:.65}
+35%{opacity:.15}
+55%{opacity:.95}
+75%{opacity:.3}
+90%{opacity:.7}
+100%{top:calc(100vh + 28px);opacity:0}
 }
 @media(prefers-reduced-motion:reduce){#pepGlitterField{display:none}}
 </style>
-<script id="pepmosa-v8-glitter-script">
+<script id="pepmosa-clean-glitter-script">
 (function(){
-function start(){
+function init(){
 const old=document.getElementById('pepGlitterField');if(old)old.remove();
 const field=document.createElement('div');field.id='pepGlitterField';
-const count=window.innerWidth<650?32:55;
+const count=window.innerWidth<650?20:38;
 for(let i=0;i<count;i++){
-const s=document.createElement('span');s.className='pepSpark'+(i%8===0?' big':'');s.textContent=i%3===0?'✦':'✧';
-s.style.left=(2+Math.random()*96)+'vw';s.style.top=(2+Math.random()*96)+'vh';
-s.style.setProperty('--dur',(6.5+Math.random()*5.5).toFixed(2)+'s');
-s.style.setProperty('--delay',(-Math.random()*11).toFixed(2)+'s');
-for(const [n,v] of [['--dx1',(-5+Math.random()*10)+'px'],['--dy1',(-5+Math.random()*10)+'px'],['--dx2',(-12+Math.random()*24)+'px'],['--dy2',(-12+Math.random()*24)+'px'],['--dx3',(-8+Math.random()*16)+'px'],['--dy3',(-8+Math.random()*16)+'px'],['--dx4',(-14+Math.random()*28)+'px'],['--dy4',(-14+Math.random()*28)+'px'],['--dx5',(-20+Math.random()*40)+'px'],['--dy5',(-20+Math.random()*40)+'px']])s.style.setProperty(n,v);
+const s=document.createElement('span');s.className='pepStar';s.textContent=i%5===0?'✦':'✧';
+s.style.setProperty('--x',(Math.random()*100).toFixed(2)+'vw');
+s.style.setProperty('--size',(10+Math.random()*15).toFixed(1)+'px');
+s.style.setProperty('--time',(13+Math.random()*11).toFixed(1)+'s');
+s.style.setProperty('--delay',(-Math.random()*24).toFixed(1)+'s');
 field.appendChild(s)}
 document.body.appendChild(field)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
 </body>

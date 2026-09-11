@@ -2680,7 +2680,7 @@ load();
     const liveProducts=
       (Array.isArray(window.products)&&window.products.length ? window.products : null) ||
       (Array.isArray(window.__pepBaseProducts)&&window.__pepBaseProducts.length ? window.__pepBaseProducts : null) ||
-      (Array.isArray(products)&&products.length ? products : []);
+      (typeof products!=='undefined' && Array.isArray(products) && products.length ? products : []);
     const input=document.getElementById('search');
     const q=String(input?.value||'').toLowerCase().trim();
 
@@ -2729,13 +2729,8 @@ load();
       '</article>';
     }).join('');
 
-    grid.querySelectorAll('.pepSelectVariant').forEach(btn=>{
-      btn.addEventListener('click',function(){
-        if(typeof window.openProductPicker==='function'){
-          window.openProductPicker(this.dataset.pid);
-        }
-      });
-    });
+    // Clicks are handled by the single delegated handler below.
+    // Do not attach a second per-button handler here.
   }
 
   window.renderProducts=renderIndexProducts;

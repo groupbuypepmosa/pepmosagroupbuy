@@ -143,7 +143,7 @@ async function trackOFA(){
   out.innerHTML='<div class="track-empty">Checking your MOQ orders…</div>';
   try{
     const [r,gs]=await Promise.all([
-      S().rpc('ofa_get_customer_tracking',{p_email:email}),
+      S().rpc('ofa_get_customer_tracking',{p_email:email,p_gb_id:ACTIVE_GB?.gb_id||null}),
       S().from('ofa_group_buys').select('global_tracking_status,global_tracking_notes').eq('gb_id',ACTIVE_GB?.gb_id).single()
     ]);
     if(r.error)throw r.error;if(gs.error)throw gs.error;

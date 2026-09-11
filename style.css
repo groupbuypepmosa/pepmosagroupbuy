@@ -328,3 +328,51 @@ body::after{
   opacity:.9!important;
   animation:pepGlitterV2 3.2s ease-in-out infinite!important;
 }
+
+
+/* PEPMOSA GLITTER V4 — full-site sparkle overlay */
+/* Dense full-page glitter, intentionally above all page surfaces but below modals/buttons. */
+body::after{
+  content:"";
+  position:fixed!important;
+  inset:0!important;
+  z-index:9999!important;
+  pointer-events:none!important;
+  opacity:1!important;
+  background-image:
+    radial-gradient(circle at 2% 4%,#fff 0 1.4px,transparent 3px),
+    radial-gradient(circle at 6% 21%,#ffd1e7 0 1px,transparent 2.5px),
+    radial-gradient(circle at 10% 49%,#fff 0 1.8px,transparent 3.2px),
+    radial-gradient(circle at 14% 76%,#ffc4e0 0 1.1px,transparent 2.7px),
+    radial-gradient(circle at 18% 11%,#fff 0 1.3px,transparent 2.8px),
+    radial-gradient(circle at 23% 34%,#ffd9ec 0 1.2px,transparent 2.7px),
+    radial-gradient(circle at 27% 61%,#fff 0 1.7px,transparent 3.2px),
+    radial-gradient(circle at 31% 91%,#ffc5e1 0 1px,transparent 2.6px),
+    radial-gradient(circle at 36% 18%,#fff 0 1.5px,transparent 3px),
+    radial-gradient(circle at 40% 45%,#ffd2e8 0 1px,transparent 2.5px),
+    radial-gradient(circle at 44% 73%,#fff 0 1.8px,transparent 3.2px),
+    radial-gradient(circle at 48% 7%,#ffc5e1 0 1.1px,transparent 2.7px),
+    radial-gradient(circle at 52% 31%,#fff 0 1.4px,transparent 2.9px),
+    radial-gradient(circle at 56% 58%,#ffd9ec 0 1px,transparent 2.5px),
+    radial-gradient(circle at 60% 86%,#fff 0 1.8px,transparent 3.2px),
+    radial-gradient(circle at 64% 14%,#ffc5e1 0 1.1px,transparent 2.7px),
+    radial-gradient(circle at 68% 40%,#fff 0 1.5px,transparent 3px),
+    radial-gradient(circle at 72% 69%,#ffd2e8 0 1px,transparent 2.5px),
+    radial-gradient(circle at 76% 94%,#fff 0 1.7px,transparent 3.1px),
+    radial-gradient(circle at 80% 23%,#ffc5e1 0 1.1px,transparent 2.7px),
+    radial-gradient(circle at 84% 51%,#fff 0 1.5px,transparent 3px),
+    radial-gradient(circle at 88% 79%,#ffd9ec 0 1px,transparent 2.5px),
+    radial-gradient(circle at 92% 6%,#fff 0 1.8px,transparent 3.2px),
+    radial-gradient(circle at 96% 35%,#ffc5e1 0 1.1px,transparent 2.7px),
+    radial-gradient(circle at 99% 64%,#fff 0 1.5px,transparent 3px);
+  filter:drop-shadow(0 0 6px rgba(239,92,170,.75));
+  animation:pepFullSparkle 2.6s ease-in-out infinite;
+}
+@keyframes pepFullSparkle{
+  0%,100%{opacity:.28;filter:drop-shadow(0 0 3px rgba(239,92,170,.35))}
+  18%{opacity:.95}
+  32%{opacity:.42}
+  48%{opacity:1;filter:drop-shadow(0 0 10px rgba(239,92,170,.9))}
+  64%{opacity:.35}
+  82%{opacity:.9}
+}

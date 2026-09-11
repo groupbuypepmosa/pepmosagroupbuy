@@ -139,23 +139,67 @@ function ofaEsc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':
 async function trackOFA(){
   const input=document.getElementById('trackEmail'),out=document.getElementById('trackResult');
   const email=(input?.value||EMAIL||'').trim().toLowerCase();
-  if(!/^\S+@\S+\.\S+$/.test(email)){out.innerHTML='<div class="track-empty">Please enter the email used for your MOQ/Open for All checkout.</div>';return;}
+  if(!/^\\S+@\\S+\\.\\S+$/.test(email)){
+    out.innerHTML='<div class="track-empty">Please enter the email used for your MOQ/Open for All checkout.</div>';
+    return;
+  }
   out.innerHTML='<div class="track-empty">Checking your MOQ orders…</div>';
   try{
-    const [r,gs]=await Promise.all([
-      S().rpc('ofa_get_customer_tracking',{p_email:email}),
-      S().from('ofa_group_buys').select('global_tracking_status,global_tracking_notes').eq('gb_id',ACTIVE_GB?.gb_id).single()
-    ]);
-    // Tracking is intentionally scoped to the selected GB/MOQ.
-    if(r.error)throw r.error;if(gs.error)throw gs.error;
-    const data=r.data||{},orders=Array.isArray(data.orders)?data.orders:[],items=Array.isArray(data.items)?data.items:[];
-    if(!orders.length){out.innerHTML='<div class="track-empty">No MOQ/Open for All orders found for this email yet.</div>';return;}
-    const g=gs.data||{},status=g.global_tracking_status||'ORDER RECEIVED',notes=g.global_tracking_notes||'';
-    const products={};items.forEach(i=>products[i.product_name]=(products[i.product_name]||0)+Number(i.qty||0));
-    const itemText=Object.entries(products).map(([name,qty])=>'<div>• '+ofaEsc(name)+' × <b>'+qty+'</b></div>').join('')||'<div>Items are being prepared.</div>';
-    const orderText=orders.map(o=>'<span class="track-id" style="margin-right:6px">'+ofaEsc(o.order_id)+'</span>').join('');
-    out.innerHTML='<div class="track-card" style="border:2px solid #efb5d2"><div class="track-head"><div><div class="small" style="font-weight:900;color:#cc2d88">GLOBAL MOQ SHIPPING UPDATE</div><h3 style="margin:5px 0">📦 '+ofaEsc(status)+'</h3></div><span class="track-status">'+ofaEsc(status)+'</span></div><div class="ofa-track-now"><div class="ofa-track-icon">📦</div><div><small>CURRENT UPDATE</small><h4>'+ofaEsc(status)+'</h4><p>'+ofaEsc(ofaTrackMessage(status))+'</p></div></div>'+ofaTimeline(status)+(notes?'<div class="ofa-track-note"><b>Latest note</b><br>'+ofaEsc(notes)+'</div>':'')+'<div class="track-items"><b>Your combined MOQ orders</b><div style="margin-top:8px">'+itemText+'</div></div><div style="margin-top:12px"><div class="small">Your checkout references</div>'+orderText+'</div><div class="small" style="margin-top:12px">This is one shared shipping update for all Open for All / MOQ customers.</div></div>';
-  }catch(err){console.error(err);out.innerHTML='<div class="track-empty">Unable to load your tracking right now. Please try again.</div>';}
+    const r=await S().rpc('ofa_get_customer_tracking',{p_email:email});
+    if(r.error) throw r.error;
+
+    const data=r.data||{},orders=Array.isArray(data.orders)?data.orders:[],items=Array.isArray(data.items)?data.items:[],waybills=Array.isArray(data.waybills)?data.waybills:[];
+    if(!orders.length){
+      out.innerHTML='<div class="track-empty">No MOQ/Open for All orders found for this email yet.</div>';
+      return;
+    }
+
+    const byOrder={};
+    waybills.forEach(w=>{ if(w && w.order_id) byOrder[w.order_id]=w; });
+
+    const groups={};
+    orders.forEach(o=>{
+      const key=o.gb_id||o.gb_number||'unknown';
+      if(!groups[key]) groups[key]={gb_id:o.gb_id,gb_number:o.gb_number,gb_name:o.gb_name,global_status:o.global_tracking_status||'ORDER RECEIVED',global_notes:o.global_tracking_notes||'',orders:[]};
+      groups[key].orders.push(o);
+    });
+
+    const html=Object.values(groups).map(g=>{
+      const orderIds=new Set(g.orders.map(o=>o.order_id));
+      const groupItems={};
+      items.filter(i=>orderIds.has(i.order_id)).forEach(i=>{
+        groupItems[i.product_name]=(groupItems[i.product_name]||0)+Number(i.qty||0);
+      });
+
+      const latestWaybill=g.orders.map(o=>byOrder[o.order_id]).find(Boolean);
+      const status=(latestWaybill?.status)||g.global_status||'ORDER RECEIVED';
+      const notes=(latestWaybill?.notes)||g.global_notes||'';
+      const courier=(latestWaybill?.courier)||'';
+      const tracking=(latestWaybill?.tracking_number)||latestWaybill?.waybill_number||'';
+      const itemText=Object.entries(groupItems).map(([name,qty])=>'<div>• '+ofaEsc(name)+' × <b>'+qty+'</b></div>').join('')||'<div>Items are being prepared.</div>';
+      const orderText=g.orders.map(o=>'<span class="track-id" style="margin-right:6px">'+ofaEsc(o.order_id)+'</span>').join('');
+      const gbLabel=(g.gb_name||g.gb_number)?ofaEsc([g.gb_number?('GB '+g.gb_number):'',g.gb_name||''].filter(Boolean).join(' • ')):'Open for All / MOQ';
+
+      return '<div class="track-card" style="border:2px solid #efb5d2">'+
+        '<div class="track-head"><div><div class="small" style="font-weight:900;color:#cc2d88">MOQ / OPEN FOR ALL</div><h3 style="margin:5px 0">♡ '+gbLabel+'</h3></div><span class="track-status">'+ofaEsc(status)+'</span></div>'+
+        '<div class="ofa-track-now"><div class="ofa-track-icon">📦</div><div><small>CURRENT UPDATE</small><h4>'+ofaEsc(status)+'</h4><p>'+ofaEsc(ofaTrackMessage(status))+'</p></div></div>'+
+        ofaTimeline(status)+
+        (notes?'<div class="ofa-track-note"><b>Latest note</b><br>'+ofaEsc(notes)+'</div>':'')+
+        ((courier||tracking)?'<div class="track-waybill"><b>Shipping</b><br>'+(courier?ofaEsc(courier):'Courier pending')+(tracking?' • '+ofaEsc(tracking):'')+'</div>':'')+
+        '<div class="track-items"><b>Your orders in this MOQ</b><div style="margin-top:8px">'+itemText+'</div></div>'+
+        '<div style="margin-top:12px"><div class="small">Your checkout references</div>'+orderText+'</div>'+
+      '</div>';
+    }).join('');
+
+    out.innerHTML='<div class="track-card" style="border:2px solid #e9b4d1;background:linear-gradient(135deg,#fff7fb,#fff)">'+
+      '<div class="track-head"><div><div class="small" style="font-weight:900;color:#cc2d88">YOUR MOQ HISTORY</div><h3 style="margin:5px 0">All your Open for All orders ♡</h3></div><span class="track-status">'+Object.keys(groups).length+' MOQ'+(Object.keys(groups).length===1?'':'s')+'</span></div>'+
+      '<div class="track-empty" style="margin-top:12px">Your tracking is not limited to the currently open MOQ. Older MOQ/GB orders stay visible here even after a new GB is opened.</div>'+
+      html+
+    '</div>';
+  }catch(err){
+    console.error('MOQ tracking error:',err);
+    out.innerHTML='<div class="track-empty">Unable to load your tracking right now. Please try again.</div>';
+  }
 }
 window.trackOFA=trackOFA;
 

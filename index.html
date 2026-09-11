@@ -2777,38 +2777,39 @@ load();
 })();
 </script>
 
-<!-- PEPMOSA CLEAN GLITTER — true falling sparkle rain -->
-<style id="pepmosa-clean-glitter">
+<!-- PEPMOSA FALLING SPARKLES — no boomerang, no side-to-side motion -->
+<style id="pepmosa-falling-sparkles">
 #pepGlitterField{position:fixed;inset:0;z-index:9990;pointer-events:none;overflow:hidden}
-.pepStar{position:absolute;top:-28px;left:var(--x);font-family:Georgia,serif;font-size:var(--size);line-height:1;color:#fff;opacity:0;text-shadow:0 0 4px #fff,0 0 10px rgba(255,170,215,.95),0 0 20px rgba(235,75,157,.65);animation:pepFallStraight var(--time) linear var(--delay) infinite}
-.pepStar::before,.pepStar::after{content:"";position:absolute;left:50%;top:50%;background:#fff;border-radius:50%;box-shadow:0 0 8px rgba(255,170,215,.9)}
-.pepStar::before{width:26px;height:1px;transform:translate(-50%,-50%)}
-.pepStar::after{width:1px;height:26px;transform:translate(-50%,-50%)}
-@keyframes pepFallStraight{
-0%{top:-28px;opacity:0}
-10%{opacity:.65}
-35%{opacity:.15}
-55%{opacity:.95}
-75%{opacity:.3}
-90%{opacity:.7}
-100%{top:calc(100vh + 28px);opacity:0}
+.pepStar{position:absolute;top:-24px;left:var(--x);width:5px;height:5px;border-radius:50%;background:#fff;opacity:0;box-shadow:0 0 5px #fff,0 0 11px #ffabd5,0 0 18px rgba(235,75,157,.65);animation:pepStraightFall var(--time) linear var(--delay) infinite}
+.pepStar.big{width:8px;height:8px;box-shadow:0 0 7px #fff,0 0 15px #ffabd5,0 0 25px rgba(235,75,157,.7)}
+@keyframes pepStraightFall{
+0%{top:-24px;opacity:0}
+8%{opacity:.65}
+22%{opacity:.2}
+42%{opacity:.9}
+58%{opacity:.3}
+76%{opacity:.8}
+92%{opacity:.15}
+100%{top:calc(100vh + 24px);opacity:0}
 }
 @media(prefers-reduced-motion:reduce){#pepGlitterField{display:none}}
 </style>
-<script id="pepmosa-clean-glitter-script">
+<script id="pepmosa-falling-sparkles-script">
 (function(){
 function init(){
 const old=document.getElementById('pepGlitterField');if(old)old.remove();
 const field=document.createElement('div');field.id='pepGlitterField';
-const count=window.innerWidth<650?20:38;
+const count=window.innerWidth<650?18:34;
 for(let i=0;i<count;i++){
-const s=document.createElement('span');s.className='pepStar';s.textContent=i%5===0?'✦':'✧';
-s.style.setProperty('--x',(Math.random()*100).toFixed(2)+'vw');
-s.style.setProperty('--size',(10+Math.random()*15).toFixed(1)+'px');
-s.style.setProperty('--time',(13+Math.random()*11).toFixed(1)+'s');
-s.style.setProperty('--delay',(-Math.random()*24).toFixed(1)+'s');
-field.appendChild(s)}
-document.body.appendChild(field)}
+ const s=document.createElement('i');
+ s.className='pepStar'+(i%9===0?' big':'');
+ s.style.setProperty('--x',(Math.random()*100).toFixed(2)+'vw');
+ s.style.setProperty('--time',(14+Math.random()*10).toFixed(1)+'s');
+ s.style.setProperty('--delay',(-Math.random()*24).toFixed(1)+'s');
+ field.appendChild(s);
+}
+document.body.appendChild(field);
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>

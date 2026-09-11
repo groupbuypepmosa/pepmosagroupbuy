@@ -1,7 +1,7 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Open for All Admin</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script><style>
 :root{--pink:#cc2d88;--dark:#2d2730;--soft:#fff8fb;--line:#edd8e5}*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#fff8fb,#f6effa);margin:0;color:var(--dark)}.w{max-width:1180px;margin:auto;padding:28px 18px}.hero{background:linear-gradient(135deg,#d92f8d,#a843bd);color:#fff;border-radius:26px;padding:26px 30px;box-shadow:0 15px 40px #b62b7b33}.hero h1{margin:0 0 6px}.hero p{margin:0;opacity:.9}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}.stat,.card{background:#fff;border:1px solid var(--line);border-radius:20px}.stat{padding:18px}.stat .num{font-size:28px;font-weight:900;color:var(--pink);margin-top:7px}.card{padding:20px;margin:15px 0}.card h2{margin:0 0 15px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.f{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:13px}.f input,.f textarea,.f select{width:100%;padding:12px;border:1px solid #e2cbd8;border-radius:11px;font:inherit;background:#fff}.btn{background:var(--pink);color:#fff;border:0;border-radius:11px;padding:11px 14px;font-weight:800;cursor:pointer}.btn.alt{background:#fff;color:var(--pink);border:1px solid var(--pink)}.row{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:14px 0;border-bottom:1px solid #f0e6ec}.empty{padding:22px;text-align:center;color:#8a7b84;background:#fff8fb;border-radius:12px}.preview{width:110px;height:110px;object-fit:contain;border:1px dashed #e0b8cf;border-radius:12px;padding:5px;margin-top:8px}.actions{display:flex;gap:8px;flex-wrap:wrap}.small{font-size:12px;color:#8a7b84}.tag{display:inline-block;background:#fff0f7;color:var(--pink);padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.row{align-items:flex-start;flex-direction:column}}
 </style></head><body><div class="w">
-<div class="hero"><h1>🌐 Open for All Admin</h1><p>Completely separate from Group Buy — Products • Payments • Waybills • Totals</p><div id="moqRoundBadge" style="display:inline-block;margin-top:12px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.18);font-weight:900">CURRENT: MOQ</div></div>
+<div class="hero"><h1>🌐 Open for All Admin</h1><p>Completely separate from Group Buy — Products • Payments • Waybills • Totals</p><div id="moqRoundBadge" style="display:inline-block;margin-top:12px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.18);font-weight:900">CURRENT: MOQ</div><select id="gbSelect" style="margin-left:8px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:#fff;color:#7d2459;font-weight:800"></select></div>
 <div class="card"><h2>🏷️ MOQ Name & Number</h2><p class="small">Each NEW GB is completely separate. It gets its own products, prices, buyers, payments, shipping status and waybills. Creating a new GB does not mix with previous GBs.</p><div class="grid"><label class="f">MOQ NAME<input id="moqName" placeholder="e.g. FUAN"></label><label class="f">MOQ NUMBER / ROUND<input id="moqNumber" type="text" value="1" placeholder="e.g. RAWND 3"></label><label class="f">MOQ TARGET #<input id="moqTarget" type="number" min="1" placeholder="e.g. 50"></label></div><p class="small">Example: enter <b>50</b> and the customer-facing progress will show <b>33 / 50</b>.</p><div class="actions" style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button id="saveMoqRoundBtn" type="button" class="btn">SAVE MOQ NAME & NUMBER</button><button id="addNewMoqBtn" type="button" class="btn">➕ ADD NEW MOQ</button></div><div id="moqRoundStatus" class="small" style="margin-top:10px"></div></div>
 <div id="stats" class="stats"></div>
 <div class="card"><h2>➕ Add Product</h2><div class="grid"><label class="f">Product Name<input id="pn" placeholder="e.g. Tirzepatide 15mg"></label><label class="f">Amount<input id="pa" type="number" placeholder="0"></label><label class="f">MOQ<input id="pm" type="number" value="1"></label><label class="f">Product Photo<input id="pi" type="file" accept="image/png,image/jpeg,image/webp"></label></div><img id="pprev" class="preview" style="display:none"><br><button id="addProductBtn" type="button" class="btn">ADD PRODUCT</button><div id="saveStatus" class="small" style="margin-top:10px"></div><div id="plist"></div></div>
@@ -19,12 +19,22 @@ async function loadMoqRound(){
   try{
     const st=await s.from('ofa_settings').select('active_gb_id').eq('id',true).single();
     if(st.error)throw st.error;
+    const all=await s.from('ofa_group_buys').select('*').order('created_at',{ascending:false});
+    if(all.error)throw all.error;
+    const sel=document.getElementById('gbSelect');
+    if(sel){sel.innerHTML=(all.data||[]).map(g=>'<option value="'+g.gb_id+'">'+(g.customer_facing_name||'MOQ')+' • GB '+g.gb_number+'</option>').join('');sel.value=st.data?.active_gb_id||'';sel.onchange=()=>switchGB(sel.value);}
     const g=await s.from('ofa_group_buys').select('*').eq('gb_id',st.data?.active_gb_id).single();
     if(g.error)throw g.error;
     ACTIVE_GB=g.data;
     moqRound={name:(ACTIVE_GB.customer_facing_name||'').trim(),number:String(ACTIVE_GB.gb_number||'1').trim()||'1',target:Number(ACTIVE_GB.moq_target||0)||0};
     renderMoqRound();
   }catch(e){console.error(e);renderMoqRound();}
+}
+async function switchGB(id){
+  if(!id)return;
+  const r=await s.from('ofa_settings').update({active_gb_id:id,updated_at:new Date().toISOString()}).eq('id',true);
+  if(r.error)return alert('Could not switch GB: '+r.error.message);
+  await loadMoqRound(); await load();
 }
 const ofaPeso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2});
 const empty=t=>'<div class="empty">'+t+'</div>';

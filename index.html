@@ -2777,71 +2777,39 @@ load();
 })();
 </script>
 
-<!-- PEPMOSA V7 VISIBLE GLITTER FIELD -->
-<style id="pepmosa-v7-glitter">
-#pepGlitterField{
-  position:fixed;inset:0;z-index:9990;
-  pointer-events:none;overflow:hidden;
-}
-.pepSpark{
-  position:absolute;
-  display:block;
-  width:22px;height:22px;
-  transform:translate(-50%,-50%) scale(.35) rotate(0deg);
-  opacity:0;
-  color:#fff;
-  font-family:Georgia,serif;
-  font-size:20px;
-  line-height:22px;
-  text-align:center;
-  text-shadow:0 0 3px #fff,0 0 8px #ff8dc7,0 0 18px #e94d9d;
-  animation:pepSparkFlash var(--dur) ease-in-out var(--delay) infinite;
-}
-.pepSpark.big{
-  width:38px;height:38px;font-size:35px;line-height:38px;
-  text-shadow:0 0 5px #fff,0 0 12px #ff9bd0,0 0 28px #e93e99,0 0 45px rgba(233,62,153,.55);
-}
-.pepSpark:before,.pepSpark:after{
-  content:"";
-  position:absolute;left:50%;top:50%;
-  background:linear-gradient(to right,transparent,#fff,transparent);
-  transform:translate(-50%,-50%);
-  border-radius:999px;
-}
-.pepSpark:before{width:34px;height:2px;box-shadow:0 0 7px #ff9dcc}
-.pepSpark:after{width:2px;height:34px;box-shadow:0 0 7px #ff9dcc}
-@keyframes pepSparkFlash{
-  0%,100%{opacity:0;transform:translate(-50%,-50%) scale(.25) rotate(0deg)}
-  25%{opacity:.25;transform:translate(-50%,-50%) scale(.55) rotate(20deg)}
-  45%{opacity:1;transform:translate(-50%,-50%) scale(1.25) rotate(45deg)}
-  58%{opacity:.45;transform:translate(-50%,-50%) scale(.8) rotate(65deg)}
-  72%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(90deg)}
-  100%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(130deg)}
+<!-- PEPMOSA V8 — individual sparkle motion only -->
+<style id="pepmosa-v8-glitter">
+#pepGlitterField{position:fixed;inset:0;z-index:9990;pointer-events:none;overflow:hidden}
+.pepSpark{position:absolute;display:block;width:28px;height:28px;transform:translate(-50%,-50%);opacity:0;color:#fff;font-family:Georgia,serif;font-size:18px;line-height:28px;text-align:center;text-shadow:0 0 4px #fff,0 0 10px #ff9bcf,0 0 20px #e94b9e;animation:pepIndividual var(--dur) ease-in-out var(--delay) infinite}
+.pepSpark.big{width:42px;height:42px;font-size:32px;line-height:42px;text-shadow:0 0 5px #fff,0 0 12px #ffadd8,0 0 26px #e83e98,0 0 42px rgba(232,62,152,.5)}
+.pepSpark:before,.pepSpark:after{content:"";position:absolute;left:50%;top:50%;background:linear-gradient(to right,transparent,#fff,transparent);border-radius:999px;opacity:.9}
+.pepSpark:before{width:34px;height:1.5px;transform:translate(-50%,-50%);box-shadow:0 0 8px #ff9dcc}
+.pepSpark:after{width:1.5px;height:34px;transform:translate(-50%,-50%);box-shadow:0 0 8px #ff9dcc}
+@keyframes pepIndividual{
+0%,100%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(0deg)}
+25%{opacity:.2;transform:translate(calc(-50% + var(--dx1)),calc(-50% + var(--dy1))) scale(.55) rotate(18deg)}
+45%{opacity:1;transform:translate(calc(-50% + var(--dx2)),calc(-50% + var(--dy2))) scale(1.25) rotate(45deg)}
+60%{opacity:.35;transform:translate(calc(-50% + var(--dx3)),calc(-50% + var(--dy3))) scale(.72) rotate(70deg)}
+76%{opacity:.95;transform:translate(calc(-50% + var(--dx4)),calc(-50% + var(--dy4))) scale(1.05) rotate(100deg)}
+100%{opacity:0;transform:translate(calc(-50% + var(--dx5)),calc(-50% + var(--dy5))) scale(.25) rotate(140deg)}
 }
 @media(prefers-reduced-motion:reduce){#pepGlitterField{display:none}}
 </style>
-<script id="pepmosa-v7-glitter-script">
+<script id="pepmosa-v8-glitter-script">
 (function(){
-  function start(){
-    if(document.getElementById('pepGlitterField')) return;
-    const field=document.createElement('div');
-    field.id='pepGlitterField';
-    const count=window.innerWidth<650?34:58;
-    for(let i=0;i<count;i++){
-      const s=document.createElement('span');
-      s.className='pepSpark'+(i%9===0?' big':'');
-      s.textContent=i%3===0?'✦':'✧';
-      s.style.left=(2+Math.random()*96)+'vw';
-      s.style.top=(3+Math.random()*94)+'vh';
-      s.style.setProperty('--dur',(1.8+Math.random()*3.2).toFixed(2)+'s');
-      s.style.setProperty('--delay',(-Math.random()*4.5).toFixed(2)+'s');
-      s.style.fontSize=(13+Math.random()*12)+'px';
-      field.appendChild(s);
-    }
-    document.body.appendChild(field);
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true});
-  else start();
+function start(){
+const old=document.getElementById('pepGlitterField');if(old)old.remove();
+const field=document.createElement('div');field.id='pepGlitterField';
+const count=window.innerWidth<650?40:72;
+for(let i=0;i<count;i++){
+const s=document.createElement('span');s.className='pepSpark'+(i%8===0?' big':'');s.textContent=i%3===0?'✦':'✧';
+s.style.left=(2+Math.random()*96)+'vw';s.style.top=(2+Math.random()*96)+'vh';
+s.style.setProperty('--dur',(1.7+Math.random()*3.4).toFixed(2)+'s');
+s.style.setProperty('--delay',(-Math.random()*5).toFixed(2)+'s');
+for(const [n,v] of [['--dx1',(-5+Math.random()*10)+'px'],['--dy1',(-5+Math.random()*10)+'px'],['--dx2',(-12+Math.random()*24)+'px'],['--dy2',(-12+Math.random()*24)+'px'],['--dx3',(-8+Math.random()*16)+'px'],['--dy3',(-8+Math.random()*16)+'px'],['--dx4',(-14+Math.random()*28)+'px'],['--dy4',(-14+Math.random()*28)+'px'],['--dx5',(-20+Math.random()*40)+'px'],['--dy5',(-20+Math.random()*40)+'px']])s.style.setProperty(n,v);
+field.appendChild(s)}
+document.body.appendChild(field)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 </script>
 </body>

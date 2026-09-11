@@ -139,7 +139,7 @@ function ofaEsc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':
 async function trackOFA(){
   const input=document.getElementById('trackEmail'),out=document.getElementById('trackResult');
   const email=(input?.value||EMAIL||'').trim().toLowerCase();
-  if(!/^\\S+@\\S+\\.\\S+$/.test(email)){
+  if(!/^\S+@\S+\.\S+$/.test(email)){
     out.innerHTML='<div class="track-empty">Please enter the email used for your MOQ/Open for All checkout.</div>';
     return;
   }

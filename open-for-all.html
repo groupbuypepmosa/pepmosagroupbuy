@@ -144,7 +144,7 @@ async function trackOFA(){
   try{
     const [r,gs]=await Promise.all([
       S().rpc('ofa_get_customer_tracking',{p_email:email}),
-      S().from('ofa_settings').select('global_tracking_status,global_tracking_notes').eq('id',true).single()
+      S().from('ofa_group_buys').select('global_tracking_status,global_tracking_notes').eq('gb_id',ACTIVE_GB?.gb_id).single()
     ]);
     if(r.error)throw r.error;if(gs.error)throw gs.error;
     const data=r.data||{},orders=Array.isArray(data.orders)?data.orders:[],items=Array.isArray(data.items)?data.items:[];

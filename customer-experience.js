@@ -106,7 +106,7 @@
     if(!sb||!wrap)return;
     try{
       const [productsRes,totalsRes]=await Promise.all([
-        sb.from('ofa_products').select('*').eq('status','AVAILABLE'),
+        sb.from('ofa_products').select('*').in('status',['AVAILABLE','SOLD_OUT','SOLD OUT']),
         sb.rpc('ofa_public_product_totals')
       ]);
       if(productsRes.error)throw productsRes.error;

@@ -17,17 +17,36 @@ function moqLabel(){const n=String(moqRound.number||'1').trim()||'1';return (moq
 function renderMoqRound(){const label=moqLabel();const badge=document.getElementById('moqRoundBadge');if(badge)badge.textContent='CURRENT: '+label;const n=document.getElementById('moqName'),no=document.getElementById('moqNumber'),t=document.getElementById('moqTarget');if(n)n.value=moqRound.name||'';if(no)no.value=String(moqRound.number||'1').trim()||'1';if(t)t.value=Number(moqRound.target||0)||'';document.title=label+' • Open for All Admin';}
 async function loadMoqRound(){try{const r=await s.from('ofa_settings').select('moq_name,moq_number,moq_target').eq('id',true).single();if(!r.error&&r.data){moqRound={name:(r.data.moq_name||'').trim(),number:String(r.data.moq_number||'1').trim()||'1',target:Number(r.data.moq_target||0)||0};}renderMoqRound();}catch(e){console.error(e);renderMoqRound();}}
 async function saveMoqRound(){const name=(document.getElementById('moqName').value||'').trim(),number=(document.getElementById('moqNumber').value||'1').trim()||'1',target=Math.max(0,Number(document.getElementById('moqTarget').value||0));const st=document.getElementById('moqRoundStatus');if(st)st.textContent='Saving...';try{const r=await s.from('ofa_settings').update({moq_name:name,moq_number:number,moq_target:target,updated_at:new Date().toISOString()}).eq('id',true);if(r.error)throw r.error;moqRound={name,number,target};renderMoqRound();if(st)st.textContent='Saved: '+moqLabel()+(target?' • Target '+target:'')+'.';alert('MOQ name and number saved for all customers.');}catch(e){console.error(e);if(st)st.textContent='ERROR: '+(e.message||'Could not save');alert('Could not save MOQ name and number: '+(e.message||''));}}
-function addNewMoq(){
+async function addNewMoq(){
   const nextName=prompt('MOQ name for the new round:',moqRound.name||'FUAN');
   if(nextName===null)return;
   const suggested=String(moqRound.number||'1').trim()||'1';
   const nextNumber=prompt('MOQ number / round label (letters allowed):',suggested);
   if(nextNumber===null)return;
   const n=String(nextNumber).trim()||suggested;
-  document.getElementById('moqName').value=String(nextName).trim();
-  document.getElementById('moqNumber').value=n;
+  const targetRaw=prompt('MOQ target quantity:',String(moqRound.target||50));
+  if(targetRaw===null)return;
+  const target=Math.max(0,Number(targetRaw||0));
   const st=document.getElementById('moqRoundStatus');
-  if(st)st.textContent='New MOQ ready: '+(String(nextName).trim()?String(nextName).trim()+' ':'')+'MOQ '+n+'. Click SAVE MOQ NAME & NUMBER to activate it.';
+  if(st)st.textContent='Creating new MOQ...';
+  try{
+    const r=await s.from('ofa_settings').update({
+      moq_name:String(nextName).trim(),
+      moq_number:n,
+      moq_target:target,
+      updated_at:new Date().toISOString()
+    }).eq('id',true);
+    if(r.error)throw r.error;
+    moqRound={name:String(nextName).trim(),number:n,target};
+    renderMoqRound();
+    if(st)st.textContent='New MOQ activated: '+moqLabel()+(target?' • Target '+target:'')+'.';
+    await load();
+    alert('New MOQ activated successfully.');
+  }catch(e){
+    console.error(e);
+    if(st)st.textContent='ERROR: '+(e.message||'Could not create new MOQ');
+    alert('Could not create new MOQ: '+(e.message||''));
+  }
 }
 const ofaPeso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2});
 const empty=t=>'<div class="empty">'+t+'</div>';

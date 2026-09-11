@@ -714,13 +714,13 @@ header{
 <body>
 <script id="pep-index-soldout-runtime-cleanup">
 (function(){
+  // CSS already hides the legacy sold-out block. One targeted cleanup is enough.
   function removeLegacySoldOut(){
     const el=document.getElementById('pepSoldOutSection');
     if(el) el.remove();
   }
-  removeLegacySoldOut();
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',removeLegacySoldOut,{once:true});
-  new MutationObserver(removeLegacySoldOut).observe(document.documentElement,{childList:true,subtree:true});
+  else removeLegacySoldOut();
 })();
 </script>
 
@@ -2591,34 +2591,10 @@ load();
 </style>
 <script id="pepmosa-kit-completion-force-script">
 (function(){
-  function isKitPage(){
-    const txt=(document.body?.innerText||'').toUpperCase();
-    return txt.includes('KIT COMPLETION');
-  }
-  function removeLegacy(){
-    const phrases=['Each mg is tracked separately.','Only remaining vials are available.'];
-    document.querySelectorAll('div,section,p').forEach(el=>{
-      if(el.id==='pepKitCompletionCard' || el.closest('#pepKitCompletionCard')) return;
-      const t=(el.innerText||'').trim();
-      if(phrases.some(p=>t===p) || (t.includes('Each mg is tracked separately.') && t.includes('Complete the remaining vials'))){
-        el.style.display='none';
-      }
-    });
-  }
-  function ensure(){
-    if(!isKitPage()) return;
-    removeLegacy();
-    const card=document.getElementById('pepKitCompletionCard');
-    if(card) return;
-    const grid=document.getElementById('productGrid');
-    if(!grid || !grid.parentNode) return;
-    const k=document.createElement('section');
-    k.id='pepKitCompletionCard';
-    k.innerHTML='<div class="pepKitGlow"></div><div class="pepKitTop"><div class="pepKitBadge">✦ KIT COMPLETION</div><div class="pepKitIcon">◈</div></div><h3>Complete the remaining vials</h3><p class="pepKitLead">Each <b>mg / variant is tracked separately.</b></p><div class="pepKitRules"><div><span>1</span><p>Every strength has its own separate 10-vial kit and live remaining count.</p></div><div><span>2</span><p>Only variants with remaining vials are shown.</p></div><div><span>3</span><p>You may order from <b>1 vial up to the exact live remaining quantity.</b></p></div><div class="pepKitFooter">⚡ Remaining stock is secured only when the order is successfully submitted.</div>';
-    grid.parentNode.insertBefore(k,grid);
-  }
-  document.addEventListener('DOMContentLoaded',()=>{ensure();setTimeout(ensure,400);setTimeout(ensure,1200)});
-  new MutationObserver(()=>ensure()).observe(document.documentElement,{childList:true,subtree:true});
+  // storefront-repair.js already owns Kit Completion UI. Do not observe the whole DOM.
+  function boot(){ return; }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
 })();
 </script>
 
@@ -2679,7 +2655,7 @@ load();
   };
 })();
 </script>
-<script src="customer-experience.js?v=20260911-soldout-v2"></script>
+<script src="customer-experience.js?v=20260911-soldout-v3"></script>
 <script id="pepmosa-final-product-renderer-v3">
 (function(){
   function esc2(s){
@@ -2769,7 +2745,7 @@ load();
       if(!btn || !grid.contains(btn)) return;
       e.preventDefault();
       e.stopPropagation();
-      const pid=btn.getAttribute('data-pid');
+      const pid=btn.getAttribute('data-product-id') || btn.getAttribute('data-pid');
       if(typeof window.openProductPicker==='function') window.openProductPicker(pid);
     });
   }
@@ -2798,9 +2774,8 @@ load();
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
-  setTimeout(()=>{bind();bindProductClicks();},500);
-  setTimeout(()=>{bind();bindProductClicks();},1500);
-  setTimeout(()=>{bind();bindProductClicks();},3000);
+  setTimeout(()=>{bind();bindProductClicks();},800);
+  setTimeout(()=>{bind();bindProductClicks();},1800);
 })();
 </script>
 </body>

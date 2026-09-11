@@ -104,13 +104,17 @@
     if(!sb||!wrap)return;
     try{
       const [productsRes,totalsRes]=await Promise.all([
-        sb.from('ofa_products').select('*').eq('status','AVAILABLE'),
+        sb.from('ofa_products').select('*').in('status',['AVAILABLE','SOLD_OUT','SOLD OUT']),
         sb.rpc('ofa_public_product_totals')
       ]);
       if(productsRes.error)throw productsRes.error;
       const totals=new Map((totalsRes.data||[]).map(x=>[String(x.product_id),Number(x.total_qty)||0]));
-      const items=productsRes.data||[];
-      if(!items.length){wrap.remove();return;}
+      const items=(productsRes.data||[]).sort((a,b)=>{
+        const as=/^SOLD[ _]OUT$/i.test(String(a.status||''));
+        const bs=/^SOLD[ _]OUT$/i.test(String(b.status||''));
+        return Number(as)-Number(bs);
+      });
+      if(!items.length){wrap.innerHTML='<div class="muted">No Open for All products yet.</div>';return;}
       let moqName='',round='1',globalTarget=0;
       try{
         const roundRes=await sb.from('ofa_settings').select('moq_name,moq_number,moq_target').eq('id',true).single();
@@ -118,14 +122,15 @@
       }catch(e){console.warn('MOQ round settings unavailable',e);}
       const moqLabel=(moqName?moqName+' ':'')+'MOQ '+round;
       const displayRound=(moqName?moqName+' ':'')+'RAWND '+round;
-      wrap.innerHTML='<div class="pepMoqHeader"><div><div class="label">AVAILABLE NOW</div><h3>🌐 WHAT’S OPEN FOR MOQ</h3><div class="pepMoqRoundTitle">'+displayRound+'</div><p>See the products currently available so you don’t have to search for them.</p></div><a href="open-for-all.html" class="btn primary pepMoqOpenBtn">VIEW '+displayRound+'</a></div><div class="pepMoqCards">'+items.map(x=>{
+      wrap.innerHTML='<div class="pepMoqHeader"><div><div class="label">OPEN FOR ALL • SOLD OUT ITEMS ALSO SHOWN</div><h3>🌐 WHAT’S OPEN FOR MOQ</h3><div class="pepMoqRoundTitle">'+displayRound+'</div><p>See the products currently available so you don’t have to search for them.</p></div><a href="open-for-all.html" class="btn primary pepMoqOpenBtn">VIEW '+displayRound+'</a></div><div class="pepMoqCards">'+items.map(x=>{
         const total=totals.get(String(x.id))||0;
         const target=globalTarget||Number(x.moq)||0;
         const pct=target?Math.min(100,Math.round(total/target*100)):0;
         const image=x.image_url?'<img src="'+String(x.image_url).replace(/"/g,'&quot;')+'" alt="'+String(x.name||'MOQ product').replace(/"/g,'&quot;')+'">':'<div class="pepMoqPlaceholder">🧪</div>';
         const remaining=target?Math.max(0,target-total):0;
-        const progressText=target?(remaining===0?'MOQ target reached!':' • '+remaining+' remaining'):'';
-        return '<a class="pepMoqProduct" href="open-for-all.html"><div class="pepMoqImage">'+image+'</div><div class="pepMoqInfo"><b>'+String(x.name||'MOQ PRODUCT')+'</b><span class="pepMoqBadge">MOQ '+(target||'—')+'</span><div class="pepMoqProgress"><div style="width:'+pct+'%"></div></div><small>'+total+' ordered'+(target?' • target '+target+progressText:'')+'</small></div></a>';
+        const soldOut=/^SOLD[ _]OUT$/i.test(String(x.status||''));
+        const progressText=soldOut?' • SOLD OUT':(target?(remaining===0?'MOQ target reached!':' • '+remaining+' remaining'):'');
+        return '<a class="pepMoqProduct" href="open-for-all.html"'+(soldOut?' style="opacity:.82"':'')+'><div class="pepMoqImage">'+image+'</div><div class="pepMoqInfo"><b>'+String(x.name||'MOQ PRODUCT')+'</b><span class="pepMoqBadge">'+(soldOut?'SOLD OUT • FOR REFERENCE':'MOQ '+(target||'—'))+'</span><div class="pepMoqProgress"><div style="width:'+pct+'%"></div></div><small>'+total+' ordered'+(target?' • target '+target+progressText:'')+'</small></div></a>';
       }).join('')+'</div>';
     }catch(e){
       wrap.innerHTML='<div class="pepMoqHeader"><div><div class="label">MOQ AVAILABLE NOW</div><h3>🌐 WHAT’S OPEN FOR MOQ</h3><p>Open MOQ to see the currently available products.</p></div><a href="open-for-all.html" class="btn primary pepMoqOpenBtn">OPEN MOQ</a></div>';

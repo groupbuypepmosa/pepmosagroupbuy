@@ -30,6 +30,25 @@ async function loadMoqRound(){
     renderMoqRound();
   }catch(e){console.error(e);renderMoqRound();}
 }
+async function saveMoqRound(){
+ if(!ACTIVE_GB)return alert('No active GB.');
+ const name=document.getElementById('moqName').value.trim(), number=document.getElementById('moqNumber').value.trim(), target=Math.max(0,Number(document.getElementById('moqTarget').value)||0);
+ if(!name||!number)return alert('Please enter MOQ name and number.');
+ const r=await s.from('ofa_group_buys').update({customer_facing_name:name,gb_number:number,moq_target:target,updated_at:new Date().toISOString()}).eq('gb_id',ACTIVE_GB.gb_id).select().single();
+ if(r.error)return alert('Could not save MOQ: '+r.error.message);
+ ACTIVE_GB=r.data; moqRound={name,number,target}; renderMoqRound(); document.getElementById('moqRoundStatus').textContent='Saved to this GB.'; await load();
+}
+async function addNewMoq(){
+ const name=prompt('NEW GB name (example: FUAN):'); if(name===null||!name.trim())return;
+ const number=prompt('NEW GB number / round:'); if(number===null||!number.trim())return;
+ const targetRaw=prompt('MOQ target (example: 50):','50'); if(targetRaw===null)return;
+ const r=await s.rpc('ofa_admin_create_group_buy',{p_name:name.trim(),p_number:number.trim(),p_target:Math.max(0,Number(targetRaw)||0)});
+ if(r.error)return alert('Could not create new GB: '+r.error.message);
+ const g=Array.isArray(r.data)?r.data[0]:r.data;
+ if(!g?.gb_id)return alert('New GB was not returned by database.');
+ ACTIVE_GB=g; moqRound={name:g.customer_facing_name||name.trim(),number:String(g.gb_number||number.trim()),target:Number(g.moq_target||0)||0};
+ renderMoqRound(); await loadMoqRound(); await load(); alert('New GB created. It starts empty and is completely separate from previous GBs.');
+}
 async function switchGB(id){
   if(!id)return;
   const r=await s.from('ofa_settings').update({active_gb_id:id,updated_at:new Date().toISOString()}).eq('id',true);

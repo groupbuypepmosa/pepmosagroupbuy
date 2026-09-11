@@ -2786,12 +2786,12 @@ load();
 .pepSpark:before{width:34px;height:1.5px;transform:translate(-50%,-50%);box-shadow:0 0 8px #ff9dcc}
 .pepSpark:after{width:1.5px;height:34px;transform:translate(-50%,-50%);box-shadow:0 0 8px #ff9dcc}
 @keyframes pepIndividual{
-0%,100%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(0deg)}
-25%{opacity:.2;transform:translate(calc(-50% + var(--dx1)),calc(-50% + var(--dy1))) scale(.55) rotate(18deg)}
-45%{opacity:1;transform:translate(calc(-50% + var(--dx2)),calc(-50% + var(--dy2))) scale(1.25) rotate(45deg)}
-60%{opacity:.35;transform:translate(calc(-50% + var(--dx3)),calc(-50% + var(--dy3))) scale(.72) rotate(70deg)}
-76%{opacity:.95;transform:translate(calc(-50% + var(--dx4)),calc(-50% + var(--dy4))) scale(1.05) rotate(100deg)}
-100%{opacity:0;transform:translate(calc(-50% + var(--dx5)),calc(-50% + var(--dy5))) scale(.25) rotate(140deg)}
+0%,100%{opacity:0;transform:translate(-50%,-50%) scale(.55) rotate(0deg)}
+30%{opacity:.18;transform:translate(-50%,-50%) scale(.7) rotate(8deg)}
+48%{opacity:.9;transform:translate(-50%,-50%) scale(1.15) rotate(45deg)}
+56%{opacity:1;transform:translate(-50%,-50%) scale(1.3) rotate(45deg)}
+66%{opacity:.28;transform:translate(-50%,-50%) scale(.82) rotate(70deg)}
+100%{opacity:0;transform:translate(-50%,-50%) scale(.55) rotate(90deg)}
 }
 @media(prefers-reduced-motion:reduce){#pepGlitterField{display:none}}
 </style>
@@ -2800,12 +2800,12 @@ load();
 function start(){
 const old=document.getElementById('pepGlitterField');if(old)old.remove();
 const field=document.createElement('div');field.id='pepGlitterField';
-const count=window.innerWidth<650?40:72;
+const count=window.innerWidth<650?32:55;
 for(let i=0;i<count;i++){
 const s=document.createElement('span');s.className='pepSpark'+(i%8===0?' big':'');s.textContent=i%3===0?'✦':'✧';
 s.style.left=(2+Math.random()*96)+'vw';s.style.top=(2+Math.random()*96)+'vh';
-s.style.setProperty('--dur',(1.7+Math.random()*3.4).toFixed(2)+'s');
-s.style.setProperty('--delay',(-Math.random()*5).toFixed(2)+'s');
+s.style.setProperty('--dur',(6.5+Math.random()*5.5).toFixed(2)+'s');
+s.style.setProperty('--delay',(-Math.random()*11).toFixed(2)+'s');
 for(const [n,v] of [['--dx1',(-5+Math.random()*10)+'px'],['--dy1',(-5+Math.random()*10)+'px'],['--dx2',(-12+Math.random()*24)+'px'],['--dy2',(-12+Math.random()*24)+'px'],['--dx3',(-8+Math.random()*16)+'px'],['--dy3',(-8+Math.random()*16)+'px'],['--dx4',(-14+Math.random()*28)+'px'],['--dy4',(-14+Math.random()*28)+'px'],['--dx5',(-20+Math.random()*40)+'px'],['--dy5',(-20+Math.random()*40)+'px']])s.style.setProperty(n,v);
 field.appendChild(s)}
 document.body.appendChild(field)}

@@ -2780,7 +2780,8 @@ load();
 <!-- PEPMOSA V7 VISIBLE GLITTER FIELD -->
 <style id="pepmosa-v7-glitter">
 #pepGlitterField{
-  position:fixed;inset:0;z-index:9990;pointer-events:none;overflow:hidden;
+  position:absolute;left:0;top:0;width:100%;height:100%;z-index:9990;
+  pointer-events:none;overflow:hidden;
 }
 .pepSpark{
   position:absolute;
@@ -2838,6 +2839,12 @@ load();
       field.appendChild(s);
     }
     document.body.appendChild(field);
+    function pepGlitterScroll(){
+      const y=window.scrollY||0;
+      field.style.transform='translate3d(0,'+(y*.10)+'px,0)';
+    }
+    window.addEventListener('scroll',pepGlitterScroll,{passive:true});
+    pepGlitterScroll();
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();

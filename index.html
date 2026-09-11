@@ -2677,7 +2677,7 @@ load();
     const grid=document.getElementById('productGrid');
     if(!grid) return;
 
-    const list=Array.isArray(window.products)?window.products:[];
+    const list=Array.isArray(products)?products:[];
     const input=document.getElementById('search');
     const q=String(input?.value||'').toLowerCase().trim();
 

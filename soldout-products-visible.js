@@ -32,8 +32,10 @@
   }
 
   function getHost(){
-    const grid=$('productGrid');
-    return grid&&grid.parentNode?grid.parentNode:null;
+    /* IMPORTANT: the storefront's product renderer replaces the products
+       container during loading. Put the sold-out section directly in BODY
+       so it can never be removed by a product-grid rerender. */
+    return document.body || null;
   }
 
   function ensureSection(){
@@ -45,7 +47,9 @@
       section=document.createElement('section');
       section.id='pepSoldOutSection';
       section.innerHTML='<div class="pepSoldOutHead"><div class="eyebrow">CURRENTLY UNAVAILABLE</div><h3>Sold Out Products</h3></div><div id="pepSoldOutGrid"></div>';
-      host.appendChild(section);
+      const footer=document.querySelector('footer');
+      if(footer) host.insertBefore(section,footer);
+      else host.appendChild(section);
     }
     return $('pepSoldOutGrid');
   }

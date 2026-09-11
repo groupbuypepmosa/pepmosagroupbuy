@@ -2664,5 +2664,92 @@ load();
 })();
 </script>
 <script src="customer-experience.js?v=20260911-soldout-v2"></script>
+<script id="pepmosa-final-product-renderer-v3">
+(function(){
+  function esc2(s){
+    return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function peso2(v){
+    return '₱'+(Number(v)||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+
+  function renderIndexProducts(){
+    const grid=document.getElementById('productGrid');
+    if(!grid) return;
+
+    const list=Array.isArray(window.products)?window.products:[];
+    const input=document.getElementById('search');
+    const q=String(input?.value||'').toLowerCase().trim();
+
+    const filtered=list.filter(p=>{
+      const hay=(String(p.product_name||'')+' '+String(p.description||'')).toLowerCase();
+      return !q || hay.includes(q);
+    });
+
+    if(!filtered.length){
+      grid.innerHTML='<div class="card"><div style="text-align:center;padding:35px"><div style="font-size:36px;margin-bottom:10px">🛍️</div><b>'+(q?'No products found':'No products available yet.')+'</b><p class="muted">'+(q?'Try another product name or clear your search.':'No products are available right now.')+'</p></div></div>';
+      return;
+    }
+
+    grid.innerHTML=filtered.map(p=>{
+      const variants=(Array.isArray(p.product_variants)?p.product_variants:[]).filter(v=>v.active!==false);
+      const prices=variants.map(v=>Number(v.price)||0).filter(v=>v>0);
+      const lowest=prices.length?Math.min(...prices):0;
+      return '<article class="card pepStoreCard" data-product-id="'+esc2(p.product_id)+'">'+
+        '<div class="productImg">'+
+          '<span class="pepVariantBadge">'+variants.length+' VARIANT'+(variants.length===1?'':'S')+'</span>'+
+          (p.image_url?'<img src="'+esc2(p.image_url)+'" alt="'+esc2(p.product_name)+'">':esc2(p.product_name))+
+        '</div>'+
+        '<div class="pepStoreBody">'+
+          '<h3>'+esc2(p.product_name)+'</h3>'+
+          '<p class="muted">'+esc2(p.description||'')+'</p>'+
+          '<div class="pepStoreBottom">'+
+            '<div class="pepStarting"><small>Starting at</small><b>'+peso2(lowest)+'</b></div>'+
+            '<button class="btn primary pepSelectVariant" type="button" data-pid="'+esc2(p.product_id)+'">SELECT VARIANT</button>'+
+          '</div>'+
+        '</div>'+
+      '</article>';
+    }).join('');
+
+    grid.querySelectorAll('.pepSelectVariant').forEach(btn=>{
+      btn.addEventListener('click',function(){
+        if(typeof window.openProductPicker==='function'){
+          window.openProductPicker(this.dataset.pid);
+        }
+      });
+    });
+  }
+
+  window.renderProducts=renderIndexProducts;
+  window.pepRenderProductsFinal=renderIndexProducts;
+
+  function bind(){
+    const input=document.getElementById('search');
+    if(input && !input.dataset.pepFinalBound){
+      input.dataset.pepFinalBound='1';
+      input.addEventListener('input',renderIndexProducts);
+    }
+    const clear=document.getElementById('pepSearchClear');
+    if(clear && !clear.dataset.pepFinalBound){
+      clear.dataset.pepFinalBound='1';
+      clear.addEventListener('click',function(){
+        const i=document.getElementById('search');
+        if(i){i.value='';renderIndexProducts();}
+      });
+    }
+  }
+
+  function boot(){
+    bind();
+    renderIndexProducts();
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
+  setTimeout(bind,500);
+  setTimeout(bind,1500);
+  setTimeout(bind,3000);
+})();
+</script>
 </body>
 </html>

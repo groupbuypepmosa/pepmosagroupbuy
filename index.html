@@ -1389,6 +1389,7 @@ async function load(){
 
     products =
       productData || [];
+    window.__pepBaseProducts = products;
 
     if(gb.status==="CLOSED" && !categoryNames.length){
       $("gbStatus").insertAdjacentHTML(

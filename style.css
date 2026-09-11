@@ -376,3 +376,43 @@ body::after{
   64%{opacity:.35}
   82%{opacity:.9}
 }
+
+
+/* PEPMOSA GLITTER V5 — moving twinkle particles */
+/* Replace the static dust look with moving, short-lived twinkles. */
+body::after{
+  content:"";
+  position:fixed!important;
+  inset:-12%!important;
+  z-index:9999!important;
+  pointer-events:none!important;
+  opacity:.95!important;
+  background:
+    radial-gradient(circle at 4% 12%,#fff 0 1.6px,transparent 3.2px),
+    radial-gradient(circle at 13% 78%,#ffd2e8 0 1.2px,transparent 3px),
+    radial-gradient(circle at 23% 31%,#fff 0 1.8px,transparent 3.5px),
+    radial-gradient(circle at 34% 88%,#ffc7e2 0 1.1px,transparent 3px),
+    radial-gradient(circle at 46% 20%,#fff 0 1.5px,transparent 3.2px),
+    radial-gradient(circle at 58% 66%,#ffd2e8 0 1.2px,transparent 3px),
+    radial-gradient(circle at 69% 9%,#fff 0 1.8px,transparent 3.5px),
+    radial-gradient(circle at 80% 47%,#ffc7e2 0 1.1px,transparent 3px),
+    radial-gradient(circle at 91% 82%,#fff 0 1.6px,transparent 3.2px),
+    radial-gradient(circle at 98% 25%,#ffd2e8 0 1.2px,transparent 3px);
+  background-size:100% 100%;
+  filter:drop-shadow(0 0 7px rgba(235,91,168,.75));
+  animation:pepMovingTwinkle 5.5s linear infinite;
+}
+@keyframes pepMovingTwinkle{
+  0%{transform:translate3d(-2%,1%,0) scale(.99);opacity:.18}
+  12%{opacity:.9}
+  25%{transform:translate3d(3%,-2%,0) scale(1.015);opacity:.45}
+  38%{opacity:1}
+  52%{transform:translate3d(-3%,3%,0) scale(1);opacity:.2}
+  66%{opacity:.95}
+  80%{transform:translate3d(2%,-3%,0) scale(1.02);opacity:.38}
+  92%{opacity:.9}
+  100%{transform:translate3d(-2%,1%,0) scale(.99);opacity:.18}
+}
+@media(prefers-reduced-motion:reduce){
+  body::after{animation:none!important}
+}

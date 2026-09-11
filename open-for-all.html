@@ -145,10 +145,17 @@ async function trackOFA(){
   }
   out.innerHTML='<div class="track-empty">Checking your MOQ orders…</div>';
   try{
-    const r=await S().rpc('ofa_get_customer_tracking',{p_email:email});
+    // IMPORTANT: tracking is intentionally NOT scoped to ACTIVE_GB.
+    // A customer must be able to see older MOQ/GB orders (e.g. FUAN GB3)
+    // even when a newer MOQ (e.g. LAENNEC GB2) is currently open.
+    // Pass p_gb_id explicitly as null so PostgREST never applies the active-GB filter.
+    const r=await S().rpc('ofa_get_customer_tracking',{p_email:email,p_gb_id:null});
     if(r.error) throw r.error;
 
-    const data=r.data||{},orders=Array.isArray(data.orders)?data.orders:[],items=Array.isArray(data.items)?data.items:[],waybills=Array.isArray(data.waybills)?data.waybills:[];
+    const data=(r.data&&typeof r.data==='object')?r.data:{};
+    const orders=Array.isArray(data.orders)?data.orders:[];
+    const items=Array.isArray(data.items)?data.items:[];
+    const waybills=Array.isArray(data.waybills)?data.waybills:[];
     if(!orders.length){
       out.innerHTML='<div class="track-empty">No MOQ/Open for All orders found for this email yet.</div>';
       return;

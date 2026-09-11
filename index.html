@@ -705,10 +705,29 @@ header{
 </style>
 
 <style id="pep-hide-legacy-soldout-section">
-/* Sold-out items are represented in the current product/MOQ UI.
-   Keep the legacy large duplicate block hidden. */
-#pepSoldOutSection{display:none!important}
+  #pepSoldOutSection{display:none!important}
 </style>
+<script id="pep-hide-duplicate-soldout-by-heading">
+(function(){
+  function hideDuplicateSoldOut(){
+    document.querySelectorAll('h1,h2,h3,h4').forEach(function(h){
+      var t=(h.textContent||'').trim().toLowerCase();
+      if(t!=='sold out products') return;
+      var section=h.closest('section');
+      if(section && section.id!=='productGrid'){
+        section.style.setProperty('display','none','important');
+        return;
+      }
+      var parent=h.parentElement;
+      if(parent && !parent.closest('#productGrid')){
+        parent.style.setProperty('display','none','important');
+      }
+    });
+  }
+  hideDuplicateSoldOut();
+  new MutationObserver(hideDuplicateSoldOut).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
 </head>
 
 

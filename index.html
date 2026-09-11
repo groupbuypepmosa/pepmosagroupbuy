@@ -2678,7 +2678,12 @@ load();
     const grid=document.getElementById('productGrid');
     if(!grid) return;
 
-    const list=Array.isArray(products)?products:[];
+    /* Always use the live catalog populated by the storefront repair layer.
+       The base page and repair layer have separate `products` variables. */
+    const liveProducts=Array.isArray(window.products)&&window.products.length
+      ? window.products
+      : (Array.isArray(products)?products:[]);
+    const list=liveProducts;
     const input=document.getElementById('search');
     const q=String(input?.value||'').toLowerCase().trim();
 

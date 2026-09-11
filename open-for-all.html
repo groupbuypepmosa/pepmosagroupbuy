@@ -146,6 +146,7 @@ async function trackOFA(){
       S().rpc('ofa_get_customer_tracking',{p_email:email,p_gb_id:ACTIVE_GB?.gb_id||null}),
       S().from('ofa_group_buys').select('global_tracking_status,global_tracking_notes').eq('gb_id',ACTIVE_GB?.gb_id).single()
     ]);
+    // Tracking is intentionally scoped to the selected GB/MOQ.
     if(r.error)throw r.error;if(gs.error)throw gs.error;
     const data=r.data||{},orders=Array.isArray(data.orders)?data.orders:[],items=Array.isArray(data.items)?data.items:[];
     if(!orders.length){out.innerHTML='<div class="track-empty">No MOQ/Open for All orders found for this email yet.</div>';return;}

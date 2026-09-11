@@ -2776,5 +2776,72 @@ load();
   setTimeout(()=>{bind();bindProductClicks();},1800);
 })();
 </script>
+
+<!-- PEPMOSA V7 VISIBLE GLITTER FIELD -->
+<style id="pepmosa-v7-glitter">
+#pepGlitterField{
+  position:fixed;inset:0;z-index:9990;pointer-events:none;overflow:hidden;
+}
+.pepSpark{
+  position:absolute;
+  display:block;
+  width:22px;height:22px;
+  transform:translate(-50%,-50%) scale(.35) rotate(0deg);
+  opacity:0;
+  color:#fff;
+  font-family:Georgia,serif;
+  font-size:20px;
+  line-height:22px;
+  text-align:center;
+  text-shadow:0 0 3px #fff,0 0 8px #ff8dc7,0 0 18px #e94d9d;
+  animation:pepSparkFlash var(--dur) ease-in-out var(--delay) infinite;
+}
+.pepSpark.big{
+  width:38px;height:38px;font-size:35px;line-height:38px;
+  text-shadow:0 0 5px #fff,0 0 12px #ff9bd0,0 0 28px #e93e99,0 0 45px rgba(233,62,153,.55);
+}
+.pepSpark:before,.pepSpark:after{
+  content:"";
+  position:absolute;left:50%;top:50%;
+  background:linear-gradient(to right,transparent,#fff,transparent);
+  transform:translate(-50%,-50%);
+  border-radius:999px;
+}
+.pepSpark:before{width:34px;height:2px;box-shadow:0 0 7px #ff9dcc}
+.pepSpark:after{width:2px;height:34px;box-shadow:0 0 7px #ff9dcc}
+@keyframes pepSparkFlash{
+  0%,100%{opacity:0;transform:translate(-50%,-50%) scale(.25) rotate(0deg)}
+  25%{opacity:.25;transform:translate(-50%,-50%) scale(.55) rotate(20deg)}
+  45%{opacity:1;transform:translate(-50%,-50%) scale(1.25) rotate(45deg)}
+  58%{opacity:.45;transform:translate(-50%,-50%) scale(.8) rotate(65deg)}
+  72%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(90deg)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(130deg)}
+}
+@media(prefers-reduced-motion:reduce){#pepGlitterField{display:none}}
+</style>
+<script id="pepmosa-v7-glitter-script">
+(function(){
+  function start(){
+    if(document.getElementById('pepGlitterField')) return;
+    const field=document.createElement('div');
+    field.id='pepGlitterField';
+    const count=window.innerWidth<650?34:58;
+    for(let i=0;i<count;i++){
+      const s=document.createElement('span');
+      s.className='pepSpark'+(i%9===0?' big':'');
+      s.textContent=i%3===0?'✦':'✧';
+      s.style.left=(2+Math.random()*96)+'vw';
+      s.style.top=(3+Math.random()*94)+'vh';
+      s.style.setProperty('--dur',(1.8+Math.random()*3.2).toFixed(2)+'s');
+      s.style.setProperty('--delay',(-Math.random()*4.5).toFixed(2)+'s');
+      s.style.fontSize=(13+Math.random()*12)+'px';
+      field.appendChild(s);
+    }
+    document.body.appendChild(field);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true});
+  else start();
+})();
+</script>
 </body>
 </html>

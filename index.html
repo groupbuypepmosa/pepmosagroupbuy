@@ -703,10 +703,27 @@ header{
 #productGrid .pepSelectVariant{position:relative!important;z-index:30!important;pointer-events:auto!important}
 #productGrid .pepSelectVariant{cursor:pointer!important}
 </style>
+
+<style id="pep-index-soldout-cleanup">
+/* Index must never show the legacy duplicate sold-out product block. */
+#pepSoldOutSection{display:none!important}
+</style>
 </head>
 
 
 <body>
+<script id="pep-index-soldout-runtime-cleanup">
+(function(){
+  function removeLegacySoldOut(){
+    const el=document.getElementById('pepSoldOutSection');
+    if(el) el.remove();
+  }
+  removeLegacySoldOut();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',removeLegacySoldOut,{once:true});
+  new MutationObserver(removeLegacySoldOut).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+
 
 <div class="pepAnnouncement" role="status"><span>🌸</span><b>PEPMOSA GROUP BUY</b><em>•</em><span id="pepAnnouncementText">Choose your favorites and secure your slot.</span></div>
 
@@ -2724,7 +2741,7 @@ load();
           '<p class="muted">'+esc2(p.description||'')+'</p>'+
           '<div class="pepStoreBottom">'+
             '<div class="pepStarting"><small>Starting at</small><b>'+peso2(lowest)+'</b></div>'+
-            '<button class="btn primary pepSelectVariant" type="button" data-pid="'+esc2(p.product_id)+'">SELECT VARIANT</button>'+
+            '<button class="btn primary pepSelectVariant" type="button" data-product-id="'+esc2(p.product_id)+'">SELECT VARIANT</button>'+
           '</div>'+
         '</div>'+
       '</article>';

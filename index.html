@@ -2759,3 +2759,22 @@ load();
 </script>
 </body>
 </html>
+<!-- PEPMOSA SOLD-OUT DISPLAY GUARD -->
+<style id="pepmosa-soldout-display-guard">
+  #pepSoldOutSection,
+  [data-pepmosa-soldout-section="true"] { display:none!important; }
+</style>
+<script id="pepmosa-soldout-display-guard-script">
+(function(){
+  function hideSoldOut(){
+    var el=document.getElementById('pepSoldOutSection');
+    if(el){ el.style.setProperty('display','none','important'); }
+  }
+  hideSoldOut();
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',hideSoldOut,{once:true});
+  }
+  var obs=new MutationObserver(hideSoldOut);
+  obs.observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>

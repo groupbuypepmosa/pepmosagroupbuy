@@ -497,7 +497,6 @@ header{
 
 
   .heroLogo{
-
     min-height:330px;
 
     padding:0;
@@ -930,9 +929,9 @@ header{
         id="search"
         class="search"
         placeholder="Search products…"
-        oninput="renderProducts();pepSyncSearchClear()"
+        oninput="window.renderProducts();pepSyncSearchClear()"
       >
-      <button id="pepSearchClear" class="pepSearchClear" type="button" onclick="document.getElementById('search').value='';renderProducts();pepSyncSearchClear()" aria-label="Clear search">×</button>
+      <button id="pepSearchClear" class="pepSearchClear" type="button" onclick="document.getElementById('search').value='';window.renderProducts();pepSyncSearchClear()" aria-label="Clear search">×</button>
     </div>
 
 
@@ -997,8 +996,7 @@ header{
       </h2>
 
 
-      <button
-        class="btn secondary"
+      <button        class="btn secondary"
         onclick="closeModal('cartModal')"
       >
         CLOSE
@@ -1498,7 +1496,6 @@ function renderProducts(){
     ($("search")?.value || "")
       .toLowerCase()
       .trim();
-
   const filtered =
     products.filter(
       p =>
@@ -1997,8 +1994,7 @@ function addToCart(pid,vid){
       variant_id:
         vid,
 
-      product_name:
-        product.product_name,
+      product_name:        product.product_name,
 
       strength:
         variant.strength,
@@ -2497,8 +2493,7 @@ load();
     const wrap=document.createElement("div");wrap.id="pepmosaSiteNotice";
     wrap.innerHTML='<div class="pn-card" role="dialog" aria-modal="true" aria-labelledby="pnTitle"><button class="pn-close" type="button" aria-label="Close">×</button><div class="pn-icon">'+(icons[n.notice_type]||"📣")+'</div><div class="pn-eyebrow">PEPMOSA GROUP BUY</div><h2 class="pn-title" id="pnTitle">'+escHtml(n.title)+'</h2><div class="pn-message">'+escHtml(n.message)+'</div><button class="pn-button" type="button">'+escHtml(n.button_text||"GOT IT! ♥")+'</button></div>';
     const dismiss=()=>{localStorage.setItem(key,"1");wrap.remove();document.removeEventListener("keydown",onKey)};
-    const onKey=e=>{if(e.key==="Escape")dismiss()};
-    wrap.querySelector(".pn-close").onclick=dismiss;
+    const onKey=e=>{if(e.key==="Escape")dismiss()};    wrap.querySelector(".pn-close").onclick=dismiss;
     wrap.querySelector(".pn-button").onclick=()=>{if(n.button_url){try{const u=new URL(n.button_url,location.href);if(u.origin===location.origin)location.href=u.href;else window.open(u.href,"_blank","noopener")}catch(e){dismiss()}}else dismiss()};
     wrap.addEventListener("click",e=>{if(e.target===wrap)dismiss()});document.addEventListener("keydown",onKey);document.body.appendChild(wrap);
   }

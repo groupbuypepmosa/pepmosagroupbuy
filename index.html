@@ -704,32 +704,15 @@ header{
 #productGrid .pepSelectVariant{cursor:pointer!important}
 </style>
 
-<style id="pep-index-soldout-cleanup">
-/* Index must never show the legacy duplicate sold-out product block. */
-#pepSoldOutSection{display:none!important}
-</style>
-
 <style id="pep-hide-legacy-soldout-section">
-/* Hide the legacy large sold-out section. Sold-out items are already shown
-   in the MOQ area, so the duplicate section should not appear below products. */
+/* Sold-out items are represented in the current product/MOQ UI.
+   Keep the legacy large duplicate block hidden. */
 #pepSoldOutSection{display:none!important}
 </style>
 </head>
 
 
 <body>
-<script id="pep-index-soldout-runtime-cleanup">
-(function(){
-  // CSS already hides the legacy sold-out block. One targeted cleanup is enough.
-  function removeLegacySoldOut(){
-    const el=document.getElementById('pepSoldOutSection');
-    if(el) el.remove();
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',removeLegacySoldOut,{once:true});
-  else removeLegacySoldOut();
-})();
-</script>
-
 
 <div class="pepAnnouncement" role="status"><span>🌸</span><b>PEPMOSA GROUP BUY</b><em>•</em><span id="pepAnnouncementText">Choose your favorites and secure your slot.</span></div>
 
@@ -2595,14 +2578,7 @@ load();
 #pepKitCompletionCard .pepKitFooter{position:relative!important;margin-top:16px!important;padding:14px 16px!important;border-radius:15px!important;background:linear-gradient(90deg,rgba(229,43,139,.10),rgba(255,255,255,.78))!important;color:#784e65!important;font-size:13px!important;font-weight:800!important}
 @media(max-width:760px){#pepKitCompletionCard{padding:22px 18px!important;border-radius:23px!important}#pepKitCompletionCard h3{font-size:31px!important}#pepKitCompletionCard .pepKitRules{grid-template-columns:1fr!important}}
 </style>
-<script id="pepmosa-kit-completion-force-script">
-(function(){
-  // storefront-repair.js already owns Kit Completion UI. Do not observe the whole DOM.
-  function boot(){ return; }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
-  else boot();
-})();
-</script>
+<!-- Kit Completion is owned by storefront-repair.js; redundant no-op observer removed. -->
 
 
 <style id="pepmosa-popup-unified-style">
@@ -2662,6 +2638,8 @@ load();
 })();
 </script>
 <script src="customer-experience.js?v=20260911-soldout-v3"></script>
+<!-- soldout-products-visible.js intentionally not loaded on the customer index. -->
+
 <script id="pepmosa-final-product-renderer-v3">
 (function(){
   function esc2(s){
@@ -2680,7 +2658,7 @@ load();
     const liveProducts=
       (Array.isArray(window.products)&&window.products.length ? window.products : null) ||
       (Array.isArray(window.__pepBaseProducts)&&window.__pepBaseProducts.length ? window.__pepBaseProducts : null) ||
-      (Array.isArray(products)&&products.length ? products : []);
+      (typeof products!=='undefined' && Array.isArray(products) && products.length ? products : []);
     const input=document.getElementById('search');
     const q=String(input?.value||'').toLowerCase().trim();
 
@@ -2729,13 +2707,8 @@ load();
       '</article>';
     }).join('');
 
-    grid.querySelectorAll('.pepSelectVariant').forEach(btn=>{
-      btn.addEventListener('click',function(){
-        if(typeof window.openProductPicker==='function'){
-          window.openProductPicker(this.dataset.pid);
-        }
-      });
-    });
+    // Clicks are handled by the single delegated handler below.
+    // Do not attach a second per-button handler here.
   }
 
   window.renderProducts=renderIndexProducts;

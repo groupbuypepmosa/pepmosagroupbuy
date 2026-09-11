@@ -89,7 +89,11 @@
   if(!grid)return;
 
   const q=($('search')?.value||'').toLowerCase().trim();
-  const list=products.filter(p=>`${p.product_name} ${p.category} ${(p.product_variants||[]).map(v=>v.strength).join(' ')}`.toLowerCase().includes(q));
+  /* The base index loader and this repair layer load in parallel. During that
+     short window, use the base loader's already-fetched products instead of
+     treating the search as an empty catalog. */
+  const source=products.length ? products : (Array.isArray(window.__pepBaseProducts)?window.__pepBaseProducts:[]);
+  const list=source.filter(p=>`${p.product_name} ${p.category} ${(p.product_variants||[]).map(v=>v.strength).join(' ')}`.toLowerCase().includes(q));
 
   if(!list.length){
     grid.innerHTML='<div class="card"><b>No products available yet.</b><br><span class="muted">No active products are available for this Group Buy.</span></div>';

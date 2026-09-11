@@ -416,3 +416,66 @@ body::after{
 @media(prefers-reduced-motion:reduce){
   body::after{animation:none!important}
 }
+
+
+/* PEPMOSA GLITTER V6 — luxe starburst sparkle */
+/* Stronger, prettier sparkle effect: star-shaped glints + soft shimmer. */
+body::before{
+  content:"";
+  position:fixed!important;
+  inset:0!important;
+  z-index:9997!important;
+  pointer-events:none!important;
+  opacity:.92!important;
+  background-image:
+    radial-gradient(circle at 5% 16%,rgba(255,255,255,.98) 0 1.4px,transparent 3.8px),
+    radial-gradient(circle at 15% 62%,rgba(255,202,231,.98) 0 1.2px,transparent 3.5px),
+    radial-gradient(circle at 25% 24%,rgba(255,255,255,.98) 0 1.6px,transparent 4px),
+    radial-gradient(circle at 35% 81%,rgba(255,211,237,.98) 0 1.2px,transparent 3.5px),
+    radial-gradient(circle at 45% 42%,rgba(255,255,255,.98) 0 1.5px,transparent 4px),
+    radial-gradient(circle at 55% 13%,rgba(255,200,230,.98) 0 1.2px,transparent 3.5px),
+    radial-gradient(circle at 65% 72%,rgba(255,255,255,.98) 0 1.7px,transparent 4px),
+    radial-gradient(circle at 75% 34%,rgba(255,208,235,.98) 0 1.2px,transparent 3.5px),
+    radial-gradient(circle at 85% 88%,rgba(255,255,255,.98) 0 1.5px,transparent 4px),
+    radial-gradient(circle at 94% 18%,rgba(255,200,230,.98) 0 1.2px,transparent 3.5px);
+  filter:drop-shadow(0 0 8px rgba(238,83,166,.8));
+  animation:pepLuxeDust 3.8s ease-in-out infinite;
+}
+body::after{
+  content:"✦  ✧  ⋆  ✦  ✧  ⋆  ✦  ✧  ⋆  ✦  ✧  ⋆  ✦  ✧  ⋆  ✦  ✧  ⋆  ✦  ✧  ⋆  ✦  ✧";
+  position:fixed!important;
+  inset:0!important;
+  z-index:9999!important;
+  pointer-events:none!important;
+  display:block!important;
+  padding:2vh 2vw!important;
+  box-sizing:border-box!important;
+  white-space:pre-wrap!important;
+  word-spacing:8vw!important;
+  line-height:13vh!important;
+  font-family:Georgia,serif!important;
+  font-size:18px!important;
+  letter-spacing:1.2vw!important;
+  color:rgba(255,255,255,.96)!important;
+  text-shadow:
+    0 0 4px rgba(255,255,255,1),
+    0 0 10px rgba(255,138,199,.95),
+    0 0 22px rgba(237,83,165,.72)!important;
+  mix-blend-mode:screen!important;
+  animation:pepStarBurst 2.9s ease-in-out infinite!important;
+}
+@keyframes pepLuxeDust{
+  0%,100%{opacity:.25;transform:scale(.985)}
+  18%{opacity:1}
+  33%{opacity:.38}
+  49%{opacity:1;transform:scale(1.018)}
+  67%{opacity:.32}
+  84%{opacity:.96}
+}
+@keyframes pepStarBurst{
+  0%,100%{opacity:.12;transform:scale(.96) rotate(-2deg)}
+  22%{opacity:.95;transform:scale(1.02) rotate(1deg)}
+  42%{opacity:.28;transform:scale(.99) rotate(-1deg)}
+  60%{opacity:1;transform:scale(1.025) rotate(2deg)}
+  78%{opacity:.35;transform:scale(1) rotate(-1deg)}
+}

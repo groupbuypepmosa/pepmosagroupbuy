@@ -692,6 +692,17 @@ header{
 #productGrid .pepSelectVariant:hover{transform:translateY(-1px)!important;box-shadow:0 12px 24px rgba(217,95,145,.25)!important}
 @media(max-width:620px){#productGrid{gap:14px!important}#productGrid .pepStoreCard{border-radius:22px!important}#productGrid .pepStoreCard:hover{transform:none!important}#productGrid .pepStoreCard .productImg{height:205px!important;padding:6px!important}#productGrid .pepStoreBody{padding:15px 16px 16px!important}#productGrid .pepStoreBody h3{font-size:20px!important}#productGrid .pepStoreBottom{margin-top:12px!important;padding-top:12px!important}#productGrid .pepStarting b{font-size:18px!important}}
 </style>
+
+<style id="pep-search-click-fix">
+/* Keep search + product actions above decorative/legacy layers. */
+#products .pepSearchWrap,
+#products .pepSearchWrap .search,
+#products .pepSearchWrap .pepSearchClear,
+#productGrid .pepStoreBody,
+#productGrid .pepStoreBottom,
+#productGrid .pepSelectVariant{position:relative!important;z-index:30!important;pointer-events:auto!important}
+#productGrid .pepSelectVariant{cursor:pointer!important}
+</style>
 </head>
 
 
@@ -2731,6 +2742,21 @@ load();
   window.renderProducts=renderIndexProducts;
   window.pepRenderProductsFinal=renderIndexProducts;
 
+  /* One delegated click handler survives every search re-render. */
+  function bindProductClicks(){
+    const grid=document.getElementById('productGrid');
+    if(!grid || grid.dataset.pepClickBound) return;
+    grid.dataset.pepClickBound='1';
+    grid.addEventListener('click',function(e){
+      const btn=e.target.closest('.pepSelectVariant');
+      if(!btn || !grid.contains(btn)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const pid=btn.getAttribute('data-pid');
+      if(typeof window.openProductPicker==='function') window.openProductPicker(pid);
+    });
+  }
+
   function bind(){
     const input=document.getElementById('search');
     if(input && !input.dataset.pepFinalBound){
@@ -2749,14 +2775,15 @@ load();
 
   function boot(){
     bind();
+    bindProductClicks();
     renderIndexProducts();
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
-  setTimeout(bind,500);
-  setTimeout(bind,1500);
-  setTimeout(bind,3000);
+  setTimeout(()=>{bind();bindProductClicks();},500);
+  setTimeout(()=>{bind();bindProductClicks();},1500);
+  setTimeout(()=>{bind();bindProductClicks();},3000);
 })();
 </script>
 </body>

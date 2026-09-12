@@ -1017,6 +1017,7 @@ async function loadVialTracker(){
   });
   renderVialTracker();await loadCancelledKits();
  }catch(e){console.error(e);$("vialTrackerResults").innerHTML='<div class="notice error">'+esc(e.message||"Unable to load vial tracker.")+'</div>';}
+ } finally { setVialTrackerLoading(false); }
 }
 function printTotalVials(){
  const gb=$("vialTrackerGB")?.value||"";

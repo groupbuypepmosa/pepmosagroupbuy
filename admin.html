@@ -983,7 +983,6 @@ async function loadVialTracker(){
  setVialTrackerLoading(true);
  try{
  const gb=$("vialTrackerGB").value;
- try{
   /* ONE tracker rule for OPEN and KIT COMPLETION:
      count all valid orders, including MANUAL ADMIN ORDER.
      Every 10 vials = one completed kit; the remainder starts the next kit. */

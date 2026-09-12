@@ -107,7 +107,36 @@ function render(){
 }
 function fillVariants(){const p=catalog.find(x=>x.product_id===document.getElementById('product').value);document.getElementById('variant').innerHTML='<option value="">Select variant</option>'+((p?.variants)||[]).map(v=>'<option value="'+v.variant_id+'">'+esc(v.strength)+'</option>').join('');document.getElementById('price').value='';}
 function updatePrice(){const p=catalog.find(x=>x.product_id===document.getElementById('product').value),v=(p?.variants||[]).find(x=>x.variant_id===document.getElementById('variant').value);const pr=prices.find(x=>String(x.product_id)===String(p?.product_id)&&String(x.variant_id||'')===String(v?.variant_id||''));document.getElementById('price').value=pr?Number(pr.manufacturer_price):0;}
-async function addOrder(){const gb=document.getElementById('gb').value;if(!gb)return alert('Please select a Group Buy.');const ai=Number(document.getElementById('admin').value),p=catalog.find(x=>x.product_id===document.getElementById('product').value),v=(p?.variants||[]).find(x=>x.variant_id===document.getElementById('variant').value),qty=Number(document.getElementById('qty').value),price=Number(document.getElementById('price').value);if(!p||!v||!qty)return alert('Please select admin, product, variant and quantity.');const {data,error}=await sb.from('admin_orders').insert({gb_number:gb,admin_index:ai,product_id:p.product_id,variant_id:v.variant_id,product_name:p.product_name,variant:v.strength,qty,manufacturer_price:price}).select().single();if(error)return alert(error.message);orders.unshift(data);document.getElementById('qty').value='';render();document.getElementById('product').value='';fillVariants();}
+async async function addOrder(){
+ const gb=document.getElementById('gb').value;
+ if(!gb)return alert('Please select a Group Buy.');
+ const ai=Number(document.getElementById('admin').value);
+ const p=catalog.find(x=>x.product_id===document.getElementById('product').value);
+ const v=(p?.variants||[]).find(x=>x.variant_id===document.getElementById('variant').value);
+ const qty=Number(document.getElementById('qty').value);
+ const price=Number(document.getElementById('price').value);
+ if(!p||!v||!qty)return alert('Please select admin, product, variant and quantity.');
+ const btn=document.querySelector('button[onclick="addOrder()"]');
+ if(btn){btn.disabled=true;btn.textContent='SAVING…';}
+ try{
+   const payload={gb_number:gb,admin_index:ai,product_id:p.product_id,variant_id:v.variant_id,product_name:p.product_name,variant:v.strength,qty,manufacturer_price:price};
+   const {data,error}=await sb.from('admin_orders').insert(payload).select().single();
+   if(error)throw error;
+   if(!data)throw new Error('Admin Order was not returned after saving.');
+   orders.unshift(data);
+   document.getElementById('qty').value='';
+   document.getElementById('product').value='';
+   fillVariants();
+   render();
+   // Keep the main Admin Vial Tracker in sync on the next refresh.
+   alert('Admin Order saved to '+gb+'. It is now included in kit completion.');
+ }catch(e){
+   console.error('ADMIN ORDER SAVE ERROR:',e);
+   alert('Could not save Admin Order: '+(e.message||'Unknown error'));
+ }finally{
+   if(btn){btn.disabled=false;btn.textContent='ADD ORDER';}
+ }
+}
 async function delOrder(id){if(!confirm('Delete this admin order?'))return;const {error}=await sb.from('admin_orders').delete().eq('id',id);if(error)return alert(error.message);orders=orders.filter(x=>x.id!==id);render();}
 init().catch(e=>{document.getElementById('rows').innerHTML='<div style="color:#a33">'+esc(e.message)+'</div>';console.error(e)});
 

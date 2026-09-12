@@ -16,32 +16,34 @@ table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;borde
 <header><div><b>👥 ADMIN ORDERS</b><div style="margin-top:5px;color:#d9cfd9;font-size:13px">PEPMOSA • Shared Admin Order Tracker</div></div><span class="muted" style="color:#ddd">VICKY • JOYCE • RHEA • ANNE</span></header>
 <main>
 <div class="stats" id="stats"></div><div id="productTotals"></div><div id="kitCompletion"></div>
-<div class="card"><h2 style="margin-top:0">➕ Add New Admin Order</h2><p class="muted">Select the admin and product. Manufacturer price is automatically pulled from Finance.</p><div class="grid"><div><label>Admin</label><select id="admin"></select></div><div><label>Product</label><select id="product" onchange="fillVariants()"><option value="">Select product</option></select></div><div><label>Variant / Strength</label><select id="variant" onchange="updatePrice()"><option value="">Select product first</option></select></div><div><label>Quantity</label><input id="qty" type="number" min="1" step="1"></div><div><label>Manufacturer Price</label><input id="price" readonly></div></div><button onclick="addOrder()">ADD ORDER</button><div class="muted" style="margin-top:8px">Manufacturer price is automatically taken from Finance → Manufacturer Pricelist.</div></div>
+<div class="card"><h2 style="margin-top:0">➕ Add New Admin Order</h2><p class="muted">Select the admin and product. Manufacturer price is automatically pulled from Finance.</p><div class="grid"><div><label>Group Buy</label><select id="gb" onchange="render()"></select></div><div><label>Admin</label><select id="admin"></select></div><div><label>Product</label><select id="product" onchange="fillVariants()"><option value="">Select product</option></select></div><div><label>Variant / Strength</label><select id="variant" onchange="updatePrice()"><option value="">Select product first</option></select></div><div><label>Quantity</label><input id="qty" type="number" min="1" step="1"></div><div><label>Manufacturer Price</label><input id="price" readonly></div></div><button onclick="addOrder()">ADD ORDER</button><div class="muted" style="margin-top:8px">Admin Orders are recorded under the selected GB. Pricing stays separate from customer sales.</div><div class="muted" style="margin-top:8px">Manufacturer price is automatically taken from Finance → Manufacturer Pricelist.</div></div>
 <div id="consolidated"></div><div class="card"><h2 style="margin-top:0">📋 All Admin Orders</h2><div id="rows">Loading…</div></div>
 </main>
 <script>
 const cfg=window.PEPMOSA_CONFIG;const sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
-const admins=['VICKY','JOYCE','RHEA','ANNE'];let catalog=[],prices=[],orders=[],customerRows=[];
+const admins=['VICKY','JOYCE','RHEA','ANNE'];let catalog=[],prices=[],orders=[],customerRows=[],groupBuys=[];
 async function init(){
  const r=await Promise.all([
   sb.from('products').select('product_id,product_name,active').order('product_name'),
   sb.from('product_variants').select('variant_id,product_id,strength,active').order('strength'),
   sb.from('finance_manufacturer_prices').select('*'),
   sb.from('admin_orders').select('*').order('created_at',{ascending:false}),
-  sb.from('orders').select('*').order('created_at',{ascending:false})
+  sb.from('orders').select('*').order('created_at',{ascending:false}),
+  sb.from('group_buys').select('gb_number,customer_facing_name,status,created_at').order('created_at',{ascending:false})
  ]);
  for(const x of r)if(x.error)throw x.error;
  const vm=new Map();(r[1].data||[]).forEach(v=>{if(!vm.has(v.product_id))vm.set(v.product_id,[]);vm.get(v.product_id).push(v)});
  catalog=(r[0].data||[]).filter(x=>x.active!==false).map(p=>({...p,variants:(vm.get(p.product_id)||[]).filter(v=>v.active!==false)}));
- prices=r[2].data||[];orders=r[3].data||[];customerRows=r[4].data||[];
+ prices=r[2].data||[];orders=r[3].data||[];customerRows=r[4].data||[];groupBuys=r[5].data||[];
  render();
 }
 function renderKitCompletion(){
  const box=document.getElementById('kitCompletion'); if(!box)return;
+ const activeGb=document.getElementById('gb')?.value||groupBuys[0]?.gb_number||'';
  const customerMap={};
- customerRows.forEach(o=>{
+ customerRows.filter(o=>String(o.gb_number||'')===String(activeGb)).forEach(o=>{
    const status=String(o.status||'').toLowerCase();
    if(['cancelled','canceled','refunded'].includes(status))return;
    const pid=String(o.product_id||o.product||o.product_name||'');
@@ -53,7 +55,7 @@ function renderKitCompletion(){
    customerMap[k].qty+=qty;
  });
  const adminMap={};
- orders.forEach(o=>{const k=String(o.product_id||o.product_name)+'||'+String(o.variant_id||o.variant||'');adminMap[k]=(adminMap[k]||0)+Number(o.qty||0)});
+ orders.filter(o=>String(o.gb_number||'')===String(activeGb)).forEach(o=>{const k=String(o.product_id||o.product_name)+'||'+String(o.variant_id||o.variant||'');adminMap[k]=(adminMap[k]||0)+Number(o.qty||0)});
  const items=Object.values(customerMap).map(x=>{
    const p=catalog.find(a=>String(a.product_id)===String(x.pid)||a.product_name===x.name);
    const kit=10;
@@ -74,7 +76,7 @@ function renderKitCompletion(){
    const p=catalog.find(a=>String(a.product_id)===String(x.pid)||a.product_name===x.name);
    const v=(p?.variants||[]).find(a=>String(a.variant_id)===String(x.vid)||String(a.strength)===String(x.variant));
    const pr=prices.find(a=>String(a.product_id)===String(p?.product_id||x.pid)&&String(a.variant_id||'')===String(v?.variant_id||x.vid));
-   const {data,error}=await sb.from('admin_orders').insert({admin_index:ai,product_id:p?.product_id||x.pid,variant_id:v?.variant_id||x.vid,product_name:p?.product_name||x.name,variant:v?.strength||x.variant,qty,manufacturer_price:Number(pr?.manufacturer_price||0)}).select().single();
+   const {data,error}=await sb.from('admin_orders').insert({gb_number:document.getElementById('gb').value,admin_index:ai,product_id:p?.product_id||x.pid,variant_id:v?.variant_id||x.vid,product_name:p?.product_name||x.name,variant:v?.strength||x.variant,qty,manufacturer_price:Number(pr?.manufacturer_price||0)}).select().single();
    if(error)return alert(error.message);
    orders.unshift(data);render();alert('Kit completion claimed by '+admins[ai]+'!');
  };
@@ -82,22 +84,23 @@ function renderKitCompletion(){
 
 function render(){
  renderKitCompletion();
+ document.getElementById('gb').innerHTML=groupBuys.map(g=>'<option value="'+esc(g.gb_number)+'">GB '+esc(g.gb_number)+' — '+esc(g.customer_facing_name||g.status||'')+'</option>').join('');
  document.getElementById('admin').innerHTML=admins.map((a,i)=>'<option value="'+i+'">'+esc(a)+'</option>').join('');
  document.getElementById('product').innerHTML='<option value="">Select product</option>'+catalog.map(p=>'<option value="'+p.product_id+'">'+esc(p.product_name)+'</option>').join('');
- const totals=admins.map((a,i)=>orders.filter(o=>o.admin_index===i).reduce((s,o)=>s+Number(o.qty)*Number(o.manufacturer_price),0));
- document.getElementById('stats').innerHTML=admins.map((a,i)=>'<div class="stat"><span>'+esc(a)+'</span><b>'+peso(totals[i])+'</b><small>'+orders.filter(o=>o.admin_index===i).length+' line item(s)</small></div>').join('');
+ const activeGb=String(document.getElementById('gb')?.value||groupBuys[0]?.gb_number||'');orders=orders;const gbOrders=orders.filter(o=>String(o.gb_number||'')===activeGb);const totals=admins.map((a,i)=>gbOrders.filter(o=>o.admin_index===i).reduce((s,o)=>s+Number(o.qty)*Number(o.manufacturer_price),0));
+ document.getElementById('stats').innerHTML=admins.map((a,i)=>'<div class="stat"><span>'+esc(a)+'</span><b>'+peso(totals[i])+'</b><small>'+gbOrders.filter(o=>o.admin_index===i).length+' line item(s)</small></div>').join('');
  const productMap={};
- orders.forEach(o=>{const k=String(o.product_name||'')+'||'+String(o.variant||'');if(!productMap[k])productMap[k]={product:o.product_name,variant:o.variant,qty:0,amount:0};productMap[k].qty+=Number(o.qty||0);productMap[k].amount+=Number(o.qty||0)*Number(o.manufacturer_price||0);});
+ gbOrders.forEach(o=>{const k=String(o.product_name||'')+'||'+String(o.variant||'');if(!productMap[k])productMap[k]={product:o.product_name,variant:o.variant,qty:0,amount:0};productMap[k].qty+=Number(o.qty||0);productMap[k].amount+=Number(o.qty||0)*Number(o.manufacturer_price||0);});
  const productTotals=Object.values(productMap).sort((a,b)=>(a.product+' '+a.variant).localeCompare(b.product+' '+b.variant));
  document.getElementById('productTotals').innerHTML='<div class="card"><h2 style="margin-top:0">💰 Total Amount per Product</h2><p class="muted">Combined total from all admins. Example: Tirzepatide 15mg = total pcs + total amount.</p>'+(productTotals.length?'<div class="product-summary">'+productTotals.map(x=>'<div class="product-chip"><b>'+esc(x.product)+' <span class="muted">'+esc(x.variant||'')+'</span></b><div class="qtybig">'+x.qty+' PCS</div><div class="muted">TOTAL QUANTITY</div><div class="amt">'+peso(x.amount)+'</div><div class="muted">TOTAL AMOUNT</div></div>').join('')+'</div>':'<div class="muted">No admin orders yet.</div>')+'</div>';
- const grouped=admins.map((a,i)=>{const mine=orders.filter(o=>o.admin_index===i);const map={};mine.forEach(o=>{const k=o.product_name+'||'+(o.variant||'');if(!map[k])map[k]={product:o.product_name,variant:o.variant,qty:0,price:Number(o.manufacturer_price||0)};map[k].qty+=Number(o.qty||0)});return {name:a,items:Object.values(map)}}).filter(g=>g.items.length);
+ const grouped=admins.map((a,i)=>{const mine=gbOrders.filter(o=>o.admin_index===i);const map={};mine.forEach(o=>{const k=o.product_name+'||'+(o.variant||'');if(!map[k])map[k]={product:o.product_name,variant:o.variant,qty:0,price:Number(o.manufacturer_price||0)};map[k].qty+=Number(o.qty||0)});return {name:a,items:Object.values(map)}}).filter(g=>g.items.length);
  const consolidated='<div class="card"><h2 style="margin-top:0">📦 Consolidated Orders per Admin</h2>'+ (grouped.length?grouped.map(g=>'<div class="admin-block"><h3>👤 '+esc(g.name)+'</h3><table><tr><th>Product</th><th>Variant</th><th>Total Qty</th><th>Manuf Price</th><th>Subtotal</th></tr>'+g.items.map(x=>'<tr><td>'+esc(x.product)+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.price)+'</td><td>'+peso(x.qty*x.price)+'</td></tr>').join('')+'</table><div class="admin-total">TOTAL '+esc(g.name)+': '+peso(g.items.reduce((s,x)=>s+x.qty*x.price,0))+'</div></div>').join(''):'<div class="muted">No admin orders yet.</div>')+'</div>';
  document.getElementById('consolidated').innerHTML=consolidated;
- document.getElementById('rows').innerHTML=orders.length?'<table><tr><th>Admin</th><th>Product</th><th>Variant</th><th>Qty</th><th>Manuf Price</th><th>Total</th><th></th></tr>'+orders.map(o=>'<tr><td>'+esc(admins[o.admin_index]||'Admin')+'</td><td>'+esc(o.product_name)+'</td><td>'+esc(o.variant||'—')+'</td><td>'+o.qty+'</td><td>'+peso(o.manufacturer_price)+'</td><td>'+peso(Number(o.qty)*Number(o.manufacturer_price))+'</td><td><button class="danger" onclick="delOrder(\''+o.id+'\')">Delete</button></td></tr>').join('')+'</table>':'<div class="muted">No admin orders yet.</div>';
+ document.getElementById('rows').innerHTML=gbOrders.length?'<table><tr><th>Admin</th><th>Product</th><th>Variant</th><th>Qty</th><th>Manuf Price</th><th>Total</th><th></th></tr>'+gbOrders.map(o=>'<tr><td>'+esc(admins[o.admin_index]||'Admin')+'</td><td>'+esc(o.product_name)+'</td><td>'+esc(o.variant||'—')+'</td><td>'+o.qty+'</td><td>'+peso(o.manufacturer_price)+'</td><td>'+peso(Number(o.qty)*Number(o.manufacturer_price))+'</td><td><button class="danger" onclick="delOrder(\''+o.id+'\')">Delete</button></td></tr>').join('')+'</table>':'<div class="muted">No admin orders yet.</div>';
 }
 function fillVariants(){const p=catalog.find(x=>x.product_id===document.getElementById('product').value);document.getElementById('variant').innerHTML='<option value="">Select variant</option>'+((p?.variants)||[]).map(v=>'<option value="'+v.variant_id+'">'+esc(v.strength)+'</option>').join('');document.getElementById('price').value='';}
 function updatePrice(){const p=catalog.find(x=>x.product_id===document.getElementById('product').value),v=(p?.variants||[]).find(x=>x.variant_id===document.getElementById('variant').value);const pr=prices.find(x=>String(x.product_id)===String(p?.product_id)&&String(x.variant_id||'')===String(v?.variant_id||''));document.getElementById('price').value=pr?Number(pr.manufacturer_price):0;}
-async function addOrder(){const ai=Number(document.getElementById('admin').value),p=catalog.find(x=>x.product_id===document.getElementById('product').value),v=(p?.variants||[]).find(x=>x.variant_id===document.getElementById('variant').value),qty=Number(document.getElementById('qty').value),price=Number(document.getElementById('price').value);if(!p||!v||!qty)return alert('Please select admin, product, variant and quantity.');const {data,error}=await sb.from('admin_orders').insert({admin_index:ai,product_id:p.product_id,variant_id:v.variant_id,product_name:p.product_name,variant:v.strength,qty,manufacturer_price:price}).select().single();if(error)return alert(error.message);orders.unshift(data);document.getElementById('qty').value='';render();document.getElementById('product').value='';fillVariants();}
+async function addOrder(){const gb=document.getElementById('gb').value;if(!gb)return alert('Please select a Group Buy.');const ai=Number(document.getElementById('admin').value),p=catalog.find(x=>x.product_id===document.getElementById('product').value),v=(p?.variants||[]).find(x=>x.variant_id===document.getElementById('variant').value),qty=Number(document.getElementById('qty').value),price=Number(document.getElementById('price').value);if(!p||!v||!qty)return alert('Please select admin, product, variant and quantity.');const {data,error}=await sb.from('admin_orders').insert({admin_index:ai,product_id:p.product_id,variant_id:v.variant_id,product_name:p.product_name,variant:v.strength,qty,manufacturer_price:price}).select().single();if(error)return alert(error.message);orders.unshift(data);document.getElementById('qty').value='';render();document.getElementById('product').value='';fillVariants();}
 async function delOrder(id){if(!confirm('Delete this admin order?'))return;const {error}=await sb.from('admin_orders').delete().eq('id',id);if(error)return alert(error.message);orders=orders.filter(x=>x.id!==id);render();}
 init().catch(e=>{document.getElementById('rows').innerHTML='<div style="color:#a33">'+esc(e.message)+'</div>';console.error(e)});
 

@@ -14,7 +14,8 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 <div class="card stat"><span>REFUNDED TOTAL</span><b id="refundedTotal">₱0.00</b><div class="muted">REFUNDED kits only</div></div>
 <div class="card stat"><span>REVENUE</span><b id="rev">₱0.00</b><div class="muted">Approved product sales</div></div>
 <div class="card stat"><span>MANUFACTURER COST (REFERENCE)</span><b id="cost">₱0.00</b><div class="muted">Reference only • not automatically deducted</div></div>
-<div class="card stat"><span>EXPENSES PAID</span><b id="exp">₱0.00</b><div class="muted">Only expenses you manually record</div></div>
+<div class="card stat"><span>ADMIN ORDERS TOTAL</span><b id="adminOrdersTotal">₱0.00</b><div class="muted">Admin/manufacturer value for selected Finance view</div></div>
+<div class="card stat"><span>EXPENSES PAID</span><b id="exp">₱0.00</b><div class="muted">Only expenses manually recorded for this view</div></div>
 <div class="card stat profit-highlight"><span>NET PROFIT ✦</span><b id="profit">₱0.00</b><div class="muted">Revenue − manually recorded expenses</div></div>
 </div>
 
@@ -116,9 +117,11 @@ function renderExpenses(){
    const s=String(x.scope||'GENERAL');
    if(scope==='ALL')return true;
    if(scope==='OFA')return s==='OFA'||s==='GENERAL';
+   // A selected Group Buy must show ONLY that GB's expenses plus General.
+   // Never allow another GB's expense to bleed into the selected GB view.
    return s===scope||s==='GENERAL';
  });
- $('expenses').innerHTML='<table><tr><th>Date</th><th>Scope</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr>'+visible.map(x=>'<tr><td>'+x.expense_date+'</td><td>'+esc(x.scope||'GENERAL')+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.description||'')+'</td><td>'+peso(x.amount)+'</td><td><button class="danger" onclick="delExpense(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>'+(visible.length?'':'<div class="muted" style="padding:12px 0">No expenses for this Finance view.</div>');
+ $('expenses').innerHTML='<table><tr><th>Date</th><th>Scope</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr>'+visible.map(x=>'<tr><td>'+x.expense_date+'</td><td><b>'+esc(x.scope||'GENERAL')+'</b></td><td>'+esc(x.category)+'</td><td>'+esc(x.description||'')+'</td><td>'+peso(x.amount)+'</td><td><button class="danger" onclick="delExpense(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>'+(visible.length?'':'<div class="muted" style="padding:12px 0">No expenses for this Finance view.</div>');
 }
 function renderManufTally(rows,scope){
  const box=$('manufTally'); if(!box)return;
@@ -213,6 +216,9 @@ window.loadSales=function(){
  // Manufacturer Pricelist is reference only. It is NOT automatically deducted.
  // Net profit changes only when you manually record an actual expense/payment.
  $('profit').textContent=peso(revenue-exp);
+ const adminScopeRows=adminOrders.filter(o=>scope==='ALL'||(scope!=='OFA'&&String(o.gb_number)===String(scope.replace('GB:',''))));
+ const adminOrdersTotal=adminScopeRows.reduce((s,o)=>s+Number(o.qty||0)*Number(o.manufacturer_price||0),0);
+ $('adminOrdersTotal').textContent=peso(adminOrdersTotal);
  renderExpenses();renderAdminOrdersFinance();
  $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>'+(refundedAmount?'<div class="muted" style="margin-top:10px">💸 Refunded cancellations deducted: '+peso(refundedAmount)+'</div>':'');renderManufTally(rows,scope);
 };

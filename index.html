@@ -724,8 +724,13 @@ header{
       }
     });
   }
+  function startSoldOutObserver(){
+    if(!document.body) return;
+    new MutationObserver(hideDuplicateSoldOut).observe(document.body,{childList:true,subtree:true});
+  }
   hideDuplicateSoldOut();
-  new MutationObserver(hideDuplicateSoldOut).observe(document.body,{childList:true,subtree:true});
+  if(document.body) startSoldOutObserver();
+  else document.addEventListener('DOMContentLoaded',startSoldOutObserver,{once:true});
 })();
 </script>
 </head>
@@ -1390,7 +1395,7 @@ async function load(){
     const productQuery =
       sb
         .from("products")
-        .select("*,product_variants(*)")
+        .select("*")
         .eq("active",true)
         .order("product_name");
 
@@ -1402,16 +1407,22 @@ async function load(){
         ? await productQuery.in("category",categoryNames)
         : await productQuery;
 
+    if(productError) throw productError;
 
-    if(productError){
-
-      throw productError;
-
+    // Fetch variants separately instead of relying on a PostgREST embedded
+    // relationship that is not present in the current database schema cache.
+    const productIds=(productData||[]).map(p=>p.product_id).filter(Boolean);
+    let variantData=[];
+    if(productIds.length){
+      const vr=await sb.from("product_variants").select("*").in("product_id",productIds);
+      if(vr.error) throw vr.error;
+      variantData=vr.data||[];
     }
 
-
-    products =
-      productData || [];
+    products=(productData||[]).map(p=>({
+      ...p,
+      product_variants:variantData.filter(v=>String(v.product_id)===String(p.product_id))
+    }));
     window.__pepBaseProducts = products;
 
     if(gb.status==="CLOSED" && !categoryNames.length){

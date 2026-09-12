@@ -240,15 +240,16 @@ window.saveExpense=async function(){const amount=Number($('eamount').value);if(!
 window.delPrice=async function(id){if(confirm('Delete this manufacturer price?')){const rr=await sb.from('finance_manufacturer_prices').delete().eq('id',id);if(rr.error)alert(rr.error.message);else await refreshFinance();}};
 window.delExpense=async function(id){if(confirm('Delete this expense?')){const rr=await sb.from('finance_expenses').delete().eq('id',id);if(rr.error)alert(rr.error.message);else await refreshFinance();}};
 async function refreshFinance(){
- const [p,e,a,cx]=await Promise.all([
+ const [p,e,a,cx,ao]=await Promise.all([
   sb.from('finance_manufacturer_prices').select('*').order('product_name'),
   sb.from('finance_expenses').select('*').order('expense_date',{ascending:false}),
   sb.from('finance_manufacturer_orders').select('*'),
-  sb.from('cancelled_kits').select('id,gb_number,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status,refunded_at')
+  sb.from('cancelled_kits').select('id,gb_number,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status,refunded_at'),
+  sb.from('admin_orders').select('id,gb_number,admin_index,product_id,variant_id,product_name,variant,qty,manufacturer_price,created_at').order('created_at',{ascending:false})
  ]);
  if(p.error)alert(p.error.message);if(e.error)alert(e.error.message);if(a.error)alert(a.error.message);if(cx.error)alert(cx.error.message);
  prices=p.data||[];expenses=e.data||[];manufacturerAssignments=a.data||[];cancelledKits=cx.data||[];adminOrders=ao.data||[];
- renderPrices();renderExpenses();loadSales();
+ renderPrices();renderExpenses();renderAdminOrdersFinance();loadSales();
 }
 try{await init();}catch(e){console.error(e);$('sales').innerHTML='<div style="color:#a33;padding:12px">Finance error: '+esc(e.message||String(e))+'</div>';}}
 )();

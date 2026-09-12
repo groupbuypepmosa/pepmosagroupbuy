@@ -30,13 +30,18 @@ async function init(){
   sb.from('product_variants').select('variant_id,product_id,strength,active').order('strength'),
   sb.from('finance_manufacturer_prices').select('*'),
   sb.from('admin_orders').select('*').order('created_at',{ascending:false}),
-  sb.from('orders').select('*').order('created_at',{ascending:false}),
+  sb.from('orders').select('order_id,gb_number,payment_status,created_at').order('created_at',{ascending:false}),
+  sb.from('order_items').select('order_item_id,order_id,product_id,variant_id,product_name,strength,qty,unit_price,line_total'),
   sb.from('group_buys').select('gb_number,customer_facing_name,status,created_at').order('created_at',{ascending:false})
  ]);
  for(const x of r)if(x.error)throw x.error;
  const vm=new Map();(r[1].data||[]).forEach(v=>{if(!vm.has(v.product_id))vm.set(v.product_id,[]);vm.get(v.product_id).push(v)});
  catalog=(r[0].data||[]).filter(x=>x.active!==false).map(p=>({...p,variants:(vm.get(p.product_id)||[]).filter(v=>v.active!==false)}));
- prices=r[2].data||[];orders=r[3].data||[];customerRows=r[4].data||[];groupBuys=r[5].data||[];
+ prices=r[2].data||[];orders=r[3].data||[];
+ const orderMap=new Map((r[4].data||[]).map(o=>[o.order_id,o]));
+ // Build customer line items correctly: orders and order_items are separate tables.
+ customerRows=(r[5].data||[]).map(item=>({...item,...(orderMap.get(item.order_id)||{})}));
+ groupBuys=r[6].data||[];
  render();
 }
 function renderKitCompletion(){

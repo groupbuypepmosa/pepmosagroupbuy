@@ -262,9 +262,23 @@
   function renderProducts(){const host=$('productGrid');if(!host)return;const q=($('search')?.value||'').toLowerCase().trim();const list=products.filter(p=>(p.product_name+' '+(p.description||'')).toLowerCase().includes(q));if(!list.length){host.innerHTML='<div class="pepEmpty">No products available in this Group Buy.</div>';return}host.innerHTML=list.map(p=>{const vars=(p.product_variants||[]).filter(v=>v.active!==false);const image=p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.product_name)}" loading="lazy">`:`<div>${esc(p.product_name)}</div>`;const rows=vars.map(v=>{const kit=getGB()?.status==='KIT_COMPLETION';const rem=Number(v.remaining_qty||0);return `<div><div class="pepVariantRow"><div class="pepVariantInfo"><div class="pepVariantStrength">${esc(v.strength||'Standard')}</div><div class="pepVariantPrice">${peso(v.price)}</div></div><input class="pepVariantQty" type="number" min="${Number(v.minimum_qty||1)}" ${kit?`max="${rem}"`:''} value="${Number(v.minimum_qty||1)}" id="qty-${esc(v.variant_id)}"><button class="pepVariantAdd" type="button" onclick="addToCart('${esc(p.product_id)}','${esc(v.variant_id)}')">ADD</button></div><div class="pepMin">${kit?`Only ${rem} vial(s) remaining to complete this kit • minimum 1 vial`:`Minimum ${Number(v.minimum_qty||1)} pc`}</div></div>`}).join('');return`<article class="pepProductCard"><div class="pepProductImage${p.image_url?'':' noImage'}">${image}</div><div class="pepProductName">${esc(p.product_name)}</div><p class="pepProductDesc">${esc(p.description||'')}</p><div class="pepVariants">${rows||'<div class="pepMin">No variants available.</div>'}</div></article>`}).join('')}
   window.renderProducts=renderProducts;
   window.addToCart=function(pid,vid){
-    const gbNow=getGB(),product=products.find(p=>String(p.product_id)===String(pid));
-    const variant=product?.product_variants?.find(v=>String(v.variant_id)===String(vid));
-    if(!product||!variant){alert('Product not found.');return;}
+    const gbNow=getGB();
+    // This file has its own product cache, while the main storefront and
+    // product picker may already have the same catalog in their own cache.
+    // Use those shared fallbacks so approving the Admin Fee never makes the
+    // immediately-following Add to Cart lose the selected product.
+    const shared=(Array.isArray(window.__pepBaseProducts)?window.__pepBaseProducts:[]);
+    const picked=window.__pepLastPickerProduct;
+    const product=products.find(p=>String(p.product_id)===String(pid))
+      || shared.find(p=>String(p.product_id)===String(pid))
+      || (picked&&String(picked.product_id)===String(pid)?picked:null);
+    const variant=product?.product_variants?.find(v=>String(v.variant_id)===String(vid))
+      || (picked&&String(picked.product_id)===String(pid)?(picked.product_variants||[]).find(v=>String(v.variant_id)===String(vid)):null);
+    if(!product||!variant){
+      console.error('PEPMOSA ADD TO CART: product/variant not found', {pid,vid,cache:products.length,shared:shared.length,picked:!!picked});
+      alert('Product not found. Please refresh the page and try again.');
+      return;
+    }
     const input=$('qty-'+vid);
     let qty=Math.max(Number(variant.minimum_qty||1),Number(input?.value||variant.minimum_qty||1));
     // Never carry cart quantities across different Group Buys.

@@ -983,6 +983,9 @@ async function loadVialTracker(){
   let q=sb.from("orders").select("order_id,gb_number,payment_status,email,total,created_at,order_items(*)").order("created_at",{ascending:true});
   if(gb)q=q.eq("gb_number",gb);
   const{data:orders,error:oe}=await q;if(oe)throw oe;
+  let aq=sb.from("admin_orders").select("id,gb_number,product_id,variant_id,product_name,variant,qty").order("created_at",{ascending:true});
+  if(gb)aq=aq.eq("gb_number",gb);
+  const{data:adminOrders,error:ae}=await aq;if(ae)throw ae;
   const {data:cancelledRows}=await sb.from("cancelled_kits").select("order_id,product_id,variant_id,product_name,strength,qty,status");
   const cancelledMap=new Map();for(const x of (cancelledRows||[]).filter(x=>String(x.status||"").toUpperCase()==="REFUNDED")){const k=[x.order_id,x.product_id||x.product_name,x.variant_id||x.strength||""].join("::");cancelledMap.set(k,(cancelledMap.get(k)||0)+Number(x.qty||0));}
   const valid=(orders||[]).filter(o=>!["REJECTED","CANCELLED","CANCELED"].includes(String(o.payment_status||"").toUpperCase()));
@@ -993,9 +996,11 @@ async function loadVialTracker(){
     if(cancelledBox)cancelledBox.innerHTML="";
     return renderVialTracker();
   }
-  const items=valid.flatMap(o=>(o.order_items||[]).map(i=>({...i,order_id:o.order_id,email:o.email,gb_number:o.gb_number,total:o.total})));
+  const items=valid.flatMap(o=>(o.order_items||[]).map(i=>({...i,order_id:o.order_id,email:o.email,gb_number:o.gb_number,total:o.total,source:"CUSTOMER"})));
+  const adminItems=(adminOrders||[]).map(i=>({order_id:"ADMIN-"+i.id,email:"",gb_number:i.gb_number,product_id:i.product_id||"",product_name:i.product_name||"",variant_id:i.variant_id||"",strength:i.variant||"",qty:i.qty||0,total:0,source:"ADMIN"}));
+  const allItems=[...items,...adminItems];
   const map=new Map();
-  for(const item of items||[]){
+  for(const item of allItems){
     const cancelKey=[item.order_id,item.product_id||item.product_name,item.variant_id||item.strength||""].join("::");
     const activeQty=Math.max(0,Number(item.qty||0)-Number(cancelledMap.get(cancelKey)||0));if(!activeQty)continue;
     const key=[item.product_id||item.product_name,item.variant_id||item.strength||""].join("::");

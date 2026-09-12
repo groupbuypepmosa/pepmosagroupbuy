@@ -16,7 +16,7 @@ table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;borde
 <header><div><b>👥 ADMIN ORDERS</b><div style="margin-top:5px;color:#d9cfd9;font-size:13px">PEPMOSA • Shared Admin Order Tracker</div></div><span class="muted" style="color:#ddd">VICKY • JOYCE • RHEA • ANNE</span></header>
 <main>
 <div class="stats" id="stats"></div><div id="productTotals"></div><div id="kitCompletion"></div>
-<div class="card"><h2 style="margin-top:0">➕ Add New Admin Order</h2><p class="muted">Select the admin and product. Manufacturer price is automatically pulled from Finance.</p><div class="grid"><div><label>Group Buy</label><select id="gb" onchange="render()"></select></div><div><label>Admin</label><select id="admin"></select></div><div><label>Product</label><select id="product" onchange="fillVariants()"><option value="">Select product</option></select></div><div><label>Variant / Strength</label><select id="variant" onchange="updatePrice()"><option value="">Select product first</option></select></div><div><label>Quantity</label><input id="qty" type="number" min="1" step="1"></div><div><label>Manufacturer Price</label><input id="price" readonly></div></div><button onclick="addOrder()">ADD ORDER</button><div class="muted" style="margin-top:8px">Admin Orders are recorded under the selected GB. Pricing stays separate from customer sales.</div><div class="muted" style="margin-top:8px">Manufacturer price is automatically taken from Finance → Manufacturer Pricelist.</div></div>
+<div class="card"><h2 style="margin-top:0">➕ Add New Admin Order</h2><p class="muted">Select the admin and product. Manufacturer price is automatically pulled from Finance.</p><div class="grid"><div><label>Group Buy</label><select id="gb" onchange="render()"></select></div><div><label>Admin</label><select id="admin"></select></div><div><label>Product</label><select id="product" onchange="fillVariants()"><option value="">Select product</option></select></div><div><label>Variant / Strength</label><select id="variant" onchange="updatePrice()"><option value="">Select product first</option></select></div><div><label>Quantity</label><input id="qty" type="number" min="1" step="1"></div><div><label>Manufacturer Price</label><input id="price" readonly></div></div><button onclick="addOrder()">ADD ORDER</button><div class="muted" style="margin-top:8px">Admin Orders are recorded under the selected GB and are included in the GB kit count. Admin pricing stays separate from customer sales.</div><div class="muted" style="margin-top:8px">Manufacturer price is automatically taken from Finance → Manufacturer Pricelist.</div></div>
 <div id="consolidated"></div><div class="card"><h2 style="margin-top:0">📋 All Admin Orders</h2><div id="rows">Loading…</div></div>
 </main>
 <script>
@@ -56,19 +56,22 @@ function renderKitCompletion(){
  });
  const adminMap={};
  orders.filter(o=>String(o.gb_number||'')===String(activeGb)).forEach(o=>{const k=String(o.product_id||o.product_name)+'||'+String(o.variant_id||o.variant||'');adminMap[k]=(adminMap[k]||0)+Number(o.qty||0)});
- const items=Object.values(customerMap).map(x=>{
+ const keys=new Set([...Object.keys(customerMap),...Object.keys(adminMap)]);
+ const items=[...keys].map(k=>{
+   const x=customerMap[k]||(()=>{const [pid,vid]=k.split('||');const p=catalog.find(a=>String(a.product_id)===pid);return {pid,vid,name:p?.product_name||pid,variant:(p?.variants||[]).find(v=>String(v.variant_id)===vid)?.strength||vid,qty:0};})();
    const p=catalog.find(a=>String(a.product_id)===String(x.pid)||a.product_name===x.name);
    const kit=10;
-   const adminQty=adminMap[x.pid+'||'+x.vid]||adminMap[String(p?.product_id||x.pid)+'||'+String(x.vid)]||0;
+   const adminQty=adminMap[k]||adminMap[String(p?.product_id||x.pid)+'||'+String(x.vid)]||0;
    const customer=x.qty;
-   const remainder=customer%kit;
+   const total=customer+adminQty;
+   const completeKits=Math.floor(total/kit);
+   const remainder=total%kit;
    const need=remainder===0?0:kit-remainder;
-   const remaining=Math.max(0,need-adminQty);
-   return {...x,kit,adminQty,need,remaining};
- }).filter(x=>x.remaining>0);
+   return {...x,kit,adminQty,total,completeKits,need,remaining:need};
+ }).filter(x=>x.total>0);
  box.innerHTML='<div class="card"><h2 style="margin-top:0">🧩 Complete Incomplete Kits</h2><p class="muted">Customer orders are grouped automatically. Admins can claim the remaining quantity needed to complete a 10-vial kit.</p>'+
- (items.length?'<div style="overflow:auto"><table><tr><th>Product</th><th>Customer Qty</th><th>Kit Size</th><th>Needed</th><th>Already Claimed</th><th>Still Available</th><th>Claim</th></tr>'+
- items.map((x,i)=>'<tr><td><b>'+esc(x.name)+'</b><br><span class="muted">'+esc(x.variant||'—')+'</span></td><td>'+x.qty+'</td><td>'+x.kit+'</td><td>'+x.need+'</td><td>'+x.adminQty+'</td><td><b style="color:#b33">'+x.remaining+'</b></td><td><select id="kitAdmin'+i+'">'+admins.map((a,j)=>'<option value="'+j+'">'+esc(a)+'</option>').join('')+'</select><input id="kitQty'+i+'" type="number" min="1" max="'+x.remaining+'" value="'+x.remaining+'" style="max-width:90px"><button onclick="claimKit('+i+')">CLAIM</button></td></tr>').join('')+'</table></div>':'<div class="muted" style="padding:14px 0">🎉 No incomplete kits to complete right now.</div>')+'</div>';
+ (items.length?'<div style="overflow:auto"><table><tr><th>Product</th><th>Customer Qty</th><th>Admin Qty</th><th>Total Qty</th><th>Complete Kits</th><th>Next Kit Needs</th><th>Claim</th></tr>'+
+ items.map((x,i)=>'<tr><td><b>'+esc(x.name)+'</b><br><span class="muted">'+esc(x.variant||'—')+'</span></td><td>'+x.qty+'</td><td>'+x.adminQty+'</td><td><b>'+x.total+'</b></td><td>'+x.completeKits+'</td><td>'+(x.need||'✓ Complete')+'</td><td><select id="kitAdmin'+i+'">'+admins.map((a,j)=>'<option value="'+j+'">'+esc(a)+'</option>').join('')+'</select><input id="kitQty'+i+'" type="number" min="1" max="'+x.remaining+'" value="'+x.remaining+'" style="max-width:90px"><button onclick="claimKit('+i+')">CLAIM</button></td></tr>').join('')+'</table></div>':'<div class="muted" style="padding:14px 0">🎉 No incomplete kits to complete right now.</div>')+'</div>';
  window.__kitItems=items;
  window.claimKit=async function(i){
    const x=window.__kitItems[i], ai=Number(document.getElementById('kitAdmin'+i).value), qty=Number(document.getElementById('kitQty'+i).value);

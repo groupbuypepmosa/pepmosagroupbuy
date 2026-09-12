@@ -83,8 +83,12 @@ function renderKitCompletion(){
 }
 
 function render(){
+ const gbSelect=document.getElementById('gb');
+ const previousGb=String(gbSelect?.value||'');
+ gbSelect.innerHTML=groupBuys.map(g=>'<option value="'+esc(g.gb_number)+'">GB '+esc(g.gb_number)+' — '+esc(g.customer_facing_name||g.status||'')+'</option>').join('');
+ if(previousGb && groupBuys.some(g=>String(g.gb_number)===previousGb)) gbSelect.value=previousGb;
+ else if(groupBuys.length) gbSelect.value=groupBuys[0].gb_number;
  renderKitCompletion();
- document.getElementById('gb').innerHTML=groupBuys.map(g=>'<option value="'+esc(g.gb_number)+'">GB '+esc(g.gb_number)+' — '+esc(g.customer_facing_name||g.status||'')+'</option>').join('');
  document.getElementById('admin').innerHTML=admins.map((a,i)=>'<option value="'+i+'">'+esc(a)+'</option>').join('');
  document.getElementById('product').innerHTML='<option value="">Select product</option>'+catalog.map(p=>'<option value="'+p.product_id+'">'+esc(p.product_name)+'</option>').join('');
  const activeGb=String(document.getElementById('gb')?.value||groupBuys[0]?.gb_number||'');orders=orders;const gbOrders=orders.filter(o=>String(o.gb_number||'')===activeGb);const totals=admins.map((a,i)=>gbOrders.filter(o=>o.admin_index===i).reduce((s,o)=>s+Number(o.qty)*Number(o.manufacturer_price),0));

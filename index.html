@@ -2792,5 +2792,15 @@ load();
 @keyframes pepmosaTwinkle{0%,100%{opacity:0}22%{opacity:.15}36%{opacity:.95}43%{opacity:.25}50%{opacity:1}58%{opacity:.12}72%{opacity:.7}82%{opacity:0}}
 </style>
 <script id="pepmosa-twinkling-stars-script">(function(){function mount(){const old=document.getElementById('pepmosaTwinkles');if(old)old.remove();const field=document.createElement('div');field.id='pepmosaTwinkles';const n=window.innerWidth<700?34:68;for(let i=0;i<n;i++){const s=document.createElement('span');s.className='pepmosa-twinkle';s.style.setProperty('--x',(Math.random()*100).toFixed(2)+'vw');s.style.setProperty('--y',(4+Math.random()*92).toFixed(2)+'vh');s.style.setProperty('--s',(9+Math.random()*10).toFixed(1)+'px');s.style.setProperty('--t',(3+Math.random()*4).toFixed(1)+'s');s.style.setProperty('--d',(-Math.random()*9).toFixed(1)+'s');field.appendChild(s)}document.body.appendChild(field)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount()})();</script>
+<!-- PEPMOSA VARIED TWINKLE SHAPES -->
+<style id="pepmosa-varied-twinkle">
+.pepmosa-twinkle.dot{clip-path:none;border-radius:50%}
+.pepmosa-twinkle.cross{clip-path:none;background:transparent}
+.pepmosa-twinkle.cross::before,.pepmosa-twinkle.cross::after{content:"";position:absolute;left:50%;top:50%;background:#fff;border-radius:999px;transform:translate(-50%,-50%);box-shadow:0 0 8px #fff,0 0 16px rgba(255,170,220,.9)}
+.pepmosa-twinkle.cross::before{width:100%;height:2px}.pepmosa-twinkle.cross::after{width:2px;height:100%}
+.pepmosa-twinkle.diamond{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.pepmosa-twinkle.ring{clip-path:none;border-radius:50%;background:transparent;border:2px solid rgba(255,255,255,.95);box-shadow:0 0 7px #fff,0 0 15px rgba(255,170,220,.9),0 0 24px rgba(236,77,160,.55)}
+</style>
+<script id="pepmosa-varied-twinkle-script">(function(){function addVaried(){const field=document.getElementById('pepmosaTwinkles');if(!field)return;field.querySelectorAll('.pepmosa-twinkle').forEach((s,i)=>{s.classList.remove('dot','cross','diamond','ring');const t=i%4;s.classList.add(t===0?'cross':t===1?'diamond':t===2?'ring':'dot')})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addVaried,{once:true});else addVaried()})();</script>
 </body>
 </html>

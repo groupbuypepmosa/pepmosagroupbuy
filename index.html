@@ -2066,21 +2066,47 @@ function addToCart(pid,vid){
    CART COUNT
    ========================================================= */
 
-function updateCart(){
-
-  // Always sync from storage so storefront add-to-cart and cart modal use one source of truth.
-  cart = JSON.parse(localStorage.pepmosaCart || "[]");
-
-  const count =
-    cart.reduce(
-      (sum,item) =>
-        sum + Number(item.qty || 0),
-      0
-    );
-
-  if($("cartCount")) $("cartCount").textContent = count;
-
+function readSavedCart(){
+  try{
+    const raw=localStorage.getItem("pepmosaCart");
+    if(raw===null)return Array.isArray(cart)?cart:[];
+    const parsed=JSON.parse(raw||"[]");
+    return Array.isArray(parsed)?parsed:[];
+  }catch(e){
+    console.warn("PEPMOSA cart read failed:",e);
+    return Array.isArray(cart)?cart:[];
+  }
 }
+
+function updateCart(){
+  // Keep one persistent cart source. Other storefront scripts may update
+  // localStorage asynchronously, so always reconcile from the saved cart.
+  cart=readSavedCart();
+  const count=cart.reduce((sum,item)=>sum+Math.max(0,Number(item?.qty??item?.quantity??0)||0),0);
+  const badge=$("cartCount");
+  if(badge)badge.textContent=String(count);
+  const modal=$("cartModal");
+  if(modal?.classList.contains("show"))renderCartContents();
+}
+
+function renderCartContents(){
+  const itemsBox=$("cartItems");
+  if(!itemsBox)return;
+  const saved=readSavedCart();
+  cart=saved;
+  const total=saved.reduce((sum,item)=>sum+Number(item?.price??item?.unit_price??0)*Number(item?.qty??item?.quantity??0),0);
+  if(!saved.length){
+    itemsBox.innerHTML='<div class="pepCartEmpty"><div class="pepCartEmptyIcon">🛍️</div><b>Your cart is empty</b><span>Add your favorite PEPMOSA products to get started.</span><button type="button" class="btn primary pepCartShopBtn" onclick="closeModal(\\'cartModal\\');document.getElementById(\\'products\\').scrollIntoView({behavior:\\'smooth\\'})">SHOP PRODUCTS</button></div>';
+  }else{
+    itemsBox.innerHTML='<div class="pepCartList">'+saved.map((item,index)=>{
+      const price=Number(item?.price??item?.unit_price??0),qty=Number(item?.qty??item?.quantity??0);
+      return '<div class="pepCartItem"><div class="pepCartItemMain"><div class="pepCartItemName">'+esc(item.product_name)+'</div><div class="pepCartItemMeta">'+esc(item.strength||'')+' • '+peso(price)+' each</div></div><div class="pepCartItemSide"><div class="pepCartQty">× '+qty+'</div><b>'+peso(price*qty)+'</b><button class="pepCartRemove" type="button" onclick="removeCart('+index+')" aria-label="Remove item">×</button></div></div>';
+    }).join("")+'</div>';
+  }
+  const totalEl=$("cartTotal");
+  if(totalEl)totalEl.textContent=peso(total);
+}
+window.renderCart=renderCartContents;
 
 window.pepSyncCartBadge = function(){
   updateCart();

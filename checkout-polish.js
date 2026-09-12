@@ -160,13 +160,11 @@
   }
   window.checkout=async function(){
     const{cart}=totals();if(!cart.length){if(typeof window.openCart==='function')window.openCart();return}
-    // The Cart modal must get out of the way immediately when Checkout is clicked.
-    // Otherwise it stays above the Checkout modal and blocks the form.
-    const cartModal=$('cartModal');
-    if(cartModal){
-      cartModal.classList.remove('show','open');
-      cartModal.style.removeProperty('display');
-    }
+    // Close the Cart modal using the storefront's normal modal helper.
+    // Do not touch inline display styles, because the modal CSS controls
+    // visibility and clearing them can make the underlying storefront behave oddly.
+    if(typeof window.closeModal==='function') window.closeModal('cartModal');
+    else $('cartModal')?.classList.remove('show');
     const activeGB=getGB();
     const freshCart=cart.filter(i=>String(i.gb_number||'')===String(activeGB?.gb_number||''));
     if(freshCart.length!==cart.length){window.cart=freshCart;localStorage.setItem(CART_KEY,JSON.stringify(freshCart));localStorage.setItem(CART_GB_KEY,String(activeGB?.gb_number||''));}

@@ -2777,14 +2777,15 @@ load();
 })();
 </script>
 
-<!-- PEPMOSA LUXURY SHIMMER DUST -->
-<style id="pepmosa-luxury-shimmer">
+<!-- PEPMOSA PINK FAIRY GLITTER -->
+<style id="pepmosa-pink-fairy-glitter">
 #pepmosaFallingGlitter{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:40}
-.pepmosa-dust{position:absolute;top:-18px;left:var(--x);width:var(--s);height:var(--s);background:#fff;opacity:0;clip-path:polygon(50% 0,57% 42%,100% 50%,57% 58%,50% 100%,43% 58%,0 50%,43% 42%);filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 7px rgba(255,170,215,.7));animation:pepmosaDustFall var(--t) linear var(--d) infinite}
-.pepmosa-dust.pink{background:#ff79b9;filter:drop-shadow(0 0 3px #ff79b9) drop-shadow(0 0 8px rgba(255,105,180,.65))}
-.pepmosa-dust.big{filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 11px rgba(255,180,220,.9)) drop-shadow(0 0 18px rgba(236,77,160,.45))}
-@keyframes pepmosaDustFall{0%{top:-18px;opacity:0}8%{opacity:var(--o)}22%{opacity:calc(var(--o)*.45)}40%{opacity:var(--o)}62%{opacity:calc(var(--o)*.55)}78%{opacity:calc(var(--o)*.85)}100%{top:calc(100vh + 18px);opacity:0}}
+.pepmosa-fairy{position:absolute;top:-16px;left:var(--x);width:var(--s);height:var(--s);opacity:0;background:#fff;clip-path:polygon(50% 0,57% 40%,100% 50%,57% 60%,50% 100%,43% 60%,0 50%,43% 40%);filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 9px rgba(255,180,225,.9));animation:pepmosaFairyFall var(--t) linear var(--d) infinite}
+.pepmosa-fairy.pink{background:#ff66ad;filter:drop-shadow(0 0 5px #ff66ad) drop-shadow(0 0 11px rgba(255,90,170,.95))}
+.pepmosa-fairy.big{width:var(--s);height:var(--s);filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 14px rgba(255,170,220,1)) drop-shadow(0 0 24px rgba(236,77,160,.6))}
+.pepmosa-fairy.big.pink{filter:drop-shadow(0 0 7px #ff66ad) drop-shadow(0 0 16px rgba(255,90,170,1)) drop-shadow(0 0 27px rgba(236,77,160,.7))}
+@keyframes pepmosaFairyFall{0%{top:-16px;opacity:0}8%{opacity:var(--o)}25%{opacity:calc(var(--o)*.75)}48%{opacity:var(--o)}70%{opacity:calc(var(--o)*.6)}88%{opacity:calc(var(--o)*.9)}100%{top:calc(100vh + 16px);opacity:0}}
 </style>
-<script id="pepmosa-luxury-shimmer-script">(function(){function mount(){const old=document.getElementById('pepmosaFallingGlitter');if(old)old.remove();const field=document.createElement('div');field.id='pepmosaFallingGlitter';const n=window.innerWidth<700?100:190;for(let i=0;i<n;i++){const x=document.createElement('span');const big=i%17===0;x.className='pepmosa-dust'+(big?' big':'')+(i%7===0?' pink':'');x.style.setProperty('--x',(Math.random()*100).toFixed(2)+'vw');x.style.setProperty('--s',(big?9+Math.random()*6:2.5+Math.random()*4.5).toFixed(1)+'px');x.style.setProperty('--o',(big?1:.45+Math.random()*.5).toFixed(2));x.style.setProperty('--t',(16+Math.random()*12).toFixed(1)+'s');x.style.setProperty('--d',(-Math.random()*28).toFixed(1)+'s');field.appendChild(x)}document.body.appendChild(field)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount()})();</script>
+<script id="pepmosa-pink-fairy-glitter-script">(function(){function mount(){const old=document.getElementById('pepmosaFallingGlitter');if(old)old.remove();const field=document.createElement('div');field.id='pepmosaFallingGlitter';const n=window.innerWidth<700?85:170;for(let i=0;i<n;i++){const x=document.createElement('span');const big=i%13===0;x.className='pepmosa-fairy'+(big?' big':'')+(i%2===0?' pink':'');x.style.setProperty('--x',(Math.random()*100).toFixed(2)+'vw');x.style.setProperty('--s',(big?9+Math.random()*7:3+Math.random()*4).toFixed(1)+'px');x.style.setProperty('--o',(big?1:.55+Math.random()*.4).toFixed(2));x.style.setProperty('--t',(15+Math.random()*11).toFixed(1)+'s');x.style.setProperty('--d',(-Math.random()*26).toFixed(1)+'s');field.appendChild(x)}document.body.appendChild(field)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount()})();</script>
 </body>
 </html>

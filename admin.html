@@ -209,7 +209,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 
 
 .btn.warning{background:#fff3cd;color:#7a5a00;border-color:#efd98a}.btn.warning:hover{filter:brightness(.98)}
-@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -975,14 +974,9 @@ async function approveFeePayment(id){try{const{error}=await sb.from("admin_fee_p
 async function rejectFeePayment(id){if(!confirm("Reject this Admin Fee payment?"))return;try{const{error}=await sb.from("admin_fee_payments").update({status:"REJECTED",updated_at:new Date().toISOString()}).eq("id",id);if(error)throw error;await loadFees();showMessage("Admin Fee payment rejected.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to reject Admin Fee payment.","error")}}
 async function approveCheckoutPayment(orderId){try{const{error}=await sb.from("orders").update({payment_status:"PAID",admin_note:"Payment approved by admin"}).eq("order_id",orderId);if(error)throw error;await loadOrders();showMessage("Checkout payment approved.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to approve checkout payment.","error")}}
 async function rejectCheckoutPayment(orderId){if(!confirm("Reject this checkout payment?"))return;try{const{error}=await sb.from("orders").update({payment_status:"REJECTED",admin_note:"Payment rejected by admin"}).eq("order_id",orderId);if(error)throw error;await loadOrders();showMessage("Checkout payment rejected.","success")}catch(e){console.error(e);showMessage(e.message||"Unable to reject checkout payment.","error")}}
-function setVialTrackerLoading(on){
- const box=$("vialTrackerResults");
- if(box&&on)box.innerHTML='<div class="empty" style="padding:28px;text-align:center"><span class="spinner" style="display:inline-block;width:18px;height:18px;border:2px solid #ddd;border-top-color:currentColor;border-radius:50%;vertical-align:-4px;margin-right:8px;animation:spin .8s linear infinite"></span>Loading Vial Tracker…</div>';
-}
 async function loadVialTracker(){
- setVialTrackerLoading(true);
- try{
  const gb=$("vialTrackerGB").value;
+ try{
   /* ONE tracker rule for OPEN and KIT COMPLETION:
      count all valid orders, including MANUAL ADMIN ORDER.
      Every 10 vials = one completed kit; the remainder starts the next kit. */
@@ -1124,7 +1118,6 @@ async function loadCancelledKits(){
    const undoBtn='<button class="btn secondary" type="button" onclick="undoCancelledKit('+rid+')">↩ UNDO CANCELLATION</button>';
    return '<div class="pepKitCard"><div class="pepKitTop"><div><b>'+esc(r.product_name||"Cancelled item")+'</b><div class="small">'+esc(r.strength||"")+' • '+esc(r.email||"No email")+'</div><div class="small">Order: '+esc(r.order_id||"—")+' • Qty: '+Number(r.qty||0)+'</div></div><b>'+esc(r.status||"CANCELLED")+'</b></div><div class="small" style="margin-top:10px">Refund amount: '+peso(Number(r.refund_amount||0))+(r.reason?' • Reason: '+esc(r.reason):'')+'</div>'+statusHtml+'<div class="actions" style="margin-top:12px">'+refundBtn+undoBtn+'</div></div>';
  }).join("")+'</div>';
- } finally { setVialTrackerLoading(false); }
 }
 function renderVialTracker(){
  const q=($("vialTrackerSearch")?.value||"").trim().toLowerCase();

@@ -166,7 +166,10 @@
  #pepInfoModal #pepInfoTitle{font-size:26px!important}
 }
 #pepInfoModal #pepInfoTitle{font-size:26px!important}}@media(max-width:700px){.pepFinalBody{padding:17px 18px 23px}.pepFinalHead{padding:24px 20px 20px}.pepFinalHead h2{font-size:29px}.pepPaymentGrid{grid-template-columns:1fr 1fr}.pepQRWrap{grid-template-columns:1fr;text-align:center}.pepQRWrap img{margin:auto;width:210px;height:210px}.pepQRText{text-align:left}.pepFields{grid-template-columns:1fr}.pepField.full{grid-column:auto}.pepFinalActions{flex-direction:column}.pepCancel{order:2}}`;document.head.appendChild(s)}
-  <style id="pep-success-popup-v2">
+  if(!document.getElementById('pep-success-popup-v2')){
+  const s=document.createElement('style');
+  s.id='pep-success-popup-v2';
+  s.textContent=`
 #pepInfoModal{position:fixed!important;inset:0!important;z-index:999998!important;display:none!important;align-items:center!important;justify-content:center!important;padding:20px!important;background:rgba(48,26,42,.22)!important}
 #pepInfoModal.open{display:flex!important}
 #pepInfoModal>.pepSuccessCard,.pepSuccessCard{
@@ -190,7 +193,10 @@
 .pepSuccessDone{width:100%!important;min-height:50px!important;border:0!important;border-radius:15px!important;background:linear-gradient(135deg,#e72b8b,#bd3fba)!important;color:#fff!important;font-size:14px!important;font-weight:950!important;letter-spacing:.3px!important;cursor:pointer!important;box-shadow:0 10px 24px rgba(205,44,139,.20)!important}
 .pepSuccessDone:hover{transform:translateY(-1px)!important}
 @media(max-width:520px){#pepInfoModal{padding:14px!important}.pepSuccessCard{padding:29px 20px 22px!important;border-radius:25px!important}.pepSuccessIcon{width:68px!important;height:68px!important}.pepSuccessTitle{font-size:26px!important}}
-</style>
+`;
+  document.head.appendChild(s);
+}
+
   function buildCheckout(){
     const modal=$('checkoutModal'),box=modal?.querySelector('.modalbox'),{cart,subtotal}=totals();if(!modal||!box||!cart.length)return;
     const gb=getGB(),qr=gb?.final_payment_qr_url||'',adminFee=Number(gb?.admin_fee||0),email=getVerifiedEmail();

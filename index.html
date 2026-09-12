@@ -2800,6 +2800,9 @@ load();
 .pepmosa-twinkle.cross::before{width:100%;height:2px}.pepmosa-twinkle.cross::after{width:2px;height:100%}
 .pepmosa-twinkle.diamond{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
 .pepmosa-twinkle.ring{clip-path:none;border-radius:50%;background:transparent;border:2px solid rgba(255,255,255,.95);box-shadow:0 0 7px #fff,0 0 15px rgba(255,170,220,.9),0 0 24px rgba(236,77,160,.55)}
+/* PEPMOSA PINK SPARKLE */
+.pepmosa-twinkle.pink{background:#ff4fa3;box-shadow:0 0 8px #ff4fa3,0 0 18px rgba(255,79,163,.95),0 0 30px rgba(255,79,163,.65)}
+.pepmosa-twinkle.pink::before,.pepmosa-twinkle.pink::after{background:#ff4fa3;box-shadow:0 0 8px #ff4fa3,0 0 18px rgba(255,79,163,.9)}
 </style>
 <script id="pepmosa-varied-twinkle-script">(function(){function addVaried(){const field=document.getElementById('pepmosaTwinkles');if(!field)return;field.querySelectorAll('.pepmosa-twinkle').forEach((s,i)=>{s.classList.remove('dot','cross','diamond','ring');const t=i%4;s.classList.add(t===0?'cross':t===1?'diamond':t===2?'ring':'dot')})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addVaried,{once:true});else addVaried()})();</script>
 </body>

@@ -54,11 +54,18 @@
     const ids=(or.data||[])
       .filter(o=>!['REJECTED','CANCELLED','CANCELED'].includes(String(o.payment_status||'').toUpperCase()))
       .map(o=>o.order_id).filter(Boolean);
-    if(!ids.length)return new Map();
-    const ir=await window.sb.from('order_items').select('variant_id,qty,order_id').in('order_id',ids);
+    const ir=ids.length
+      ? await window.sb.from('order_items').select('variant_id,qty,order_id').in('order_id',ids)
+      : {data:[],error:null};
     if(ir.error)throw ir.error;
+    const ar=await window.sb.from('admin_orders').select('variant_id,qty').eq('gb_number',gb.gb_number);
+    if(ar.error)throw ar.error;
     const totals=new Map();
     for(const item of (ir.data||[])){
+      const id=String(item.variant_id||'');
+      if(id)totals.set(id,(totals.get(id)||0)+Math.max(0,Number(item.qty||0)));
+    }
+    for(const item of (ar.data||[])){
       const id=String(item.variant_id||'');
       if(id)totals.set(id,(totals.get(id)||0)+Math.max(0,Number(item.qty||0)));
     }

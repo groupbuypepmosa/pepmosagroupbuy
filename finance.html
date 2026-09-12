@@ -22,7 +22,8 @@ body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{
 <div class="grid"><select id="pname"><option value="">Loading all products…</option></select><select id="variant"><option value="">Select product first</option></select><input id="pprice" type="number" step="0.01" placeholder="Manufacturer price"></div>
 <button onclick="savePrice()">ADD / UPDATE PRICE</button><div id="prices"></div></div></details>
 
-<div class="card"><h2>📦 Manufacturer Order Tally</h2><div id="manufTally"></div></div><div class="card"><h2>💸 Expenses</h2><p class="muted">Expenses are filtered by the selected Finance view. General expenses appear in every view; Group Buy expenses stay with their assigned GB.</p>
+<div class="card"><h2>📦 Manufacturer Order Tally</h2><div id="manufTally"></div></div>
+<div class="card"><h2>👑 Admin Orders — Separate from Customer Sales</h2><p class="muted">Admin Orders are tied to their selected Group Buy and use their own admin/manufacturer pricing. They are shown separately and are not added to customer revenue.</p><div id="adminOrdersFinance"></div></div><div class="card"><h2>💸 Expenses</h2><p class="muted">Expenses are filtered by the selected Finance view. General expenses appear in every view; Group Buy expenses stay with their assigned GB.</p>
 <div class="grid"><input id="edate" type="date"><select id="escope"><option value="GENERAL">General</option><option value="OFA">Open for All</option></select><select id="ecat"><option>Shipping</option><option>Supplier</option><option>Packaging</option><option>Customs</option><option>Operational</option><option>Other</option></select><input id="eamount" type="number" step="0.01" placeholder="Amount"></div>
 <textarea id="edesc" placeholder="Description / notes"></textarea><button onclick="saveExpense()">ADD EXPENSE</button><div id="expenses"></div></div>
 
@@ -47,7 +48,7 @@ document.getElementById('backToAdminBtn')?.addEventListener('click',async functi
 (async()=>{
 try{initSupabase();await requireAdmin();}catch(e){document.body.innerHTML='<main style="padding:30px;font-family:Arial"><h2>Admin access required</h2><p>Please log in as PEPMOSA admin.</p></main>';return;}
 const $=id=>document.getElementById(id);const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let catalog=[],prices=[],expenses=[],regularItems=[],ofaItems=[],orders=[],groupBuys=[],manufacturerAssignments=[],cancelledKits=[];
+let catalog=[],prices=[],expenses=[],regularItems=[],ofaItems=[],orders=[],groupBuys=[],manufacturerAssignments=[],cancelledKits=[],adminOrders=[];
 $('edate').value=new Date().toISOString().slice(0,10);
 
 async function init(){
@@ -64,16 +65,17 @@ async function init(){
   sb.from('ofa_order_items').select('product_id,product_name,qty,unit_price,order_id'),
   sb.from('ofa_orders').select('order_id,total,subtotal,shipping_fee,payment_status'),
   sb.from('admin_fee_payments').select('amount,status,gb_number'),
-  sb.from('cancelled_kits').select('id,gb_number,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status,refunded_at')
+  sb.from('cancelled_kits').select('id,gb_number,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status,refunded_at'),
+  sb.from('admin_orders').select('id,gb_number,admin_index,product_id,variant_id,product_name,variant,qty,manufacturer_price,created_at').order('created_at',{ascending:false})
  ]);
  for(const x of rs)if(x.error)throw x.error;
- const [prods,vars,ofap,gbs,pr,ex,assignments,ord,items,ofi,ofaOrders,adminFees,cancelled]=rs;
+ const [prods,vars,ofap,gbs,pr,ex,assignments,ord,items,ofi,ofaOrders,adminFees,cancelled,adminOrd]=rs;
  const varMap=new Map();(vars.data||[]).forEach(v=>{if(!varMap.has(v.product_id))varMap.set(v.product_id,[]);varMap.get(v.product_id).push(v);});
  window.ofaOrdersCache=ofaOrders.data||[];window.adminFeesCache=adminFees.data||[];catalog=(prods.data||[]).map(p=>({product_id:p.product_id,product_name:p.product_name,variants:varMap.get(p.product_id)||[],source:'GB'}))
  .concat((ofap.data||[]).map(p=>({product_id:'OFA:'+p.id,raw_id:p.id,product_name:p.name,variants:[],source:'OFA'})));
  catalog.sort((a,b)=>a.product_name.localeCompare(b.product_name));
- prices=pr.data||[];expenses=ex.data||[];manufacturerAssignments=assignments.data||[];orders=ord.data||[];regularItems=items.data||[];ofaItems=ofi.data||[];groupBuys=gbs.data||[];cancelledKits=cancelled.data||[];
- renderScopes();renderCatalog();renderPrices();renderExpenses();loadSales();
+ prices=pr.data||[];expenses=ex.data||[];manufacturerAssignments=assignments.data||[];orders=ord.data||[];regularItems=items.data||[];ofaItems=ofi.data||[];groupBuys=gbs.data||[];cancelledKits=cancelled.data||[];adminOrders=adminOrd.data||[];
+ renderScopes();renderCatalog();renderPrices();renderExpenses();renderAdminOrdersFinance();loadSales();
 }
 function renderScopes(){
  const s=$('scope'),e=$('escope'),old=s.value,oldE=e.value;
@@ -97,6 +99,16 @@ $('pname').addEventListener('change',updateVariants);
 
 function renderPrices(){
  $('prices').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Manuf. Price</th><th>Action</th></tr>'+prices.map(x=>'<tr><td>'+esc(x.product_name)+'</td><td>'+esc(x.variant||'—')+'</td><td>'+peso(x.manufacturer_price)+'</td><td><button onclick="editPrice(\''+x.id+'\')">Edit</button> <button class="danger" onclick="delPrice(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
+}
+function renderAdminOrdersFinance(){
+ const scope=$('scope')?.value||'ALL';
+ const rows=adminOrders.filter(o=>scope==='ALL'||(scope!=='OFA'&&String(o.gb_number)===String(scope.replace('GB:',''))));
+ const total=rows.reduce((s,o)=>s+Number(o.qty||0)*Number(o.manufacturer_price||0),0);
+ $('adminOrdersFinance').innerHTML=rows.length?
+ '<div class="muted" style="margin-bottom:10px">Admin Orders: '+rows.length+' lines • Total admin/manufacturer value: '+peso(total)+'</div>'+
+ '<table><tr><th>GB</th><th>Admin</th><th>Product</th><th>Qty</th><th>Admin Price</th><th>Total</th></tr>'+
+ rows.map(o=>'<tr><td>GB '+esc(o.gb_number||'—')+'</td><td>'+esc(['VICKY','JOYCE','RHEA','ANNE'][Number(o.admin_index)]||'Admin')+'</td><td>'+esc(o.product_name||'')+'<br><span class="muted">'+esc(o.variant||'—')+'</span></td><td>'+Number(o.qty||0)+'</td><td>'+peso(o.manufacturer_price||0)+'</td><td>'+peso(Number(o.qty||0)*Number(o.manufacturer_price||0))+'</td></tr>').join('')+'</table>'
+ :'<div class="muted" style="padding:12px 0">No Admin Orders for this Finance view.</div>';
 }
 function renderExpenses(){
  const scope=$('scope')?.value||'ALL';
@@ -201,7 +213,7 @@ window.loadSales=function(){
  // Manufacturer Pricelist is reference only. It is NOT automatically deducted.
  // Net profit changes only when you manually record an actual expense/payment.
  $('profit').textContent=peso(revenue-exp);
- renderExpenses();
+ renderExpenses();renderAdminOrdersFinance();
  $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>'+(refundedAmount?'<div class="muted" style="margin-top:10px">💸 Refunded cancellations deducted: '+peso(refundedAmount)+'</div>':'');renderManufTally(rows,scope);
 };
 window.editPrice=function(id){
@@ -235,7 +247,7 @@ async function refreshFinance(){
   sb.from('cancelled_kits').select('id,gb_number,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status,refunded_at')
  ]);
  if(p.error)alert(p.error.message);if(e.error)alert(e.error.message);if(a.error)alert(a.error.message);if(cx.error)alert(cx.error.message);
- prices=p.data||[];expenses=e.data||[];manufacturerAssignments=a.data||[];cancelledKits=cx.data||[];
+ prices=p.data||[];expenses=e.data||[];manufacturerAssignments=a.data||[];cancelledKits=cx.data||[];adminOrders=ao.data||[];
  renderPrices();renderExpenses();loadSales();
 }
 try{await init();}catch(e){console.error(e);$('sales').innerHTML='<div style="color:#a33;padding:12px">Finance error: '+esc(e.message||String(e))+'</div>';}}

@@ -166,6 +166,31 @@
  #pepInfoModal #pepInfoTitle{font-size:26px!important}
 }
 #pepInfoModal #pepInfoTitle{font-size:26px!important}}@media(max-width:700px){.pepFinalBody{padding:17px 18px 23px}.pepFinalHead{padding:24px 20px 20px}.pepFinalHead h2{font-size:29px}.pepPaymentGrid{grid-template-columns:1fr 1fr}.pepQRWrap{grid-template-columns:1fr;text-align:center}.pepQRWrap img{margin:auto;width:210px;height:210px}.pepQRText{text-align:left}.pepFields{grid-template-columns:1fr}.pepField.full{grid-column:auto}.pepFinalActions{flex-direction:column}.pepCancel{order:2}}`;document.head.appendChild(s)}
+  <style id="pep-success-popup-v2">
+#pepInfoModal{position:fixed!important;inset:0!important;z-index:999998!important;display:none!important;align-items:center!important;justify-content:center!important;padding:20px!important;background:rgba(48,26,42,.22)!important}
+#pepInfoModal.open{display:flex!important}
+#pepInfoModal>.pepSuccessCard,.pepSuccessCard{
+ box-sizing:border-box!important;width:min(440px,calc(100vw - 34px))!important;
+ padding:34px 34px 28px!important;border-radius:30px!important;
+ border:1px solid rgba(218,91,161,.18)!important;
+ background:linear-gradient(145deg,#fff 0%,#fff8fc 62%,#faf3ff 100%)!important;
+ box-shadow:0 24px 70px rgba(70,34,56,.20)!important;
+ text-align:center!important;position:relative!important;overflow:hidden!important;
+}
+.pepSuccessCard:before{content:"";position:absolute;inset:-80px -60px auto auto;width:190px;height:190px;border-radius:50%;background:rgba(242,143,195,.12);filter:blur(2px);pointer-events:none}
+.pepSuccessIcon{width:76px!important;height:76px!important;margin:0 auto 12px!important;border-radius:50%!important;background:linear-gradient(145deg,#e52b91,#c341bd)!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 12px 28px rgba(211,43,143,.22)!important}
+.pepSuccessIcon span{color:#fff!important;font-size:43px!important;font-weight:500!important;line-height:1!important}
+.pepSuccessBrand{font-size:10px!important;letter-spacing:3px!important;font-weight:950!important;color:#c92d88!important;margin-bottom:8px!important}
+.pepSuccessTitle{font-size:30px!important;line-height:1.12!important;letter-spacing:-.7px!important;color:#382934!important;margin:0 0 9px!important;font-weight:950!important}
+.pepSuccessOrder{display:inline-block!important;padding:7px 12px!important;border-radius:999px!important;background:#fcebf5!important;color:#8d5977!important;font-size:11px!important;letter-spacing:.2px!important;margin-bottom:17px!important}
+.pepSuccessOrder b{color:#572f48!important}
+.pepSuccessText{max-width:350px!important;margin:0 auto 17px!important;color:#756672!important;font-size:13px!important;line-height:1.65!important}
+.pepSuccessNote{display:flex!important;gap:9px!important;align-items:flex-start!important;text-align:left!important;max-width:350px!important;margin:0 auto 24px!important;padding:12px 13px!important;border-radius:15px!important;background:rgba(249,237,247,.72)!important;border:1px solid #f0dce9!important;color:#74566a!important;font-size:11px!important;line-height:1.5!important}
+.pepSuccessNote>span:first-child{flex:0 0 auto;width:19px;height:19px;border-radius:50%;background:#e83b95;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
+.pepSuccessDone{width:100%!important;min-height:50px!important;border:0!important;border-radius:15px!important;background:linear-gradient(135deg,#e72b8b,#bd3fba)!important;color:#fff!important;font-size:14px!important;font-weight:950!important;letter-spacing:.3px!important;cursor:pointer!important;box-shadow:0 10px 24px rgba(205,44,139,.20)!important}
+.pepSuccessDone:hover{transform:translateY(-1px)!important}
+@media(max-width:520px){#pepInfoModal{padding:14px!important}.pepSuccessCard{padding:29px 20px 22px!important;border-radius:25px!important}.pepSuccessIcon{width:68px!important;height:68px!important}.pepSuccessTitle{font-size:26px!important}}
+</style>
   function buildCheckout(){
     const modal=$('checkoutModal'),box=modal?.querySelector('.modalbox'),{cart,subtotal}=totals();if(!modal||!box||!cart.length)return;
     const gb=getGB(),qr=gb?.final_payment_qr_url||'',adminFee=Number(gb?.admin_fee||0),email=getVerifiedEmail();
@@ -267,7 +292,22 @@
       localStorage.setItem('pepmosa_last_order_id',oid);localStorage.setItem('pepmosa_customer_email',email);localStorage.setItem('pepmosa_customer_name',name);localStorage.setItem('pepmosa_phone',contact);
       // Clear both in-memory and persisted cart state only AFTER the order RPC succeeds.
       clearPersistedCart();
-      const cartModal=$('cartModal');if(cartModal)cartModal.classList.remove('show','open');closeCheckout();if($('pepInfoTitle')&&$('pepInfoText')&&$('pepInfoModal')){$('pepInfoTitle').textContent='Payment Submitted ✓';$('pepInfoText').textContent=`Your order ${oid} was submitted successfully. Your payment proof is now waiting for admin review.`;$('pepInfoOk').textContent='DONE';$('pepInfoModal').classList.add('open')}else alert('Order submitted: '+oid)}catch(e){
+      const cartModal=$('cartModal');if(cartModal)cartModal.classList.remove('show','open');closeCheckout();
+      const info=$('pepInfoModal');
+      if(info){
+        info.innerHTML=`<div class="pepSuccessCard">
+          <div class="pepSuccessIcon" aria-hidden="true"><span>✓</span></div>
+          <div class="pepSuccessBrand">PEPMOSA</div>
+          <h2 class="pepSuccessTitle">Payment Submitted</h2>
+          <div class="pepSuccessOrder">Order <b>${esc(oid)}</b></div>
+          <p class="pepSuccessText">Your order has been submitted successfully. Your payment proof is now <b>pending admin review</b>.</p>
+          <div class="pepSuccessNote"><span>✓</span><span>We’ll review your payment and update your order status once approved.</span></div>
+          <button type="button" id="pepInfoOk" class="pepSuccessDone">DONE</button>
+        </div>`;
+        info.classList.add('open');
+        const done=$('pepInfoOk');
+        if(done)done.onclick=()=>{info.classList.remove('open');info.setAttribute('aria-hidden','true')};
+      }else alert('Order submitted: '+oid)}catch(e){
       console.error('PEPMOSA CHECKOUT ERROR',e);
       const errorText=String(e?.message||'Please try again.');
       const soldOut=/no longer available|only .* vial\(s\) remain|remaining vial|sold out|kit completion quantity|inventory/i.test(errorText);

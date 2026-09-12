@@ -990,7 +990,7 @@ async function loadVialTracker(){
   const cancelledMap=new Map();for(const x of (cancelledRows||[]).filter(x=>String(x.status||"").toUpperCase()==="REFUNDED")){const k=[x.order_id,x.product_id||x.product_name,x.variant_id||x.strength||""].join("::");cancelledMap.set(k,(cancelledMap.get(k)||0)+Number(x.qty||0));}
   const valid=(orders||[]).filter(o=>!["REJECTED","CANCELLED","CANCELED"].includes(String(o.payment_status||"").toUpperCase()));
   const ids=valid.map(o=>o.order_id);
-  if(!ids.length){
+  if(!ids.length && !(adminOrders||[]).length){
     vialTrackerRows=[];
     const cancelledBox=$("cancelledKitsResults");
     if(cancelledBox)cancelledBox.innerHTML="";

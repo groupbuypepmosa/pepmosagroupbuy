@@ -2713,7 +2713,7 @@ load();
       return '<article class="card pepStoreCard" data-product-id="'+esc2(p.product_id)+'">'+
         '<div class="productImg">'+
           '<span class="pepVariantBadge">'+variants.length+' VARIANT'+(variants.length===1?'':'S')+'</span>'+
-          (p.image_url?'<img src="'+esc2(p.image_url)+'" alt="'+esc2(p.product_name)+'">':esc2(p.product_name))+
+          (p.image_url?'<img loading="lazy" decoding="async" src="'+esc2(p.image_url)+'" alt="'+esc2(p.product_name)+'">':esc2(p.product_name))+
         '</div>'+
         '<div class="pepStoreBody">'+
           '<h3>'+esc2(p.product_name)+'</h3>'+

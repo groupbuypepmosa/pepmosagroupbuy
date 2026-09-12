@@ -285,6 +285,18 @@
       return;
     }
     feePayment=await findFee();lastFeeStatus=feePayment?.status||null;await refreshFeeState(false);hookCheckout();hookPlaceOrder();await loadNotices();await authReturn();}catch(e){console.error('PEPMOSA STOREFRONT STABLE',e);if($('gbStatus'))$('gbStatus').innerHTML='<div class="notice error">Unable to load the current Group Buy. Please refresh and try again.</div>'}}
-  function boot(){styles();ensureUI();let n=0;const t=setInterval(()=>{if(S()){clearInterval(t);load()}if(++n>100)clearInterval(t)},100);if(S())load();setTimeout(()=>{ensureUI();if(S())load()},1800)}
+  let booted=false,loadStarted=false;
+function boot(){
+  if(booted)return;
+  booted=true;
+  styles();ensureUI();
+  const start=()=>{if(loadStarted)return;loadStarted=true;load()};
+  if(S()) start();
+  else {
+    let n=0;
+    const t=setInterval(()=>{if(S()){clearInterval(t);start()}if(++n>100)clearInterval(t)},100);
+    setTimeout(()=>{ensureUI();if(S())start()},1800);
+  }
+}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();

@@ -539,6 +539,13 @@ async function saveGroupBuy(){
 
     if(!saved||saved.gb_number!==n)throw new Error("Group Buy was not saved correctly. No categories were changed.");
 
+    // FUTURE-GB ONLY: assign queued Admin Orders only when a NEW GB is created.
+    // Editing the current GB never consumes the Admin Order queue.
+    if(isNew){
+      const {error:queueError}=await sb.rpc("assign_queued_admin_orders_to_new_gb",{p_gb_number:n});
+      if(queueError)throw queueError;
+    }
+
     // Only clear stale customer/cart state after the parent GB definitely exists.
     if(isNew){
       ["pepmosa_cart","pepmosa_active_gb","pepmosa_checkout_customer","pepmosa_checkout_gb"].forEach(k=>localStorage.removeItem(k));

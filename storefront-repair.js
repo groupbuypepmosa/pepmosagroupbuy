@@ -219,11 +219,19 @@
     if(or.error)throw or.error;
     const valid=(or.data||[]).filter(o=>!['REJECTED','CANCELLED','CANCELED'].includes(String(o.payment_status||'').toUpperCase()));
     const ids=valid.map(o=>o.order_id).filter(Boolean);
-    if(!ids.length)return new Map();
-    const ir=await s.from('order_items').select('variant_id,qty,order_id').in('order_id',ids);
+    const ir=ids.length
+      ? await s.from('order_items').select('variant_id,qty,order_id').in('order_id',ids)
+      : {data:[],error:null};
     if(ir.error)throw ir.error;
+    const ar=await s.from('admin_orders').select('variant_id,qty').eq('gb_number',gbNumber);
+    if(ar.error)throw ar.error;
     const totals=new Map();
     for(const item of (ir.data||[])){
+      const id=String(item.variant_id||'');
+      if(!id)continue;
+      totals.set(id,(totals.get(id)||0)+Math.max(0,Number(item.qty||0)));
+    }
+    for(const item of (ar.data||[])){
       const id=String(item.variant_id||'');
       if(!id)continue;
       totals.set(id,(totals.get(id)||0)+Math.max(0,Number(item.qty||0)));

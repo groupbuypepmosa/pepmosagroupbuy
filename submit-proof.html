@@ -33,10 +33,20 @@ async function submitProofNow(){
   showMsg('Preparing your submission...','#555');
   try{
     const sb=await getProofSb();
-    const ext=(f.name.split('.').pop()||'jpg').toLowerCase();
+    async function prepareProofImage(file){
+  if(!/^image\/(jpeg|png|webp)$/.test(file.type)||file.size<=900*1024)return file;
+  const img=await new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=URL.createObjectURL(file)});
+  const max=1600,scale=Math.min(1,max/img.width,max/img.height),canvas=document.createElement('canvas');
+  canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));
+  canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);URL.revokeObjectURL(img.src);
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.78));
+  return blob&&blob.size<file.size?new File([blob],'proof.webp',{type:'image/webp'}):file;
+}
+    const optimized=await prepareProofImage(f);
+    const ext=(optimized.name.split('.').pop()||'webp').toLowerCase();
     const path='pending/'+Date.now()+'-'+crypto.getRandomValues(new Uint32Array(1))[0]+'.'+ext;
     showMsg('Uploading your proof...','#555');
-    const up=await sb.storage.from('buyer-proofs').upload(path,f,{contentType:f.type,upsert:false});
+    const up=await sb.storage.from('buyer-proofs').upload(path,optimized,{contentType:optimized.type,upsert:false,cacheControl:'31536000'});
     if(up.error) throw up.error;
     showMsg('Saving your submission...','#555');
     const q=await sb.from('buyer_proofs').insert({image_path:path,caption:comment,submitter_display_name:name||null,submitter_email:email,is_published:false,status:'pending'});

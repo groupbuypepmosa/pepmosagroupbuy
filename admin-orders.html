@@ -107,7 +107,7 @@ function render(){
 }
 function fillVariants(){const p=catalog.find(x=>x.product_id===document.getElementById('product').value);document.getElementById('variant').innerHTML='<option value="">Select variant</option>'+((p?.variants)||[]).map(v=>'<option value="'+v.variant_id+'">'+esc(v.strength)+'</option>').join('');document.getElementById('price').value='';}
 function updatePrice(){const p=catalog.find(x=>x.product_id===document.getElementById('product').value),v=(p?.variants||[]).find(x=>x.variant_id===document.getElementById('variant').value);const pr=prices.find(x=>String(x.product_id)===String(p?.product_id)&&String(x.variant_id||'')===String(v?.variant_id||''));document.getElementById('price').value=pr?Number(pr.manufacturer_price):0;}
-async async function addOrder(){
+async function addOrder(){
  const gb=document.getElementById('gb').value;
  if(!gb)return alert('Please select a Group Buy.');
  const ai=Number(document.getElementById('admin').value);

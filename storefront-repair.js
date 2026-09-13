@@ -252,9 +252,13 @@
     if(!gb){if($('gbStatus'))$('gbStatus').innerHTML='<div class="notice error">No Group Buy available right now.</div>';return}
     if($('gbStatus')){
       if(gb.status==='KIT_COMPLETION'){
-        $('gbStatus').innerHTML='';
-        $('gbStatus').style.display='none';
-        if($('pepKitCompletionCard'))$('pepKitCompletionCard').style.display='block'
+        $('gbStatus').innerHTML=`<b class="gb-name">${esc(gb.customer_facing_name||gb.gb_number)}</b> <span class="status open">KIT COMPLETION</span>`;
+        $('gbStatus').style.display='';
+        if($('pepKitCompletionCard')){
+          $('pepKitCompletionCard').style.display='block';
+          const title=$('pepKitCompletionCard').querySelector('h3');
+          if(title)title.innerHTML='Complete the remaining vials <span style="display:block;font-size:.78em;font-weight:800;opacity:.75;margin-top:6px">'+esc(gb.customer_facing_name||gb.gb_number)+'</span>';
+        }
       }else if(gb.status==='CLOSED'){
         $('gbStatus').style.display='';
         $('gbStatus').innerHTML=`<b>${esc(gb.customer_facing_name||gb.gb_number)}</b> <span class="status closed">CLOSED • PRICELIST VIEW</span><div class="muted" style="margin-top:8px">Products and prices are visible. Ordering is currently closed.</div>`;

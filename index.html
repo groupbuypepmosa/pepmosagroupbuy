@@ -1471,7 +1471,7 @@ async function load(){
       esc(gb.status==="CLOSED" ? "CLOSED • PRICELIST VIEW" : gb.status) +
       '</span>' +
       (window.pepmosaGBDeadlineBadge ? window.pepmosaGBDeadlineBadge(gb) : '') +
-      (gb.order_deadline_at && isOrderOpen ? '<span class="gb-remaining">● '+Math.max(0,Math.ceil((new Date(gb.order_deadline_at).getTime()-Date.now())/86400000))+' DAYS LEFT TO ORDER</span>' : '') +
+
       (!isOrderOpen
         ? '<div class="muted" style="margin-top:8px">Browsing is available. Ordering is currently closed.</div>'
         : '');

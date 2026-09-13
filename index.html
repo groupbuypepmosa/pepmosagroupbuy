@@ -848,7 +848,7 @@ header{
   else document.addEventListener('DOMContentLoaded',startSoldOutObserver,{once:true});
 })();
 </script>
-</head>
+<style id="gb-deadline-live-style">.gb-remaining{display:inline-flex;align-items:center;margin:8px 0 0 8px;padding:6px 10px;border-radius:999px;background:#fff0f7;border:1px solid #f2c7db;color:#c32678;font-size:10px;font-weight:900;letter-spacing:.04em}.gb-remaining.closed{background:#f3eef0;color:#786b72;border-color:#e3d9de}</style></head>
 
 
 <body>
@@ -1418,6 +1418,16 @@ async function load(){
     const activeGB=(gbRows||[]).find(x=>["OPEN","KIT_COMPLETION"].includes(x.status));
     const closedGB=(gbRows||[]).find(x=>x.status==="CLOSED");
     const gb=activeGB||closedGB||null;
+    // Deadline is read directly from GB Settings (group_buys.order_deadline_at).
+    window.pepmosaGBDeadlineBadge=function(g){
+      if(!g || !g.order_deadline_at) return "";
+      const t=new Date(g.order_deadline_at).getTime();
+      if(!Number.isFinite(t)) return "";
+      const ms=t-Date.now();
+      if(ms<=0) return '<span class="gb-remaining closed">ORDERING CLOSED</span>';
+      const days=Math.ceil(ms/86400000);
+      return '<span class="gb-remaining">● '+days+' DAY'+(days===1?'':'S')+' LEFT TO ORDER</span>';
+    };
 
     currentGB = gb;
     syncOrderingControls();
@@ -1460,6 +1470,7 @@ async function load(){
       '<span class="status ' + (isOrderOpen?'open':'closed') + '">' +
       esc(gb.status==="CLOSED" ? "CLOSED • PRICELIST VIEW" : gb.status) +
       '</span>' +
+      (window.pepmosaGBDeadlineBadge ? window.pepmosaGBDeadlineBadge(gb) : '') +
       (gb.order_deadline_at && isOrderOpen ? '<span class="gb-remaining">● '+Math.max(0,Math.ceil((new Date(gb.order_deadline_at).getTime()-Date.now())/86400000))+' DAYS LEFT TO ORDER</span>' : '') +
       (!isOrderOpen
         ? '<div class="muted" style="margin-top:8px">Browsing is available. Ordering is currently closed.</div>'

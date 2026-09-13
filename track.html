@@ -316,6 +316,12 @@ async function track(){
   try{
     const data=await loadTrackingData(email);
     const orders=asArray(data.orders),rawShipments=asArray(data.shipments),allItems=asArray(data.order_items),refundedItems=asArray(data.refunded_items);
+    if(!allItems.length){
+      orders.forEach(o=>{
+        const nested=nestedItems(o);
+        if(nested.length) nested.forEach(i=>allItems.push({...i,order_id:i.order_id??o.order_id??o.id}));
+      });
+    }
 
     // GLOBAL TRACKER: show all recorded orders for this email, grouped by Group Buy.
     if(!orders.length){

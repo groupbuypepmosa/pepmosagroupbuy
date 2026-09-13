@@ -273,7 +273,11 @@
       if(vr.error)throw vr.error;
       allVariants=vr.data||[];
     }
-    products=baseProducts.map(p=>({...p,product_variants:allVariants.filter(v=>String(v.product_id)===String(p.product_id)&&v.active!==false)}));const ms=await s.from('gb_minimum_quantities').select('gb_number,product_id,variant_id,minimum_qty').eq('gb_number',gb.gb_number);if(ms.error)throw ms.error;minimums=ms.data||[];const cs=await s.from('gb_category_settings').select('gb_number,category_name,minimum_qty').eq('gb_number',gb.gb_number);if(cs.error){console.warn('PEPMOSA CATEGORY MINIMUMS',cs.error);categoryMinimums=[]}else categoryMinimums=cs.data||[];
+    products=baseProducts.map(p=>({...p,product_variants:allVariants.filter(v=>String(v.product_id)===String(p.product_id)&&v.active!==false)}));const ms=await s.from('gb_minimum_quantities').select('gb_number,product_id,variant_id,minimum_qty').eq('gb_number',gb.gb_number);if(ms.error)throw ms.error;minimums=ms.data||[];// Category-level minimums are optional. This project currently stores the
+     // active per-variant minimums in gb_minimum_quantities. Do not query the
+     // legacy/nonexistent gb_category_settings table because its REST 404
+     // creates a noisy console error and an unnecessary network request.
+     categoryMinimums=[];
     if(gb.status==='KIT_COMPLETION'){const kitMap=await loadKitInventory(gb.gb_number);products=products.map(p=>({...p,product_variants:(p.product_variants||[]).filter(v=>Number(kitMap.get(String(v.variant_id))||0)>0).map(v=>({...v,minimum_qty:1,remaining_qty:Number(kitMap.get(String(v.variant_id))||0)}))})).filter(p=>(p.product_variants||[]).length>0)}else{products=products.map(p=>({...p,product_variants:(p.product_variants||[]).map(v=>({...v,minimum_qty:minFor(v.variant_id,p.category)}))}))}
     window.products=products; renderProducts();
     if(gb.status==='CLOSED'){

@@ -520,17 +520,27 @@ async function saveGroupBuy(){
     // Never let that stale ID cause a silent UPDATE of zero rows.
     const rawId=$("editingGBId").value;
     const editingExists=rawId && (groupBuys||[]).some(x=>String(x.gb_id)===String(rawId));
-    let saved,isNew=!editingExists;
+    // If the form has no edit ID but this GB number already exists, update it
+    // instead of attempting a duplicate INSERT.
+    const existingByNumber=(groupBuys||[]).find(x=>String(x.gb_number)===String(n));
+    let saved,isNew=!editingExists && !existingByNumber;
 
     if(editingExists){
       const {data,error}=await sb.from("group_buys").update(p).eq("gb_id",rawId).select("gb_id,gb_number").maybeSingle();
       if(error)throw error;
       if(!data){
-        // Record disappeared since the page loaded: safely create it instead.
-        const {data:created,error:createError}=await sb.from("group_buys").insert(p).select("gb_id,gb_number").single();
-        if(createError)throw createError;
-        saved=created;isNew=true;
+        const fallback=await sb.from("group_buys").update(p).eq("gb_number",n).select("gb_id,gb_number").maybeSingle();
+        if(fallback.error)throw fallback.error;
+        if(!fallback.data){
+          const {data:created,error:createError}=await sb.from("group_buys").insert(p).select("gb_id,gb_number").single();
+          if(createError)throw createError;
+          saved=created;isNew=true;
+        }else saved=fallback.data;
       }else saved=data;
+    }else if(existingByNumber){
+      const {data,error}=await sb.from("group_buys").update(p).eq("gb_number",n).select("gb_id,gb_number").maybeSingle();
+      if(error)throw error;
+      saved=data;isNew=false;
     }else{
       const {data,error}=await sb.from("group_buys").insert(p).select("gb_id,gb_number").single();
       if(error)throw error;

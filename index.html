@@ -849,9 +849,9 @@ header{
 })();
 </script>
 <style id="gb-deadline-live-style">
-.gb-remaining{display:inline-flex;align-items:center;gap:7px;margin:8px 0 0 8px;padding:8px 14px;border-radius:999px;background:linear-gradient(135deg,#fff4fa 0%,#ffe1ef 100%);border:1.5px solid #e84b9b;color:#c51d75;font-size:11px;font-weight:1000;letter-spacing:.055em;box-shadow:0 4px 14px rgba(214,48,135,.16);vertical-align:middle;animation:gbDeadlinePulse 2s ease-in-out infinite}
-.gb-remaining::before{content:"⏳";font-size:13px;line-height:1}
-.gb-remaining::after{content:"";width:6px;height:6px;border-radius:50%;background:#e72f91;box-shadow:0 0 0 4px rgba(231,47,145,.12);animation:gbDotPulse 1.4s ease-in-out infinite}
+.gb-remaining{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 0 0;padding:11px 18px;border-radius:14px;background:linear-gradient(135deg,#d91b83 0%,#a92bc0 100%);border:0;color:#fff;font-size:12px;font-weight:1000;letter-spacing:.07em;box-shadow:0 8px 22px rgba(195,27,117,.28);vertical-align:middle;animation:gbDeadlinePulse 1.8s ease-in-out infinite;position:relative;overflow:hidden}
+.gb-remaining::before{content:"⏰";font-size:15px;line-height:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}
+.gb-remaining::after{content:"";width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.18);animation:gbDotPulse 1.2s ease-in-out infinite}
 .gb-remaining.closed{background:#f3eef0;color:#786b72;border-color:#d8cbd1;box-shadow:none;animation:none}
 .gb-remaining.closed::before{content:"🔒"}
 .gb-remaining.closed::after{display:none}

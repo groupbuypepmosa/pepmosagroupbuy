@@ -238,19 +238,47 @@ async function loadTrackingData(email){
   if(!cleanEmail)throw new Error('Please enter the email used for your order.');
   if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)throw new Error('Tracker configuration is missing.');
   const url=cfg.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/get_customer_tracking';
-  const res=await fetch(url,{
-    method:'POST',mode:'cors',cache:'no-store',
-    headers:{
-      'apikey':cfg.SUPABASE_ANON_KEY,
-      'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,
-      'Content-Type':'application/json','Accept':'application/json'
-    },
-    body:JSON.stringify({p_email:cleanEmail})
+  const headers={
+    'apikey':cfg.SUPABASE_ANON_KEY,
+    'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,
+    'Content-Type':'application/json','Accept':'application/json'
+  };
+  // ONE GLOBAL TRACKER: regular Group Buy + MOQ/Open-for-All in one result.
+  const [gbRes, moqRes]=await Promise.all([
+    fetch(url,{method:'POST',mode:'cors',cache:'no-store',headers,body:JSON.stringify({p_email:cleanEmail})}),
+    fetch(cfg.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/ofa_get_customer_tracking',{
+      method:'POST',mode:'cors',cache:'no-store',headers,
+      body:JSON.stringify({p_email:cleanEmail,p_gb_id:null})
+    })
+  ]);
+  const [gbText,moqText]=await Promise.all([gbRes.text(),moqRes.text()]);
+  let raw=null,moqRaw=null;
+  try{raw=gbText?JSON.parse(gbText):null}catch{throw new Error('Group Buy tracker returned an invalid response.')}
+  try{moqRaw=moqText?JSON.parse(moqText):null}catch{moqRaw=null}
+  if(!gbRes.ok)throw new Error(raw?.message||raw?.hint||raw?.details||('Unable to load Group Buy orders (HTTP '+gbRes.status+').'));
+  const base=normalizeTrackingPayload(raw);
+  let moq=normalizeTrackingPayload({
+    orders:moqRaw?.orders||[],
+    shipments:moqRaw?.waybills||moqRaw?.shipments||[],
+    order_items:moqRaw?.items||[],
+    refunded_items:[]
   });
-  const text=await res.text();let raw=null;
-  try{raw=text?JSON.parse(text):null}catch{throw new Error('Tracker returned an invalid response.')}
-  if(!res.ok)throw new Error(raw?.message||raw?.hint||raw?.details||('Unable to load orders (HTTP '+res.status+').'));
-  return normalizeTrackingPayload(raw);
+  // Convert MOQ records to the same shape used by the global renderer.
+  const moqOrders=moq.orders.map(o=>({
+    ...o,
+    source_type:'MOQ',
+    gb_number:o.gb_number||'MOQ',
+    gb_name:o.gb_name||('MOQ '+(o.gb_number||'')),
+    payment_status:o.payment_status||'ORDER RECEIVED'
+  }));
+  const moqItems=moq.order_items.map(i=>({...i,source_type:'MOQ'}));
+  const moqShipments=moq.shipments.map(s=>({...s,source_type:'MOQ'}));
+  return {
+    orders:[...base.orders,...moqOrders],
+    order_items:[...base.order_items,...moqItems],
+    shipments:[...base.shipments,...moqShipments],
+    refunded_items:base.refunded_items
+  };
 }
 
 function phaseIndex(status){
@@ -345,6 +373,7 @@ async function track(){
       const rows=[...grouped.values()].map(row=>
         '<div class="product"'+(row.refunded?' style="opacity:.62;text-decoration:line-through;background:#fff1f5"':'')+'><b>'+esc(row.name)+(row.refunded?' <span style="display:inline-block;text-decoration:none;color:#b51f61;font-size:9px;font-weight:950;margin-left:6px">REFUNDED</span>':'')+'</b><span class="qty">QTY '+row.qty+'</span></div>'
       ).join('')||'<div class="product"><span style="color:#8b7a83;font-size:12px">No products attached to this order yet.</span></div>';
+      const source=o.source_type||'GROUP BUY';
       const gbNumber=o.gb_number||'UNASSIGNED';
       const gbName=o.gb_name||gbNumber;
       const card=
@@ -381,7 +410,7 @@ async function track(){
 
     const gbSections=[...gbGroups.entries()].map(([gb,g])=>
       '<section class="gbOrderGroup">'+
-        '<div class="gbOrderHead"><div><span class="gbOrderEyebrow">GROUP BUY</span><h3>'+esc(g.name)+'</h3><p>'+esc(g.count+' checkout'+(g.count===1?'':'s')+' recorded in this Group Buy')+'</p></div><span class="gbOrderBadge">'+esc(gb)+'</span></div>'+
+        '<div class="gbOrderHead"><div><span class="gbOrderEyebrow">ORDER SOURCE</span><h3>'+esc(g.name)+'</h3><p>'+esc((String(g.name||'').toUpperCase().includes('MOQ')?'MOQ / OPEN FOR ALL':'GROUP BUY')+' • '+g.count+' checkout'+(g.count===1?'':'s')+' recorded')+'</p></div><span class="gbOrderBadge">'+esc(gb)+'</span></div>'+
         g.cards.join('')+
       '</section>'
     ).join('');

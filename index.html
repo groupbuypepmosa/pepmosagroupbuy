@@ -858,7 +858,9 @@ header{
     if(!gb) return '';
     var name=String(gb.customer_facing_name||gb.gb_number||'').toUpperCase();
     // MINI GB-3 is open only until September 16, 2026.
-    if(name.indexOf('MINI GB-3')!==-1 || String(gb.gb_number)==='3'){
+    if(gb.order_deadline_at){
+      var end=new Date(gb.order_deadline_at);
+    }else if(name.indexOf('MINI GB-3')!==-1 || String(gb.gb_number)==='3'){
       var end=new Date('2026-09-16T23:59:59+08:00');
       var now=new Date();
       var ms=end-now;

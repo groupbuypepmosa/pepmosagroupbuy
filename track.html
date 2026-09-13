@@ -230,22 +230,7 @@ function itemsFor(order,allItems){
 }
 function noteFor(o){return o.manual_note??o.note??o.notes??o.admin_note??o.late_order_note??''}
 
-async function resolveTrackingGB(){
-  if(TRACK_GB)return TRACK_GB;
-  const cfg=window.PEPMOSA_CONFIG||{};
-  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)throw new Error('Tracker configuration is missing.');
-  const base=cfg.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/group_buys';
-  const res=await fetch(base+'?select=gb_number,status,created_at&status=in.(OPEN,KIT_COMPLETION,CLOSED)&order=created_at.desc&limit=20',{
-    headers:{'apikey':cfg.SUPABASE_ANON_KEY,'Authorization':'Bearer '+cfg.SUPABASE_ANON_KEY,'Accept':'application/json'},
-    cache:'no-store'
-  });
-  if(!res.ok)throw new Error('Unable to find the current Group Buy.');
-  const rows=await res.json();
-  const gb=(rows||[]).find(x=>['OPEN','KIT_COMPLETION'].includes(x.status))||(rows||[]).find(x=>x.status==='CLOSED');
-  if(!gb?.gb_number)throw new Error('No Group Buy is available for tracking right now.');
-  TRACK_GB=gb.gb_number;
-  return TRACK_GB;
-}
+async function resolveTrackingGB(){ return Promise.resolve(TRACK_GB||''); }
 
 async function loadTrackingData(email){
   const cfg=window.PEPMOSA_CONFIG||{};

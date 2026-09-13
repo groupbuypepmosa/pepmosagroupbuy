@@ -848,7 +848,16 @@ header{
   else document.addEventListener('DOMContentLoaded',startSoldOutObserver,{once:true});
 })();
 </script>
-<style id="gb-deadline-live-style">.gb-remaining{display:inline-flex;align-items:center;margin:8px 0 0 8px;padding:6px 10px;border-radius:999px;background:#fff0f7;border:1px solid #f2c7db;color:#c32678;font-size:10px;font-weight:900;letter-spacing:.04em}.gb-remaining.closed{background:#f3eef0;color:#786b72;border-color:#e3d9de}</style></head>
+<style id="gb-deadline-live-style">
+.gb-remaining{display:inline-flex;align-items:center;gap:7px;margin:8px 0 0 8px;padding:8px 14px;border-radius:999px;background:linear-gradient(135deg,#fff4fa 0%,#ffe1ef 100%);border:1.5px solid #e84b9b;color:#c51d75;font-size:11px;font-weight:1000;letter-spacing:.055em;box-shadow:0 4px 14px rgba(214,48,135,.16);vertical-align:middle;animation:gbDeadlinePulse 2s ease-in-out infinite}
+.gb-remaining::before{content:"⏳";font-size:13px;line-height:1}
+.gb-remaining::after{content:"";width:6px;height:6px;border-radius:50%;background:#e72f91;box-shadow:0 0 0 4px rgba(231,47,145,.12);animation:gbDotPulse 1.4s ease-in-out infinite}
+.gb-remaining.closed{background:#f3eef0;color:#786b72;border-color:#d8cbd1;box-shadow:none;animation:none}
+.gb-remaining.closed::before{content:"🔒"}
+.gb-remaining.closed::after{display:none}
+@keyframes gbDeadlinePulse{0%,100%{transform:translateY(0);box-shadow:0 4px 14px rgba(214,48,135,.16)}50%{transform:translateY(-1px);box-shadow:0 7px 20px rgba(214,48,135,.25)}}
+@keyframes gbDotPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.35);opacity:.65}}
+</style></head></head>
 
 
 <body>
@@ -1426,7 +1435,7 @@ async function load(){
       const ms=t-Date.now();
       if(ms<=0) return '<span class="gb-remaining closed">ORDERING CLOSED</span>';
       const days=Math.ceil(ms/86400000);
-      return '<span class="gb-remaining">● '+days+' DAY'+(days===1?'':'S')+' LEFT TO ORDER</span>';
+      return '<span class="gb-remaining">⏳ HURRY! '+days+' DAY'+(days===1?'':'S')+' LEFT TO ORDER</span>';
     };
 
     currentGB = gb;

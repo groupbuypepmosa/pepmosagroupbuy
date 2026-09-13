@@ -108,6 +108,13 @@ body{
 .infoBox small{display:block;color:#ad6b8d;font-weight:950;letter-spacing:.1em;font-size:9px}
 .infoBox b{display:block;margin-top:6px;color:#46343e;word-break:break-word;font-size:13px}
 
+.gbOrderGroup{margin-top:18px;padding:12px;border:1px solid #efd5e2;border-radius:24px;background:linear-gradient(145deg,#fffafe,#fff);box-shadow:0 10px 24px rgba(91,45,70,.05)}
+.gbOrderHead{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:13px 14px 15px;border-bottom:1px solid #f0dfe8}
+.gbOrderEyebrow{font-size:9px;font-weight:950;letter-spacing:.16em;color:#bd4a82}
+.gbOrderHead h3{margin:5px 0 3px;font-size:20px;color:#3d2b35}
+.gbOrderHead p{margin:0;color:#887781;font-size:11px}
+.gbOrderBadge{padding:7px 10px;border-radius:999px;background:#fff0f7;color:#ad2e70;font-size:9px;font-weight:950;white-space:nowrap}
+.gbOrderGroup .orderCard{margin-top:10px}
 .orders{margin-top:28px}
 .sectionHead{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:12px}
 .sectionHead h2{margin:5px 0 0;font-size:27px}
@@ -321,7 +328,7 @@ async function track(){
     const status=shipment.status||'ORDER RECEIVED';
     const rawIndex=STATUSES.indexOf(status),ci=rawIndex>=0?rawIndex:0;
 
-    const summary=new Map(),orderCards=[],notes=[];
+    const summary=new Map(),orderCards=[],notes=[],gbGroups=new Map();
     const normText=v=>String(v||'').trim().toLowerCase().replace(/\s+/g,'');
     orders.forEach((o,idx)=>{
       const oid=o.order_id??o.id??('ORDER '+(idx+1));
@@ -347,12 +354,17 @@ async function track(){
       const rows=[...grouped.values()].map(row=>
         '<div class="product"'+(row.refunded?' style="opacity:.62;text-decoration:line-through;background:#fff1f5"':'')+'><b>'+esc(row.name)+(row.refunded?' <span style="display:inline-block;text-decoration:none;color:#b51f61;font-size:9px;font-weight:950;margin-left:6px">REFUNDED</span>':'')+'</b><span class="qty">QTY '+row.qty+'</span></div>'
       ).join('')||'<div class="product"><span style="color:#8b7a83;font-size:12px">No products attached to this order yet.</span></div>';
-      orderCards.push(
+      const gbNumber=o.gb_number||'UNASSIGNED';
+      const gbName=o.gb_name||gbNumber;
+      const card=
         '<article class="orderCard"><div class="orderTop"><div><div class="orderRef">ORDER # '+esc(oid)+'</div>'+
-        '<div style="font-size:11px;color:#8b7a83;margin-top:4px">'+esc(o.gb_number||'PEPMOSA GROUP BUY')+'</div></div>'+
+        '<div style="font-size:11px;color:#8b7a83;margin-top:4px">'+esc(gbName)+'</div></div>'+
         '<div class="orderStatus">'+esc(o.payment_status||o.status||'ORDER RECEIVED')+'</div></div>'+
-        '<div class="items">'+rows+'</div></article>'
-      );
+        '<div class="items">'+rows+'</div></article>';
+      orderCards.push(card);
+      if(!gbGroups.has(gbNumber))gbGroups.set(gbNumber,{name:gbName,cards:[],count:0});
+      gbGroups.get(gbNumber).cards.push(card);
+      gbGroups.get(gbNumber).count++;
     });
 
     if(!summary.size)allItems.forEach(i=>{
@@ -376,6 +388,13 @@ async function track(){
       shipment.waybill_number?'<div class="infoBox"><small>WAYBILL NUMBER</small><b>'+esc(shipment.waybill_number)+'</b></div>':''
     ].filter(Boolean).join('');
 
+    const gbSections=[...gbGroups.entries()].map(([gb,g])=>
+      '<section class="gbOrderGroup">'+
+        '<div class="gbOrderHead"><div><span class="gbOrderEyebrow">GROUP BUY</span><h3>'+esc(g.name)+'</h3><p>'+esc(g.count+' checkout'+(g.count===1?'':'s')+' recorded in this Group Buy')+'</p></div><span class="gbOrderBadge">'+esc(gb)+'</span></div>'+
+        g.cards.join('')+
+      '</section>'
+    ).join('');
+
     out.innerHTML=
       '<section class="clientCard">'+
         '<div class="clientHero"><div class="clientTop"><div><div class="clientLabel">PEPMOSA CLIENT TRACKER</div>'+
@@ -387,9 +406,9 @@ async function track(){
           phaseTimeline(status)+
           (shippingBoxes?'<div class="shippingInfo">'+shippingBoxes+'</div>':'')+
           '<section class="orders"><div class="sectionHead"><div><div class="eyebrow">YOUR ORDERS</div>'+
-          '<h2>What you ordered</h2><p>All recorded checkouts, organized by Group Buy.</p></div>'+
+          '<h2>What you ordered</h2><p>All recorded checkouts, organized by Group Buy. Your previous GB orders stay here too.</p></div>'+
           '<span class="count">'+orders.length+' ORDER'+(orders.length===1?'':'S')+(totalItems?' • '+totalItems+' ITEMS':'')+'</span></div>'+
-          summaryCard+orderCards.join('')+
+          summaryCard+gbSections+
           (notes.length?'<div class="note"><b>♡ ADMIN NOTES</b><br>'+[...new Set(notes)].map(esc).join('<br>')+'</div>':'')+
           '</section></div></section>';
   }catch(err){

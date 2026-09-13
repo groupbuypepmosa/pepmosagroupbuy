@@ -2417,14 +2417,16 @@ load();
       const el=document.getElementById('gbStatus');
       if(!el) return;
       const st=String(gb.status||'').toUpperCase();
+      const gbName=gb.customer_facing_name||gb.gb_number;
       if(st==='CLOSED'){
         el.style.display='';
-        el.innerHTML='<span class="status closed">CLOSED</span> <span class="muted">Products and prices are visible. Ordering is currently closed.</span>';
+        el.innerHTML='<b class="gb-name">'+esc(gbName)+'</b> <span class="status closed">CLOSED • PRICELIST VIEW</span>';
       }else if(st==='OPEN'){
         el.style.display='';
-        el.innerHTML='<span class="status open">OPEN</span>';
+        el.innerHTML='<b class="gb-name">'+esc(gbName)+'</b> <span class="status open">OPEN</span>';
       }else if(st==='KIT_COMPLETION'){
-        el.style.display='none';
+        el.style.display='';
+        el.innerHTML='<b class="gb-name">'+esc(gbName)+'</b> <span class="status open">KIT COMPLETION</span>';
       }
     }catch(e){console.warn('Final GB status sync:',e)}
   }

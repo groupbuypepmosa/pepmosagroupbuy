@@ -94,25 +94,40 @@ async function render(){
   updateStats();renderSummary();
  }catch(e){document.getElementById('body').innerHTML='<tr><td colspan="11" class="error">'+esc(e.message)+'</td></tr>';}
 }
-function assign(el,i){
- const x=rows[i];x.manufacturer=el.value;
- const key=x.key+'||'+x.scopeKey;
- if(el.value)selected[key]=el.value;else delete selected[key];
+async function assign(el,i){
+ const x=rows[i];
+ const scope=String(x.scopeKey||'');
+ const manufacturer=el.value||'';
+ x.manufacturer=manufacturer;
+ const key=x.key+'||'+scope;
+ if(manufacturer)selected[key]=manufacturer;else delete selected[key];
  localStorage.setItem('pepmosa_manufacturer_selected_v3',JSON.stringify(selected));
- render();
+ if(!scope || scope==='ALL') { render(); return; }
+ const payload={scope:scope,product_id:x.pid,variant_id:x.vid||'',manufacturer:manufacturer,updated_at:new Date().toISOString()};
+ try{
+  const r=await sb.from('finance_manufacturer_orders').upsert(payload,{onConflict:'scope,product_id,variant_id'});
+  if(r.error) throw r.error;
+  const fresh=await sb.from('finance_manufacturer_orders').select('*');
+  if(fresh.error) throw fresh.error;
+  assignments=fresh.data||[];
+  render();
+ }catch(e){
+  alert('Could not save manufacturer assignment: '+e.message);
+  render();
+ }
 }
 function updateStats(){
- const total=rows.reduce((s,x)=>s+x.total,0),gb=rows.reduce((s,x)=>s+x.gb,0),adm=rows.reduce((s,x)=>s+x.admin,0),picked=rows.filter(x=>selected[x.key+'||'+x.scopeKey]),cost=picked.reduce((s,x)=>s+x.total*x.price,0),unassigned=rows.filter(x=>!x.manufacturer).length;
+ const total=rows.reduce((s,x)=>s+x.total,0),gb=rows.reduce((s,x)=>s+x.gb,0),adm=rows.reduce((s,x)=>s+x.admin,0),picked=rows.filter(x=>x.manufacturer),cost=picked.reduce((s,x)=>s+x.total*x.price,0),unassigned=rows.filter(x=>!x.manufacturer).length;
  document.getElementById('stats').innerHTML='<div class="stat"><small>GB Qty</small><b>'+gb+'</b></div><div class="stat"><small>Admin Qty</small><b>'+adm+'</b></div><div class="stat"><small>Total Qty</small><b>'+total+'</b></div><div class="stat"><small>Assigned Lines</small><b>'+picked.length+'</b></div><div class="stat"><small>Selected Cost</small><b>'+peso(cost)+'</b></div>';
 }
 function renderSummary(){
- const picked=rows.filter(x=>selected[x.key+'||'+x.scopeKey]);
+ const picked=rows.filter(x=>x.manufacturer);
  const list=['BBG','KERUN'];
  document.getElementById('summary').innerHTML='<div class="manufs">'+list.map(m=>{const rs=picked.filter(x=>x.manufacturer===m),qty=rs.reduce((s,x)=>s+x.total,0),cost=rs.reduce((s,x)=>s+x.total*x.price,0);return '<div class="manuf"><div class="mh"><span>'+m+'</span><span>'+peso(cost)+'</span></div>'+(rs.length?'<div class="tablewrap"><table><tr><th>Product</th><th>Variant</th><th>GB Qty</th><th>Admin Qty</th><th>Total</th><th>Unit</th><th>Subtotal</th></tr>'+rs.map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.gb+'</td><td>'+x.admin+'</td><td><b>'+x.total+'</b></td><td>'+peso(x.price)+'</td><td class="money">'+peso(x.total*x.price)+'</td></tr>').join('')+'</table></div><div style="padding:14px" class="total">TOTAL '+m+': '+peso(cost)+'</div>':'<div class="empty">No products selected for '+m+'.</div>')+'</div>'}).join('')+'</div>';
 }
 async function saveAll(){
  const scope=document.getElementById('scope').value;
- const chosen=rows.filter(x=>selected[x.key+'||'+x.scopeKey]&&x.manufacturer);
+ const chosen=rows.filter(x=>x.manufacturer);
  if(scope==='ALL'){return alert('Select a specific GB before saving manufacturer assignments. This prevents one GB assignment from being applied to another GB.');}
  for(const x of chosen){
   const payload={scope:scope,product_id:x.pid,variant_id:x.vid||'',manufacturer:x.manufacturer,updated_at:new Date().toISOString()};

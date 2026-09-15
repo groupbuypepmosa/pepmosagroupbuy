@@ -1,87 +1,127 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA • Manufacturer Orders</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA • Manufacturer Orders</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(135deg,#fff7fa,#f7f3f7);color:#302830}main{max-width:1350px;margin:auto;padding:22px}.hero{background:linear-gradient(135deg,#302633,#60455d);color:#fff;border-radius:22px;padding:24px;box-shadow:0 12px 30px #33243618}.hero h1{margin:0 0 5px}.hero p{margin:0;color:#eadfea;font-size:13px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.toolbar button,button{border:0;border-radius:11px;padding:11px 15px;font-weight:800;cursor:pointer}.primary{background:#fff;color:#4c3650}.ghost{background:#ffffff18;color:#fff;border:1px solid #ffffff30}.card{background:#fff;border:1px solid #eadfe8;border-radius:20px;padding:18px;margin-top:18px;box-shadow:0 8px 25px #3825360b}.filters{display:flex;gap:9px;flex-wrap:wrap}.filters select,.filters input{padding:10px;border:1px solid #e4dce4;border-radius:10px;background:#fff}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{padding:15px;border:1px solid #eee5ec;border-radius:16px;background:#fff}.stat small{color:#8b7e89}.stat b{display:block;font-size:23px;margin-top:5px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:900px}th,td{padding:11px;border-bottom:1px solid #f0e8ee;text-align:left;font-size:13px}th{font-size:11px;color:#80727e;text-transform:uppercase;background:#fffafd}.money{font-weight:900;white-space:nowrap}.pill{padding:5px 9px;border-radius:99px;font-size:11px;font-weight:900;background:#f0eaf2}.bbg{background:#eee8ff;color:#674ca1}.kerun{background:#e5f4ff;color:#267496}.pick{width:18px;height:18px;accent-color:#d96d9d}.selected{background:#fff2f7}.manufs{display:grid;grid-template-columns:1fr 1fr;gap:15px}.manuf{border:1px solid #eadfe8;border-radius:16px;overflow:hidden}.mh{padding:14px 16px;background:#fff5f9;font-weight:900;display:flex;justify-content:space-between}.empty{text-align:center;color:#938691;padding:30px}.note{font-size:12px;color:#8b7e89;background:#fff9df;border-radius:12px;padding:12px;margin-top:12px}@media(max-width:850px){.stats{grid-template-columns:repeat(2,1fr)}.manufs{grid-template-columns:1fr}}@media(max-width:520px){main{padding:12px}.stats{grid-template-columns:1fr 1fr}.hero h1{font-size:22px}}
-</style></head>
-<body><main>
-<section class="hero"><h1>📦 Manufacturer Orders</h1><p>GB Orders + Admin Orders consolidated. Select only the products you actually want to order from each manufacturer.</p><div class="toolbar"><button class="primary" onclick="saveSelection()">SAVE SELECTION</button><button class="ghost" onclick="exportCSV()">EXPORT CSV</button><button class="ghost" onclick="window.print()">PRINT</button></div></section>
-
-<section class="card"><div class="filters"><select id="gb" onchange="render()"><option value="">All GBs</option></select><select id="manuf" onchange="render()"><option value="">All Manufacturers</option><option>BBG</option><option>KERUN</option></select><input id="search" placeholder="Search product..." oninput="render()"></div></section>
-
-<section class="stats" style="margin-top:18px" id="stats"></section>
-
-<section class="card"><h2>All GB + Admin Orders</h2><div class="note">Read-only source data. The checkbox is the only selection control here; selecting an item does not change your existing Orders, Admin Orders, or Finance records.</div><div class="tablewrap"><table><thead><tr><th>Order?</th><th>Product</th><th>Variant</th><th>GB Qty</th><th>Admin Qty</th><th>Total Qty</th><th>Manufacturer</th><th>Manuf Price / pc</th><th>Total Cost</th></tr></thead><tbody id="body"></tbody></table></div></section>
-
-<section class="card"><h2>Selected Manufacturer Orders</h2><div id="summary"></div></section>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(135deg,#fff7fa,#f7f3f7);color:#302830}main{max-width:1400px;margin:auto;padding:22px}.hero{background:linear-gradient(135deg,#302633,#60455d);color:#fff;border-radius:22px;padding:24px;box-shadow:0 12px 30px #33243618}.hero h1{margin:0 0 5px}.hero p{margin:0;color:#eadfea;font-size:13px}.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}.toolbar button,button{border:0;border-radius:11px;padding:10px 14px;font-weight:800;cursor:pointer}.primary{background:#fff;color:#4c3650}.ghost{background:#ffffff18;color:#fff;border:1px solid #ffffff30}.card{background:#fff;border:1px solid #eadfe8;border-radius:20px;padding:18px;margin-top:18px;box-shadow:0 8px 25px #3825360b}.filters{display:flex;gap:9px;flex-wrap:wrap}.filters>*{padding:10px;border:1px solid #e4dce4;border-radius:10px;background:#fff;font:inherit}.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:18px}.stat{padding:15px;border:1px solid #eee5ec;border-radius:16px;background:#fff}.stat small{color:#8b7e89}.stat b{display:block;font-size:22px;margin-top:5px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:1050px}th,td{padding:11px;border-bottom:1px solid #f0e8ee;text-align:left;font-size:13px;vertical-align:middle}th{font-size:11px;color:#80727e;text-transform:uppercase;background:#fffafd}.money{font-weight:900;white-space:nowrap}.pick{width:18px;height:18px;accent-color:#d96d9d}.selected{background:#fff2f7}.pill{padding:5px 9px;border-radius:99px;font-size:11px;font-weight:900;background:#eee8f0}.bbg{background:#eee8ff;color:#674ca1}.kerun{background:#e5f4ff;color:#267496}.unassigned{background:#fff1d7;color:#9a6515}.note{font-size:12px;color:#8b7e89;background:#fff9df;border-radius:12px;padding:12px;margin:10px 0 14px}.manufs{display:grid;grid-template-columns:1fr 1fr;gap:15px}.manuf{border:1px solid #eadfe8;border-radius:16px;overflow:hidden}.mh{padding:14px 16px;background:#fff5f9;font-weight:900;display:flex;justify-content:space-between}.empty{text-align:center;color:#938691;padding:30px}.assign{min-width:180px;padding:9px;border:1px solid #e1d7df;border-radius:9px;background:#fff;font-weight:700}.total{font-size:20px;font-weight:900}.error{color:#a33;background:#fff0f0;border:1px solid #f0cccc;padding:12px;border-radius:12px}@media(max-width:950px){.stats{grid-template-columns:repeat(3,1fr)}.manufs{grid-template-columns:1fr}}@media(max-width:600px){main{padding:12px}.stats{grid-template-columns:1fr 1fr}.hero h1{font-size:22px}}
+</style></head><body><main>
+<section class="hero"><h1>📦 Manufacturer Orders</h1><p>GB customer orders + Admin Orders • assign each product to BBG or KERUN • manufacturer totals are calculated automatically.</p><div class="toolbar"><button class="primary" onclick="saveAll()">SAVE ASSIGNMENTS</button><button class="ghost" onclick="exportCSV()">EXPORT CSV</button><button class="ghost" onclick="window.print()">PRINT</button></div></section>
+<section class="card"><div class="filters"><select id="scope" onchange="render()"><option value="ALL">All Group Buys</option></select><select id="status"><option value="APPROVED">Approved/Paid Orders</option></select><input id="search" placeholder="Search product or variant" oninput="render()"></div><div class="note">Only approved/paid customer orders are included, matching the Finance page. Cancelled/refunded line items are excluded. Admin Orders are added separately and are never counted twice.</div></section>
+<div class="stats" id="stats"></div>
+<section class="card"><h2>All GB + Admin Orders</h2><div class="tablewrap"><table><thead><tr><th>Order</th><th>Source</th><th>GB</th><th>Product</th><th>Variant</th><th>GB Qty</th><th>Admin Qty</th><th>Total Qty</th><th>Manufacturer</th><th>Manuf Price</th><th>Total Cost</th></tr></thead><tbody id="body"></tbody></table></div></section>
+<section class="card"><h2>Manufacturer Order Summary</h2><div id="summary"></div></section>
 </main>
 <script>
-let sb,prices=[],products=[],variants=[],gbOrders=[],adminOrders=[],gbs=[];let selected=JSON.parse(localStorage.getItem("pepmosa_manuf_selected_v2")||"{}");
-const peso=n=>"₱"+Number(n||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2});
-const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const cfg=window.PEPMOSA_CONFIG;let sb;
+const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const approved=s=>['PAID','PAYMENT APPROVED','APPROVED'].includes(String(s||'').toUpperCase());
+let products=[],variants=[],prices=[],orders=[],items=[],groupBuys=[],adminOrders=[],assignments=[],rows=[];
+let selected=JSON.parse(localStorage.getItem('pepmosa_manufacturer_selected_v3')||'{}');
+
 async function init(){
- if(!window.supabase||!window.PEPMOSA_CONFIG)throw Error("Supabase/config.js unavailable.");
- sb=window.supabase.createClient(PEPMOSA_CONFIG.SUPABASE_URL,PEPMOSA_CONFIG.SUPABASE_ANON_KEY);
- const r=await Promise.all([
-  sb.from("products").select("product_id,product_name,active").order("product_name"),
-  sb.from("product_variants").select("variant_id,product_id,strength,active").order("strength"),
-  sb.from("finance_manufacturer_prices").select("*"),
-  sb.from("orders").select("order_id,gb_number,payment_status").order("created_at",{ascending:false}),
-  sb.from("order_items").select("order_item_id,order_id,product_id,variant_id,product_name,strength,qty,unit_price,line_total"),
-  sb.from("admin_orders").select("*").order("created_at",{ascending:false}),
-  sb.from("group_buys").select("gb_number,customer_facing_name,status").order("created_at",{ascending:false})
+ if(!cfg||!window.supabase)throw Error('Supabase configuration is unavailable.');
+ sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
+ const rs=await Promise.all([
+  sb.from('products').select('product_id,product_name,active').order('product_name'),
+  sb.from('product_variants').select('variant_id,product_id,strength,active').order('strength'),
+  sb.from('finance_manufacturer_prices').select('*').order('product_name'),
+  sb.from('orders').select('order_id,gb_number,payment_status,created_at').order('created_at',{ascending:false}),
+  sb.from('order_items').select('order_item_id,order_id,product_id,variant_id,product_name,strength,qty,unit_price,line_total'),
+  sb.from('group_buys').select('gb_number,customer_facing_name,status,created_at').order('created_at',{ascending:false}),
+  sb.from('admin_orders').select('id,gb_number,admin_index,product_id,variant_id,product_name,variant,qty,manufacturer_price,created_at').order('created_at',{ascending:false}),
+  sb.from('finance_manufacturer_orders').select('*')
  ]);
- for(const x of r)if(x.error)throw x.error;
- products=r[0].data||[];variants=r[1].data||[];prices=r[2].data||[];gbs=r[6].data||[];
- const om=new Map((r[3].data||[]).map(x=>[x.order_id,x]));
- gbOrders=(r[4].data||[]).map(x=>({...x,...(om.get(x.order_id)||{})})).filter(x=>!["cancelled","canceled","refunded"].includes(String(x.payment_status||"").toLowerCase()));
- adminOrders=r[5].data||[];
- document.getElementById("gb").innerHTML='<option value="">All GBs</option>'+gbs.map(g=>'<option value="'+esc(g.gb_number)+'">GB '+esc(g.gb_number)+' — '+esc(g.customer_facing_name||"")+'</option>').join("");
+ for(const r of rs)if(r.error)throw r.error;
+ products=rs[0].data||[];variants=rs[1].data||[];prices=rs[2].data||[];orders=rs[3].data||[];items=rs[4].data||[];groupBuys=rs[5].data||[];adminOrders=rs[6].data||[];assignments=rs[7].data||[];
+ const sel=document.getElementById('scope');sel.innerHTML='<option value="ALL">All Group Buys</option>'+groupBuys.map(g=>'<option value="'+esc(g.gb_number)+'">GB '+esc(g.gb_number)+' — '+esc(g.customer_facing_name||g.status||'')+'</option>').join('');
  render();
 }
-function priceFor(pid,vid){
- let p=prices.find(x=>String(x.product_id)===String(pid)&&String(x.variant_id||"")===String(vid));
- if(!p)p=prices.find(x=>String(x.product_id)===String(pid)&&!x.variant_id);
- return Number(p?.manufacturer_price||p?.price||0);
+function priceFor(pid,vid,name,variant){
+ let p=prices.find(x=>String(x.product_id||'')===String(pid||'')&&String(x.variant_id||'')===String(vid||''));
+ if(!p)p=prices.find(x=>String(x.product_name||'').toLowerCase()===String(name||'').toLowerCase()&&String(x.variant||'').toLowerCase()===String(variant||'').toLowerCase());
+ if(!p)p=prices.find(x=>String(x.product_name||'').toLowerCase()===String(name||'').toLowerCase()&&!x.variant_id);
+ return Number(p?.manufacturer_price||0);
 }
-function build(){
- const gb=document.getElementById("gb").value;
- const map={};
- const add=(x,kind)=>{
-  if(gb&&String(x.gb_number)!==String(gb))return;
-  const pid=x.product_id||"";const vid=x.variant_id||"";
-  const key=String(pid)+"||"+String(vid)+"||"+String(x.product_name||"");
-  if(!map[key])map[key]={key,pid,vid,product:x.product_name||products.find(p=>p.product_id===pid)?.product_name||pid,variant:x.strength||x.variant||variants.find(v=>v.variant_id===vid)?.strength||"",gb:0,admin:0};
-  map[key][kind]+=Number(x.qty||0);
- };
- gbOrders.forEach(x=>add(x,"gb"));adminOrders.forEach(x=>add(x,"admin"));
- return Object.values(map).map(x=>({...x,total:x.gb+x.admin,manuf:(adminOrders.find(a=>String(a.product_id)===String(x.pid)&&String(a.variant_id||"")===String(x.vid))?.manufacturer||"")||"Unassigned",price:priceFor(x.pid,x.vid)}));
+function assignmentFor(scope,pid,vid){
+ return assignments.find(a=>String(a.scope)===String(scope)&&String(a.product_id||'')===String(pid||'')&&String(a.variant_id||'')===String(vid||''))?.manufacturer||'';
 }
-function render(){
- const mf=document.getElementById("manuf").value,q=document.getElementById("search").value.toLowerCase().trim();
- let rows=build().filter(x=>(!mf||x.manuf===mf)&&(!q||x.product.toLowerCase().includes(q)||x.variant.toLowerCase().includes(q)));
- const body=document.getElementById("body");
- body.innerHTML=rows.length?rows.map(x=>{const checked=!!selected[x.key];return '<tr class="'+(checked?"selected":"")+'"><td><input class="pick" type="checkbox" '+(checked?"checked":"")+' onchange="toggle(\''+esc(x.key).replaceAll("'","&#39;")+'\',this.checked)"></td><td><b>'+esc(x.product)+'</b></td><td>'+esc(x.variant||"—")+'</td><td>'+x.gb+'</td><td>'+x.admin+'</td><td><b>'+x.total+'</b></td><td><span class="pill '+String(x.manuf).toLowerCase()+'">'+esc(x.manuf)+'</span></td><td class="money">'+(x.price?peso(x.price):"—")+'</td><td class="money">'+(x.price?peso(x.total*x.price):"—")+'</td></tr>'}).join(""):'<tr><td colspan="9" class="empty">No orders found.</td></tr>';
- updateStats();renderSummary(rows);
+function makeRows(){
+ const scope=document.getElementById('scope').value;
+ const orderMap=new Map(orders.map(o=>[o.order_id,o]));
+ const refundKeys=new Set();
+ // The existing Finance page handles refunded kits through cancelled_kits; load them here too.
+ return Promise.resolve(sb.from('cancelled_kits').select('order_id,product_id,variant_id,status')).then(cr=>{
+  if(cr.error)throw cr.error;
+  (cr.data||[]).filter(x=>String(x.status||'').toUpperCase()==='REFUNDED').forEach(x=>refundKeys.add(String(x.order_id||'')+'||'+String(x.product_id||'')+'||'+String(x.variant_id||'')));
+  const map={};
+  const add=(x,type)=>{
+   const o=orderMap.get(x.order_id);
+   if(type==='gb'){
+    if(!o||!approved(o.payment_status))return;
+    if(scope!=='ALL'&&String(o.gb_number)!==String(scope))return;
+    const rk=String(x.order_id||'')+'||'+String(x.product_id||'')+'||'+String(x.variant_id||'');if(refundKeys.has(rk))return;
+   }else{
+    if(scope!=='ALL'&&String(x.gb_number)!==String(scope))return;
+   }
+   const pid=x.product_id||'',vid=x.variant_id||'',name=x.product_name||products.find(p=>String(p.product_id)===String(pid))?.product_name||pid,variant=x.strength||x.variant||variants.find(v=>String(v.variant_id)===String(vid))?.strength||'';
+   const key=String(pid)+'||'+String(vid)+'||'+name;
+   if(!map[key])map[key]={key,pid,vid,name,variant,gb:0,admin:0,gbNumber:scope==='ALL'?(o?.gb_number||x.gb_number||'') : scope};
+   map[key][type]+=Number(x.qty||0);
+  };
+  items.forEach(x=>add(x,'gb'));adminOrders.forEach(x=>add(x,'admin'));
+  return Object.values(map).map(x=>{const scopeKey=scope==='ALL'?String(x.gbNumber||''):String(scope);const manufacturer=assignmentFor(scopeKey,x.pid,x.vid);const price=priceFor(x.pid,x.vid,x.name,x.variant);return {...x,total:x.gb+x.admin,manufacturer,price,scopeKey}});
+ });
 }
-function toggle(key,v){if(v)selected[key]=true;else delete selected[key];saveSelection(false);render();}
-function saveSelection(show=true){localStorage.setItem("pepmosa_manuf_selected_v2",JSON.stringify(selected));if(show)alert("Manufacturer order selection saved.");}
+async function render(){
+ try{
+  rows=await makeRows();
+  const mf=document.getElementById('manuf').value||'';
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  if(mf)rows=rows.filter(x=>x.manufacturer===mf);
+  if(q)rows=rows.filter(x=>(x.name+' '+x.variant).toLowerCase().includes(q));
+  const body=document.getElementById('body');
+  body.innerHTML=rows.length?rows.map((x,i)=>{
+   const key=x.key+'||'+x.scopeKey, checked=!!selected[key];
+   return '<tr class="'+(checked?'selected':'')+'"><td>'+esc(x.scopeKey)+'</td><td>GB + Admin</td><td>GB '+esc(x.gbNumber||x.scopeKey)+'</td><td><b>'+esc(x.name)+'</b></td><td>'+esc(x.variant||'—')+'</td><td>'+x.gb+'</td><td>'+x.admin+'</td><td><b>'+x.total+'</b></td><td><select class="assign" onchange="assign(this,'+i+')"><option value="">Select manufacturer</option><option value="BBG" '+(x.manufacturer==='BBG'?'selected':'')+'>MANUF 1 — BBG</option><option value="KERUN" '+(x.manufacturer==='KERUN'?'selected':'')+'>MANUF 2 — KERUN</option></select></td><td class="money">'+(x.price?peso(x.price):'—')+'</td><td class="money">'+(x.price?peso(x.total*x.price):'—')+'</td></tr>';
+  }).join(''):'<tr><td colspan="11" class="empty">No approved GB orders or Admin Orders found for this GB.</td></tr>';
+  updateStats();renderSummary();
+ }catch(e){document.getElementById('body').innerHTML='<tr><td colspan="11" class="error">'+esc(e.message)+'</td></tr>';}
+}
+function assign(el,i){
+ const x=rows[i];x.manufacturer=el.value;
+ const key=x.key+'||'+x.scopeKey;
+ if(el.value)selected[key]=el.value;else delete selected[key];
+ localStorage.setItem('pepmosa_manufacturer_selected_v3',JSON.stringify(selected));
+ render();
+}
 function updateStats(){
- const rows=build(),picked=rows.filter(x=>selected[x.key]),qty=picked.reduce((s,x)=>s+x.total,0),cost=picked.reduce((s,x)=>s+x.total*x.price,0);
- const gbq=rows.reduce((s,x)=>s+x.gb,0),aq=rows.reduce((s,x)=>s+x.admin,0);
- document.getElementById("stats").innerHTML='<div class="stat"><small>GB Orders</small><b>'+gbq+'</b></div><div class="stat"><small>Admin Orders</small><b>'+aq+'</b></div><div class="stat"><small>Selected Qty</small><b>'+qty+'</b></div><div class="stat"><small>Selected Cost</small><b>'+peso(cost)+'</b></div>';
+ const total=rows.reduce((s,x)=>s+x.total,0),gb=rows.reduce((s,x)=>s+x.gb,0),adm=rows.reduce((s,x)=>s+x.admin,0),picked=rows.filter(x=>selected[x.key+'||'+x.scopeKey]),cost=picked.reduce((s,x)=>s+x.total*x.price,0),unassigned=rows.filter(x=>!x.manufacturer).length;
+ document.getElementById('stats').innerHTML='<div class="stat"><small>GB Qty</small><b>'+gb+'</b></div><div class="stat"><small>Admin Qty</small><b>'+adm+'</b></div><div class="stat"><small>Total Qty</small><b>'+total+'</b></div><div class="stat"><small>Assigned Lines</small><b>'+picked.length+'</b></div><div class="stat"><small>Selected Cost</small><b>'+peso(cost)+'</b></div>';
 }
 function renderSummary(){
- const rows=build().filter(x=>selected[x.key]);const ms=[...new Set(rows.map(x=>x.manuf))].sort();
- const el=document.getElementById("summary");
- if(!rows.length){el.innerHTML='<div class="empty">Nothing selected yet. Tick the products you want to order.</div>';return}
- el.innerHTML='<div class="manufs">'+ms.map(m=>{const rs=rows.filter(x=>x.manuf===m),qty=rs.reduce((s,x)=>s+x.total,0),cost=rs.reduce((s,x)=>s+x.total*x.price,0);return '<div class="manuf"><div class="mh"><span>'+esc(m)+'</span><span>'+peso(cost)+'</span></div><div class="tablewrap"><table><thead><tr><th>Product</th><th>Variant</th><th>Total Qty</th><th>Unit</th><th>Total</th></tr></thead><tbody>'+rs.map(x=>'<tr><td>'+esc(x.product)+'</td><td>'+esc(x.variant||"—")+'</td><td><b>'+x.total+'</b></td><td>'+peso(x.price)+'</td><td class="money">'+peso(x.total*x.price)+'</td></tr>').join("")+'</tbody><tfoot><tr><th colspan="2">TOTAL</th><th>'+qty+'</th><th></th><th>'+peso(cost)+'</th></tr></tfoot></table></div></div>'}).join("")+'</div>';
+ const picked=rows.filter(x=>selected[x.key+'||'+x.scopeKey]);
+ const list=['BBG','KERUN'];
+ document.getElementById('summary').innerHTML='<div class="manufs">'+list.map(m=>{const rs=picked.filter(x=>x.manufacturer===m),qty=rs.reduce((s,x)=>s+x.total,0),cost=rs.reduce((s,x)=>s+x.total*x.price,0);return '<div class="manuf"><div class="mh"><span>'+m+'</span><span>'+peso(cost)+'</span></div>'+(rs.length?'<div class="tablewrap"><table><tr><th>Product</th><th>Variant</th><th>GB Qty</th><th>Admin Qty</th><th>Total</th><th>Unit</th><th>Subtotal</th></tr>'+rs.map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.gb+'</td><td>'+x.admin+'</td><td><b>'+x.total+'</b></td><td>'+peso(x.price)+'</td><td class="money">'+peso(x.total*x.price)+'</td></tr>').join('')+'</table></div><div style="padding:14px" class="total">TOTAL '+m+': '+peso(cost)+'</div>':'<div class="empty">No products selected for '+m+'.</div>')+'</div>'}).join('')+'</div>';
 }
-function exportCSV(){
- const rows=build().filter(x=>selected[x.key]);if(!rows.length)return alert("No selected products.");
- const lines=[["Product","Variant","GB Qty","Admin Qty","Total Qty","Manufacturer","Unit Price","Total Cost"],...rows.map(x=>[x.product,x.variant,x.gb,x.admin,x.total,x.manuf,x.price,(x.total*x.price).toFixed(2)])];
- const csv=lines.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(",")).join("\n");
- const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="PEPMOSA-manufacturer-orders.csv";a.click();
+async function saveAll(){
+ const scope=document.getElementById('scope').value;
+ const chosen=rows.filter(x=>selected[x.key+'||'+x.scopeKey]&&x.manufacturer);
+ if(scope==='ALL'){return alert('Select a specific GB before saving manufacturer assignments. This prevents one GB assignment from being applied to another GB.');}
+ for(const x of chosen){
+  const payload={scope:scope,product_id:x.pid,variant_id:x.vid||'',manufacturer:x.manufacturer,updated_at:new Date().toISOString()};
+  const r=await sb.from('finance_manufacturer_orders').upsert(payload,{onConflict:'scope,product_id,variant_id'});
+  if(r.error)return alert('Could not save '+x.name+': '+r.error.message);
+ }
+ const fresh=await sb.from('finance_manufacturer_orders').select('*');if(fresh.error)return alert(fresh.error.message);assignments=fresh.data||[];
+ alert('Manufacturer assignments saved for GB '+scope+'.');
+ render();
 }
-init().catch(e=>{document.getElementById("body").innerHTML='<tr><td colspan="9" class="empty">'+esc(e.message)+'</td></tr>';});
+async function exportCSV(){
+ const picked=rows.filter(x=>selected[x.key+'||'+x.scopeKey]&&x.manufacturer);
+ if(!picked.length)return alert('No selected products.');
+ const lines=[['GB','Product','Variant','GB Qty','Admin Qty','Total Qty','Manufacturer','Unit Price','Total Cost'],...picked.map(x=>[x.gbNumber,x.name,x.variant,x.gb,x.admin,x.total,x.manufacturer,x.price,(x.total*x.price).toFixed(2)])];
+ const csv=lines.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='PEPMOSA-manufacturer-orders.csv';a.click();
+}
+document.getElementById('scope').addEventListener('change',render);
+init().catch(e=>document.getElementById('body').innerHTML='<tr><td colspan="11" class="error">'+esc(e.message)+'</td></tr>');
 </script></body></html>

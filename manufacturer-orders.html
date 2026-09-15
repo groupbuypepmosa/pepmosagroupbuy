@@ -10,9 +10,6 @@
 <section class="card"><h2>Manufacturer Order Summary</h2><div id="summary"></div></section>
 </main>
 <script>
-const cfg=window.PEPMOSA_CONFIG;let sb;
-const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
-const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const approved=s=>['PAID','PAYMENT APPROVED','APPROVED'].includes(String(s||'').toUpperCase());
 let products=[],variants=[],prices=[],orders=[],items=[],groupBuys=[],adminOrders=[],assignments=[],rows=[];
 let selected=JSON.parse(localStorage.getItem('pepmosa_manufacturer_selected_v3')||'{}');

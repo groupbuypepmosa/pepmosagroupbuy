@@ -20,6 +20,14 @@ let selected=JSON.parse(localStorage.getItem('pepmosa_manufacturer_selected_v3')
 async function init(){
  if(!cfg||!window.supabase)throw Error('Supabase configuration is unavailable.');
  sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
+ // Admin-only gate: do not render or query manufacturer-order data for public visitors.
+ try{
+  if(typeof requireAdmin!=='function') throw Error('Admin authentication is unavailable.');
+  await requireAdmin();
+ }catch(e){
+  document.body.innerHTML='<main style="max-width:620px;margin:80px auto;padding:24px;font-family:Arial;text-align:center"><h2>🔒 Admin Access Required</h2><p>This Manufacturer Orders page is restricted to PEPMOSA admins.</p><a href="admin.html" style="display:inline-block;margin-top:12px;padding:10px 14px;border-radius:10px;background:#c92c78;color:#fff;text-decoration:none;font-weight:800">BACK TO ADMIN</a></main>';
+  throw e;
+ }
  const rs=await Promise.all([
   sb.from('products').select('product_id,product_name,active').order('product_name'),
   sb.from('product_variants').select('variant_id,product_id,strength,active').order('strength'),

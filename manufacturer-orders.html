@@ -18,8 +18,7 @@ let products=[],variants=[],prices=[],orders=[],items=[],groupBuys=[],adminOrder
 let selected=JSON.parse(localStorage.getItem('pepmosa_manufacturer_selected_v3')||'{}');
 
 async function init(){
- if(!cfg||!window.supabase)throw Error('Supabase configuration is unavailable.');
- sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
+ initSupabase();
  // Admin-only gate: do not render or query manufacturer-order data for public visitors.
  try{
   if(typeof requireAdmin!=='function') throw Error('Admin authentication is unavailable.');

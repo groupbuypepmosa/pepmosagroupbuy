@@ -41,7 +41,9 @@ function priceFor(pid,vid,name,variant){
  if(!p)p=prices.find(x=>String(x.product_name||'').toLowerCase()===String(name||'').toLowerCase()&&!x.variant_id);
  return Number(p?.manufacturer_price||0);
 }
-function assignmentFor(scope,pid,vid){
+function assignmentFor(scope,pid,vid,key){
+ const localKey=key+'||'+scope;
+ if(selected[localKey]) return selected[localKey];
  return assignments.find(a=>String(a.scope)===String(scope)&&String(a.product_id||'')===String(pid||'')&&String(a.variant_id||'')===String(vid||''))?.manufacturer||'';
 }
 function makeRows(){
@@ -68,7 +70,7 @@ function makeRows(){
    map[key][type]+=Number(x.qty||0);
   };
   items.forEach(x=>add(x,'gb'));adminOrders.forEach(x=>add(x,'admin'));
-  return Object.values(map).map(x=>{const scopeKey=scope==='ALL'?String(x.gbNumber||''):String(scope);const manufacturer=assignmentFor(scopeKey,x.pid,x.vid);const price=priceFor(x.pid,x.vid,x.name,x.variant);return {...x,total:x.gb+x.admin,manufacturer,price,scopeKey}});
+  return Object.values(map).map(x=>{const scopeKey=scope==='ALL'?String(x.gbNumber||''):String(scope);const manufacturer=assignmentFor(scopeKey,x.pid,x.vid,x.key);const price=priceFor(x.pid,x.vid,x.name,x.variant);return {...x,total:x.gb+x.admin,manufacturer,price,scopeKey}});
  });
 }
 async function render(){

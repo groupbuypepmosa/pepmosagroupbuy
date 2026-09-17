@@ -232,7 +232,6 @@
   ready(()=>{
     addStyles();
     addAnchors();
-    injectHeroActions();
     injectTrustStrip();
     improveProductHeading();
     injectMobileBar();

@@ -232,8 +232,6 @@
   ready(()=>{
     addStyles();
     addAnchors();
-    injectTopNotice();
-    injectCustomerNav();
     injectHeroActions();
     injectTrustStrip();
     improveProductHeading();

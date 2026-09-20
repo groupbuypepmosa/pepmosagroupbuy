@@ -145,4 +145,4 @@ async function addOrder(){
 async function delOrder(id){if(!confirm('Delete this admin order?'))return;const {error}=await sb.from('admin_orders').delete().eq('id',id);if(error)return alert(error.message);orders=orders.filter(x=>x.id!==id);render();}
 init().catch(e=>{document.getElementById('rows').innerHTML='<div style="color:#a33">'+esc(e.message)+'</div>';console.error(e)});
 
-<!-- Admin Orders → Kit Completion linkage: admin_orders are tagged to the latest GB and the database trigger syncs kit_inventory automatically. --></script></body></html>
+// Admin Orders → Kit Completion linkage: admin_orders are tagged to the selected GB and the database trigger syncs kit_inventory automatically.</script></body></html>

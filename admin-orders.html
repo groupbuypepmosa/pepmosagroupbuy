@@ -2,16 +2,117 @@
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA • Admin Orders</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script>
 <style>
-*{box-sizing:border-box}body{font-family:Inter,Arial,sans-serif;background:linear-gradient(135deg,#f7f3f5,#eef1f6);margin:0;color:#29252b;min-height:100vh}
-header{background:linear-gradient(135deg,#2b2630,#4a3b4b);color:#fff;padding:26px 30px;display:flex;justify-content:space-between;gap:12px;align-items:center;box-shadow:0 8px 28px #0002}header b{font-size:24px;letter-spacing:.4px}main{max-width:1240px;margin:auto;padding:28px 22px 50px}
-.card{background:rgba(255,255,255,.92);border:1px solid #ffffff;border-radius:22px;padding:22px;margin-bottom:20px;box-shadow:0 10px 30px #30243612}.card h2{font-size:21px}.card h3{margin:8px 0 14px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:#756b76}
-input,select{width:100%;padding:13px;margin:6px 0 4px;border:1px solid #e3dfe5;border-radius:12px;background:#fff;font:inherit;outline:none}input:focus,select:focus{border-color:#79627c;box-shadow:0 0 0 3px #79627c18}
-button{padding:12px 18px;border:0;border-radius:11px;background:linear-gradient(135deg,#302934,#5b475c);color:#fff;cursor:pointer;font-weight:800;letter-spacing:.2px;box-shadow:0 6px 14px #33253a22}.danger{background:linear-gradient(135deg,#a93642,#cf5360);padding:8px 11px;font-size:12px}.muted{color:#817783;font-size:13px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:22px}
-.stat{background:linear-gradient(135deg,#fff,#f7f3f7);border:1px solid #e9e3e9;border-radius:20px;padding:18px;box-shadow:0 8px 20px #3024360c;position:relative;overflow:hidden}.stat:before{content:'ADMIN';font-size:9px;letter-spacing:2px;color:#9b8e9b;font-weight:bold}.stat span{display:block;font-weight:900;font-size:18px;margin-top:5px;color:#413543}.stat b{display:block;font-size:24px;margin:9px 0 3px;color:#342b35}.stat small{color:#9a919a}
-table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid #eee8ee;border-radius:14px;background:#fff}th{background:#f4f0f4;color:#665a66;font-size:11px;text-transform:uppercase;letter-spacing:.6px}th,td{padding:12px;border-bottom:1px solid #f0ebf0;text-align:left}tr:last-child td,tr:last-child th{border-bottom:0}tbody tr:hover{background:#fcfafc}
-#rows{overflow:auto}.admin-block{border:1px solid #ebe4eb;border-radius:18px;padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#fff,#fcf9fc)}.admin-block h3{display:flex;align-items:center;gap:8px}.admin-total{margin-top:10px;padding:12px 14px;background:#f4eff4;border-radius:12px;text-align:right;font-weight:900}.product-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.product-chip{background:linear-gradient(135deg,#fff,#f8f4f8);border:1px solid #e9e1e9;border-radius:16px;padding:16px}.product-chip b{display:block;font-size:17px;margin-bottom:8px}.product-chip .qtybig{font-size:24px;font-weight:900}.product-chip .amt{font-weight:900;font-size:18px;margin-top:6px}
-@media(max-width:800px){main{padding:16px 12px}.stats{grid-template-columns:repeat(2,1fr)}header{padding:20px 16px}header b{font-size:19px}table{font-size:12px}th,td{padding:9px}}
+:root{
+  --pink:#d85b8a;--pink-dark:#a83f68;--pink-soft:#fff1f6;--pink-pale:#fff8fb;
+  --ink:#302630;--muted:#837681;--line:#eee3e9;--card:#fff;--shadow:0 12px 32px rgba(80,35,58,.08)
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  color:var(--ink);background:#fbf8fa;min-height:100vh
+}
+header{
+  background:linear-gradient(135deg,#fff 0%,#fff5f8 58%,#f9eaf1 100%);
+  color:var(--ink);padding:28px 30px 24px 78px;border-bottom:1px solid #f0dfe7;
+  box-shadow:0 5px 22px rgba(90,38,62,.06)
+}
+header b{font-size:24px;letter-spacing:.3px;color:#3a2d35}
+header .muted{color:#9a7f8c!important}
+main{max-width:1280px;margin:auto;padding:26px 24px 56px}
+.card{
+  background:rgba(255,255,255,.98);border:1px solid var(--line);border-radius:18px;
+  padding:22px;margin-bottom:18px;box-shadow:var(--shadow)
+}
+.card h2{font-size:19px;margin-bottom:6px;color:#3b3037}
+.card h3{margin:7px 0 14px}
+.muted{color:var(--muted);font-size:13px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+label{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:#75636d}
+input,select{
+  width:100%;height:44px;padding:0 13px;margin:7px 0 3px;border:1px solid #e5dbe1;border-radius:11px;
+  background:#fff;color:var(--ink);font:inherit;outline:none;transition:.18s
+}
+input:focus,select:focus{border-color:#df78a0;box-shadow:0 0 0 3px rgba(216,91,138,.12)}
+input[readonly]{background:#faf6f8;color:#8c4c68;font-weight:800}
+button{
+  min-height:42px;padding:10px 17px;border:0;border-radius:11px;background:linear-gradient(135deg,var(--pink),var(--pink-dark));
+  color:#fff;cursor:pointer;font-weight:800;letter-spacing:.2px;box-shadow:0 7px 16px rgba(168,63,104,.18);
+  transition:transform .15s,box-shadow .15s,opacity .15s
+}
+button:hover{transform:translateY(-1px);box-shadow:0 9px 20px rgba(168,63,104,.23)}
+button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.danger{background:#fff1f3;color:#b33f59;border:1px solid #f1cfd8;box-shadow:none;padding:7px 11px;min-height:34px;font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.stat{
+  position:relative;background:#fff;border:1px solid var(--line);border-radius:17px;padding:17px 18px;
+  box-shadow:0 8px 24px rgba(80,35,58,.06);overflow:hidden
+}
+.stat:before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(#df6f99,#b94570)
+}
+.stat span{display:block;font-size:11px;font-weight:900;letter-spacing:1px;color:#8b7480;text-transform:uppercase}
+.stat b{display:block;font-size:22px;margin:9px 0 3px;color:#392d34}
+.stat small{color:#9a8991;font-size:12px}
+table{
+  width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--line);
+  border-radius:13px;background:#fff
+}
+th{
+  background:#fff5f8;color:#775e6a;font-size:10px;text-transform:uppercase;letter-spacing:.7px;
+  white-space:nowrap
+}
+th,td{padding:12px 13px;border-bottom:1px solid #f1e9ed;text-align:left}
+td{font-size:13px;color:#43373e;vertical-align:middle}
+tr:last-child td,tr:last-child th{border-bottom:0}
+tbody tr:hover{background:#fffafd}
+#rows{overflow:auto}
+#rows table td:nth-child(4),#rows table td:nth-child(5),#rows table td:nth-child(6){white-space:nowrap}
+.admin-block{
+  border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:13px;background:#fff
+}
+.admin-block h3{
+  display:flex;align-items:center;gap:8px;color:#4a3942;font-size:15px
+}
+.admin-total{
+  margin-top:10px;padding:12px 14px;background:var(--pink-soft);color:#9e3e63;
+  border:1px solid #f5dce6;border-radius:11px;text-align:right;font-weight:900
+}
+.product-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.product-chip{
+  background:linear-gradient(145deg,#fff,#fff7fa);border:1px solid #f0dfe7;border-radius:15px;padding:15px
+}
+.product-chip b{display:block;font-size:15px;margin-bottom:8px;color:#46363e}
+.product-chip .qtybig{font-size:22px;font-weight:900;color:#a83f68}
+.product-chip .amt{font-weight:900;font-size:17px;margin-top:6px;color:#43323b}
+#kitCompletion .card{border-color:#f0dce5;background:linear-gradient(180deg,#fff,#fffafd)}
+#kitCompletion table select{height:36px;width:auto;min-width:100px;margin:0 5px 0 0;padding:0 9px}
+#kitCompletion table input{height:36px;margin:0 5px 0 0}
+#kitCompletion table button{min-height:36px;padding:7px 12px;font-size:11px}
+a[aria-label="Back to Admin"]{
+  top:18px!important;left:18px!important;background:#fff!important;color:#a83f68!important;
+  border:1px solid #efd9e2!important;border-radius:10px!important;padding:9px 12px!important;
+  box-shadow:0 4px 14px rgba(80,35,58,.08)!important
+}
+@media(max-width:900px){
+  header{padding:24px 18px 20px 70px}
+  header b{font-size:20px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  main{padding:18px 14px 45px}
+}
+@media(max-width:560px){
+  header{padding:68px 15px 18px}
+  header>div b{font-size:18px}
+  header>span{display:none}
+  .stats{grid-template-columns:1fr 1fr;gap:9px}
+  .stat{padding:14px 13px}
+  .stat b{font-size:18px}
+  .grid{grid-template-columns:1fr}
+  .card{padding:16px;border-radius:15px}
+  .card h2{font-size:17px}
+  table{min-width:720px}
+  #kitCompletion table{min-width:900px}
+}
 </style></head><body><a href="admin.html" aria-label="Back to Admin" onclick="event.preventDefault();try{localStorage.setItem('pepmosa_admin_return','1')}catch(e){}location.href='admin.html';" style="position:fixed;top:16px;left:16px;z-index:9999;background:#fff;color:#5a2445;border:1px solid #e5d5e1;border-radius:10px;padding:10px 14px;text-decoration:none;font-weight:900;box-shadow:0 4px 14px rgba(0,0,0,.08)">← BACK TO ADMIN</a>
 <header><div><b>👥 ADMIN ORDERS</b><div style="margin-top:5px;color:#d9cfd9;font-size:13px">PEPMOSA • Shared Admin Order Tracker</div></div><span class="muted" style="color:#ddd">VICKY • JOYCE • RHEA • ANNE</span></header>
 <main>

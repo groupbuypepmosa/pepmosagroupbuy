@@ -983,9 +983,13 @@ async function track(){
       const rows=[...grouped.values()].map(row=>
         '<div class="product"'+(row.refunded?' style="opacity:.62;text-decoration:line-through;background:#fff1f5"':'')+'><b>'+esc(row.name)+(row.refunded?' <span style="display:inline-block;text-decoration:none;color:#b51f61;font-size:9px;font-weight:950;margin-left:6px">REFUNDED</span>':'')+'</b><span class="qty">QTY '+row.qty+'</span></div>'
       ).join('')||'<div class="product"><span style="color:#8b7a83;font-size:12px">No products attached to this order yet.</span></div>';
-      const source=o.source_type||'GROUP BUY';
-      const gbNumber=o.gb_number||'UNASSIGNED';
-      const gbName=o.gb_name||gbNumber;
+      const orderItemsForSource=itemsFor(o,allItems);
+      const sourceRaw=String(o.source_type||o.order_source||o.source||'').trim().toUpperCase();
+      const productSource=(orderItemsForSource.map(i=>String(i.product_name||i.products?.product_name||i.product?.product_name||i.name||'')).find(n=>/LAENNEC/i.test(n))||'').trim();
+      const sourceLabel=sourceRaw==='MOQ'?'OPEN FOR ALL / MOQ':sourceRaw==='GROUP BUY'?'GROUP BUY':sourceRaw||productSource||'GROUP BUY';
+      const gbNumber=o.gb_number||o.gb_id||'';
+      const gbName=o.gb_name||((sourceLabel!=='GROUP BUY'&&sourceLabel!=='OPEN FOR ALL / MOQ')?sourceLabel:(gbNumber||sourceLabel));
+      const groupKey=(sourceLabel+'||'+(gbNumber||gbName)).toLowerCase();
       const orderShipment=shipmentForOrder(o,shipments);
       const orderStatus=orderShipment?.status||o.tracking_status||o.shipment_status||o.status||o.payment_status||'ORDER RECEIVED';
       const orderStatusLabel=orderShipment?'SHIPPING STATUS':'ORDER STATUS';
@@ -1005,9 +1009,9 @@ async function track(){
         (orderMeta?'<div class="orderShipMeta">'+orderMeta+'</div>':'')+
         '<div class="items">'+rows+'</div></article>';
       orderCards.push(card);
-      if(!gbGroups.has(gbNumber))gbGroups.set(gbNumber,{name:gbName,cards:[],count:0});
-      gbGroups.get(gbNumber).cards.push(card);
-      gbGroups.get(gbNumber).count++;
+      if(!gbGroups.has(groupKey))gbGroups.set(groupKey,{name:gbName,source:sourceLabel,badge:gbNumber||sourceLabel,cards:[],count:0});
+      gbGroups.get(groupKey).cards.push(card);
+      gbGroups.get(groupKey).count++;
     });
 
     if(!summary.size)allItems.forEach(i=>{
@@ -1031,9 +1035,9 @@ async function track(){
       shipment.waybill_number?'<div class="infoBox"><small>WAYBILL NUMBER</small><b>'+esc(shipment.waybill_number)+'</b></div>':''
     ].filter(Boolean).join('');
 
-    const gbSections=[...gbGroups.entries()].map(([gb,g])=>
+    const gbSections=[...gbGroups.entries()].map(([key,g])=>
       '<section class="gbOrderGroup">'+
-        '<div class="gbOrderHead"><div><span class="gbOrderEyebrow">ORDER SOURCE</span><h3>'+esc(g.name)+'</h3><p>'+esc((String(g.name||'').toUpperCase().includes('MOQ')?'MOQ / OPEN FOR ALL':'GROUP BUY')+' • '+g.count+' checkout'+(g.count===1?'':'s')+' recorded')+'</p></div><span class="gbOrderBadge">'+esc(gb)+'</span></div>'+
+        '<div class="gbOrderHead"><div><span class="gbOrderEyebrow">ORDER SOURCE</span><h3>'+esc(g.name)+'</h3><p>'+esc(g.source+' • '+g.count+' order'+(g.count===1?'':'s')+' recorded')+'</p></div><span class="gbOrderBadge">'+esc(g.badge)+'</span></div>'+
         g.cards.join('')+
       '</section>'
     ).join('');

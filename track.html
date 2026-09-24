@@ -518,6 +518,18 @@ body{
   .qty{font-size:7px!important}
 }
 </style>
+<style id="pep-track-per-order-status">
+.clientOrderCount{margin-top:6px;font-size:9px;font-weight:900;letter-spacing:.09em;opacity:.82}
+.trackerIntro{display:grid;grid-template-columns:50px 1fr;gap:13px;align-items:center;padding:15px 17px;border:1px solid #f0d8e5;border-radius:17px;background:linear-gradient(135deg,#fff7fb,#fff)}
+.trackerIntro small{display:block;color:#a15b7e;font-size:8px;font-weight:950;letter-spacing:.12em}
+.trackerIntro h2{font-size:18px;margin:4px 0 0;color:#3b2d35}.trackerIntro p{font-size:10px;color:#786d75;margin:5px 0 0;line-height:1.45}
+.orderStatusLabel{font-size:7px;text-align:right;color:#ad7a92;font-weight:950;letter-spacing:.08em;margin-top:3px}.orderStatus.shipping{background:#fff0f7;color:#b51f73}
+.orderStatusPanel{margin:0 14px;padding:10px 12px;border:1px solid #f1dce6;border-radius:12px;background:#fff8fb}
+.orderStatusPanel small{display:block;font-size:7px;letter-spacing:.12em;color:#a15b7e;font-weight:950}.orderStatusPanel b{display:block;font-size:12px;color:#3d3037;margin-top:3px}.orderStatusPanel span{display:block;font-size:9px;color:#87757d;margin-top:3px}
+.orderTimeline{padding:0 14px}.orderTimeline .timeline{margin-top:8px!important}.orderTimeline .phase{min-height:58px!important;font-size:7px!important}.orderTimeline .phase .dot{width:25px!important;height:25px!important;font-size:10px!important}
+.orderShipMeta{margin:7px 14px 0;padding:7px 9px;border:1px solid #efdde6;border-radius:10px;background:#fff;color:#866d79;font-size:7px;font-weight:900}
+@media(max-width:760px){.trackerIntro{grid-template-columns:40px 1fr;padding:12px}.trackerIntro h2{font-size:15px}.trackerIntro p{font-size:9px}.orderStatusPanel{margin:0 12px;padding:9px 10px}.orderTimeline{padding:0 12px}.orderTimeline .phase{min-height:55px!important;font-size:6px!important}.orderShipMeta{margin-left:12px;margin-right:12px}.orderStatusLabel{font-size:6px}}
+</style>
 </head>
 <body>
 <div class="top"><a class="back" href="index.html">← <span>Back to Shop</span></a></div>
@@ -589,6 +601,21 @@ function itemsFor(order,allItems){
   return asArray(allItems).filter(i=>oid&&String(i.order_id??i.order?.order_id??i.order?.id??'')===oid);
 }
 function noteFor(o){return o.manual_note??o.note??o.notes??o.admin_note??o.late_order_note??''}
+
+function shipmentForOrder(order,shipments){
+  const oid=String(order.order_id??order.id??'').trim();
+  const on=String(order.order_number??order.order_no??'').trim().toLowerCase();
+  const gb=String(order.gb_number??'').trim().toLowerCase();
+  const matches=asArray(shipments).filter(s=>{
+    const sid=String(s.order_id??s.order?.order_id??s.order?.id??'').trim();
+    const sn=String(s.order_number??s.order_no??s.order?.order_number??'').trim().toLowerCase();
+    const sg=String(s.gb_number??s.gb_id??s.group_buy_number??'').trim().toLowerCase();
+    if(oid && sid && sid===oid)return true;
+    if(on && sn && sn===on)return true;
+    return !!(gb && sg && gb===sg && !s.order_id && !s.order_number);
+  });
+  return matches.sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0))[0]||null;
+}
 
 async function resolveTrackingGB(){ return Promise.resolve(TRACK_GB||''); }
 
@@ -736,10 +763,23 @@ async function track(){
       const source=o.source_type||'GROUP BUY';
       const gbNumber=o.gb_number||'UNASSIGNED';
       const gbName=o.gb_name||gbNumber;
+      const orderShipment=shipmentForOrder(o,shipments);
+      const orderStatus=orderShipment?.status||o.tracking_status||o.shipment_status||o.status||o.payment_status||'ORDER RECEIVED';
+      const orderStatusLabel=orderShipment?'SHIPPING STATUS':'ORDER STATUS';
+      const orderTimeline=orderShipment?phaseTimeline(orderStatus):'';
+      const orderMeta=[
+        orderShipment?.courier?'🚚 '+esc(orderShipment.courier):'',
+        orderShipment?.tracking_number?'TRACKING: '+esc(orderShipment.tracking_number):'',
+        orderShipment?.waybill_number?'WAYBILL: '+esc(orderShipment.waybill_number):''
+      ].filter(Boolean).join(' · ');
       const card=
-        '<article class="orderCard"><div class="orderTop"><div><div class="orderRef">ORDER # '+esc(oid)+'</div>'+
+        '<article class="orderCard">'+
+        '<div class="orderTop"><div><div class="orderRef">ORDER # '+esc(oid)+'</div>'+
         '<div style="font-size:11px;color:#8b7a83;margin-top:4px">'+esc(gbName)+'</div></div>'+
-        '<div class="orderStatus">'+esc(o.payment_status||o.status||'ORDER RECEIVED')+'</div></div>'+
+        '<div><div class="orderStatus '+(orderShipment?'shipping':'')+'">'+esc(orderStatus)+'</div><div class="orderStatusLabel">'+orderStatusLabel+'</div></div></div>'+
+        '<div class="orderStatusPanel"><small>CURRENT STATUS</small><b>'+esc(orderStatus)+'</b><span>'+esc(statusMessage(orderStatus))+'</span></div>'+
+        (orderTimeline?'<div class="orderTimeline">'+orderTimeline+'</div>':'')+
+        (orderMeta?'<div class="orderShipMeta">'+orderMeta+'</div>':'')+
         '<div class="items">'+rows+'</div></article>';
       orderCards.push(card);
       if(!gbGroups.has(gbNumber))gbGroups.set(gbNumber,{name:gbName,cards:[],count:0});
@@ -778,13 +818,10 @@ async function track(){
     out.innerHTML=
       '<section class="clientCard">'+
         '<div class="clientHero"><div class="clientTop"><div><div class="clientLabel">PEPMOSA CLIENT TRACKER</div>'+
-        '<div class="clientEmail">'+esc(email)+'</div><div style="margin-top:7px;font-size:10px;font-weight:900;letter-spacing:.12em;opacity:.82">LATEST GROUP BUY: '+esc(shipment.gb_name||shipment.gb_number||'PEPMOSA')+'</div></div><span class="statusPill">● '+esc(status)+'</span></div></div>'+
+        '<div class="clientEmail">'+esc(email)+'</div><div class="clientOrderCount">'+orders.length+' recorded order'+(orders.length===1?'':'s')+'</div></div><span class="statusPill">● ORDER TRACKING</span></div></div>'+
         '<div class="body">'+
-          '<section class="nowCard"><div class="nowIcon">✦</div><div><small>CURRENT STATUS</small>'+
-          '<h2>'+esc(status)+'</h2><p>'+esc(statusMessage(status))+'</p></div>'+
-          '<div class="stepText">CURRENT UPDATE</div></section>'+
-          phaseTimeline(status)+
-          (shippingBoxes?'<div class="shippingInfo">'+shippingBoxes+'</div>':'')+
+          '<section class="trackerIntro"><div class="nowIcon">✦</div><div><small>ORDER-BY-ORDER TRACKING</small>'+
+          '<h2>Each order has its own status</h2><p>Check the status inside the specific order below — so you can see exactly which order is handed over, in transit, or delivered.</p></div></section>'+
           '<section class="orders"><div class="sectionHead"><div><div class="eyebrow">YOUR ORDERS</div>'+
           '<h2>What you ordered</h2><p>All recorded checkouts, organized by Group Buy. Your previous GB orders stay here too.</p></div>'+
           '<span class="count">'+orders.length+' ORDER'+(orders.length===1?'':'S')+(totalItems?' • '+totalItems+' ITEMS':'')+'</span></div>'+

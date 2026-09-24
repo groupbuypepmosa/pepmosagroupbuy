@@ -1783,13 +1783,23 @@ main.wrap{width:100%!important;max-width:1120px!important;box-sizing:border-box!
 }
 </style>
 <style id="pep-remove-logo-square">
-/* Keep the PEPMOSA artwork circular — remove any rectangular edge/background from the logo asset */
+/* HARD MASK: only the circular PEPMOSA artwork is allowed to render. */
 main.wrap>.hero .heroLogo img{
-  clip-path:circle(49% at 50% 50%)!important;
-  -webkit-clip-path:circle(49% at 50% 50%)!important;
+  border:0!important;
+  outline:0!important;
   border-radius:50%!important;
+  clip-path:circle(48% at 50% 50%)!important;
+  -webkit-clip-path:circle(48% at 50% 50%)!important;
+  -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 0 47%,transparent 48%)!important;
+  mask-image:radial-gradient(circle at 50% 50%,#000 0 47%,transparent 48%)!important;
+  -webkit-mask-repeat:no-repeat!important;
+  mask-repeat:no-repeat!important;
   background:transparent!important;
   box-shadow:none!important;
+}
+main.wrap>.hero .heroLogo{
+  border:0!important;
+  outline:0!important;
 }
 </style>
 <style id="pep-home-additions-v1">

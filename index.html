@@ -1224,6 +1224,146 @@ main.wrap>.hero .gbPanel .muted{
 @media(max-width:900px){.pepHomeShopNowWrap{text-align:center}}
 @media(max-width:760px){.pepHomeShopNow{width:100%;box-sizing:border-box;min-height:44px;padding:11px 16px}.pepHomeShopNowWrap{margin-top:11px}}
 </style>
+
+<style id="pep-home-girly-redesign">
+/* PEPMOSA GIRLY HOME — visual only */
+main.wrap{max-width:1160px!important;padding:26px 24px 55px!important}
+
+main.wrap>.hero{
+  min-height:410px!important;
+  margin:0 0 24px!important;
+  padding:24px 30px!important;
+  border-radius:34px!important;
+  grid-template-columns:minmax(390px,46%) minmax(0,54%)!important;
+  background:
+    radial-gradient(circle at 12% 20%,rgba(255,255,255,.98),transparent 26%),
+    radial-gradient(circle at 92% 12%,rgba(255,158,205,.20),transparent 25%),
+    linear-gradient(135deg,#fff,#fff0f7 58%,#f8efff)!important;
+  box-shadow:0 24px 70px rgba(170,70,130,.12)!important;
+}
+main.wrap>.hero:after{
+  content:"♡  CURATED WITH LOVE";
+  position:absolute;left:28px;top:20px;
+  padding:7px 11px;border:1px solid #f0bfd6;border-radius:999px;
+  background:rgba(255,255,255,.72);color:#c44b88;
+  font-size:8px;font-weight:950;letter-spacing:.12em;
+}
+main.wrap>.hero .heroLogo{
+  min-height:350px!important;
+  position:relative;
+}
+main.wrap>.hero .heroLogo:before{
+  content:"";
+  position:absolute;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,#fff 0%,#ffe9f3 57%,rgba(255,214,232,0) 72%);
+  box-shadow:0 0 0 1px rgba(234,139,183,.18),0 20px 60px rgba(220,77,147,.10);
+}
+main.wrap>.hero .heroLogo img{
+  position:relative;z-index:1;
+  max-width:500px!important;max-height:330px!important;
+  filter:drop-shadow(0 16px 18px rgba(80,30,60,.13));
+}
+main.wrap>.hero .gbPanel{padding:28px 24px 20px 16px!important}
+main.wrap>.hero .gbPanel h1{
+  font-size:clamp(42px,4.6vw,64px)!important;
+  line-height:.96!important;
+  letter-spacing:-.045em!important;
+  margin:8px 0 12px!important;
+}
+main.wrap>.hero .gbPanel h1 span{
+  display:block;
+  background:linear-gradient(90deg,#d82e8c,#bd57bf);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+main.wrap>.hero .gbPanel>.muted{max-width:460px;font-size:13px!important}
+#gbStatus{
+  margin-top:18px!important;padding:18px 20px!important;
+  border-radius:22px!important;
+  background:rgba(255,255,255,.78)!important;
+  border:1px solid #f0cfdf!important;
+  box-shadow:0 12px 30px rgba(150,70,115,.07)!important;
+}
+.pepHomeShopNowWrap{margin-top:13px!important}
+.pepHomeShopNow{
+  min-width:168px!important;
+  border-radius:999px!important;
+  padding:13px 18px 13px 22px!important;
+  box-shadow:0 12px 25px rgba(211,43,137,.24)!important;
+}
+.pepHomeShopNow b{font-size:19px!important}
+
+.pepLatestProof{
+  margin:0 0 24px;padding:23px 24px;
+  border-radius:27px;border:1px solid #efd8e5;
+  background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(255,244,249,.92));
+  box-shadow:0 14px 35px rgba(151,76,112,.06);
+}
+.pepLatestProofTop{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:15px}
+.pepLatestProofTop h2{margin:4px 0 4px;font-size:25px;letter-spacing:-.03em;color:#3d2b35}
+.pepLatestProofTop p{margin:0;color:#88747e;font-size:11px}
+.pepViewAllProof{
+  flex:0 0 auto;text-decoration:none;padding:10px 13px;border-radius:999px;
+  background:#fff;border:1px solid #efd1e0;color:#a52c70;
+  font-size:8px;font-weight:950;letter-spacing:.08em;
+}
+.pepViewAllProof span{font-size:13px;margin-left:4px}
+.pepLatestProofCard{
+  min-height:250px;border-radius:20px;overflow:hidden;
+  border:1px solid #f0d8e5;background:#fff;
+  display:flex;align-items:stretch;
+}
+.pepLatestProofCard .pepProofImage{
+  width:43%;min-height:250px;object-fit:cover;background:#faf5f8;cursor:zoom-in;
+}
+.pepLatestProofInfo{padding:24px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.pepLatestProofBadge{
+  width:max-content;padding:6px 9px;border-radius:999px;background:#ffe8f3;color:#bd337a;
+  font-size:7px;font-weight:950;letter-spacing:.12em;
+}
+.pepLatestProofInfo h3{margin:12px 0 7px;font-size:20px;color:#3b2b34;line-height:1.2}
+.pepLatestProofInfo p{margin:0;color:#756772;font-size:12px;line-height:1.55}
+.pepLatestProofDate{margin-top:13px;color:#a18490;font-size:9px;font-weight:800}
+.pepProofLoading{display:grid;place-items:center;width:100%;min-height:180px;color:#a18490;font-size:11px}
+.pepProofEmpty{padding:35px;text-align:center;width:100%;color:#88747e;font-size:11px}
+.pepProofOpen{margin-top:17px;display:inline-flex;width:max-content;text-decoration:none;padding:10px 13px;border-radius:12px;background:#fff0f7;color:#b62f76;font-size:9px;font-weight:950}
+.pepHomeTrustLite{margin:0!important}
+
+@media(max-width:900px){
+  main.wrap>.hero{grid-template-columns:1fr!important;padding:22px!important}
+  main.wrap>.hero .heroLogo{min-height:250px!important;height:250px!important}
+  main.wrap>.hero .heroLogo:before{width:245px;height:245px}
+  main.wrap>.hero .heroLogo img{max-height:260px!important}
+  main.wrap>.hero .gbPanel{padding:4px 8px 10px!important}
+  main.wrap>.hero .gbPanel h1{text-align:center}
+  main.wrap>.hero .gbPanel>.muted{text-align:center;margin-left:auto;margin-right:auto}
+  .pepLatestProofTop{align-items:center}
+}
+@media(max-width:760px){
+  main.wrap{padding:12px 10px 100px!important}
+  main.wrap>.hero{
+    min-height:0!important;margin-bottom:14px!important;
+    padding:15px 12px 17px!important;border-radius:24px!important;
+  }
+  main.wrap>.hero:after{left:14px;top:12px;font-size:6px;padding:6px 8px}
+  main.wrap>.hero .heroLogo{min-height:205px!important;height:205px!important}
+  main.wrap>.hero .heroLogo:before{width:190px;height:190px}
+  main.wrap>.hero .heroLogo img{max-height:205px!important;max-width:320px!important}
+  main.wrap>.hero .gbPanel h1{font-size:34px!important;margin-top:5px!important}
+  main.wrap>.hero .gbPanel>.muted{font-size:11px!important}
+  #gbStatus{margin-top:12px!important;padding:14px 15px!important;border-radius:18px!important}
+  .pepHomeShopNowWrap{margin-top:10px!important}
+  .pepHomeShopNow{width:100%;min-height:45px!important}
+  .pepLatestProof{padding:17px 12px;border-radius:22px;margin-bottom:14px}
+  .pepLatestProofTop{align-items:flex-start;flex-direction:column;gap:10px}
+  .pepLatestProofTop h2{font-size:20px}
+  .pepViewAllProof{align-self:flex-start}
+  .pepLatestProofCard{display:block}
+  .pepLatestProofCard .pepProofImage{display:block;width:100%;height:270px;min-height:0;object-fit:contain}
+  .pepLatestProofInfo{padding:16px}
+  .pepLatestProofInfo h3{font-size:17px}
+  .pepHomeTrustLite{padding:15px 10px!important}
+}
+</style>
 </head>
 
 
@@ -1347,6 +1487,20 @@ main.wrap>.hero .gbPanel .muted{
 
   </div>
 
+</section>
+
+<section class="pepLatestProof" aria-label="Latest buyers proof">
+  <div class="pepLatestProofTop">
+    <div>
+      <div class="eyebrow">JUST IN ♡</div>
+      <h2>LATEST BUYERS' PROOF</h2>
+      <p>Real orders. Real feedback. Shared by our PEPMOSA community.</p>
+    </div>
+    <a href="buyers-proof.html" class="pepViewAllProof">VIEW ALL PROOFS <span>→</span></a>
+  </div>
+  <div id="pepLatestProofCard" class="pepLatestProofCard">
+    <div class="pepProofLoading">Loading our latest proof ♡</div>
+  </div>
 </section>
 
 <section class="pepHomeTrustLite" aria-label="PEPMOSA community">
@@ -3214,5 +3368,35 @@ load();
 </style>
 <script id="pepmosa-pink-fairy-glitter-script">(function(){function mount(){const old=document.getElementById('pepmosaFallingGlitter');if(old)old.remove();const c=document.createElement('canvas');c.id='pepmosaFallingGlitter';const ctx=c.getContext('2d',{alpha:true});let w=0,h=0,dpr=1,stars=[],raf=0,last=performance.now();function resize(){dpr=Math.min(window.devicePixelRatio||1,1.5);w=innerWidth;h=innerHeight;c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);c.style.width=w+'px';c.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0);stars=Array.from({length:w<700?48:88},()=>make(true))}function make(initial){const big=Math.random()<.09;return{x:Math.random()*w,y:initial?Math.random()*h:-10-Math.random()*40,size:big?5+Math.random()*4:1.7+Math.random()*3,alpha:big?.9:.35+Math.random()*.5,speed:initial?18+Math.random()*24:18+Math.random()*24,pink:Math.random()<.48,phase:Math.random()*Math.PI*2,twinkle:1.8+Math.random()*2.4,big}}function drawStar(s){const pulse=s.big?.78+.22*Math.sin(s.phase):.65+.35*Math.sin(s.phase);const a=s.alpha*Math.max(.18,pulse);ctx.save();ctx.translate(s.x,s.y);ctx.globalAlpha=a;ctx.fillStyle=s.pink?'#ff66ad':'#fff';ctx.shadowBlur=s.big?10:5;ctx.shadowColor=s.pink?'rgba(255,102,173,.9)':'rgba(255,255,255,.9)';ctx.beginPath();const r=s.size,inner=r*.22;for(let i=0;i<8;i++){const ang=-Math.PI/2+i*Math.PI/4;const rr=i%2?r*inner:r;const px=Math.cos(ang)*rr,py=Math.sin(ang)*rr;i?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.closePath();ctx.fill();ctx.restore()}function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;ctx.clearRect(0,0,w,h);for(const s of stars){s.y+=s.speed*dt;s.phase+=s.twinkle*dt;if(s.y>h+15){Object.assign(s,make(false));s.y=-10-Math.random()*30}drawStar(s)}raf=requestAnimationFrame(frame)}document.body.appendChild(c);resize();addEventListener('resize',resize,{passive:true});cancelAnimationFrame(raf);raf=requestAnimationFrame(frame)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount()})();</script>
   <script src="customer-facing-polish.js?v=20260918"></script>
+
+<script id="pep-latest-proof-script">
+(function(){
+  async function loadLatestProof(){
+    const host=document.getElementById('pepLatestProofCard');
+    if(!host) return;
+    try{
+      const client=window.sb || (typeof initSupabase==='function' ? initSupabase() : null);
+      if(!client) throw new Error('Supabase unavailable');
+      const q=await client.from('buyer_proofs')
+        .select('id,image_path,caption,created_at')
+        .eq('is_published',true).eq('status','published')
+        .order('created_at',{ascending:false}).limit(1);
+      if(q.error) throw q.error;
+      const p=q.data?.[0];
+      if(!p){host.innerHTML='<div class="pepProofEmpty">No published proof yet ♡<br><a class="pepProofOpen" href="buyers-proof.html">VIEW BUYERS’ PROOF</a></div>';return}
+      const s=await client.storage.from('buyer-proofs').createSignedUrl(p.image_path,3600);
+      if(!s.data?.signedUrl) throw new Error('Image unavailable');
+      const safe=String(p.caption||'Verified buyer proof').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+      const date=p.created_at?new Date(p.created_at).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}):'';
+      host.innerHTML='<img class="pepProofImage" src="'+s.data.signedUrl+'" alt="Latest buyers proof"><div class="pepLatestProofInfo"><span class="pepLatestProofBadge">LATEST UPLOAD ♡</span><h3>'+safe+'</h3><p>Thank you for sharing your PEPMOSA experience with our community.</p><div class="pepLatestProofDate">'+date+'</div><a class="pepProofOpen" href="buyers-proof.html">SEE ALL BUYERS’ PROOF →</a></div>';
+    }catch(e){
+      console.error('PEPMOSA latest proof',e);
+      host.innerHTML='<div class="pepProofEmpty">Couldn’t load the latest proof right now. <a class="pepProofOpen" href="buyers-proof.html">OPEN BUYERS’ PROOF</a></div>';
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadLatestProof,{once:true});
+  else loadLatestProof();
+})();
+</script>
 </body>
 </html>

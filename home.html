@@ -4083,3 +4083,34 @@ main.wrap>.hero .heroLogo img{
   }
 }
 </style>
+
+<style id="pep-home-logo-absolute-final">
+/* HOME HERO: the source artwork is now background-keyed; never crop it into a circle. */
+main.wrap>.hero .heroLogo:before{display:none!important}
+main.wrap>.hero .heroLogo img{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  max-width:500px!important;
+  max-height:330px!important;
+  object-fit:contain!important;
+  border:0!important;
+  border-radius:0!important;
+  outline:0!important;
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+  mask:none!important;
+  -webkit-mask:none!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  mix-blend-mode:normal!important;
+  filter:none!important;
+}
+@media(max-width:760px){
+  main.wrap>.hero .heroLogo img{
+    width:100%!important;
+    max-width:370px!important;
+    max-height:255px!important;
+  }
+}
+</style>

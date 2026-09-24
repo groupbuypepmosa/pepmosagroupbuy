@@ -1710,6 +1710,40 @@ main.wrap>.hero .heroLogo img{
 .pepWhyGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.pepWhyGrid>div{padding:10px 9px;border-radius:15px;background:linear-gradient(135deg,#fff,#fff8fb);border:1px solid #f0dfe7}.pepWhyGrid span{display:block;color:#cf4387;font-size:16px;margin-bottom:5px}.pepWhyGrid b{display:block;font-size:7px;color:#4b3942;letter-spacing:.05em}.pepWhyGrid small{display:block;margin-top:3px;font-size:7px;color:#8c7982}
 @media(max-width:760px){.pepHomeUpdate{padding:13px 11px;border-radius:18px;gap:9px}.pepHomeUpdateIcon{width:34px;height:34px;flex-basis:34px;font-size:14px}.pepHomeUpdateText h2{font-size:14px}.pepHomeUpdateText p{font-size:7.5px}.pepHomeUpdate>a{padding:8px 9px;font-size:6px}.pepWhyP{padding:14px 11px;border-radius:19px}.pepWhyHead h2{font-size:17px}.pepWhyGrid{gap:5px}.pepWhyGrid>div{padding:8px 5px;border-radius:12px;text-align:center}.pepWhyGrid span{font-size:13px}.pepWhyGrid b{font-size:6px}.pepWhyGrid small{font-size:5.5px}}
 </style>
+
+<style id="pep-home-dreamy-heart-bg">
+/* DREAMY HOME BACKGROUND — top nav removed; soft falling hearts */
+header{display:none!important}
+body{
+  background:
+    radial-gradient(circle at 8% 10%,rgba(255,117,181,.20),transparent 24%),
+    radial-gradient(circle at 92% 18%,rgba(255,180,220,.18),transparent 27%),
+    radial-gradient(circle at 50% 55%,rgba(255,205,231,.16),transparent 38%),
+    radial-gradient(circle at 15% 90%,rgba(231,194,255,.14),transparent 28%),
+    linear-gradient(135deg,#fff8fc 0%,#fff0f7 48%,#faf2ff 100%)!important;
+}
+body:after{
+  content:"♡";
+  position:fixed;
+  left:-55px;
+  top:18%;
+  z-index:0;
+  pointer-events:none;
+  color:rgba(245,126,183,.11);
+  font-size:300px;
+  line-height:1;
+  transform:rotate(-14deg);
+}
+main.wrap{position:relative;z-index:3}
+.pepHomeFallingHearts{
+  position:fixed;
+  inset:0;
+  width:100%;height:100%;
+  pointer-events:none;
+  z-index:2;
+  opacity:.82;
+}
+</style>
 </head>
 
 
@@ -3769,6 +3803,72 @@ load();
   }catch(e){console.warn('Home update unavailable',e);box.style.display='none'}
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadHomeUpdate,{once:true});else loadHomeUpdate();
+})();
+</script>
+
+<script id="pep-home-falling-hearts">
+(function(){
+  function mount(){
+    if(document.getElementById('pepHomeFallingHearts')) return;
+    const c=document.createElement('canvas');
+    c.id='pepHomeFallingHearts';
+    c.className='pepHomeFallingHearts';
+    const ctx=c.getContext('2d',{alpha:true});
+    let w=0,h=0,dpr=1,items=[],raf=0,last=performance.now();
+    const mobile=()=>innerWidth<700;
+    function make(initial){
+      const size=(mobile()?5.5:7)+Math.random()*(mobile()?6:9);
+      return {
+        x:Math.random()*w,
+        y:initial?Math.random()*h:-30-Math.random()*120,
+        size,
+        speed:18+Math.random()*30,
+        drift:(Math.random()-.5)*14,
+        sway:8+Math.random()*18,
+        phase:Math.random()*Math.PI*2,
+        rot:(Math.random()-.5)*.5,
+        spin:(Math.random()-.5)*.55,
+        alpha:.20+Math.random()*.48,
+        glossy:Math.random()<.24,
+        pink:Math.random()<.72
+      };
+    }
+    function resize(){
+      dpr=Math.min(devicePixelRatio||1,1.5);w=innerWidth;h=innerHeight;
+      c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);c.style.width=w+'px';c.style.height=h+'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      const count=mobile()?24:46;
+      items=Array.from({length:count},()=>make(true));
+    }
+    function heart(x,y,r,rot,alpha,glossy,pink){
+      ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.globalAlpha=alpha;
+      const fill=pink?'#f06aa9':'#e9a1c5';
+      const g=ctx.createLinearGradient(-r,-r,r,r);
+      g.addColorStop(0,glossy?'#ffd7e9':fill);g.addColorStop(.48,fill);g.addColorStop(1,'#d94f93');
+      ctx.fillStyle=g;ctx.shadowBlur=glossy?10:5;ctx.shadowColor='rgba(224,72,145,.20)';
+      ctx.beginPath();
+      ctx.moveTo(0,r*.9);
+      ctx.bezierCurveTo(-r*1.35,r*.05,-r*1.08,-r*.95,-r*.43,-r*.95);
+      ctx.bezierCurveTo(-r*.08,-r*.95,0,-r*.68,0,-r*.48);
+      ctx.bezierCurveTo(0,-r*.68,r*.08,-r*.95,r*.43,-r*.95);
+      ctx.bezierCurveTo(r*1.08,-r*.95,r*1.35,r*.05,0,r*.9);
+      ctx.closePath();ctx.fill();
+      if(glossy){ctx.globalAlpha=alpha*.72;ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-r*.36,-r*.48,r*.20,r*.10,-.45,0,Math.PI*2);ctx.fill();}
+      ctx.restore();
+    }
+    function frame(now){
+      const dt=Math.min(.05,(now-last)/1000);last=now;ctx.clearRect(0,0,w,h);
+      for(const s of items){
+        s.y+=s.speed*dt;s.phase+=dt*1.5;s.rot+=s.spin*dt;
+        s.x+=s.drift*dt+Math.sin(s.phase)*s.sway*dt*.28;
+        if(s.y>h+45){Object.assign(s,make(false));}
+        heart(s.x,s.y,s.size,s.rot,s.alpha,s.glossy,s.pink);
+      }
+      raf=requestAnimationFrame(frame);
+    }
+    document.body.appendChild(c);resize();addEventListener('resize',resize,{passive:true});cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 })();
 </script>
 </body>

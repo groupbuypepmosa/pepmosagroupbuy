@@ -994,6 +994,14 @@ header{
 <section class="pepHome">
   <div class="pepHomeBrand">
     <img src="pepmosa-no-name.png" alt="PEPMOSA">
+
+    <section class="pepHomeGB" aria-label="Current Group Buy">
+      <div class="pepHomeGBLabel">CURRENT GROUP BUY</div>
+      <div id="gbStatus" class="pepHomeGBStatus">
+        <div class="pepHomeGBLoading">Loading Group Buy…</div>
+      </div>
+    </section>
+
     <a class="pepHomeShop" href="#products">SHOP NOW</a>
   </div>
 
@@ -1018,6 +1026,23 @@ header{
 .pepHome{padding:18px 0 10px}
 .pepHomeBrand{text-align:center;padding:4px 10px 25px}
 .pepHomeBrand img{display:block;width:min(340px,70vw);max-height:150px;object-fit:contain;margin:0 auto 14px;mix-blend-mode:multiply}
+.pepHomeGB{width:min(620px,100%);margin:0 auto 14px;text-align:left}
+.pepHomeGBLabel{margin-bottom:6px;padding-left:3px;color:#b64b7f;font-size:9px;font-weight:900;letter-spacing:.16em}
+.pepHomeGBStatus{min-height:52px;padding:14px 16px;border:1px solid #ead6e2;border-radius:16px;background:linear-gradient(135deg,#fff,#fff4f9);box-shadow:0 8px 22px rgba(150,70,130,.07)}
+.pepHomeGBStatus .notice{margin:0!important}
+.pepHomeGBStatus > b,.pepHomeGBStatus .gb-name{display:block;margin:0 0 7px;color:#3e2d37;font-size:21px;line-height:1.1;font-weight:900}
+.pepHomeGBStatus .status{display:inline-flex;align-items:center;min-height:25px;padding:5px 10px;border-radius:999px;font-size:9px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+.pepHomeGBStatus .status.open{color:#9c155d;background:#ffe8f3;border:1px solid #f2b2d0}
+.pepHomeGBStatus .status.closed{color:#755466;background:#f2edf0;border:1px solid #ded1da}
+.pepHomeGBStatus .gb-remaining{display:inline-flex;align-items:center;margin-left:6px;padding:5px 9px;border-radius:999px;background:#fff1d9;color:#a36317;font-size:9px;font-weight:900;letter-spacing:.04em}
+.pepHomeGBStatus .gb-remaining.closed{background:#f2edf0;color:#755466}
+.pepHomeGBLoading{color:#927887;font-size:11px}
+@media(max-width:760px){
+  .pepHomeGB{margin-bottom:12px}
+  .pepHomeGBStatus{padding:12px 13px;border-radius:14px}
+  .pepHomeGBStatus > b,.pepHomeGBStatus .gb-name{font-size:18px}
+  .pepHomeGBStatus .gb-remaining{display:inline-flex;margin:5px 4px 0 0}
+}
 .pepHomeShop,.pepHomeCommunityBtn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 25px;border-radius:13px;text-decoration:none;font-size:11px;font-weight:900;letter-spacing:.08em}
 .pepHomeShop{color:#fff;background:linear-gradient(135deg,#e83b91,#b83eaa);box-shadow:0 9px 22px rgba(205,55,139,.18)}
 .pepHomeProofSection{margin:0 0 18px;padding:18px;border:1px solid #ead6e2;border-radius:20px;background:rgba(255,255,255,.72)}

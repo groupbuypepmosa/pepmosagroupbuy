@@ -104,7 +104,7 @@ body{background:#fff9fc;color:#251a27}.proofWrap{width:min(1100px,94%);margin:28
 </style>
 </head>
 <body>
-<header><a class="brand" href="home.html"><span class="logoMark">P</span>PEPMOSA</a></header>
+<header><a class="brand" href="./?home=20260924fix"><span class="logoMark">P</span>PEPMOSA</a></header>
 <main class="proofWrap">
 <section class="proofHero"><div class="eyebrow">PEPMOSA COMMUNITY</div><h1>♥ BUYERS' PROOF</h1><p>Real buyer feedback and successful order proofs shared with personal information protected.</p></section>
 <div class="privacy">🔒 Buyer information is kept private. Email is partially masked for privacy.</div>
@@ -131,7 +131,7 @@ async function loadProofs(){try{grid.innerHTML='<div class="empty">Loading buyer
 document.getElementById('closeViewerBtn').onclick=()=>document.getElementById('viewer').classList.remove('show');
 async function doSubmit(){const f=document.getElementById('submitFile').files[0],email=document.getElementById('submitEmail').value.trim(),caption=document.getElementById('submitCaption').value.trim(),name=document.getElementById('submitName').value.trim(),btn=document.getElementById('submitBtn');if(!f){msg.textContent='Please choose your proof image.';msg.style.color='#c22';return}if(!email){msg.textContent='Please enter your email address.';msg.style.color='#c22';return}if(!caption){msg.textContent='Please leave your comment or experience.';msg.style.color='#c22';return}if(!/^\S+@\S+\.\S+$/.test(email)){msg.textContent='Please enter a valid email address.';msg.style.color='#c22';return}if(f.size>10*1024*1024){msg.textContent='Image must be 10MB or smaller.';msg.style.color='#c22';return}btn.disabled=true;btn.textContent='SUBMITTING...';msg.textContent='Uploading your proof...';msg.style.color='#555';try{const ext=(f.name.split('.').pop()||'jpg').toLowerCase();const path='pending/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;const up=await buyerSb.storage.from('buyer-proofs').upload(path,f,{contentType:f.type,upsert:false});if(up.error)throw up.error;msg.textContent='Saving submission...';const q=await buyerSb.from('buyer_proofs').insert({image_path:path,caption:caption,submitter_display_name:null,submitter_email:email,is_published:false,status:'pending'});if(q.error){await buyerSb.storage.from('buyer-proofs').remove([path]);throw q.error}msg.textContent='♥ Thank you! Your proof was submitted for admin review.';msg.style.color='#23834d';form.reset();setTimeout(()=>modal.classList.remove('show'),1800)}catch(err){console.error(err);msg.textContent='Submission failed: '+(err.message||'Please try again.');msg.style.color='#c22'}finally{btn.disabled=false;btn.textContent='SUBMIT FOR REVIEW ♥'}}document.getElementById('submitBtn').onclick=doSubmit;loadProofs();
 </script><nav class="pepSideRail" aria-label="PEPMOSA shortcuts">
-  <a href="home.html" title="Home"><span>⌂</span><b>HOME</b></a>
+  <a href="./?home=20260924fix" title="Home"><span>⌂</span><b>HOME</b></a>
   <a href="shop.html" title="Products"><span>🛍</span><b>PRODUCTS</b></a>
   <a href="calculator.html" title="Calculator"><span>⌗</span><b>CALCULATOR</b></a>
   <a href="protocols.html" title="Protocols"><span>☷</span><b>PROTOCOLS</b></a>

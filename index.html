@@ -1648,6 +1648,16 @@ main.wrap{width:100%!important;max-width:1120px!important;box-sizing:border-box!
   .pepSideRail b{font-size:5px!important}
 }
 </style>
+<style id="pep-remove-logo-square">
+/* Keep the PEPMOSA artwork circular — remove any rectangular edge/background from the logo asset */
+main.wrap>.hero .heroLogo img{
+  clip-path:circle(49% at 50% 50%)!important;
+  -webkit-clip-path:circle(49% at 50% 50%)!important;
+  border-radius:50%!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+</style>
 </head>
 
 

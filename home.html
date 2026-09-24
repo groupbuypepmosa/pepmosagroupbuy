@@ -1,0 +1,4116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="pepmosa-no-name.png">
+  <link rel="apple-touch-icon" href="pepmosa-no-name.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>PEPMOSA • Group Buy</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+/* =========================================================
+   PAGE BACKGROUND
+   ========================================================= */
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+
+  background:
+    radial-gradient(
+      circle at 8% 12%,
+      rgba(255,105,180,.16),
+      transparent 27%
+    ),
+    radial-gradient(
+      circle at 92% 15%,
+      rgba(180,125,255,.17),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 50% 85%,
+      rgba(255,180,220,.14),
+      transparent 35%
+    ),
+    linear-gradient(
+      135deg,
+      #fff8fc 0%,
+      #fff3f9 45%,
+      #f7efff 100%
+    );
+}
+
+/* subtle dots */
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+
+  opacity:.45;
+
+  background-image:
+    radial-gradient(
+      rgba(255,255,255,.9) 1.5px,
+      transparent 1.5px
+    );
+
+  background-size:38px 38px;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+header{
+  position:relative;
+  z-index:20;
+}
+
+.brand{
+  display:flex !important;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+  font-weight:800;
+}
+
+.brand .logoMark{
+  display:none !important;
+}
+
+.brand img{
+  width:48px;
+  height:40px;
+  object-fit:contain;
+  display:block;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero{
+
+  position:relative;
+  z-index:1;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(420px,48%)
+    minmax(0,52%);
+
+  align-items:center;
+
+  min-height:430px;
+
+  padding:28px 38px;
+
+  box-sizing:border-box;
+
+  overflow:visible;
+
+  border-radius:30px;
+
+  border:1px solid rgba(190,100,165,.20);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.88),
+      rgba(255,240,249,.91) 55%,
+      rgba(247,235,255,.91)
+    );
+
+  box-shadow:
+    0 24px 70px rgba(150,70,130,.10),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+
+/* decorative pink shape */
+
+.hero::before{
+
+  content:"";
+
+  position:absolute;
+
+  width:390px;
+  height:390px;
+
+  border-radius:50%;
+
+  left:-190px;
+  top:-190px;
+
+  background:
+    rgba(255,115,185,.08);
+
+  pointer-events:none;
+
+}
+
+
+/* decorative purple shape */
+
+.hero::after{
+
+  content:"";
+
+  position:absolute;
+
+  width:330px;
+  height:330px;
+
+  border-radius:50%;
+
+  right:-150px;
+  bottom:-180px;
+
+  background:
+    rgba(170,115,255,.09);
+
+  pointer-events:none;
+
+}
+
+
+/* =========================================================
+   MAIN LOGO AREA
+   ========================================================= */
+
+.heroLogo{
+
+  position:relative;
+  z-index:3;
+
+  width:100%;
+
+  min-height:390px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  box-sizing:border-box;
+
+  padding:0 15px;
+
+  overflow:visible;
+
+  background:transparent;
+
+  border:none;
+}
+
+
+/* MAIN PEPMOSA IMAGE */
+
+.heroLogo img{
+
+  display:block;
+
+  width:100%;
+
+  max-width:650px;
+
+  height:auto;
+
+  max-height:390px;
+
+  object-fit:contain;
+
+  object-position:center;
+
+  /*
+     This makes white areas of the PNG visually blend
+     with the page background.
+  */
+
+  mix-blend-mode:multiply;
+
+  filter:
+    contrast(1.04)
+    drop-shadow(
+      0 14px 22px rgba(120,50,100,.10)
+    );
+
+  /*
+     No transform.
+     This prevents the logo from being cut.
+  */
+
+  transform:none;
+}
+
+
+/* =========================================================
+   GROUP BUY TEXT
+   ========================================================= */
+
+.gbPanel{
+
+  position:relative;
+  z-index:4;
+
+  padding:
+    25px
+    20px
+    25px
+    30px;
+}
+
+
+.gbPanel h1{
+
+  margin:
+    8px 0 14px;
+
+  font-size:
+    clamp(42px,5vw,68px);
+
+  line-height:.98;
+
+  letter-spacing:-2.5px;
+}
+
+
+.gbPanel h1 span{
+
+  color:#d52b87;
+
+}
+
+
+.gbPanel .muted{
+
+  max-width:560px;
+
+  font-size:15px;
+
+  line-height:1.65;
+
+}
+
+
+/* =========================================================
+   GROUP BUY STATUS — PREMIUM CUSTOMER CARD
+   ========================================================= */
+
+#gbStatus{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  margin-top:24px;
+  padding:24px 28px 23px 30px;
+  border:1px solid rgba(219,62,143,.18);
+  border-radius:26px;
+  background:
+    radial-gradient(circle at 92% 18%,rgba(232,77,157,.16),transparent 25%),
+    radial-gradient(circle at 5% 105%,rgba(190,74,193,.10),transparent 30%),
+    linear-gradient(135deg,#fffafd 0%,#fff 47%,#fff4fa 100%);
+  box-shadow:
+    0 16px 38px rgba(92,43,74,.12),
+    0 3px 10px rgba(220,62,143,.06),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  min-height:92px;
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+
+#gbStatus:hover{
+  transform:translateY(-1px);
+  box-shadow:
+    0 19px 42px rgba(92,43,74,.14),
+    0 4px 12px rgba(220,62,143,.08),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+#gbStatus::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:0;
+  top:0;
+  bottom:0;
+  width:7px;
+  background:linear-gradient(180deg,#ee3b99 0%,#cf2fa9 52%,#a948c1 100%);
+  border-radius:26px 0 0 26px;
+}
+
+#gbStatus::after{
+  content:"✦";
+  position:absolute;
+  right:25px;
+  top:13px;
+  font-size:38px;
+  line-height:1;
+  font-weight:900;
+  color:rgba(216,47,145,.11);
+  transform:rotate(8deg);
+  pointer-events:none;
+}
+
+#gbStatus > b,
+#gbStatus .gb-name{
+  display:block;
+  position:relative;
+  z-index:1;
+  margin:0 48px 12px 0;
+  color:#382631;
+  font-size:clamp(25px,3.4vw,39px);
+  line-height:1.02;
+  font-weight:950;
+  letter-spacing:-1px;
+  word-break:break-word;
+  text-shadow:0 1px 0 rgba(255,255,255,.9);
+}
+
+#gbStatus > b::before,
+#gbStatus .gb-name::before{
+  content:"CURRENT GROUP BUY";
+  display:block;
+  margin-bottom:7px;
+  color:#c13b83;
+  font-size:9px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:2px;
+}
+
+#gbStatus .status{
+  position:relative;
+  z-index:1;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:29px;
+  padding:7px 13px;
+  border-radius:999px;
+  font-size:10px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  box-shadow:0 5px 12px rgba(76,35,61,.07);
+}
+
+#gbStatus .status.open{
+  color:#9c155d;
+  background:linear-gradient(180deg,#ffeaf4,#ffe0ef);
+  border:1px solid #f3b4d1;
+}
+
+#gbStatus .status.open::before{
+  content:"";
+  width:8px;
+  height:8px;
+  flex:0 0 8px;
+  border-radius:50%;
+  background:#e52d91;
+  box-shadow:
+    0 0 0 4px rgba(229,45,145,.10),
+    0 0 11px rgba(229,45,145,.28);
+}
+
+#gbStatus .status.closed{
+  color:#755466;
+  background:linear-gradient(180deg,#f7f1f5,#eee7ec);
+  border:1px solid #ded1da;
+}
+
+@media (max-width:600px){
+  #gbStatus{
+    margin-top:18px;
+    padding:21px 19px 19px 23px;
+    border-radius:21px;
+  }
+  #gbStatus::before{border-radius:21px 0 0 21px}
+  #gbStatus > b,
+  #gbStatus .gb-name{
+    font-size:27px;
+    margin-right:32px;
+  }
+  #gbStatus::after{
+    right:17px;
+    top:12px;
+    font-size:30px;
+  }
+}
+
+/* =========================================================
+   PEPMOSA QUICK TOOLS
+   ========================================================= */
+
+.pepTools{
+  margin:24px 0 6px;
+}
+
+.pepToolsHead{
+  margin-bottom:12px;
+}
+
+.pepToolsGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+
+.pepToolCard{
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-height:108px;
+  padding:18px 20px;
+  border:1px solid rgba(213,43,135,.18);
+  border-radius:22px;
+  background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(255,240,248,.92));
+  box-shadow:0 12px 32px rgba(150,70,130,.08);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+
+.pepToolCard:hover{
+  transform:translateY(-2px);
+  box-shadow:0 18px 40px rgba(150,70,130,.14);
+}
+
+.pepToolIcon{
+  flex:0 0 54px;
+  width:54px;
+  height:54px;
+  display:grid;
+  place-items:center;
+  border-radius:18px;
+  color:#fff;
+  background:linear-gradient(135deg,#ef5ba9,#b73da3);
+  font-size:25px;
+  box-shadow:0 9px 20px rgba(213,72,151,.22);
+}
+
+.pepToolText{
+  min-width:0;
+}
+
+.pepToolText strong{
+  display:block;
+  color:#392832;
+  font-size:15px;
+  letter-spacing:.02em;
+}
+
+.pepToolText span{
+  display:block;
+  margin-top:4px;
+  color:#806f79;
+  font-size:12px;
+  line-height:1.45;
+}
+
+.pepToolArrow{
+  margin-left:auto;
+  color:#d52b87;
+  font-size:22px;
+  font-weight:900;
+}
+
+@media(max-width:760px){
+  .pepTools{
+    margin:18px 0 4px;
+  }
+  .pepToolsGrid{
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  .pepToolCard{
+    min-height:86px;
+    padding:14px 16px;
+    border-radius:18px;
+  }
+  .pepToolIcon{
+    flex-basis:48px;
+    width:48px;
+    height:48px;
+    border-radius:15px;
+    font-size:22px;
+  }
+}
+
+/* =========================================================
+   PRODUCTS
+   ========================================================= */
+
+#products{
+
+  position:relative;
+
+}
+
+
+.sectionHead{
+
+  margin-top:30px;
+
+}
+
+
+.sectionHead h2{
+
+  font-size:28px;
+
+  margin-top:5px;
+
+}
+
+
+/* =========================================================
+   PRODUCT IMAGE
+   ========================================================= */
+
+.productImg img{
+
+  width:100%;
+
+  height:100%;
+
+  object-fit:contain;
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width:900px){
+
+  .hero{
+
+    grid-template-columns:1fr;
+
+    min-height:auto;
+
+    padding:
+      20px
+      20px
+      25px;
+  }
+
+
+  .heroLogo{
+    min-height:330px;
+
+    padding:0;
+
+  }
+
+
+  .heroLogo img{
+
+    width:100%;
+
+    max-width:570px;
+
+    max-height:340px;
+
+  }
+
+
+  .gbPanel{
+
+    padding:
+      10px
+      5px
+      20px;
+
+    text-align:center;
+
+  }
+
+
+  .gbPanel .muted{
+
+    margin-left:auto;
+    margin-right:auto;
+
+  }
+
+}
+
+
+@media(max-width:560px){
+
+  .hero{
+
+    border-radius:22px;
+
+    padding:
+      15px
+      12px
+      22px;
+
+  }
+
+
+  .heroLogo{
+
+    min-height:270px;
+
+  }
+
+
+  .heroLogo img{
+
+    width:100%;
+
+    max-width:480px;
+
+    max-height:290px;
+
+  }
+
+
+  .gbPanel h1{
+
+    font-size:40px;
+
+    letter-spacing:-1.5px;
+
+  }
+
+
+  .brand img{
+
+    width:42px;
+
+    height:35px;
+
+  }
+
+}
+
+
+/* =========================================================
+   PEPMOSA SIDE SHORTCUT RAIL
+   ========================================================= */
+.pepSideRail{
+  position:fixed;
+  right:18px;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:60;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  padding:9px;
+  border:1px solid rgba(221,158,190,.32);
+  border-radius:22px;
+  background:rgba(255,250,253,.78);
+  backdrop-filter:blur(16px);
+  box-shadow:0 18px 45px rgba(100,48,83,.13);
+}
+.pepSideRail a{
+  width:54px;
+  min-height:50px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  text-decoration:none;
+  color:#725866;
+  border-radius:15px;
+  transition:.18s ease;
+}
+.pepSideRail a:hover{
+  color:#c52f80;
+  background:#fff0f7;
+  transform:translateX(-2px);
+}
+.pepSideRail span{
+  font-size:19px;
+  line-height:1;
+}
+.pepSideRail b{
+  font-size:7px;
+  letter-spacing:.06em;
+  font-weight:950;
+}
+@media(max-width:1100px){
+  .pepSideRail{right:10px}
+}
+@media(max-width:760px){
+  .pepSideRail{
+    left:50%;
+    right:auto;
+    top:auto;
+    bottom:12px;
+    transform:translateX(-50%);
+    width:min(calc(100vw - 22px),560px);
+    flex-direction:row;
+    justify-content:space-around;
+    gap:2px;
+    padding:7px;
+    border-radius:18px;
+  }
+  .pepSideRail a{
+    width:auto;
+    flex:1;
+    min-height:48px;
+    border-radius:13px;
+  }
+  .pepSideRail span{font-size:17px}
+  .pepSideRail b{font-size:6.5px}
+}
+@media(max-width:430px){
+  .pepSideRail{overflow-x:auto;justify-content:flex-start}
+  .pepSideRail a{flex:0 0 58px}
+}
+.hero{min-height:360px}
+.heroLogo{min-height:320px}
+.heroLogo img{max-height:330px}
+@media(max-width:900px){.hero{min-height:auto}.heroLogo{min-height:270px}.heroLogo img{max-height:280px}}
+<style id="pep-home-mobile-same-design">
+/* HOME MOBILE — responsive version of the desktop design, not a separate layout */
+@media(max-width:760px){
+  main.wrap{
+    max-width:1120px!important;
+    width:100%!important;
+    padding:18px 14px 96px!important;
+  }
+  main.wrap>.hero{
+    min-height:0!important;
+    margin:0 0 22px!important;
+    padding:20px 18px!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:0!important;
+    border-radius:32px!important;
+  }
+  main.wrap>.hero .heroLogo{
+    min-height:255px!important;
+    height:255px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+  main.wrap>.hero .heroLogo:before{
+    width:235px!important;
+    height:235px!important;
+  }
+  main.wrap>.hero .heroLogo img{
+    width:min(100%,350px)!important;
+    max-width:350px!important;
+    max-height:245px!important;
+  }
+  main.wrap>.hero .gbPanel{
+    padding:12px 6px 4px!important;
+    text-align:center!important;
+  }
+  main.wrap>.hero .gbPanel h1{
+    margin:5px 0 11px!important;
+    font-size:clamp(37px,10vw,52px)!important;
+    line-height:.96!important;
+    letter-spacing:-1.8px!important;
+  }
+  main.wrap>.hero .gbPanel>.muted{
+    max-width:390px!important;
+    margin:0 auto!important;
+    font-size:11px!important;
+    line-height:1.5!important;
+  }
+  #gbStatus{
+    width:100%!important;
+    box-sizing:border-box!important;
+    margin:14px auto 0!important;
+    padding:16px 17px!important;
+    border-radius:20px!important;
+    text-align:left!important;
+  }
+  #gbStatus > b,#gbStatus .gb-name{font-size:23px!important}
+  .pepHomeShopNowWrap{
+    margin-top:14px!important;
+    text-align:center!important;
+  }
+  .pepHomeShopNow{
+    width:100%!important;
+    min-height:48px!important;
+    box-sizing:border-box!important;
+  }
+
+  .pepHomeUpdate{
+    margin:0 0 18px!important;
+    padding:16px 17px!important;
+    border-radius:21px!important;
+  }
+  .pepHomeUpdateIcon{
+    width:40px!important;
+    height:40px!important;
+    flex-basis:40px!important;
+  }
+  .pepHomeUpdateText h2{font-size:16px!important}
+  .pepHomeUpdateText p{font-size:9px!important;line-height:1.4!important}
+  .pepHomeUpdate>a{font-size:7px!important}
+
+  .pepWhyP{
+    margin:0 0 18px!important;
+    padding:18px 17px!important;
+    border-radius:23px!important;
+  }
+  .pepWhyHead h2{font-size:20px!important}
+  .pepWhyGrid{
+    grid-template-columns:repeat(2,1fr)!important;
+    gap:8px!important;
+  }
+  .pepWhyGrid>div{
+    padding:11px 9px!important;
+    border-radius:15px!important;
+  }
+  .pepWhyGrid span{font-size:16px!important}
+  .pepWhyGrid b{font-size:7px!important}
+  .pepWhyGrid small{font-size:6px!important}
+
+  .pepLatestProof{
+    margin:0 0 20px!important;
+    padding:19px 17px!important;
+    border-radius:25px!important;
+  }
+  .pepLatestProofTop{
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:10px!important;
+  }
+  .pepLatestProofTop h2{font-size:20px!important}
+  .pepLatestProofTop p{font-size:9px!important}
+  .pepViewAllProof{
+    align-self:center!important;
+    white-space:nowrap!important;
+  }
+  .pepLatestProofCard{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    height:auto!important;
+    min-height:0!important;
+    border-radius:18px!important;
+    overflow:hidden!important;
+  }
+  .pepLatestProofCard .pepProofImage{
+    width:100%!important;
+    height:245px!important;
+    min-height:0!important;
+    object-fit:contain!important;
+  }
+  .pepLatestProofInfo{padding:17px!important}
+  .pepLatestProofInfo h3{font-size:17px!important}
+  .pepLatestProofInfo p{font-size:9px!important;line-height:1.45!important}
+
+  .pepHomeTrustLite{
+    padding:18px 15px!important;
+    border-radius:23px!important;
+  }
+  .pepHomeTrustLiteHead{
+    display:flex!important;
+    align-items:flex-end!important;
+    justify-content:space-between!important;
+    margin-bottom:11px!important;
+  }
+  .pepHomeTrustLiteHead h2{font-size:20px!important}
+  .pepHomeTrustLiteHead p{font-size:8px!important}
+  .pepHomeTrustLiteGrid{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+  .pepHomeTrustLiteCard{
+    min-height:72px!important;
+    padding:10px 6px!important;
+    flex-direction:column!important;
+    text-align:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    border-radius:15px!important;
+  }
+  .pepHomeTrustLiteIcon{
+    width:31px!important;
+    height:31px!important;
+    flex-basis:31px!important;
+  }
+  .pepHomeTrustLiteCard strong{font-size:7px!important}
+  .pepHomeTrustLiteCard span{
+    display:block!important;
+    font-size:6px!important;
+    line-height:1.25!important;
+  }
+
+  .pepHomeCommunityCTA{
+    margin:20px 0 10px!important;
+    padding:18px 17px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    border-radius:23px!important;
+    gap:14px!important;
+  }
+  .pepHomeCommunityCTA h2{font-size:20px!important}
+  .pepHomeCommunityCTA p{font-size:9px!important}
+  .pepHomeCommunityCTA>a{
+    margin-top:0!important;
+    white-space:nowrap!important;
+    font-size:8px!important;
+  }
+}
+@media(max-width:430px){
+  main.wrap{padding:14px 12px 96px!important}
+  main.wrap>.hero{
+    padding:18px 15px!important;
+    border-radius:29px!important;
+  }
+  main.wrap>.hero .heroLogo{
+    min-height:225px!important;
+    height:225px!important;
+  }
+  main.wrap>.hero .heroLogo:before{
+    width:205px!important;
+    height:205px!important;
+  }
+  main.wrap>.hero .heroLogo img{max-height:220px!important}
+  main.wrap>.hero .gbPanel h1{font-size:38px!important}
+  .pepLatestProofTop{
+    align-items:flex-start!important;
+  }
+  .pepLatestProofTop h2{font-size:19px!important}
+  .pepViewAllProof{
+    font-size:7px!important;
+    padding:8px 10px!important;
+  }
+  .pepLatestProofCard .pepProofImage{height:225px!important}
+  .pepHomeTrustLiteGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .pepHomeTrustLiteCard{min-height:66px!important}
+  .pepHomeCommunityCTA{display:block!important}
+  .pepHomeCommunityCTA>a{
+    display:inline-block!important;
+    margin-top:10px!important;
+  }
+}
+</style></style>
+
+<style id="pep-inline-picker-style">
+.pepStoreCard{padding:0!important;overflow:hidden;border-radius:24px!important}
+.pepStoreCard .productImg{height:220px!important;margin:0!important;border-radius:0!important;border:0!important;background:#fff7fb!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}
+.pepStoreCard .productImg img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;display:block!important}
+.pepStoreBody{padding:16px}
+.pepStoreBottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:13px;border-top:1px dashed #ead8e3}
+.pepStarting small{display:block;font-size:10px;color:#8d7580}
+.pepStarting b{display:block;font-size:15px;color:#3a2933;margin-top:3px}
+.pepSelectVariant{white-space:nowrap}
+.pepProductPicker{position:fixed;inset:0;z-index:100500;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(48,25,40,.64);backdrop-filter:blur(8px)}
+.pepProductPicker.show{display:flex}
+.pepPickerBox{position:relative;width:min(680px,100%);max-height:92vh;overflow:auto;border-radius:28px;background:linear-gradient(145deg,#fff,#fff9fc 58%,#f8efff);border:1px solid #efd5e4;box-shadow:0 30px 100px rgba(55,18,43,.34);padding:28px;box-sizing:border-box}
+.pepPickerClose{position:absolute;right:16px;top:14px;width:38px;height:38px;border-radius:50%;border:1px solid #edd3df;background:#fff;font-size:24px;cursor:pointer;z-index:2}
+.pepPickerHead{display:grid;grid-template-columns:145px 1fr;gap:20px;align-items:center;padding-right:36px}
+.pepPickerImage{height:145px;border-radius:20px;overflow:hidden;background:#fff1f7}
+.pepPickerImage img{width:100%;height:100%;object-fit:contain}
+.pepPickerHead h2{margin:5px 0 8px;font-size:29px}
+.pepPickerLabel{margin:23px 0 10px;font-size:10px;letter-spacing:.12em;font-weight:950;color:#a04b78}
+.pepPickerLabel.small{margin:0 0 4px}
+.pepVariantChoices{display:grid;gap:9px}
+.pepVariantChoice{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;border:1px solid #ead8e3;background:#fff;border-radius:16px;padding:14px 16px;cursor:pointer;color:#35252e}
+.pepVariantChoice span{display:flex;flex-direction:column;gap:3px}
+.pepVariantChoice small{font-size:10px;color:#8b7780}
+.pepVariantChoice.selected{border-color:#d9509b;background:#fff1f7;box-shadow:0 0 0 3px rgba(217,80,155,.08)}
+.pepQuantityRow{margin-top:16px;padding:16px;border-radius:18px;background:#fff;border:1px solid #eedce6;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.pepStepper{display:grid;grid-template-columns:40px 70px 40px}
+.pepStepper button,.pepStepper input{height:42px;border:1px solid #ead5e0;text-align:center}
+.pepStepper button{background:#fff7fb;color:#b3347a;font-size:22px;font-weight:900;cursor:pointer}
+.pepPickerTotal{display:flex;justify-content:space-between;margin-top:16px;padding:16px 2px;border-top:1px solid #efdee7}
+.pepPickerTotal b{font-size:22px;color:#c52e7d}
+.pepPickerAdd{width:100%;min-height:52px;margin-top:8px}
+@media(max-width:620px){.pepProductPicker{align-items:flex-end;padding:8px}.pepPickerBox{padding:22px 18px 20px;border-radius:26px 26px 18px 18px;max-height:94vh}.pepPickerHead{grid-template-columns:95px 1fr;gap:13px}.pepPickerImage{height:95px}.pepPickerHead h2{font-size:23px}.pepQuantityRow{align-items:flex-start;flex-direction:column}.pepStepper{width:100%;grid-template-columns:1fr 72px 1fr}.pepStepper input{width:72px}.pepStoreCard .productImg{height:155px!important}}
+</style>
+
+<style id="pep-mobile-product-polish">
+@media(max-width:620px){
+  #productGrid{gap:14px!important}
+  #productGrid .pepStoreCard{border-radius:20px!important}
+  #productGrid .pepStoreCard .productImg{height:145px!important}
+  #productGrid .pepStoreBody{padding:13px 14px 14px!important}
+  #productGrid .pepStoreBody h3{font-size:20px!important;margin:0 0 6px!important;letter-spacing:.02em}
+  #productGrid .pepStoreBody>.muted{font-size:14px!important;line-height:1.42!important;display:-webkit-box!important;-webkit-line-clamp:3!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
+  #productGrid .pepStoreBottom{margin-top:11px!important;padding-top:11px!important;gap:10px!important}
+  #productGrid .pepStarting small{font-size:9px!important}
+  #productGrid .pepStarting b{font-size:18px!important}
+  #productGrid .pepStarting span{display:block!important;font-size:12px!important;margin-top:2px!important}
+  #productGrid .pepSelectVariant{min-height:46px!important;padding:0 15px!important;font-size:13px!important;letter-spacing:.04em!important;border-radius:14px!important}
+}
+</style>
+<style id="pep-no-crop-product-images">
+/* Full-width product photos: no side gutters */
+#productGrid .pepStoreCard .productImg{padding:0!important;overflow:hidden!important}
+#productGrid .pepStoreCard .productImg img{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center!important;display:block!important;margin:0!important}
+#productGrid .pepStoreCard .productImg:after{display:none!important}
+@media(max-width:620px){#productGrid .pepStoreCard .productImg{height:220px!important}}
+</style>
+
+
+<style id="pep-customer-extras">
+/* Customer-facing visual additions only */
+.pepAnnouncement{min-height:38px;display:flex;align-items:center;justify-content:center;gap:9px;padding:8px 16px;background:linear-gradient(90deg,#fff0f6,#fce8f0,#fff4f8);border-bottom:1px solid rgba(225,158,187,.35);color:#805967;font-size:11px;letter-spacing:.02em;text-align:center}.pepAnnouncement b{color:#c96b91;letter-spacing:.12em;font-size:10px}.pepAnnouncement em{font-style:normal;color:#e3a0ba}.pepHeroActions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}.pepHeroBtn{min-height:46px;padding:0 18px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;gap:10px;font-size:11px;font-weight:900;letter-spacing:.07em;transition:.2s ease}.pepHeroPrimary{background:linear-gradient(135deg,#e997b6,#d96f99);color:#fff;box-shadow:0 12px 25px rgba(217,111,153,.20)}.pepHeroPrimary:hover{transform:translateY(-2px);box-shadow:0 17px 30px rgba(217,111,153,.28)}.pepHeroSecondary{background:rgba(255,255,255,.72);border:1px solid #ecd3df;color:#684b57}.pepHeroSecondary:hover{background:#fff5f8;border-color:#e4b9ca}.pepHow{position:relative;margin:32px 0 28px;padding:30px;border-radius:30px;border:1px solid rgba(237,215,225,.95);background:linear-gradient(135deg,rgba(255,255,255,.86),rgba(255,242,247,.84));box-shadow:0 18px 50px rgba(171,101,132,.07);overflow:hidden}.pepHow:after{content:"✿";position:absolute;right:24px;top:-16px;font-family:Georgia,serif;font-size:110px;color:rgba(222,128,166,.07);pointer-events:none}.pepHowHead{text-align:center;position:relative;z-index:1}.pepHowHead h2{margin:6px 0 7px;color:#3b2b34;font-size:30px;letter-spacing:-.8px}.pepHowHead h2 span{font-family:Georgia,serif;color:#e4a0ba;font-size:.7em}.pepHowHead .muted{margin:0}.pepHowGrid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:23px}.pepHowCard{position:relative;text-align:center;padding:25px 18px 22px;border-radius:22px;border:1px solid #f0dce5;background:rgba(255,255,255,.88);box-shadow:0 10px 26px rgba(171,101,132,.055)}.pepStep{position:absolute;top:12px;left:14px;color:#e6b1c5;font-size:10px;font-weight:950;letter-spacing:.08em}.pepHowIcon{width:52px;height:52px;margin:3px auto 12px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#fff0f6,#ffe3ed);font-size:23px}.pepHowCard h3{margin:0;color:#4a303c;font-size:13px;letter-spacing:.08em}.pepHowCard p{margin:8px auto 0;max-width:240px;color:#89747e;font-size:11px;line-height:1.55}.pepTools{position:relative}.pepTools:before{content:"✿";position:absolute;left:-18px;top:16px;color:rgba(217,91,143,.08);font-family:Georgia,serif;font-size:64px;pointer-events:none}@media(max-width:760px){.pepAnnouncement{font-size:10px;gap:6px;min-height:34px}.pepAnnouncement b{font-size:9px}.pepHeroActions{justify-content:center}.pepHeroBtn{flex:1;min-width:145px}.pepHow{margin:22px 0;padding:24px 14px;border-radius:24px}.pepHowHead h2{font-size:25px}.pepHowGrid{grid-template-columns:1fr;gap:10px;margin-top:18px}.pepHowCard{padding:20px 16px}.pepHowIcon{margin-top:4px}}
+</style>
+
+<style id="pep-search-and-badges">
+.pepSearchWrap{position:relative;width:min(100%,420px)}
+.pepSearchWrap .search{width:100%!important;box-sizing:border-box!important;padding-left:42px!important;padding-right:42px!important}
+.pepSearchIcon{position:absolute;left:15px;top:50%;transform:translateY(-52%);z-index:2;font-size:25px;line-height:1;color:#b16d8d;pointer-events:none}
+.pepSearchClear{position:absolute;right:9px;top:50%;transform:translateY(-50%);width:30px;height:30px;border:0;border-radius:50%;background:#f7e8ef;color:#b33177;font-size:22px;line-height:1;display:none;place-items:center;cursor:pointer}
+.pepSearchClear.show{display:grid}
+#productGrid .productImg{position:relative!important}
+.pepVariantBadge{position:absolute!important;top:12px!important;left:12px!important;z-index:5!important;padding:6px 9px!important;border-radius:999px!important;background:rgba(255,255,255,.9)!important;border:1px solid rgba(222,107,160,.24)!important;color:#b73c7d!important;font-size:9px!important;font-weight:950!important;letter-spacing:.08em!important;box-shadow:0 6px 16px rgba(100,50,75,.08)!important}
+.pepCartShopBtn{margin-top:18px!important}
+@media(max-width:900px){.pepSearchWrap{width:100%!important}.pepSearchWrap .search{max-width:none!important}}
+</style>
+<style id="pep-products-heading-center">
+@media(max-width:900px){
+  #products .sectionHead{display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center!important;gap:14px!important}
+  #products .sectionHead>div{width:100%!important;text-align:center!important}
+  #products .sectionHead .eyebrow,#products .sectionHead h2{text-align:center!important}
+  #products .sectionHead .search{width:100%!important;max-width:none!important}
+}
+</style>
+<style id="pep-product-boutique-refresh">
+/* PRODUCT STOREFRONT POLISH — VISUAL ONLY */
+#products{margin-top:34px!important}
+#products .sectionHead{align-items:end!important;margin-bottom:20px!important}
+#productGrid{gap:18px!important}
+#productGrid .pepStoreCard{background:rgba(255,255,255,.94)!important;border:1px solid #efdfe6!important;border-radius:26px!important;box-shadow:0 14px 36px rgba(160,95,125,.075)!important;overflow:hidden!important;transition:transform .22s ease,box-shadow .22s ease!important}
+#productGrid .pepStoreCard:hover{transform:translateY(-5px)!important;box-shadow:0 24px 52px rgba(160,95,125,.14)!important}
+#productGrid .pepStoreCard .productImg{height:245px!important;padding:8px!important;box-sizing:border-box!important;background:radial-gradient(circle at 20% 15%,rgba(255,255,255,.98),transparent 30%),radial-gradient(circle at 85% 88%,rgba(246,190,213,.20),transparent 36%),linear-gradient(145deg,#fffafb,#fff1f6)!important;position:relative!important}
+#productGrid .pepStoreCard .productImg:after{content:"✿";position:absolute;right:14px;bottom:6px;font-family:Georgia,serif;font-size:38px;color:rgba(215,100,150,.09);pointer-events:none}
+#productGrid .pepStoreCard .productImg img{max-width:98%!important;max-height:98%!important;margin:auto!important;filter:drop-shadow(0 10px 13px rgba(98,48,70,.10))!important;position:relative;z-index:1}
+#productGrid .pepStoreBody{padding:18px 19px 19px!important}
+#productGrid .pepStoreBody h3{font-size:21px!important;letter-spacing:-.25px!important;color:#392b33!important;margin:0 0 7px!important}
+#productGrid .pepStoreBody>.muted{color:#907983!important;line-height:1.5!important;min-height:42px!important}
+#productGrid .pepStoreBottom{border-top:1px solid #f1e1e7!important;margin-top:16px!important;padding-top:15px!important}
+#productGrid .pepStarting small{text-transform:uppercase;letter-spacing:.1em;color:#b38b9a!important;font-size:9px!important}
+#productGrid .pepStarting b{font-size:20px!important;color:#ce6f97!important}
+#productGrid .pepSelectVariant{border-radius:14px!important;min-height:46px!important;padding:0 17px!important;background:linear-gradient(135deg,#ef9fbc,#dc739c)!important;color:#fff!important;border:0!important;box-shadow:0 8px 18px rgba(217,95,145,.18)!important}
+#productGrid .pepSelectVariant:hover{transform:translateY(-1px)!important;box-shadow:0 12px 24px rgba(217,95,145,.25)!important}
+@media(max-width:620px){#productGrid{gap:14px!important}#productGrid .pepStoreCard{border-radius:22px!important}#productGrid .pepStoreCard:hover{transform:none!important}#productGrid .pepStoreCard .productImg{height:205px!important;padding:6px!important}#productGrid .pepStoreBody{padding:15px 16px 16px!important}#productGrid .pepStoreBody h3{font-size:20px!important}#productGrid .pepStoreBottom{margin-top:12px!important;padding-top:12px!important}#productGrid .pepStarting b{font-size:18px!important}}
+</style>
+
+<style id="pep-search-click-fix">
+/* Keep search + product actions above decorative/legacy layers. */
+#products .pepSearchWrap,
+#products .pepSearchWrap .search,
+#products .pepSearchWrap .pepSearchClear,
+#productGrid .pepStoreBody,
+#productGrid .pepStoreBottom,
+#productGrid .pepSelectVariant{position:relative!important;z-index:30!important;pointer-events:auto!important}
+#productGrid .pepSelectVariant{cursor:pointer!important}
+</style>
+
+<style id="pep-hide-legacy-soldout-section">
+  #pepSoldOutSection{display:none!important}
+</style>
+<script id="pep-hide-duplicate-soldout-by-heading">
+(function(){
+  function hideDuplicateSoldOut(){
+    document.querySelectorAll('h1,h2,h3,h4').forEach(function(h){
+      var t=(h.textContent||'').trim().toLowerCase();
+      if(t!=='sold out products') return;
+      var section=h.closest('section');
+      if(section && section.id!=='productGrid'){
+        section.style.setProperty('display','none','important');
+        return;
+      }
+      var parent=h.parentElement;
+      if(parent && !parent.closest('#productGrid')){
+        parent.style.setProperty('display','none','important');
+      }
+    });
+  }
+  function startSoldOutObserver(){
+    if(!document.body) return;
+    new MutationObserver(hideDuplicateSoldOut).observe(document.body,{childList:true,subtree:true});
+  }
+  hideDuplicateSoldOut();
+  if(document.body) startSoldOutObserver();
+  else document.addEventListener('DOMContentLoaded',startSoldOutObserver,{once:true});
+})();
+</script>
+<style id="gb-deadline-live-style">
+.gb-remaining{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 0 6px;padding:10px 16px;border-radius:14px;background:linear-gradient(135deg,#fff 0%,#ffe8f3 45%,#ffd3e7 100%);border:2px solid #e83a91;color:#b51668;font-size:11px;font-weight:1000;letter-spacing:.06em;box-shadow:0 8px 22px rgba(216,44,137,.18),inset 0 1px rgba(255,255,255,.95);vertical-align:middle;position:relative;overflow:hidden}.gb-remaining strong{font-size:17px;line-height:1;color:#e11d83}.gb-remaining-final{animation:gbDeadlinePulse 2.4s ease-in-out infinite}.gb-clock{font-size:18px;line-height:1;color:#e11d83}
+.gb-remaining::before{content:"⏰";font-size:14px;line-height:1}
+.gb-remaining::after{content:"";width:6px;height:6px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.16);animation:gbDotPulse 1.2s ease-in-out infinite}
+.gb-remaining.closed{background:#eee9ed;color:#786b72;border-color:#ddd3d9;box-shadow:none;animation:none}
+.gb-remaining.closed::before{content:"🔒"}
+.gb-remaining.closed::after{display:none}
+@keyframes gbDeadlinePulse{0%,100%{transform:translateY(0);box-shadow:0 7px 18px rgba(199,42,150,.22),inset 0 1px rgba(255,255,255,.45)}50%{transform:translateY(-2px);box-shadow:0 10px 24px rgba(199,42,150,.30),inset 0 1px rgba(255,255,255,.55)}}
+@keyframes gbDotPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.65}}
+</style><style id="gb-deadline-redesign">
+.gb-remaining.gb-remaining-final{display:inline-flex;align-items:center;gap:11px;margin:0 0 0 8px;padding:8px 15px 8px 10px;border-radius:18px;background:linear-gradient(135deg,#fff 0%,#fff3f8 48%,#ffe2ef 100%);border:1px solid rgba(218,48,132,.28);box-shadow:0 7px 20px rgba(204,42,126,.12),inset 0 1px 0 #fff;color:#8f235b;vertical-align:middle;animation:none}
+.gb-remaining-final .gb-clock{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:11px;background:linear-gradient(135deg,#e93a93,#b92883);color:#fff;font-size:17px;box-shadow:0 5px 12px rgba(202,43,132,.22)}
+.gb-remaining-copy{display:flex;align-items:baseline;gap:5px;line-height:1;white-space:nowrap}
+.gb-remaining-copy small{display:block;align-self:center;font-size:8px;font-weight:900;letter-spacing:.09em;color:#a45b7d;margin-right:2px}
+.gb-remaining-copy strong{font-size:18px;font-weight:1000;color:#d12682;letter-spacing:-.02em}
+.gb-remaining-copy em{font-style:normal;font-size:8px;font-weight:900;letter-spacing:.07em;color:#a45b7d}
+@media(max-width:700px){.gb-remaining.gb-remaining-final{margin:8px 0 0;padding:8px 12px}.gb-remaining-copy{gap:4px}.gb-remaining-copy small{font-size:7px}.gb-remaining-copy strong{font-size:16px}.gb-remaining-copy em{font-size:7px}}
+<style id="pep-home-trust-lite">
+.pepHomeTrustLite{margin:24px 0 10px;padding:22px;border:1px solid #efdbe5;border-radius:26px;background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(255,244,249,.9));box-shadow:0 12px 32px rgba(151,76,112,.06)}
+.pepHomeTrustLiteHead{text-align:left;margin-bottom:14px}.pepHomeTrustLiteHead h2{margin:4px 0;font-size:23px;color:#392b33}.pepHomeTrustLiteHead p{margin:0;max-width:650px}
+.pepHomeTrustLiteGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pepHomeTrustLiteCard{display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit;padding:13px 14px;border:1px solid #efdae5;border-radius:17px;background:rgba(255,255,255,.82);transition:.2s ease}
+.pepHomeTrustLiteCard:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(151,76,112,.08)}
+.pepHomeTrustLiteIcon{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,#ffeaf3,#f5e9ff);font-size:17px}
+.pepHomeTrustLiteCard strong{display:block;font-size:12px;color:#3d2c35}.pepHomeTrustLiteCard span{display:block;margin-top:3px;font-size:10px;line-height:1.35;color:#88747e}
+@media(max-width:760px){.pepHomeTrustLite{padding:18px 12px;border-radius:21px}.pepHomeTrustLiteHead h2{font-size:20px}.pepHomeTrustLiteGrid{grid-template-columns:1fr}.pepHomeTrustLiteCard{padding:12px}}
+</style>
+<style id="pepmosa-clean-mobile-v2">
+/* CLEAN HOME LAYOUT — keeps existing functionality, only visual spacing */
+@media(max-width:760px){
+  body{padding-bottom:92px!important}
+  .pepAnnouncement{display:none!important}
+
+  header{
+    min-height:58px!important;
+    padding:8px 12px!important;
+    gap:8px!important;
+  }
+  header .brand{
+    flex:1 1 auto!important;
+    min-width:0!important;
+  }
+  header .brand span{font-size:14px!important}
+  header .brand img{width:40px!important;height:34px!important}
+  header .nav{display:none!important}
+  header .cart{
+    flex:0 0 auto!important;
+    min-height:38px!important;
+    padding:0 11px!important;
+    border-radius:12px!important;
+    font-size:10px!important;
+  }
+
+  main.wrap{padding-left:10px!important;padding-right:10px!important}
+  .hero{
+    display:block!important;
+    margin:10px 0 16px!important;
+    padding:10px 10px 18px!important;
+    border-radius:22px!important;
+  }
+  .heroLogo{
+    min-height:190px!important;
+    height:190px!important;
+    padding:0!important;
+  }
+  .heroLogo img{
+    width:92%!important;
+    max-width:390px!important;
+    max-height:205px!important;
+  }
+  .gbPanel{
+    padding:5px 5px 0!important;
+    text-align:center!important;
+  }
+  .gbPanel .eyebrow{font-size:9px!important}
+  .gbPanel h1{
+    margin:7px 0 9px!important;
+    font-size:29px!important;
+    line-height:1.02!important;
+    letter-spacing:-1.1px!important;
+  }
+  .gbPanel .muted{
+    font-size:12px!important;
+    line-height:1.45!important;
+    max-width:310px!important;
+  }
+
+  #gbStatus{
+    margin-top:13px!important;
+    padding:16px 15px 15px 18px!important;
+    border-radius:18px!important;
+    min-height:0!important;
+    text-align:left!important;
+  }
+  #gbStatus > b,#gbStatus .gb-name{
+    font-size:22px!important;
+    line-height:1.08!important;
+    margin:0 28px 9px 0!important;
+    letter-spacing:-.5px!important;
+  }
+  #gbStatus > b::before,#gbStatus .gb-name::before{
+    font-size:7px!important;
+    letter-spacing:1.4px!important;
+    margin-bottom:5px!important;
+  }
+  #gbStatus .status{
+    min-height:25px!important;
+    padding:6px 10px!important;
+    font-size:8px!important;
+  }
+  #gbStatus::after{right:12px!important;top:9px!important;font-size:24px!important}
+
+  .pepHomeTrustLite{
+    margin:0 0 8px!important;
+    padding:15px 11px!important;
+    border-radius:19px!important;
+    box-shadow:0 8px 22px rgba(151,76,112,.05)!important;
+  }
+  .pepHomeTrustLiteHead{margin-bottom:10px!important}
+  .pepHomeTrustLiteHead h2{
+    margin:3px 0 4px!important;
+    font-size:17px!important;
+  }
+  .pepHomeTrustLiteHead p{font-size:10px!important;line-height:1.35!important}
+  .pepHomeTrustLiteGrid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:7px!important;
+  }
+  .pepHomeTrustLiteCard{
+    min-width:0!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    text-align:center!important;
+    gap:5px!important;
+    padding:10px 5px!important;
+    border-radius:14px!important;
+  }
+  .pepHomeTrustLiteIcon{
+    width:30px!important;height:30px!important;flex-basis:30px!important;
+    border-radius:9px!important;font-size:14px!important;
+  }
+  .pepHomeTrustLiteCard strong{font-size:8px!important;line-height:1.15!important}
+  .pepHomeTrustLiteCard span{display:none!important}
+
+  .pepSideRail{
+    left:50%!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:9px!important;
+    transform:translateX(-50%)!important;
+    width:calc(100vw - 20px)!important;
+    max-width:430px!important;
+    box-sizing:border-box!important;
+    display:grid!important;
+    grid-template-columns:repeat(7,minmax(0,1fr))!important;
+    gap:3px!important;
+    padding:5px!important;
+    border-radius:16px!important;
+    overflow:visible!important;
+  }
+  .pepSideRail a{
+    width:auto!important;
+    min-width:0!important;
+    min-height:45px!important;
+    flex:none!important;
+    border-radius:11px!important;
+    gap:2px!important;
+  }
+  .pepSideRail span{font-size:15px!important}
+  .pepSideRail b{
+    font-size:5.5px!important;
+    letter-spacing:.02em!important;
+    white-space:nowrap!important;
+  }
+}
+@media(max-width:390px){
+  .pepSideRail a{min-height:42px!important}
+  .pepSideRail span{font-size:14px!important}
+  .pepSideRail b{font-size:5px!important}
+  .heroLogo{height:175px!important;min-height:175px!important}
+  .heroLogo img{max-height:190px!important}
+}
+</style>
+
+
+<style id="pep-home-final-clean">
+/* HOME FINAL CLEANUP */
+#pepFeeCard{display:none!important}
+#pepKitCompletionCard{display:none!important}
+
+main.wrap{
+  max-width:1180px!important;
+  padding-left:22px!important;
+  padding-right:22px!important;
+}
+main.wrap>.hero{
+  width:100%!important;
+  max-width:none!important;
+  min-height:360px!important;
+  margin:0 0 24px!important;
+  padding:24px 30px!important;
+  grid-template-columns:minmax(360px,44%) minmax(0,56%)!important;
+  gap:10px!important;
+}
+main.wrap>.hero .heroLogo{
+  min-height:315px!important;
+  padding:0!important;
+}
+main.wrap>.hero .heroLogo img{
+  max-width:510px!important;
+  max-height:325px!important;
+}
+main.wrap>.hero .gbPanel{
+  padding:12px 18px 12px 20px!important;
+}
+main.wrap>.hero .gbPanel h1{
+  font-size:clamp(42px,4.3vw,60px)!important;
+  margin:7px 0 11px!important;
+}
+main.wrap>.hero .gbPanel .muted{
+  font-size:13px!important;
+  line-height:1.5!important;
+}
+#gbStatus{
+  margin-top:18px!important;
+  padding:19px 22px 18px 24px!important;
+  border-radius:21px!important;
+  min-height:74px!important;
+}
+#gbStatus > b,#gbStatus .gb-name{
+  font-size:clamp(23px,2.7vw,32px)!important;
+  margin-bottom:8px!important;
+}
+.pepHomeTrustLite{
+  margin:0!important;
+  padding:18px 20px!important;
+  border-radius:21px!important;
+  box-shadow:0 9px 25px rgba(151,76,112,.055)!important;
+}
+.pepHomeTrustLiteHead{margin-bottom:12px!important}
+.pepHomeTrustLiteHead h2{font-size:20px!important}
+.pepHomeTrustLiteHead p{font-size:11px!important}
+.pepHomeTrustLiteGrid{gap:9px!important}
+.pepHomeTrustLiteCard{padding:11px 13px!important;border-radius:15px!important}
+.pepHomeTrustLiteIcon{width:34px!important;height:34px!important;flex-basis:34px!important}
+.pepSideRail{right:12px!important}
+@media(max-width:900px){
+  main.wrap>.hero{
+    grid-template-columns:1fr!important;
+    min-height:auto!important;
+  }
+  main.wrap>.hero .heroLogo{
+    min-height:245px!important;
+    height:245px!important;
+  }
+  main.wrap>.hero .heroLogo img{max-height:255px!important}
+  main.wrap>.hero .gbPanel{padding:4px 8px 8px!important}
+}
+@media(max-width:760px){
+  main.wrap{padding:10px 10px 92px!important}
+  main.wrap>.hero{
+    margin:0 0 14px!important;
+    padding:10px 10px 17px!important;
+    border-radius:21px!important;
+  }
+  main.wrap>.hero .heroLogo{
+    min-height:185px!important;
+    height:185px!important;
+  }
+  main.wrap>.hero .heroLogo img{max-height:195px!important;max-width:370px!important}
+  main.wrap>.hero .gbPanel h1{
+    font-size:30px!important;
+    line-height:1.02!important;
+  }
+  main.wrap>.hero .gbPanel .muted{
+    font-size:11px!important;
+    max-width:330px!important;
+  }
+  #gbStatus{
+    margin-top:12px!important;
+    padding:14px 14px 13px 17px!important;
+  }
+  #gbStatus > b,#gbStatus .gb-name{font-size:21px!important}
+  .pepHomeTrustLite{padding:14px 10px!important}
+}
+</style>
+<style id="pep-home-shop-now">
+.pepHomeShopNowWrap{margin-top:14px}
+.pepHomeShopNow{display:inline-flex;align-items:center;justify-content:center;gap:14px;min-width:150px;padding:13px 17px 13px 20px;border-radius:14px;text-decoration:none;background:linear-gradient(135deg,#e52b8b,#c13ab0);color:#fff;font-size:11px;font-weight:950;letter-spacing:.08em;box-shadow:0 10px 24px rgba(211,43,137,.20);transition:transform .18s ease,box-shadow .18s ease}
+.pepHomeShopNow b{font-size:17px;line-height:1;font-weight:700}.pepHomeShopNow:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(211,43,137,.25)}
+@media(max-width:900px){.pepHomeShopNowWrap{text-align:center}}
+@media(max-width:760px){.pepHomeShopNow{width:100%;box-sizing:border-box;min-height:44px;padding:11px 16px}.pepHomeShopNowWrap{margin-top:11px}}
+</style>
+
+<style id="pep-home-girly-redesign">
+/* PEPMOSA GIRLY HOME — visual only */
+main.wrap{max-width:1160px!important;padding:26px 24px 55px!important}
+
+main.wrap>.hero{
+  min-height:410px!important;
+  margin:0 0 24px!important;
+  padding:24px 30px!important;
+  border-radius:34px!important;
+  grid-template-columns:minmax(390px,46%) minmax(0,54%)!important;
+  background:
+    radial-gradient(circle at 12% 20%,rgba(255,255,255,.98),transparent 26%),
+    radial-gradient(circle at 92% 12%,rgba(255,158,205,.20),transparent 25%),
+    linear-gradient(135deg,#fff,#fff0f7 58%,#f8efff)!important;
+  box-shadow:0 24px 70px rgba(170,70,130,.12)!important;
+}
+main.wrap>.hero:after{
+  content:"♡  CURATED WITH LOVE";
+  position:absolute;left:28px;top:20px;
+  padding:7px 11px;border:1px solid #f0bfd6;border-radius:999px;
+  background:rgba(255,255,255,.72);color:#c44b88;
+  font-size:8px;font-weight:950;letter-spacing:.12em;
+}
+main.wrap>.hero .heroLogo{
+  min-height:350px!important;
+  position:relative;
+}
+main.wrap>.hero .heroLogo:before{
+  content:"";
+  position:absolute;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,#fff 0%,#ffe9f3 57%,rgba(255,214,232,0) 72%);
+  box-shadow:0 0 0 1px rgba(234,139,183,.18),0 20px 60px rgba(220,77,147,.10);
+}
+main.wrap>.hero .heroLogo img{
+  position:relative;z-index:1;
+  max-width:500px!important;max-height:330px!important;
+  filter:drop-shadow(0 16px 18px rgba(80,30,60,.13));
+}
+main.wrap>.hero .gbPanel{padding:28px 24px 20px 16px!important}
+main.wrap>.hero .gbPanel h1{
+  font-size:clamp(42px,4.6vw,64px)!important;
+  line-height:.96!important;
+  letter-spacing:-.045em!important;
+  margin:8px 0 12px!important;
+}
+main.wrap>.hero .gbPanel h1 span{
+  display:block;
+  background:linear-gradient(90deg,#d82e8c,#bd57bf);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+main.wrap>.hero .gbPanel>.muted{max-width:460px;font-size:13px!important}
+#gbStatus{
+  margin-top:18px!important;padding:18px 20px!important;
+  border-radius:22px!important;
+  background:rgba(255,255,255,.78)!important;
+  border:1px solid #f0cfdf!important;
+  box-shadow:0 12px 30px rgba(150,70,115,.07)!important;
+}
+.pepHomeShopNowWrap{margin-top:13px!important}
+.pepHomeShopNow{
+  min-width:168px!important;
+  border-radius:999px!important;
+  padding:13px 18px 13px 22px!important;
+  box-shadow:0 12px 25px rgba(211,43,137,.24)!important;
+}
+.pepHomeShopNow b{font-size:19px!important}
+
+.pepLatestProof{
+  margin:0 0 24px;padding:23px 24px;
+  border-radius:27px;border:1px solid #efd8e5;
+  background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(255,244,249,.92));
+  box-shadow:0 14px 35px rgba(151,76,112,.06);
+}
+.pepLatestProofTop{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:15px}
+.pepLatestProofTop h2{margin:4px 0 4px;font-size:25px;letter-spacing:-.03em;color:#3d2b35}
+.pepLatestProofTop p{margin:0;color:#88747e;font-size:11px}
+.pepViewAllProof{
+  flex:0 0 auto;text-decoration:none;padding:10px 13px;border-radius:999px;
+  background:#fff;border:1px solid #efd1e0;color:#a52c70;
+  font-size:8px;font-weight:950;letter-spacing:.08em;
+}
+.pepViewAllProof span{font-size:13px;margin-left:4px}
+.pepLatestProofCard{
+  min-height:250px;border-radius:20px;overflow:hidden;
+  border:1px solid #f0d8e5;background:#fff;
+  display:flex;align-items:stretch;
+}
+.pepLatestProofCard .pepProofImage{
+  width:43%;min-height:250px;object-fit:cover;background:#faf5f8;cursor:zoom-in;
+}
+.pepLatestProofInfo{padding:24px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.pepLatestProofBadge{
+  width:max-content;padding:6px 9px;border-radius:999px;background:#ffe8f3;color:#bd337a;
+  font-size:7px;font-weight:950;letter-spacing:.12em;
+}
+.pepLatestProofInfo h3{margin:12px 0 7px;font-size:20px;color:#3b2b34;line-height:1.2}
+.pepLatestProofInfo p{margin:0;color:#756772;font-size:12px;line-height:1.55}
+.pepLatestProofDate{margin-top:13px;color:#a18490;font-size:9px;font-weight:800}
+.pepProofLoading{display:grid;place-items:center;width:100%;min-height:180px;color:#a18490;font-size:11px}
+.pepProofEmpty{padding:35px;text-align:center;width:100%;color:#88747e;font-size:11px}
+.pepProofOpen{margin-top:17px;display:inline-flex;width:max-content;text-decoration:none;padding:10px 13px;border-radius:12px;background:#fff0f7;color:#b62f76;font-size:9px;font-weight:950}
+.pepHomeTrustLite{margin:0!important}
+
+@media(max-width:900px){
+  main.wrap>.hero{grid-template-columns:1fr!important;padding:22px!important}
+  main.wrap>.hero .heroLogo{min-height:250px!important;height:250px!important}
+  main.wrap>.hero .heroLogo:before{width:245px;height:245px}
+  main.wrap>.hero .heroLogo img{max-height:260px!important}
+  main.wrap>.hero .gbPanel{padding:4px 8px 10px!important}
+  main.wrap>.hero .gbPanel h1{text-align:center}
+  main.wrap>.hero .gbPanel>.muted{text-align:center;margin-left:auto;margin-right:auto}
+  .pepLatestProofTop{align-items:center}
+}
+@media(max-width:760px){
+  main.wrap{padding:12px 10px 100px!important}
+  main.wrap>.hero{
+    min-height:0!important;margin-bottom:14px!important;
+    padding:15px 12px 17px!important;border-radius:24px!important;
+  }
+  main.wrap>.hero:after{left:14px;top:12px;font-size:6px;padding:6px 8px}
+  main.wrap>.hero .heroLogo{min-height:205px!important;height:205px!important}
+  main.wrap>.hero .heroLogo:before{width:190px;height:190px}
+  main.wrap>.hero .heroLogo img{max-height:205px!important;max-width:320px!important}
+  main.wrap>.hero .gbPanel h1{font-size:34px!important;margin-top:5px!important}
+  main.wrap>.hero .gbPanel>.muted{font-size:11px!important}
+  #gbStatus{margin-top:12px!important;padding:14px 15px!important;border-radius:18px!important}
+  .pepHomeShopNowWrap{margin-top:10px!important}
+  .pepHomeShopNow{width:100%;min-height:45px!important}
+  .pepLatestProof{padding:17px 12px;border-radius:22px;margin-bottom:14px}
+  .pepLatestProofTop{align-items:flex-start;flex-direction:column;gap:10px}
+  .pepLatestProofTop h2{font-size:20px}
+  .pepViewAllProof{align-self:flex-start}
+  .pepLatestProofCard{display:block}
+  .pepLatestProofCard .pepProofImage{display:block;width:100%;height:270px;min-height:0;object-fit:contain}
+  .pepLatestProofInfo{padding:16px}
+  .pepLatestProofInfo h3{font-size:17px}
+  .pepHomeTrustLite{padding:15px 10px!important}
+}
+</style>
+
+<style id="pep-home-design-final-v4">
+/* ── PEPMOSA HOME / GIRLY EDITION ── */
+main.wrap{max-width:1120px!important;padding:24px 22px 52px!important}
+
+main.wrap>.hero{
+  min-height:390px!important;
+  margin:0 0 22px!important;
+  padding:24px 28px!important;
+  grid-template-columns:44% 56%!important;
+  border-radius:32px!important;
+  border:1px solid #f0cfdf!important;
+  background:
+    radial-gradient(circle at 8% 10%,rgba(255,255,255,.98),transparent 25%),
+    radial-gradient(circle at 90% 12%,rgba(255,177,213,.18),transparent 26%),
+    linear-gradient(135deg,#fff 0%,#fff5fa 60%,#f9f1ff 100%)!important;
+  box-shadow:0 18px 55px rgba(155,74,123,.09)!important;
+}
+main.wrap>.hero:before{
+  width:270px!important;height:270px!important;left:-125px!important;top:-135px!important;
+  background:rgba(255,120,184,.07)!important;
+}
+main.wrap>.hero:after{
+  width:240px!important;height:240px!important;right:-105px!important;bottom:-120px!important;
+  background:rgba(184,132,255,.07)!important;
+}
+main.wrap>.hero .heroLogo{
+  min-height:325px!important;
+  position:relative!important;
+}
+main.wrap>.hero .heroLogo:before{
+  content:"";
+  position:absolute;width:285px;height:285px;border-radius:50%;
+  background:radial-gradient(circle,#fff 0,#fff0f7 55%,transparent 72%);
+  box-shadow:0 0 0 1px rgba(230,150,190,.16),0 16px 42px rgba(214,77,145,.09);
+}
+main.wrap>.hero .heroLogo:after{
+  content:"♡";
+  position:absolute;right:15%;top:12%;font-size:34px;color:#ef82b5;
+  transform:rotate(12deg);opacity:.7;
+}
+main.wrap>.hero .heroLogo img{
+  position:relative!important;z-index:2!important;
+  max-width:475px!important;max-height:320px!important;
+  filter:drop-shadow(0 12px 18px rgba(83,34,64,.12))!important;
+}
+main.wrap>.hero .gbPanel{padding:12px 10px 10px 18px!important}
+main.wrap>.hero .gbPanel h1{
+  margin:4px 0 10px!important;font-size:clamp(42px,4.5vw,59px)!important;
+  line-height:.96!important;letter-spacing:-2px!important;
+}
+main.wrap>.hero .gbPanel h1 span{
+  display:block;color:#d42d88!important;
+}
+main.wrap>.hero .gbPanel>.muted{font-size:12px!important;line-height:1.5!important;max-width:430px}
+#gbStatus{
+  margin-top:15px!important;padding:16px 18px 15px 21px!important;
+  min-height:0!important;border-radius:19px!important;
+  box-shadow:0 10px 26px rgba(100,45,77,.07)!important;
+}
+#gbStatus > b,#gbStatus .gb-name{
+  font-size:clamp(22px,2.7vw,31px)!important;margin-bottom:8px!important;
+}
+#gbStatus > b::before,#gbStatus .gb-name::before{font-size:8px!important;margin-bottom:6px!important}
+#gbStatus .status{min-height:25px!important;padding:6px 10px!important;font-size:8px!important}
+#gbStatus::after{font-size:27px!important;right:16px!important;top:10px!important}
+.pepHomeShopNowWrap{margin-top:11px!important}
+.pepHomeShopNow{
+  min-width:155px!important;padding:12px 17px 12px 20px!important;
+  border-radius:999px!important;font-size:10px!important;
+  box-shadow:0 10px 22px rgba(211,43,137,.20)!important;
+}
+
+/* Latest proof: shorter, intentional editorial card */
+.pepLatestProof{
+  margin:0 0 18px!important;padding:20px!important;
+  border:1px solid #efd6e4!important;border-radius:26px!important;
+  background:linear-gradient(145deg,#fff,#fff7fb 68%,#faf3ff)!important;
+  box-shadow:0 12px 34px rgba(151,76,112,.055)!important;
+}
+.pepLatestProofTop{margin-bottom:12px!important;align-items:center!important}
+.pepLatestProofTop h2{margin:3px 0 3px!important;font-size:21px!important;letter-spacing:-.03em!important}
+.pepLatestProofTop p{font-size:10px!important}
+.pepViewAllProof{padding:9px 12px!important;font-size:7px!important}
+.pepLatestProofCard{
+  min-height:300px!important;height:300px!important;
+  display:grid!important;grid-template-columns:38% 62%!important;
+  border-radius:19px!important;
+  border:1px solid #efdbe5!important;
+  background:#fff!important;
+}
+.pepLatestProofCard .pepProofImage{
+  width:100%!important;height:300px!important;min-height:0!important;
+  object-fit:contain!important;background:#f9f4f7!important;
+  cursor:zoom-in!important;
+}
+.pepLatestProofInfo{
+  padding:28px 30px!important;justify-content:center!important;
+  background:
+    radial-gradient(circle at 95% 8%,rgba(246,150,198,.12),transparent 28%),
+    linear-gradient(135deg,#fff,#fff8fb)!important;
+}
+.pepLatestProofBadge{font-size:6px!important;padding:6px 9px!important}
+.pepLatestProofInfo h3{font-size:20px!important;margin:11px 0 6px!important;max-width:470px}
+.pepLatestProofInfo p{font-size:10px!important;max-width:430px}
+.pepLatestProofDate{font-size:8px!important;margin-top:11px!important}
+.pepProofOpen{font-size:7px!important;padding:9px 12px!important;margin-top:13px!important;border-radius:10px!important}
+
+/* Community = one elegant trust strip, not another giant section */
+.pepHomeTrustLite{
+  margin:0!important;padding:17px 19px!important;
+  border:1px solid #efdce6!important;border-radius:23px!important;
+  background:rgba(255,255,255,.78)!important;
+  box-shadow:0 10px 28px rgba(151,76,112,.045)!important;
+}
+.pepHomeTrustLiteHead{
+  display:flex!important;align-items:end!important;justify-content:space-between!important;
+  gap:12px!important;margin-bottom:10px!important;
+}
+.pepHomeTrustLiteHead h2{font-size:18px!important;margin:3px 0!important}
+.pepHomeTrustLiteHead p{font-size:9px!important}
+.pepHomeTrustLiteGrid{gap:8px!important}
+.pepHomeTrustLiteCard{
+  min-height:54px!important;padding:9px 11px!important;border-radius:14px!important;
+  gap:9px!important;background:#fff!important;
+}
+.pepHomeTrustLiteIcon{width:31px!important;height:31px!important;flex-basis:31px!important;border-radius:10px!important;font-size:13px!important}
+.pepHomeTrustLiteCard strong{font-size:8px!important}
+.pepHomeTrustLiteCard span{font-size:8px!important;line-height:1.25!important}
+
+/* Hide redundant desktop footer gap */
+main.wrap>.footer{margin-top:16px!important;font-size:9px!important}
+
+/* MOBILE */
+@media(max-width:900px){
+  main.wrap>.hero{grid-template-columns:1fr!important;min-height:0!important}
+  main.wrap>.hero .heroLogo{min-height:235px!important;height:235px!important}
+  main.wrap>.hero .heroLogo:before{width:220px;height:220px}
+  main.wrap>.hero .heroLogo img{max-height:245px!important}
+  main.wrap>.hero .gbPanel{padding:4px 8px 8px!important;text-align:center!important}
+  main.wrap>.hero .gbPanel>.muted{margin-left:auto;margin-right:auto}
+  .pepHomeShopNowWrap{text-align:center}
+}
+@media(max-width:760px){
+  main.wrap{padding:10px 10px 98px!important}
+  main.wrap>.hero{
+    margin-bottom:13px!important;padding:13px 11px 16px!important;border-radius:23px!important
+  }
+  main.wrap>.hero .heroLogo{min-height:190px!important;height:190px!important}
+  main.wrap>.hero .heroLogo:before{width:178px;height:178px}
+  main.wrap>.hero .heroLogo:after{font-size:26px;right:16%;top:9%}
+  main.wrap>.hero .heroLogo img{max-height:195px!important;max-width:315px!important}
+  main.wrap>.hero .gbPanel h1{font-size:31px!important;letter-spacing:-1px!important}
+  main.wrap>.hero .gbPanel>.muted{font-size:10px!important}
+  #gbStatus{margin-top:10px!important;padding:13px 14px 12px 16px!important;border-radius:17px!important}
+  #gbStatus > b,#gbStatus .gb-name{font-size:20px!important}
+  #gbStatus::after{font-size:23px!important}
+  .pepHomeShopNow{width:100%;min-height:43px!important;box-sizing:border-box}
+
+  .pepLatestProof{padding:14px 11px!important;border-radius:20px!important}
+  .pepLatestProofTop{align-items:flex-start!important;flex-direction:column!important;gap:8px!important}
+  .pepLatestProofTop h2{font-size:19px!important}
+  .pepLatestProofTop p{font-size:9px!important}
+  .pepViewAllProof{align-self:flex-start}
+  .pepLatestProofCard{
+    height:auto!important;min-height:0!important;
+    display:block!important;border-radius:16px!important;
+  }
+  .pepLatestProofCard .pepProofImage{
+    width:100%!important;height:245px!important;object-fit:contain!important;
+  }
+  .pepLatestProofInfo{padding:15px!important}
+  .pepLatestProofInfo h3{font-size:16px!important}
+  .pepLatestProofInfo p{font-size:9px!important}
+  .pepProofOpen{font-size:7px!important}
+
+  .pepHomeTrustLite{padding:14px 10px!important;border-radius:19px!important}
+  .pepHomeTrustLiteHead{display:block!important;margin-bottom:9px!important}
+  .pepHomeTrustLiteHead h2{font-size:17px!important}
+  .pepHomeTrustLiteHead p{font-size:8px!important}
+  .pepHomeTrustLiteGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important}
+  .pepHomeTrustLiteCard{
+    min-height:66px!important;padding:8px 4px!important;
+    flex-direction:column!important;text-align:center!important;justify-content:center!important;gap:4px!important
+  }
+  .pepHomeTrustLiteIcon{width:27px!important;height:27px!important;flex-basis:27px!important;font-size:12px!important}
+  .pepHomeTrustLiteCard strong{font-size:7px!important;line-height:1.1!important}
+  .pepHomeTrustLiteCard span{display:none!important}
+}
+@media(max-width:390px){
+  main.wrap>.hero .heroLogo{min-height:170px!important;height:170px!important}
+  main.wrap>.hero .heroLogo img{max-height:178px!important}
+  .pepLatestProofCard .pepProofImage{height:220px!important}
+  .pepHomeTrustLiteCard strong{font-size:6.5px!important}
+}
+</style>
+<style id="pep-home-overflow-fix">
+html,body{max-width:100%;overflow-x:hidden!important}
+main.wrap{width:100%!important;max-width:1120px!important;box-sizing:border-box!important}
+@media(max-width:900px){
+  main.wrap>.hero{width:100%!important;box-sizing:border-box!important}
+}
+</style>
+<style id="pep-rail-same-everywhere">
+/* SAME SHORTCUT RAIL ON DESKTOP + MOBILE */
+.pepSideRail{
+  position:fixed!important;
+  right:14px!important;
+  left:auto!important;
+  top:50%!important;
+  bottom:auto!important;
+  transform:translateY(-50%)!important;
+  width:auto!important;
+  max-width:none!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:3px!important;
+  padding:7px!important;
+  box-sizing:border-box!important;
+  border-radius:20px!important;
+  z-index:9999!important;
+}
+.pepSideRail a{
+  width:58px!important;
+  min-width:58px!important;
+  max-width:58px!important;
+  min-height:48px!important;
+  flex:none!important;
+  border-radius:13px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+}
+.pepSideRail span{font-size:17px!important;line-height:1!important}
+.pepSideRail b{font-size:6.5px!important;letter-spacing:.04em!important;white-space:nowrap!important}
+@media(max-width:430px){
+  .pepSideRail{right:7px!important;padding:5px!important;border-radius:18px!important}
+  .pepSideRail a{width:52px!important;min-width:52px!important;max-width:52px!important;min-height:45px!important;border-radius:11px!important}
+  .pepSideRail span{font-size:15px!important}
+  .pepSideRail b{font-size:5.5px!important}
+}
+</style>
+<style id="pep-mobile-bottom-rail">
+/* Mobile: move the same shortcut rail to the bottom so it never blocks the page */
+@media(max-width:760px){
+  .pepSideRail{
+    left:50%!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:8px!important;
+    transform:translateX(-50%)!important;
+    width:calc(100vw - 16px)!important;
+    max-width:620px!important;
+    display:flex!important;
+    flex-direction:row!important;
+    justify-content:space-between!important;
+    overflow-x:auto!important;
+    gap:2px!important;
+    padding:5px!important;
+    border-radius:18px!important;
+    box-sizing:border-box!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  .pepSideRail a{
+    width:auto!important;
+    min-width:56px!important;
+    max-width:none!important;
+    min-height:45px!important;
+    flex:1 0 56px!important;
+    border-radius:12px!important;
+  }
+  .pepSideRail span{font-size:15px!important}
+  .pepSideRail b{font-size:5.5px!important}
+  body{padding-bottom:68px!important}
+}
+@media(max-width:390px){
+  .pepSideRail{bottom:6px!important;width:calc(100vw - 12px)!important}
+  .pepSideRail a{min-width:52px!important;flex-basis:52px!important;min-height:43px!important}
+  .pepSideRail span{font-size:14px!important}
+  .pepSideRail b{font-size:5px!important}
+}
+</style>
+<style id="pep-remove-logo-square">
+/* Keep the PEPMOSA artwork circular — remove any rectangular edge/background from the logo asset */
+main.wrap>.hero .heroLogo img{
+  clip-path:circle(49% at 50% 50%)!important;
+  -webkit-clip-path:circle(49% at 50% 50%)!important;
+  border-radius:50%!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+</style>
+<style id="pep-home-additions-v1">
+.pepHomeHighlights{margin:0 0 20px;padding:20px 21px;border:1px solid #efd9e5;border-radius:25px;background:linear-gradient(135deg,#fff,#fff7fb 70%,#faf3ff);box-shadow:0 12px 32px rgba(151,76,112,.05)}
+.pepHomeHighlightsIntro{margin-bottom:12px}
+.pepHomeHighlightsIntro h2{margin:4px 0 3px;font-size:22px;letter-spacing:-.03em;color:#3d2b35}
+.pepHomeHighlightsIntro p{margin:0;font-size:10px}
+.pepHomeHighlightsGrid{display:grid;grid-template-columns:1.15fr 1fr 1fr 1fr;gap:8px}
+.pepHighlightCard{min-height:68px;display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid #efdbe6;border-radius:16px;background:rgba(255,255,255,.86);text-decoration:none;color:#3d2c35;transition:.18s ease}
+.pepHighlightCard:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(180,71,130,.08);border-color:#e8bdd3}
+.pepHighlightIcon{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(135deg,#ffe7f2,#f4eaff);font-size:14px}
+.pepHighlightCard span:nth-child(2){min-width:0}
+.pepHighlightCard b{display:block;font-size:8px;letter-spacing:.02em}
+.pepHighlightCard small{display:block;margin-top:3px;color:#8b7881;font-size:7px;line-height:1.3}
+.pepHighlightCard i{margin-left:auto;color:#d13b87;font-style:normal;font-size:14px}
+.pepHomeMiniGuide{margin:0 0 20px;padding:18px 21px;display:flex;align-items:center;justify-content:space-between;gap:22px;border-radius:23px;background:linear-gradient(105deg,#fff0f7,#fff 52%,#f8f1ff);border:1px solid #efd9e5}
+.pepHomeMiniGuide h2{margin:3px 0;font-size:21px;color:#3d2b35}
+.pepHomeMiniGuide p{margin:0;max-width:600px;font-size:9px;line-height:1.5}
+.pepHomeGuideSteps{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.pepHomeGuideSteps span{padding:9px 11px;border-radius:999px;background:rgba(255,255,255,.82);border:1px solid #efd5e3;color:#806a75;font-size:7px;font-weight:900;letter-spacing:.05em}
+.pepHomeGuideSteps b{color:#cf4387;margin-right:4px}
+@media(max-width:760px){
+  .pepHomeHighlights{padding:16px 11px;border-radius:21px}
+  .pepHomeHighlightsIntro h2{font-size:19px}
+  .pepHomeHighlightsIntro p{font-size:8px}
+  .pepHomeHighlightsGrid{grid-template-columns:1fr 1fr;gap:6px}
+  .pepHighlightCard{min-height:62px;padding:8px 7px;border-radius:14px}
+  .pepHighlightIcon{width:29px;height:29px;flex-basis:29px;font-size:12px}
+  .pepHighlightCard b{font-size:7px}.pepHighlightCard small{font-size:6.5px}
+  .pepHomeMiniGuide{display:block;padding:15px 12px;border-radius:19px}
+  .pepHomeMiniGuide h2{font-size:18px}
+  .pepHomeMiniGuide p{font-size:8px}
+  .pepHomeGuideSteps{justify-content:flex-start;margin-top:11px;gap:5px}
+  .pepHomeGuideSteps span{padding:7px 9px;font-size:6px}
+}
+</style>
+<style id="pep-home-community-clean">
+.pepHomeCommunityCTA{margin:20px 0 10px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:18px;border:1px solid #efd9e5;border-radius:23px;background:linear-gradient(110deg,#fff5fa,#fff,#faf5ff);box-shadow:0 10px 28px rgba(151,76,112,.05)}
+.pepHomeCommunityCTA h2{margin:3px 0;font-size:20px;color:#3d2b35;letter-spacing:-.02em}
+.pepHomeCommunityCTA p{margin:0;font-size:9px}
+.pepHomeCommunityCTA>a{flex:0 0 auto;padding:11px 15px;border-radius:999px;background:#df3b91;color:#fff;text-decoration:none;font-size:8px;font-weight:950;letter-spacing:.04em;box-shadow:0 8px 18px rgba(213,52,139,.18)}
+.pepHomeCommunityCTA>a span{margin-left:6px}
+@media(max-width:760px){.pepHomeCommunityCTA{padding:15px 12px;display:block;border-radius:19px}.pepHomeCommunityCTA h2{font-size:17px}.pepHomeCommunityCTA p{font-size:8px}.pepHomeCommunityCTA>a{display:inline-block;margin-top:10px;font-size:7px}}
+</style>
+<style id="pep-home-update-why">
+.pepHomeUpdate{margin:0 0 18px;padding:16px 18px;display:flex;align-items:center;gap:13px;border:1px solid #efd6e3;border-radius:21px;background:linear-gradient(105deg,#fff2f8,#fff,#faf3ff);box-shadow:0 9px 25px rgba(151,76,112,.045)}
+.pepHomeUpdateIcon{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,#ffddea,#f0e5ff);color:#c73680;font-size:17px}
+.pepHomeUpdateText{min-width:0;flex:1}.pepHomeUpdateText .eyebrow{font-size:7px}.pepHomeUpdateText h2{margin:3px 0 2px;font-size:16px;color:#3d2b35}.pepHomeUpdateText p{margin:0;font-size:9px;color:#82717a;line-height:1.4}
+.pepHomeUpdate>a{flex:0 0 auto;text-decoration:none;padding:9px 12px;border-radius:999px;background:#fff;border:1px solid #ebc9da;color:#b32f76;font-size:7px;font-weight:950;letter-spacing:.04em}.pepHomeUpdate>a span{font-size:12px;margin-left:4px}
+.pepWhyP{margin:0 0 18px;padding:18px 20px;border:1px solid #efdce6;border-radius:23px;background:rgba(255,255,255,.78);box-shadow:0 8px 24px rgba(151,76,112,.035)}
+.pepWhyHead{margin-bottom:12px}.pepWhyHead h2{margin:3px 0 0;font-size:20px;color:#3d2b35}
+.pepWhyGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.pepWhyGrid>div{padding:10px 9px;border-radius:15px;background:linear-gradient(135deg,#fff,#fff8fb);border:1px solid #f0dfe7}.pepWhyGrid span{display:block;color:#cf4387;font-size:16px;margin-bottom:5px}.pepWhyGrid b{display:block;font-size:7px;color:#4b3942;letter-spacing:.05em}.pepWhyGrid small{display:block;margin-top:3px;font-size:7px;color:#8c7982}
+@media(max-width:760px){.pepHomeUpdate{padding:13px 11px;border-radius:18px;gap:9px}.pepHomeUpdateIcon{width:34px;height:34px;flex-basis:34px;font-size:14px}.pepHomeUpdateText h2{font-size:14px}.pepHomeUpdateText p{font-size:7.5px}.pepHomeUpdate>a{padding:8px 9px;font-size:6px}.pepWhyP{padding:14px 11px;border-radius:19px}.pepWhyHead h2{font-size:17px}.pepWhyGrid{gap:5px}.pepWhyGrid>div{padding:8px 5px;border-radius:12px;text-align:center}.pepWhyGrid span{font-size:13px}.pepWhyGrid b{font-size:6px}.pepWhyGrid small{font-size:5.5px}}
+</style>
+
+<style id="pep-home-dreamy-heart-bg">
+/* DREAMY HOME BACKGROUND — top nav removed; soft falling hearts */
+header{display:none!important}
+body{
+  background:
+    radial-gradient(circle at 8% 10%,rgba(255,117,181,.20),transparent 24%),
+    radial-gradient(circle at 92% 18%,rgba(255,180,220,.18),transparent 27%),
+    radial-gradient(circle at 50% 55%,rgba(255,205,231,.16),transparent 38%),
+    radial-gradient(circle at 15% 90%,rgba(231,194,255,.14),transparent 28%),
+    linear-gradient(135deg,#fff8fc 0%,#fff0f7 48%,#faf2ff 100%)!important;
+}
+body:after{
+  content:"♡";
+  position:fixed;
+  left:-55px;
+  top:18%;
+  z-index:0;
+  pointer-events:none;
+  color:rgba(245,126,183,.11);
+  font-size:300px;
+  line-height:1;
+  transform:rotate(-14deg);
+}
+main.wrap{position:relative;z-index:3}
+.pepHomeFallingHearts{
+  position:fixed;
+  inset:0;
+  width:100%;height:100%;
+  pointer-events:none;
+  z-index:2;
+  opacity:.82;
+}
+</style>
+</head>
+
+
+<body>
+
+<div class="pepAnnouncement" role="status"><span>🌸</span><b>PEPMOSA GROUP BUY</b><em>•</em><span id="pepAnnouncementText">Choose your favorites and secure your slot.</span></div>
+
+
+<!-- =======================================================
+     HEADER
+     ======================================================= -->
+
+<header>
+
+  <a
+    class="brand"
+    href="index.html"
+  >
+
+    <img
+      src="pepmosa-logo.png"
+      alt="PEPMOSA"
+    >
+
+    <span>PEPMOSA</span>
+
+  </a>
+
+
+  <nav class="nav">
+
+    <a href="index.html">
+      HOME
+    </a>
+
+    <a href="shop.html">
+      SHOP
+    </a>
+
+    <a href="calculator.html">
+      CALCULATOR
+    </a>
+
+    <a href="protocols.html">
+      PROTOCOLS
+    </a>
+
+    <a id="trackLink" href="track.html?v=20260904-tracking-per-gb">
+      TRACK
+    </a>
+
+    <a href="coa.html">
+      COA
+    </a>
+
+  </nav>
+
+
+  <button
+    class="cart"
+    onclick="openCart()"
+  >
+    🛒 CART
+    (<span id="cartCount">0</span>)
+  </button>
+
+</header>
+
+
+
+<main class="wrap">
+
+
+<!-- =======================================================
+     HERO
+     ======================================================= -->
+
+<section class="hero">
+
+
+  <!-- LARGE PEPMOSA LOGO -->
+
+  <div class="heroLogo">
+
+    <img
+      src="pepmosa-no-name.png"
+      alt="PEPMOSA"
+    >
+
+  </div>
+
+
+
+  <!-- GROUP BUY INFORMATION -->
+
+  <div class="gbPanel">
+
+    <div class="eyebrow">
+      GROUP BUY
+    </div>
+
+
+    <h1>WELCOME TO <span>PEPMOSA</span></h1>
+
+
+    <p class="muted">
+      Your Group Buy hub for updates, order tools, product information, and community access.
+    </p>
+
+
+    <div
+      id="gbStatus"
+      class="notice"
+    >
+      Loading current Group Buy…
+    </div>
+
+    <div class="pepHomeShopNowWrap">
+      <a class="pepHomeShopNow" href="shop.html"><span>SHOP NOW / VIEW PRICELIST</span><b>→</b></a>
+    </div>
+
+  </div>
+
+</section>
+
+<section class="pepHomeUpdate" id="pepHomeUpdate" aria-label="Latest PEPMOSA update">
+  <div class="pepHomeUpdateIcon">✦</div>
+  <div class="pepHomeUpdateText">
+    <div class="eyebrow">LATEST UPDATE</div>
+    <h2 id="pepHomeUpdateTitle">PEPMOSA NEWS</h2>
+    <p id="pepHomeUpdateMessage">Stay tuned for the latest Group Buy announcements and updates.</p>
+  </div>
+  <a id="pepHomeUpdateLink" href="shop.html">VIEW DETAILS <span>→</span></a>
+</section>
+
+<section class="pepWhyP" aria-label="Why PEPMOSA">
+  <div class="pepWhyHead">
+    <div class="eyebrow">WHY PEPMOSA ✦</div>
+    <h2>Simple. Clear. Connected.</h2>
+  </div>
+  <div class="pepWhyGrid">
+    <div><span>✓</span><b>VERIFIED</b><small>COA & verification access</small></div>
+    <div><span>♡</span><b>TRANSPARENT</b><small>Clear Group Buy updates</small></div>
+    <div><span>⌁</span><b>TRACKABLE</b><small>Order status anytime</small></div>
+    <div><span>✦</span><b>COMMUNITY</b><small>Real buyer updates</small></div>
+  </div>
+</section>
+
+<section class="pepLatestProof" aria-label="Latest buyers proof">
+  <div class="pepLatestProofTop">
+    <div>
+      <div class="eyebrow">JUST IN ♡</div>
+      <h2>LATEST BUYERS' PROOF</h2>
+      <p>Real orders. Real feedback. Shared by our PEPMOSA community.</p>
+    </div>
+    <a href="buyers-proof.html" class="pepViewAllProof">VIEW ALL PROOFS <span>→</span></a>
+  </div>
+  <div id="pepLatestProofCard" class="pepLatestProofCard">
+    <div class="pepProofLoading">Loading our latest proof ♡</div>
+  </div>
+</section>
+
+<section class="pepHomeCommunityCTA" aria-label="PEPMOSA community">
+  <div>
+    <div class="eyebrow">PEPMOSA COMMUNITY ✦</div>
+    <h2>STAY CONNECTED WITH PEPMOSA</h2>
+    <p class="muted">Get Group Buy updates, announcements, and community news.</p>
+  </div>
+  <a href="https://chat.whatsapp.com/B5YNWxs2c7t0l08JzNgkek" target="_blank" rel="noopener noreferrer">JOIN OUR COMMUNITY <span>→</span></a>
+</section>
+
+<!-- =======================================================
+     PEPMOSA QUICK TOOLS
+     ======================================================= -->
+
+<!-- Products are available on the dedicated Shop page. -->
+
+
+
+
+<!-- PEPMOSA SIDE SHORTCUTS -->
+<nav class="pepSideRail" aria-label="PEPMOSA shortcuts">
+  <a href="shop.html" title="Products"><span>🛍</span><b>PRODUCTS</b></a>
+  <a href="calculator.html" title="Calculator"><span>⌗</span><b>CALCULATOR</b></a>
+  <a href="protocols.html" title="Protocols"><span>☷</span><b>PROTOCOLS</b></a>
+  <a href="track.html?v=20260913-global" title="Track"><span>⌁</span><b>TRACK</b></a>
+  <a href="coa.html" title="COA"><span>✓</span><b>COA</b></a>
+  <a href="buyers-proof.html" title="Buyers' Proof"><span>♥</span><b>PROOF</b></a>
+  <a href="https://chat.whatsapp.com/B5YNWxs2c7t0l08JzNgkek" target="_blank" rel="noopener noreferrer" title="Community"><span>👥</span><b>COMMUNITY</b></a>
+</nav>
+
+<div class="footer">
+  PEPMOSA • Group Buy
+</div>
+
+
+</main>
+
+
+
+<!-- =======================================================
+     CART MODAL
+     ======================================================= -->
+
+<div
+  id="cartModal"
+  class="modal"
+>
+
+
+  <div class="modalbox">
+
+
+    <div class="sectionHead">
+
+      <h2>
+        Your Cart
+      </h2>
+
+
+      <button        class="btn secondary"
+        onclick="closeModal('cartModal')"
+      >
+        CLOSE
+      </button>
+
+    </div>
+
+
+    <div id="cartItems"></div>
+
+
+    <div class="row">
+
+      <b>
+        TOTAL
+      </b>
+
+      <b id="cartTotal">
+        ₱0.00
+      </b>
+
+    </div>
+
+
+    <div class="actions">
+
+      <button
+        id="checkoutBtn"
+        class="btn primary wide"
+        onclick="checkout()"
+      >
+        CHECKOUT
+      </button>
+
+    </div>
+
+
+  </div>
+
+</div>
+
+
+
+<!-- =======================================================
+     CHECKOUT MODAL
+     ======================================================= -->
+
+<div
+  id="checkoutModal"
+  class="modal"
+>
+
+
+  <div class="modalbox">
+
+
+    <h2>
+      Checkout
+    </h2>
+
+
+    <div
+      id="checkoutMsg"
+      class="muted"
+    ></div>
+
+
+    <div class="formGrid">
+
+
+      <div class="field">
+
+        <label>
+          Email
+        </label>
+
+        <input
+          id="email"
+          type="email"
+          required
+        >
+
+      </div>
+
+
+
+      <div class="field">
+
+        <label>
+          Customer Name
+        </label>
+
+        <input
+          id="customerName"
+        >
+
+      </div>
+
+
+
+      <div class="field">
+
+        <label>
+          Contact
+        </label>
+
+        <input
+          id="contact"
+        >
+
+      </div>
+
+
+
+      <div class="field">
+
+        <label>
+          Shipping Method
+        </label>
+
+        <input
+          id="shippingMethod"
+          placeholder="e.g. J&T"
+        >
+
+      </div>
+
+
+
+      <div class="field full">
+
+        <label>
+          Delivery Address
+        </label>
+
+        <textarea
+          id="address"
+        ></textarea>
+
+      </div>
+
+
+    </div>
+
+
+
+    <div class="actions">
+
+
+      <button
+        class="btn primary"
+        onclick="placeOrder()"
+      >
+        SUBMIT ORDER
+      </button>
+
+
+      <button
+        class="btn secondary"
+        onclick="closeModal('checkoutModal')"
+      >
+        CANCEL
+      </button>
+
+
+    </div>
+
+
+  </div>
+
+</div>
+
+
+
+<!-- =======================================================
+     SUPABASE
+     ======================================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="config.js"></script>
+
+<script src="supabase.js?v=20260904-atomic-checkout"></script>
+
+
+
+<script>
+
+/* =========================================================
+   STATE
+   ========================================================= */
+
+let currentGB = null;
+
+let products = [];
+
+let cart =
+  JSON.parse(
+    localStorage.pepmosaCart || "[]"
+  );
+
+
+initSupabase();
+
+
+
+/* =========================================================
+   HELPER
+   ========================================================= */
+
+function $(id){
+
+  return document.getElementById(id);
+
+}
+
+function pepSyncSearchClear(){
+  const input=$("search");
+  const btn=$("pepSearchClear");
+  if(btn) btn.classList.toggle("show",!!(input&&input.value.trim()));
+}
+
+function syncOrderingControls(){
+  const isOpen=!!(currentGB && ["OPEN","KIT_COMPLETION"].includes(String(currentGB.status||"").toUpperCase()));
+  const btn=$("checkoutBtn");
+  if(btn){
+    btn.disabled=!isOpen;
+    btn.textContent=isOpen ? "CHECKOUT" : "ORDERING CLOSED";
+    btn.style.opacity=isOpen ? "" : ".45";
+    btn.style.cursor=isOpen ? "" : "not-allowed";
+    btn.style.pointerEvents=isOpen ? "" : "none";
+  }
+}
+
+
+
+/* =========================================================
+   LOAD CURRENT GROUP BUY
+   ========================================================= */
+
+function getOpenForAllProducts(){try{return JSON.parse(localStorage.getItem("pepmosa_open_for_all_products")||"[]")}catch(e){return []}}
+function renderOpenForAll(){const box=$("openForAllGrid");if(!box)return;const list=getOpenForAllProducts().filter(x=>x.status==="AVAILABLE");box.innerHTML=list.length?list.map(x=>`<article class="card" style="margin:0">${x.image_url?`<div style="height:180px;margin:-2px -2px 14px;border-radius:14px;overflow:hidden;background:#fff"><img loading="lazy" decoding="async" src="${esc(x.image_url)}" alt="${esc(x.name)}" style="width:100%;height:100%;object-fit:contain;display:block"></div>`:''}<h3>${esc(x.name)}</h3><div class="muted">MOQ: ${Number(x.moq||1)}</div><div style="font-size:22px;font-weight:800;margin-top:8px">₱${Number(x.amount||0).toLocaleString("en-PH",{minimumFractionDigits:2})}</div><div class="notice success" style="margin-top:10px">Open for All • No Admin Fee</div></article>`).join(""):`<div class="muted">No Open for All products available right now.</div>`}
+async function load(){
+
+  renderOpenForAll();
+
+  try{
+
+
+    // Always show the latest GB for the public pricelist.
+    // Prefer an OPEN/KIT_COMPLETION GB for ordering, otherwise fall back to
+    // the latest CLOSED GB so customers can still browse products and prices.
+    const {
+      data:gbRows,
+      error:gbError
+    } =
+      await sb
+        .from("group_buys")
+        .select("*")
+        .in("status",["OPEN","KIT_COMPLETION","CLOSED"])
+        .order(
+          "created_at",
+          {
+            ascending:false
+          }
+        )
+        .limit(20);
+
+
+    if(gbError){
+
+      throw gbError;
+
+    }
+
+    const activeGB=(gbRows||[]).find(x=>["OPEN","KIT_COMPLETION"].includes(x.status));
+    const closedGB=(gbRows||[]).find(x=>x.status==="CLOSED");
+    const gb=activeGB||closedGB||null;
+    // Deadline is read directly from GB Settings (group_buys.order_deadline_at).
+    window.pepmosaGBDeadlineBadge=function(g){
+      if(!g || !g.order_deadline_at) return "";
+      const t=new Date(g.order_deadline_at).getTime();
+      if(!Number.isFinite(t)) return "";
+      const ms=t-Date.now();
+      if(ms<=0) return '<span class="gb-remaining closed">ORDERING CLOSED</span>';
+      const days=Math.ceil(ms/86400000);
+      return '<span class="gb-remaining">⏰ '+days+' DAY'+(days===1?'':'S')+' LEFT TO ORDER</span>';
+    };
+
+    currentGB = gb;
+    syncOrderingControls();
+
+    // Tracking is explicitly tied to this exact Group Buy.
+    const trackLink=$("trackLink");
+    if(trackLink && gb?.gb_number){
+      trackLink.href="track.html?gb="+encodeURIComponent(gb.gb_number)+"&v=20260904-tracking-per-gb";
+    }
+
+
+    /* NO OPEN GROUP BUY */
+
+    if(!gb){
+
+      $("gbStatus").innerHTML =
+
+        '<div class="notice error">' +
+
+        'No open Group Buy right now.' +
+
+        '</div>';
+
+
+      products = [];
+
+      renderProducts();
+
+      return;
+
+    }
+
+
+
+    /* GROUP BUY NAME */
+
+    const isOrderOpen=["OPEN","KIT_COMPLETION"].includes(gb.status);
+    $("gbStatus").innerHTML =
+      '<b>' + esc(gb.customer_facing_name || gb.gb_number) + '</b> ' +
+      '<span class="status ' + (isOrderOpen?'open':'closed') + '">' +
+      esc(gb.status==="CLOSED" ? "CLOSED • PRICELIST VIEW" : gb.status) +
+      '</span>' +
+      (window.pepmosaGBDeadlineBadge ? window.pepmosaGBDeadlineBadge(gb) : '') +
+
+      (!isOrderOpen
+        ? '<div class="muted" style="margin-top:8px">Browsing is available. Ordering is currently closed.</div>'
+        : '');
+
+
+
+    /* =====================================================
+       GET CATEGORIES FOR CURRENT GB
+       ===================================================== */
+
+    const {
+      data:cats,
+      error:catError
+    } =
+      await sb
+        .from("gb_categories")
+        .select("category_name")
+        .eq(
+          "gb_number",
+          gb.gb_number
+        );
+
+
+    if(catError){
+
+      throw catError;
+
+    }
+
+
+    const categoryNames =
+      (cats || [])
+        .map(
+          x => x.category_name
+        )
+        .filter(Boolean);
+
+
+
+    /*
+      ONLY PRODUCTS ASSIGNED TO THE
+      OPENED GB CATEGORIES ARE SHOWN.
+    */
+
+    /* CLOSED GB = pricelist mode.
+       If its category mapping was cleaned up/deleted, still show the active
+       catalog instead of leaving the storefront empty. */
+    const productQuery =
+      sb
+        .from("products")
+        .select("*")
+        .eq("active",true)
+        .order("product_name");
+
+    const {
+      data:productData,
+      error:productError
+    } =
+      categoryNames.length
+        ? await productQuery.in("category",categoryNames)
+        : await productQuery;
+
+    if(productError) throw productError;
+
+    // Fetch variants separately instead of relying on a PostgREST embedded
+    // relationship that is not present in the current database schema cache.
+    const productIds=(productData||[]).map(p=>p.product_id).filter(Boolean);
+    let variantData=[];
+    if(productIds.length){
+      const vr=await sb.from("product_variants").select("*").in("product_id",productIds);
+      if(vr.error) throw vr.error;
+      variantData=vr.data||[];
+    }
+
+    products=(productData||[]).map(p=>({
+      ...p,
+      product_variants:variantData.filter(v=>String(v.product_id)===String(p.product_id))
+    }));
+    window.__pepBaseProducts = products;
+
+    if(gb.status==="CLOSED" && !categoryNames.length){
+      $("gbStatus").insertAdjacentHTML(
+        "beforeend",
+        '<div class="muted" style="margin-top:8px">Showing the full active pricelist.</div>'
+      );
+    }
+
+
+
+    /* =====================================================
+       LOAD GB MINIMUM QUANTITIES
+       ===================================================== */
+
+    const {
+      data:mins,
+      error:minError
+    } =
+      await sb
+        .from(
+          "gb_minimum_quantities"
+        )
+        .select("*")
+        .eq(
+          "gb_number",
+          gb.gb_number
+        );
+
+
+    if(minError){
+
+      throw minError;
+
+    }
+
+
+
+    /*
+      EACH VARIANT GETS ITS OWN
+      MINIMUM QUANTITY.
+    */
+
+    for(
+      const p of products
+    ){
+
+      for(
+        const v of
+        (p.product_variants || [])
+      ){
+
+        const setting =
+          (mins || [])
+            .find(
+              m =>
+                m.variant_id ===
+                v.variant_id
+            );
+
+
+        v.minimum_qty =
+          Math.max(
+            1,
+            Number(
+              setting?.minimum_qty || 1
+            )
+          );
+
+      }
+
+    }
+
+
+
+    renderProducts();
+
+    updateCart();
+
+
+  }catch(e){
+
+    console.error(e);
+
+
+    $("gbStatus").className =
+      "notice error";
+
+
+    $("gbStatus").textContent =
+      e.message;
+
+  }
+
+}
+
+
+
+/* =========================================================
+   RENDER PRODUCTS
+   ========================================================= */
+
+function renderProducts(){
+
+  const search =
+    ($("search")?.value || "")
+      .toLowerCase()
+      .trim();
+  const filtered =
+    products.filter(
+      p =>
+        (
+          p.product_name +
+          " " +
+          (p.description || "")
+        )
+        .toLowerCase()
+        .includes(search)
+    );
+
+  if(!filtered.length){
+
+    $("productGrid").innerHTML =
+      '<div class="card">' +
+        '<div style="text-align:center;padding:35px">' +
+          '<div style="font-size:36px;margin-bottom:10px">🛍️</div>' +
+          '<b>'+(search ? 'No products found' : 'No products available yet.')+'</b>' +
+          '<p class="muted">' +
+            (search
+              ? 'Try another product name or clear your search.'
+              : (currentGB
+                ? 'No products are available for this Group Buy.'
+                : 'There is no Group Buy available at the moment.')) +
+          '</p>' +
+        '</div>' +
+      '</div>';
+
+    return;
+  }
+
+  $("productGrid").innerHTML =
+    filtered
+      .map(
+        p => {
+
+          const variants =
+            (p.product_variants || [])
+              .filter(v => v.active !== false);
+
+          const lowest =
+            variants.length
+              ? Math.min(...variants.map(v => Number(v.price) || 0))
+              : 0;
+
+          return `
+            <article
+              class="card pepStoreCard"
+              data-product-id="${esc(p.product_id)}"
+            >
+
+              <div class="productImg">
+                <span class="pepVariantBadge">${variants.length} VARIANT${variants.length===1?"":"S"}</span>
+                ${p.image_url
+                  ? `<img loading="lazy" decoding="async" src="${esc(p.image_url)}" alt="${esc(p.product_name)}">`
+                  : esc(p.product_name)
+                }
+              </div>
+
+              <div class="pepStoreBody">
+                <h3>${esc(p.product_name)}</h3>
+
+                <p class="muted">
+                  ${esc(p.description || "")}
+                </p>
+
+                <div class="pepStoreBottom">
+                  <div class="pepStarting">
+                    <small>Starting at</small>
+                    <b>${peso(lowest)}</b>
+                  </div>
+
+                  <button
+                    class="btn primary pepSelectVariant"
+                    type="button"
+                    onclick="openProductPicker('${esc(p.product_id)}')"
+                  >
+                    SELECT VARIANT
+                  </button>
+                </div>
+              </div>
+
+              ${variants.map(
+                v => `
+                  <input
+                    type="hidden"
+                    id="qty-${esc(v.variant_id)}"
+                    value="${v.minimum_qty}"
+                  >
+                `
+              ).join("")}
+
+            </article>
+          `;
+        }
+      )
+      .join("");
+
+}
+
+
+/* =========================================================
+   PRODUCT VARIANT PICKER
+   ========================================================= */
+
+function openProductPicker(pid, productOverride){
+
+  const product =
+    productOverride || products.find(
+      p => String(p.product_id) === String(pid)
+    );
+
+  if(!product){
+    console.error('Product picker: product not found', pid);
+    return;
+  }
+
+  window.__pepLastPickerProduct = product;
+
+  const variants =
+    (product.product_variants || [])
+      .filter(v => v.active !== false);
+
+  if(!variants.length){
+    console.error('Product picker: no variants available', product);
+    return;
+  }
+
+  let selected =
+    variants[0];
+
+  let qty =
+    Math.max(
+      1,
+      Number(selected.minimum_qty || 1)
+    );
+
+  let modal =
+    $("pepProductPicker");
+
+  if(!modal){
+
+    modal =
+      document.createElement("div");
+
+    modal.id =
+      "pepProductPicker";
+
+    modal.className =
+      "pepProductPicker";
+
+    document.body.appendChild(modal);
+
+    modal.addEventListener(
+      "click",
+      e => {
+        if(e.target === modal){
+          modal.classList.remove("show");
+        }
+      }
+    );
+  }
+
+  const render = () => {
+
+    const minimum =
+      Math.max(
+        1,
+        Number(selected.minimum_qty || 1)
+      );
+
+    qty =
+      Math.max(minimum, Number(qty) || minimum);
+
+    modal.innerHTML =
+      `
+        <div class="pepPickerBox">
+
+          <button
+            class="pepPickerClose"
+            type="button"
+            onclick="document.getElementById('pepProductPicker').classList.remove('show')"
+          >
+            ×
+          </button>
+
+          <div class="pepPickerHead">
+
+            <div class="pepPickerImage">
+              ${product.image_url
+                ? `<img loading="lazy" decoding="async" src="${esc(product.image_url)}" alt="${esc(product.product_name)}">`
+                : ""
+              }
+            </div>
+
+            <div>
+              <div class="eyebrow">PEPMOSA GROUP BUY</div>
+              <h2>${esc(product.product_name)}</h2>
+              <p class="muted">
+                ${esc(product.description || "Choose your preferred variant and quantity.")}
+              </p>
+            </div>
+
+          </div>
+
+          <div class="pepPickerLabel">
+            CHOOSE VARIANT
+          </div>
+
+          <div class="pepVariantChoices">
+
+            ${variants.map(
+              v => `
+
+                <button
+                  type="button"
+                  class="pepVariantChoice ${v.variant_id === selected.variant_id ? "selected" : ""}"
+                  onclick="window.__pepPickVariant('${esc(pid)}','${esc(v.variant_id)}')"
+                >
+
+                  <span>
+                    <b>${esc(v.strength)}</b>
+                    <small>
+                      Minimum ${Math.max(1, Number(v.minimum_qty || 1))} pc
+                    </small>
+                  </span>
+
+                  <strong>
+                    ${peso(v.price)}
+                  </strong>
+
+                </button>
+
+              `
+            ).join("")}
+
+          </div>
+
+          <div class="pepQuantityRow">
+
+            <div>
+              <div class="pepPickerLabel small">
+                QUANTITY
+              </div>
+
+              <div class="muted">
+                Minimum ${minimum} pc
+              </div>
+            </div>
+
+            <div class="pepStepper">
+
+              <button
+                type="button"
+                onclick="window.__pepChangeQty(-1)"
+              >
+                −
+              </button>
+
+              <input
+                id="pepPickerQty"
+                type="number"
+                min="${minimum}"
+                value="${qty}"
+              >
+
+              <button
+                type="button"
+                onclick="window.__pepChangeQty(1)"
+              >
+                +
+              </button>
+
+            </div>
+
+          </div>
+
+          <div class="pepPickerTotal">
+
+            <span>SUBTOTAL</span>
+
+            <b>
+              ${peso((Number(selected.price) || 0) * qty)}
+            </b>
+
+          </div>
+
+          <button
+            class="btn primary pepPickerAdd"
+            type="button"
+            ${currentGB?.status==="CLOSED" ? 'disabled aria-disabled="true" title="Ordering is closed"' : 'onclick="window.__pepAddSelected()"'}
+          >
+            ${currentGB?.status==="CLOSED" ? 'ORDERING CLOSED' : 'ADD TO CART'}
+          </button>
+
+        </div>
+      `;
+
+    modal.classList.add("show");
+
+    const qtyInput =
+      $("pepPickerQty");
+
+    qtyInput.addEventListener(
+      "input",
+      () => {
+
+        qty =
+          Math.max(
+            minimum,
+            Number(qtyInput.value) || minimum
+          );
+
+        render();
+      }
+    );
+  };
+
+  window.__pepPickVariant =
+    (productId, variantId) => {
+
+      if(productId !== pid) return;
+
+      selected =
+        variants.find(
+          v => v.variant_id === variantId
+        ) || variants[0];
+
+      qty =
+        Math.max(
+          1,
+          Number(selected.minimum_qty || 1)
+        );
+
+      render();
+    };
+
+  window.__pepChangeQty =
+    delta => {
+
+      const minimum =
+        Math.max(
+          1,
+          Number(selected.minimum_qty || 1)
+        );
+
+      const input =
+        $("pepPickerQty");
+
+      qty =
+        Math.max(
+          minimum,
+          (Number(input?.value) || qty) + delta
+        );
+
+      render();
+    };
+
+  window.__pepAddSelected =
+    async () => {
+
+      /* HARD ADMIN FEE CHECK for OPEN GB Add to Cart */
+      if(typeof window.pepRequireApprovedFee !== "function" || !await window.pepRequireApprovedFee()){
+        return;
+      }
+
+      const minimum =
+        Math.max(
+          1,
+          Number(selected.minimum_qty || 1)
+        );
+
+      const input =
+        $("pepPickerQty");
+
+      qty =
+        Math.max(
+          minimum,
+          Number(input?.value) || qty
+        );
+
+      const hidden =
+        $("qty-" + selected.variant_id);
+
+      if(hidden){
+        hidden.value = qty;
+      }
+
+      addToCart(
+        product.product_id,
+        selected.variant_id
+      );
+
+      modal.classList.remove("show");
+    };
+
+  render();
+
+}
+
+window.openProductPicker = openProductPicker;
+
+/* Storefront repair compatibility: expose a stable global entry point. */
+window.pepOpenProductPicker = function(pid, product){
+  return openProductPicker(pid, product);
+};
+
+
+/* =========================================================
+   ADD TO CART
+   ========================================================= */
+
+function addToCart(pid,vid){
+
+  if(currentGB?.status==="CLOSED"){
+    if(window.pepmosaPopup)window.pepmosaPopup("Ordering is currently closed. You can still browse variants and prices.");
+    else alert("Ordering is currently closed. You can still browse variants and prices.");
+    return;
+  }
+
+  const product =
+    products.find(
+      p => String(p.product_id) === String(pid)
+    ) || (
+      window.__pepLastPickerProduct &&
+      String(window.__pepLastPickerProduct.product_id) === String(pid)
+        ? window.__pepLastPickerProduct
+        : null
+    );
+
+
+  if(!product){
+
+    return alert(
+      "Product not found."
+    );
+
+  }
+
+
+  const variant =
+    (product.product_variants || [])
+      .find(
+        v =>
+          String(v.variant_id) === String(vid)
+      );
+
+
+  if(!variant){
+
+    return alert(
+      "Variant not found."
+    );
+
+  }
+
+
+  const qty =
+    Math.max(
+      Number(
+        variant.minimum_qty || 1
+      ),
+      Number(
+        $("qty-" + vid).value ||
+        variant.minimum_qty ||
+        1
+      )
+    );
+
+
+
+  const existing =
+    cart.find(
+      x =>
+        x.variant_id === vid &&
+        String(x.gb_number || currentGB?.gb_number || "") === String(currentGB?.gb_number || "")
+    );
+
+
+
+  if(existing){
+
+    existing.qty += qty;
+
+  }else{
+
+    cart.push({
+
+      gb_number:
+        currentGB?.gb_number || null,
+
+      product_id:
+        pid,
+
+      variant_id:
+        vid,
+
+      product_name:        product.product_name,
+
+      strength:
+        variant.strength,
+
+      price:
+        Number(
+          variant.price
+        ),
+
+      qty:
+        qty
+
+    });
+
+  }
+
+
+
+  localStorage.pepmosaCart =
+    JSON.stringify(cart);
+
+
+  updateCart();
+
+  // Adding to cart must NOT navigate, reload inventory, or open the cart.
+  // Inventory remains unchanged until a successful atomic order submission.
+  window.dispatchEvent(new Event("pepmosa-cart-updated"));
+
+}
+
+
+
+/* =========================================================
+   CART COUNT
+   ========================================================= */
+
+function updateCart(){
+
+  // Always sync from storage so storefront add-to-cart and cart modal use one source of truth.
+  cart = JSON.parse(localStorage.pepmosaCart || "[]");
+
+  const count =
+    cart.reduce(
+      (sum,item) =>
+        sum + Number(item.qty || 0),
+      0
+    );
+
+  if($("cartCount")) $("cartCount").textContent = count;
+
+}
+
+window.pepSyncCartBadge = function(){
+  updateCart();
+};
+
+window.addEventListener("pepmosa-cart-updated", updateCart);
+window.addEventListener("storage", function(e){
+  if(e.key === "pepmosaCart") updateCart();
+});
+window.addEventListener("focus", updateCart);
+document.addEventListener("visibilitychange", function(){
+  if(!document.hidden) updateCart();
+});
+
+/* FINAL CART BADGE GUARD
+   Other storefront scripts can replace cart logic, so the header badge is
+   always reconciled with the actual shared cart storage. */
+(function keepCartBadgeAccurate(){
+  function sync(){
+    let saved=[];
+    try{ saved=JSON.parse(localStorage.getItem("pepmosaCart")||"[]"); }
+    catch(e){ saved=[]; }
+    if(!Array.isArray(saved)) saved=[];
+    const count=saved.reduce((sum,item)=>sum+Math.max(0,Number(item?.qty??item?.quantity??0)||0),0);
+    const badge=document.getElementById("cartCount");
+    if(badge && String(badge.textContent).trim()!==String(count)){
+      badge.textContent=String(count);
+    }
+  }
+  window.pepSyncCartBadge=sync;
+  sync();
+  setInterval(sync,400);
+  window.addEventListener("pageshow",sync);
+  window.addEventListener("pepmosa-cart-updated",sync);
+})();
+
+
+
+/* =========================================================
+   OPEN CART
+   ========================================================= */
+
+function openCart(){
+
+  // Refresh first because other storefront guards may write directly to localStorage.
+  cart = JSON.parse(localStorage.pepmosaCart || "[]");
+
+  $("cartModal").classList.add("show");
+
+  const itemsBox=$("cartItems");
+  const total=cart.reduce((sum,item)=>sum+Number(item.price||item.unit_price||0)*Number(item.qty||0),0);
+
+  if(!cart.length){
+    itemsBox.innerHTML=
+      '<div class="pepCartEmpty">'+
+        '<div class="pepCartEmptyIcon">🛍️</div>'+
+        '<b>Your cart is empty</b>'+
+        '<span>Add your favorite PEPMOSA products to get started.</span>'+
+        '<button type="button" class="btn primary pepCartShopBtn" onclick="closeModal(\'cartModal\');document.getElementById(\'products\').scrollIntoView({behavior:\'smooth\'})">SHOP PRODUCTS</button>'+
+      '</div>';
+  }else{
+    itemsBox.innerHTML=
+      '<div class="pepCartList">'+
+      cart.map((item,index)=>{
+        const price=Number(item.price??item.unit_price??0);
+        return '<div class="pepCartItem">'+
+          '<div class="pepCartItemMain">'+
+            '<div class="pepCartItemName">'+esc(item.product_name)+'</div>'+
+            '<div class="pepCartItemMeta">'+esc(item.strength||'')+' • '+peso(price)+' each</div>'+
+          '</div>'+
+          '<div class="pepCartItemSide">'+
+            '<div class="pepCartQty">× '+Number(item.qty||0)+'</div>'+
+            '<b>'+peso(price*Number(item.qty||0))+'</b>'+
+            '<button class="pepCartRemove" type="button" onclick="removeCart('+index+')" aria-label="Remove item">×</button>'+
+          '</div>'+
+        '</div>';
+      }).join("")+
+      '</div>';
+  }
+
+  $("cartTotal").textContent=peso(total);
+}
+
+
+function clearCart(){
+  cart=[];
+  localStorage.removeItem("pepmosaCart");
+  updateCart();
+  if($("cartItems")) openCart();
+}
+
+window.clearCart=clearCart;
+
+
+
+/* =========================================================
+   REMOVE CART ITEM
+   ========================================================= */
+
+function removeCart(index){
+
+  cart.splice(
+    index,
+    1
+  );
+
+
+  localStorage.pepmosaCart =
+    JSON.stringify(cart);
+
+
+  updateCart();
+
+  openCart();
+
+}
+
+
+
+/* =========================================================
+   CLOSE MODAL
+   ========================================================= */
+
+function closeModal(id){
+
+  const modal=$(id);
+
+  if(!modal) return;
+
+  modal.classList.remove("show");
+
+  // Explicitly clear any inline state left by other storefront scripts.
+  modal.style.display="";
+  modal.setAttribute("aria-hidden","true");
+
+}
+
+
+
+/* =========================================================
+   CHECKOUT
+   ========================================================= */
+
+function checkout(){
+
+  // Closed Group Buys are pricelist/browse only.
+  if(!currentGB || !["OPEN","KIT_COMPLETION"].includes(String(currentGB.status||"").toUpperCase())){
+    syncOrderingControls();
+    return alert("Ordering is currently closed. Checkout is unavailable.");
+  }
+
+  // Use the latest cart saved by Add to Cart before checking out.
+  cart = JSON.parse(localStorage.pepmosaCart || "[]");
+
+  if(!cart.length){
+
+    return alert(
+      "Cart is empty."
+    );
+
+  }
+
+
+  closeModal(
+    "cartModal"
+  );
+
+
+  $("checkoutMsg")
+    .textContent = "";
+
+
+  $("checkoutMsg")
+    .className = "muted";
+
+
+  $("checkoutModal")
+    .classList
+    .add("show");
+
+}
+
+
+
+/* =========================================================
+   PLACE ORDER
+   ========================================================= */
+
+async function placeOrder(){
+
+  const submitBtn =
+    document.querySelector('#checkoutModal .actions .btn.primary');
+
+  try{
+
+    if(!currentGB || !["OPEN","KIT_COMPLETION"].includes(String(currentGB.status||"").toUpperCase())){
+      return alert("Ordering is currently closed for this Group Buy.");
+    }
+
+    // Always read the latest shared cart. Add to Cart does NOT change inventory.
+    cart = JSON.parse(localStorage.pepmosaCart || "[]");
+
+    if(!cart.length){
+      return alert("Cart is empty.");
+    }
+
+    const email =
+      (
+        window.verifiedEmail ||
+        localStorage.getItem("pepmosa_verified_email") ||
+        $("email")?.value ||
+        ""
+      )
+      .trim()
+      .toLowerCase();
+
+    if(!email){
+      return alert("Enter the email used for your approved Admin Fee.");
+    }
+
+    if($("email")) $("email").value=email;
+
+    if(submitBtn){
+      submitBtn.disabled=true;
+      submitBtn.textContent="SUBMITTING…";
+    }
+
+    /*
+      ONE ATOMIC DATABASE SUBMISSION
+
+      Add to Cart does NOT decrement inventory.
+
+      For KIT COMPLETION, the database checks and decrements remaining_qty
+      only here. Inventory rows are locked during the check, so two customers
+      cannot successfully submit the same remaining vial(s).
+    */
+    const { data:result, error:submitError } =
+      await sb.rpc(
+        "submit_group_buy_order_atomic",
+        {
+          p_gb_number: currentGB.gb_number,
+          p_email: email,
+          p_customer_name: $("customerName")?.value?.trim() || null,
+          p_contact: $("contact")?.value?.trim() || null,
+          p_address: $("address")?.value?.trim() || null,
+          p_shipping_method: $("shippingMethod")?.value?.trim() || null,
+          p_items: cart.map(item => ({
+            product_id: item.product_id,
+            variant_id: item.variant_id,
+            qty: Math.max(1,Number(item.qty||0))
+          }))
+        }
+      );
+
+    if(submitError) throw submitError;
+
+    const submitted =
+      Array.isArray(result) ? result[0] : result;
+
+    if(!submitted?.ok || !submitted?.order_id){
+      throw new Error("Order could not be submitted. Please try again.");
+    }
+
+    $("checkoutMsg").className="notice success";
+    $("checkoutMsg").textContent =
+      "Order submitted: " +
+      submitted.order_id +
+      ". Your order is now secured.";
+
+    // Cart clears ONLY after a successful database submission.
+    cart=[];
+    localStorage.removeItem("pepmosaCart");
+    updateCart();
+
+    window.dispatchEvent(new Event("pepmosa-order-submitted"));
+
+  }catch(e){
+
+    console.error("PEPMOSA ORDER SUBMIT",e);
+
+    $("checkoutMsg").className="notice error";
+    $("checkoutMsg").textContent =
+      e?.message ||
+      "Unable to submit your order. Please try again.";
+
+  }finally{
+
+    if(submitBtn){
+      submitBtn.disabled=false;
+      submitBtn.textContent="SUBMIT ORDER";
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+load();
+
+</script>
+
+<script src="storefront-repair.js?v=20260904-notice-scroll-v4"></script>
+<!-- Product picker version: 2026-09-02 -->
+<script src="checkout-polish.js?v=20260904-soldout-popup-final"></script>
+<script src="kit-completion-storefront.js?v=20260904-remove-duplicate-kit-hero-v2"></script>
+
+<!-- PEPMOSA custom popup system: design-only replacement for browser alerts -->
+<style id="pepmosa-popup-style">
+.pepmosa-popup-backdrop{position:fixed;inset:0;background:rgba(36,22,38,.48);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:999999;display:flex;align-items:center;justify-content:center;padding:22px;animation:pepmosaFade .18s ease}.pepmosa-popup{width:min(440px,100%);background:linear-gradient(145deg,#fff,#fff8fc);border:1px solid rgba(213,52,135,.22);border-radius:28px;box-shadow:0 24px 80px rgba(73,28,59,.28);overflow:hidden;animation:pepmosaPop .24s cubic-bezier(.2,.8,.2,1)}.pepmosa-popup-top{height:6px;background:linear-gradient(90deg,#e92c8a,#a44ec1)}.pepmosa-popup-body{padding:26px 28px 24px;text-align:center}.pepmosa-popup-icon{width:58px;height:58px;margin:0 auto 14px;border-radius:19px;display:grid;place-items:center;background:linear-gradient(135deg,#f9d8ea,#efd9fb);color:#c92f82;font-size:27px;font-weight:800}.pepmosa-popup-title{margin:0;color:#3d3942;font-size:21px;font-weight:800;letter-spacing:.02em}.pepmosa-popup-message{margin:10px auto 22px;color:#6f6972;line-height:1.6;font-size:15px;white-space:pre-wrap}.pepmosa-popup-button{border:0;border-radius:14px;padding:13px 34px;min-width:130px;background:linear-gradient(135deg,#df287f,#ad48bd);color:#fff;font-weight:800;letter-spacing:.04em;font-size:14px;box-shadow:0 10px 24px rgba(202,45,132,.25);cursor:pointer}.pepmosa-popup-button:hover{transform:translateY(-1px);filter:brightness(1.04)}@keyframes pepmosaFade{from{opacity:0}to{opacity:1}}@keyframes pepmosaPop{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}@media(max-width:480px){.pepmosa-popup-body{padding:23px 20px 20px}.pepmosa-popup{border-radius:24px}}
+</style>
+<script>
+(function(){function showPepmosaPopup(message){var old=document.getElementById('pepmosa-popup');if(old)old.remove();var wrap=document.createElement('div');wrap.className='pepmosa-popup-backdrop';wrap.id='pepmosa-popup';wrap.innerHTML='<div class="pepmosa-popup" role="dialog" aria-modal="true"><div class="pepmosa-popup-top"></div><div class="pepmosa-popup-body"><div class="pepmosa-popup-icon">✦</div><h3 class="pepmosa-popup-title">PEPMOSA</h3><div class="pepmosa-popup-message"></div><button class="pepmosa-popup-button" type="button">OKAY</button></div></div>';wrap.querySelector('.pepmosa-popup-message').textContent=String(message||'');function close(){wrap.remove();document.removeEventListener('keydown',key)}function key(e){if(e.key==='Escape'||e.key==='Enter')close()}wrap.querySelector('button').addEventListener('click',close);wrap.addEventListener('click',function(e){if(e.target===wrap)close()});document.addEventListener('keydown',key);document.body.appendChild(wrap);setTimeout(function(){var b=wrap.querySelector('button');if(b)b.focus()},0)}window.alert=showPepmosaPopup;window.pepmosaPopup=showPepmosaPopup})();
+</script>
+
+<!-- PEPMOSA FINAL GB STATUS SYNC: database is the single source of truth -->
+<script>
+(function(){
+  async function syncPublicGBStatus(){
+    try{
+      if(!window.sb) return;
+      const r=await window.sb.from('group_buys').select('*')
+        .in('status',['OPEN','KIT_COMPLETION','CLOSED'])
+        .order('created_at',{ascending:false}).limit(20);
+      if(r.error) throw r.error;
+      const rows=r.data||[];
+      const gb=rows.find(x=>['OPEN','KIT_COMPLETION'].includes(String(x.status||'').toUpperCase()))
+        || rows.find(x=>String(x.status||'').toUpperCase()==='CLOSED') || null;
+      if(!gb) return;
+      window.currentGB=gb;
+      const el=document.getElementById('gbStatus');
+      if(!el) return;
+      const st=String(gb.status||'').toUpperCase();
+      const gbName=gb.customer_facing_name||gb.gb_number;
+      if(st==='CLOSED'){
+        el.style.display='';
+        el.innerHTML='<b class="gb-name">'+esc(gbName)+'</b> <span class="status closed">CLOSED • PRICELIST VIEW</span>';
+      }else if(st==='OPEN'){
+        el.style.display='';
+        const deadline = gb.order_deadline_at ? new Date(gb.order_deadline_at).getTime() : NaN;
+        const days = Number.isFinite(deadline) ? Math.ceil((deadline-Date.now())/86400000) : null;
+        const badge = days !== null
+          ? (days <= 0
+              ? '<span class="status closed">ORDERING CLOSED</span>'
+              : '<span class="gb-remaining gb-remaining-final"><span class="gb-clock">◷</span><span class="gb-remaining-copy"><small>ORDERING CLOSES IN</small><strong>'+days+' DAY'+(days===1?'':'S')+'</strong><em>LEFT TO ORDER</em></span></span>
+          : '';
+        el.innerHTML='<b class="gb-name">'+esc(gbName)+'</b> <span class="status open">OPEN</span>'+badge;
+      }else if(st==='KIT_COMPLETION'){
+        el.style.display='';
+        el.innerHTML='<b class="gb-name">'+esc(gbName)+'</b> <span class="status open">KIT COMPLETION</span>';
+      }
+    }catch(e){console.warn('Final GB status sync:',e)}
+  }
+  window.pepmosaSyncPublicGBStatus=syncPublicGBStatus;
+  let tries=0;
+  const t=setInterval(function(){tries++;syncPublicGBStatus();if(tries>=8)clearInterval(t)},700);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(syncPublicGBStatus,1200),{once:true});
+  else setTimeout(syncPublicGBStatus,1200);
+})();
+</script>
+
+<!-- PEPMOSA universal Admin Fee guard: last-loaded so it covers OPEN GB and KIT COMPLETION -->
+<script>
+(function(){
+  async function requireApprovedAdminFee(){
+    var email=(window.verifiedEmail||localStorage.getItem('pepmosa_verified_email')||localStorage.getItem('pepmosa_customer_email')||'').trim().toLowerCase();
+
+    // If this device has no saved verified email, let an already-approved buyer enter it.
+    // This avoids blocking customers simply because they changed device or cleared browser storage.
+    if(!email){
+      email=(window.prompt('Enter the SAME EMAIL used for your approved Admin Fee:')||'').trim().toLowerCase();
+      if(!email){
+        if(window.pepmosaPopup) window.pepmosaPopup('Admin Fee Required\n\nEnter the email you used when paying the Admin Fee.'); else alert('Admin Fee Required.');
+        return false;
+      }
+    }
+    try{
+      var sb=window.sb;
+      if(!sb) throw new Error('Database not ready');
+      var gb=window.currentGB||null;
+      if(!gb||!gb.gb_number){
+        var q=await sb.from('group_buys').select('*').in('status',['OPEN','KIT_COMPLETION']).order('created_at',{ascending:false}).limit(1).maybeSingle();
+        gb=q.data||null;
+      }
+      if(!gb||!gb.gb_number) throw new Error('No active Group Buy');
+      // Use a secure database function because public visitors cannot directly SELECT
+      // rows from admin_fee_payments under RLS.
+      var r=await sb.rpc('has_approved_admin_fee',{p_email:email,p_gb_number:gb.gb_number});
+      if(r.error) throw r.error;
+      if(r.data!==true){
+        localStorage.removeItem('pepmosa_verified_email');
+        if(window.pepmosaPopup) window.pepmosaPopup('Admin Fee Required\n\nNo approved Admin Fee was found for this email in the current Group Buy.'); else alert('Admin Fee Required.');
+        return false;
+      }
+      localStorage.setItem('pepmosa_verified_email',email);
+      localStorage.setItem('pepmosa_customer_email',email);
+      window.verifiedEmail=email;
+      return true;
+    }catch(err){
+      console.error('Admin Fee guard:',err);
+      if(window.pepmosaPopup) window.pepmosaPopup('Unable to verify Admin Fee status. Please try again.'); else alert('Unable to verify Admin Fee status.');
+      return false;
+    }
+  }
+  window.pepRequireApprovedFee=requireApprovedAdminFee;
+  window.pepAdminFeeGuardReady=true;
+
+  // Block any direct click that would add an item before another script can write the cart.
+  document.addEventListener('click',async function(e){
+    var b=e.target.closest && e.target.closest('.pepPickerAdd,[onclick*="pepAddToCart"],.add-to-cart,.addCart');
+    if(!b) return;
+    if(b.dataset.pepFeePassed==='1') return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    var ok=await requireApprovedAdminFee();
+    if(ok){ b.dataset.pepFeePassed='1'; b.click(); setTimeout(function(){delete b.dataset.pepFeePassed},0); }
+  },true);
+
+  // Checkout is also protected even if a user somehow has old cart items.
+  var tries=0, timer=setInterval(function(){
+    tries++;
+    if(typeof window.placeOrder==='function' && !window.placeOrder.__pepUniversalFeeGuard){
+      var original=window.placeOrder;
+      window.placeOrder=async function(){ if(!await requireApprovedAdminFee()) return false; return original.apply(this,arguments); };
+      window.placeOrder.__pepUniversalFeeGuard=true;
+    }
+    if(tries>100) clearInterval(timer);
+  },100);
+})();
+</script>
+
+<!-- PEPMOSA SITE NOTICE POPUP -->
+<style id="pepmosa-site-notice-style">
+#pepmosaSiteNotice{position:fixed;inset:0;z-index:1000005;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(42,23,43,.48);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);animation:pnFade .22s ease;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.pn-card{width:min(520px,100%);max-height:calc(100dvh - 44px);position:relative;overflow-y:auto;-webkit-overflow-scrolling:touch;border-radius:30px;background:linear-gradient(145deg,#fff,#fff8fc 56%,#fff1f8);border:1px solid rgba(231,91,157,.35);box-shadow:0 28px 90px rgba(72,25,58,.35);padding:34px 30px 28px;text-align:center;animation:pnPop .28s cubic-bezier(.2,.8,.2,1)}
+.pn-card:before,.pn-card:after{content:"♡";position:absolute;color:#f3a8cd;font-size:90px;opacity:.22}.pn-card:before{top:-28px;left:16px;transform:rotate(-16deg)}.pn-card:after{right:-2px;bottom:-38px;transform:rotate(15deg)}
+.pn-close{position:absolute;right:16px;top:14px;width:40px;height:40px;border-radius:50%;border:1px solid #efc5d9;background:#fff8fc;color:#a64478;font-size:25px;cursor:pointer;z-index:2}
+.pn-icon{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;margin:0 auto 15px;font-size:34px;color:#fff;background:linear-gradient(135deg,#ffb3d4,#d85da3 55%,#a94fbc);box-shadow:0 12px 28px rgba(205,62,137,.25)}
+.pn-eyebrow{font-size:11px;letter-spacing:.22em;font-weight:900;color:#b44a80;margin-bottom:8px}.pn-title{font-size:30px;line-height:1.15;margin:0 0 13px;color:#3f3540}.pn-message{font-size:15px;line-height:1.65;color:#685b65;margin:0 auto 22px;max-width:430px;white-space:pre-wrap}
+.pn-button{position:relative;z-index:2;border:0;width:100%;border-radius:15px;padding:15px 18px;background:linear-gradient(135deg,#e83a8e,#bd3b98 58%,#a34dbc);color:#fff;font-size:14px;font-weight:900;letter-spacing:.05em;cursor:pointer;box-shadow:0 12px 28px rgba(205,50,128,.25)}.pn-button:hover{transform:translateY(-1px);filter:brightness(1.04)}
+@keyframes pnFade{from{opacity:0}to{opacity:1}}@keyframes pnPop{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+@media(max-width:520px){#pepmosaSiteNotice{align-items:flex-start;padding:12px}.pn-card{width:100%;max-height:calc(100dvh - 24px);padding:30px 21px 22px;border-radius:25px;margin:auto 0}.pn-title{font-size:25px}.pn-message{font-size:14px}.pn-close{position:sticky;top:0;float:right;margin:-16px -8px 8px 0}.pn-button{position:sticky;bottom:0}}
+</style>
+<script id="pepmosa-site-notice-script">
+(function(){
+  function escHtml(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+  const icons={ANNOUNCEMENT:"📣",IMPORTANT:"✦",PROMO:"♡"};
+  function showNotice(n){
+    if(document.getElementById("pepmosaSiteNotice"))return;
+    const key="pepmosa_notice_dismissed_"+n.notice_id+"_"+(n.updated_at||"");
+    if(localStorage.getItem(key))return;
+    const wrap=document.createElement("div");wrap.id="pepmosaSiteNotice";
+    wrap.innerHTML='<div class="pn-card" role="dialog" aria-modal="true" aria-labelledby="pnTitle"><button class="pn-close" type="button" aria-label="Close">×</button><div class="pn-icon">'+(icons[n.notice_type]||"📣")+'</div><div class="pn-eyebrow">PEPMOSA GROUP BUY</div><h2 class="pn-title" id="pnTitle">'+escHtml(n.title)+'</h2><div class="pn-message">'+escHtml(n.message)+'</div><button class="pn-button" type="button">'+escHtml(n.button_text||"GOT IT! ♥")+'</button></div>';
+    const dismiss=()=>{localStorage.setItem(key,"1");wrap.remove();document.removeEventListener("keydown",onKey)};
+    const onKey=e=>{if(e.key==="Escape")dismiss()};    wrap.querySelector(".pn-close").onclick=dismiss;
+    wrap.querySelector(".pn-button").onclick=()=>{if(n.button_url){try{const u=new URL(n.button_url,location.href);if(u.origin===location.origin)location.href=u.href;else window.open(u.href,"_blank","noopener")}catch(e){dismiss()}}else dismiss()};
+    wrap.addEventListener("click",e=>{if(e.target===wrap)dismiss()});document.addEventListener("keydown",onKey);document.body.appendChild(wrap);
+  }
+  async function loadSiteNotice(){
+    try{
+      if(typeof sb==="undefined"||!sb)return;
+      const now=Date.now();
+      const {data,error}=await sb.from("site_notices").select("*").eq("active",true).order("updated_at",{ascending:false});
+      if(error){console.warn("Site notice unavailable",error);return;}
+      const active=(data||[]).filter(n=>{
+        const starts=!n.starts_at||new Date(n.starts_at).getTime()<=now;
+        const ends=!n.ends_at||new Date(n.ends_at).getTime()>=now;
+        return starts&&ends;
+      });
+      if(active[0])showNotice(active[0]);
+    }catch(e){console.warn("Site notice load failed",e)}
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(loadSiteNotice,700),{once:true});else setTimeout(loadSiteNotice,700);
+})();
+</script>
+
+<!-- PEPMOSA GLOBAL POPUP POLISH -->
+<style id="pepmosa-global-popup-style">
+#pepmosaGlobalPopup{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(47,25,40,.48);backdrop-filter:blur(8px)}
+#pepmosaGlobalPopup.show{display:flex}
+.pepGlobalPopupCard{position:relative;width:min(460px,100%);overflow:hidden;border:1px solid rgba(255,255,255,.72);border-radius:28px;background:linear-gradient(145deg,#fff,#fff5fa 60%,#f8efff);box-shadow:0 30px 90px rgba(54,18,43,.30);transform:translateY(8px);animation:pepPopupIn .22s ease forwards}
+.pepGlobalPopupGlow{position:absolute;width:230px;height:230px;right:-80px;top:-105px;border-radius:50%;background:radial-gradient(circle,rgba(229,43,139,.17),transparent 70%)}
+.pepGlobalPopupBody{position:relative;padding:30px}
+.pepGlobalPopupMark{width:58px;height:58px;display:grid;place-items:center;border-radius:20px;background:linear-gradient(135deg,#e52b8b,#b93bb6);color:#fff;font-size:26px;font-weight:900;box-shadow:0 12px 28px rgba(205,43,139,.24)}
+.pepGlobalPopupTitle{margin:18px 0 8px;color:#402b36;font-size:25px;line-height:1.08;font-weight:950}
+.pepGlobalPopupText{margin:0;color:#765f6b;line-height:1.55;font-size:15px;white-space:pre-line}
+.pepGlobalPopupActions{display:flex;justify-content:flex-end;margin-top:22px}
+.pepGlobalPopupBtn{min-width:118px;border:0;border-radius:14px;padding:13px 20px;background:linear-gradient(135deg,#e52b8b,#b93bb6);color:#fff;font-weight:950;letter-spacing:.04em;cursor:pointer;box-shadow:0 10px 24px rgba(205,43,139,.22)}
+@keyframes pepPopupIn{to{transform:translateY(0)}}
+@media(max-width:560px){#pepmosaGlobalPopup{align-items:flex-end;padding:10px}.pepGlobalPopupCard{border-radius:26px 26px 20px 20px}.pepGlobalPopupBody{padding:24px 20px}.pepGlobalPopupActions{display:block}.pepGlobalPopupBtn{width:100%}}
+</style>
+<script id="pepmosa-global-popup-script">
+(function(){
+  const nativeAlert=window.alert.bind(window);
+  function ensure(){
+    let root=document.getElementById('pepmosaGlobalPopup');
+    if(root)return root;
+    root=document.createElement('div');
+    root.id='pepmosaGlobalPopup';
+    root.innerHTML='<div class="pepGlobalPopupCard" role="dialog" aria-modal="true"><div class="pepGlobalPopupGlow"></div><div class="pepGlobalPopupBody"><div class="pepGlobalPopupMark" id="pepGlobalPopupMark">✦</div><div class="pepGlobalPopupTitle" id="pepGlobalPopupTitle">PEPMOSA</div><p class="pepGlobalPopupText" id="pepGlobalPopupText"></p><div class="pepGlobalPopupActions"><button type="button" class="pepGlobalPopupBtn" id="pepGlobalPopupBtn">OKAY</button></div></div></div>';
+    root.addEventListener('click',e=>{if(e.target===root)root.classList.remove('show')});
+    document.body.appendChild(root);
+    document.getElementById('pepGlobalPopupBtn').onclick=()=>root.classList.remove('show');
+    return root;
+  }
+  window.pepmosaPopup=function(message,title,icon){
+    try{
+      const root=ensure();
+      document.getElementById('pepGlobalPopupText').textContent=String(message||'');
+      document.getElementById('pepGlobalPopupTitle').textContent=title||'PEPMOSA';
+      document.getElementById('pepGlobalPopupMark').textContent=icon||'✦';
+      root.classList.add('show');
+    }catch(e){nativeAlert(String(message||''))}
+  };
+  window.alert=function(message){window.pepmosaPopup(message,'PEPMOSA','✦')};
+})();
+</script>
+
+
+<style id="pepmosa-kit-completion-force-style">
+#pepKitCompletionCard{position:relative!important;overflow:hidden!important;margin:22px 0 26px!important;padding:30px!important;border:1px solid rgba(220,47,142,.28)!important;border-radius:28px!important;background:linear-gradient(135deg,#fff 0%,#fff4f9 54%,#f8efff 100%)!important;box-shadow:0 20px 55px rgba(174,49,124,.13)!important}
+#pepKitCompletionCard .pepKitGlow{position:absolute!important;width:280px!important;height:280px!important;right:-90px!important;top:-130px!important;border-radius:50%!important;background:radial-gradient(circle,rgba(232,50,147,.20),transparent 68%)!important}
+#pepKitCompletionCard .pepKitTop{position:relative!important;display:flex!important;align-items:center!important;justify-content:space-between!important}
+#pepKitCompletionCard .pepKitBadge{display:inline-flex!important;align-items:center!important;padding:11px 16px!important;border-radius:999px!important;background:linear-gradient(135deg,#e52b8b,#b63bb5)!important;color:#fff!important;font-weight:950!important;letter-spacing:.09em!important;font-size:12px!important;box-shadow:0 12px 26px rgba(205,43,139,.25)!important}
+#pepKitCompletionCard .pepKitIcon{display:grid!important;place-items:center!important;width:54px!important;height:54px!important;border-radius:18px!important;background:#fff!important;color:#d42f85!important;font-size:27px!important;box-shadow:0 10px 24px rgba(100,50,80,.12)!important}
+#pepKitCompletionCard h3{position:relative!important;margin:20px 0 8px!important;font-size:42px!important;line-height:1.05!important;letter-spacing:-.04em!important;color:#4b2940!important}
+#pepKitCompletionCard .pepKitLead{position:relative!important;margin:0!important;font-size:17px!important;color:#735b68!important}
+#pepKitCompletionCard .pepKitRules{position:relative!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:13px!important;margin-top:22px!important}
+#pepKitCompletionCard .pepKitRules>div{display:flex!important;gap:11px!important;padding:15px!important;border:1px solid rgba(213,43,135,.13)!important;border-radius:18px!important;background:rgba(255,255,255,.82)!important}
+#pepKitCompletionCard .pepKitRules span{display:grid!important;place-items:center!important;flex:0 0 30px!important;width:30px!important;height:30px!important;border-radius:50%!important;background:#f9d8e9!important;color:#c3337c!important;font-weight:950!important}
+#pepKitCompletionCard .pepKitRules p{margin:2px 0 0!important;color:#6d5964!important;font-size:13px!important;line-height:1.5!important}
+#pepKitCompletionCard .pepKitFooter{position:relative!important;margin-top:16px!important;padding:14px 16px!important;border-radius:15px!important;background:linear-gradient(90deg,rgba(229,43,139,.10),rgba(255,255,255,.78))!important;color:#784e65!important;font-size:13px!important;font-weight:800!important}
+@media(max-width:760px){#pepKitCompletionCard{padding:22px 18px!important;border-radius:23px!important}#pepKitCompletionCard h3{font-size:31px!important}#pepKitCompletionCard .pepKitRules{grid-template-columns:1fr!important}}
+</style>
+<!-- Kit Completion is owned by storefront-repair.js; redundant no-op observer removed. -->
+
+
+<style id="pepmosa-popup-unified-style">
+#pepmosaGlobalPopup{z-index:2147483647!important}
+</style>
+<script id="pepmosa-popup-unified-script">
+(function(){
+  const nativePrompt=window.prompt.bind(window);
+  let resolver=null;
+  function ensure(){
+    let root=document.getElementById('pepmosaGlobalPopup');
+    if(root && root.querySelector('.pepGlobalPopupCard')) return root;
+    return null;
+  }
+  window.pepmosaConfirm=function(message,title){
+    return new Promise(resolve=>{
+      const root=ensure();
+      if(!root){resolve(window.confirm(message));return}
+      const card=root.querySelector('.pepGlobalPopupCard');
+      const actions=root.querySelector('.pepGlobalPopupActions');
+      const text=root.querySelector('#pepGlobalPopupText');
+      const ttl=root.querySelector('#pepGlobalPopupTitle');
+      if(!card||!actions||!text||!ttl){resolve(window.confirm(message));return}
+      ttl.textContent=title||'PLEASE CONFIRM';
+      text.textContent=String(message||'');
+      actions.innerHTML='<button type="button" class="pepGlobalPopupBtn" data-pep-confirm="cancel" style="background:#f1e8ed;color:#755b67;box-shadow:none">CANCEL</button><button type="button" class="pepGlobalPopupBtn" data-pep-confirm="ok">CONFIRM</button>';
+      root.classList.add('show');
+      actions.onclick=e=>{
+        const b=e.target.closest('[data-pep-confirm]');if(!b)return;
+        root.classList.remove('show');actions.onclick=null;resolve(b.dataset.pepConfirm==='ok');
+      };
+    });
+  };
+  window.pepmosaPrompt=function(message,defaultValue,title){
+    return new Promise(resolve=>{
+      const root=ensure();
+      if(!root){resolve(nativePrompt(message,defaultValue||''));return}
+      const card=root.querySelector('.pepGlobalPopupCard');
+      const actions=root.querySelector('.pepGlobalPopupActions');
+      const text=root.querySelector('#pepGlobalPopupText');
+      const ttl=root.querySelector('#pepGlobalPopupTitle');
+      if(!card||!actions||!text||!ttl){resolve(nativePrompt(message,defaultValue||''));return}
+      ttl.textContent=title||'PEPMOSA';
+      text.innerHTML='';
+      const p=document.createElement('div');p.textContent=String(message||'');text.appendChild(p);
+      const input=document.createElement('input');input.type='text';input.value=defaultValue||'';input.style.cssText='width:100%;box-sizing:border-box;margin-top:14px;padding:13px 14px;border:1px solid rgba(213,43,135,.22);border-radius:13px;font:inherit;outline:none;background:#fff';
+      text.appendChild(input);
+      actions.innerHTML='<button type="button" class="pepGlobalPopupBtn" data-pep-prompt="cancel" style="background:#f1e8ed;color:#755b67;box-shadow:none">CANCEL</button><button type="button" class="pepGlobalPopupBtn" data-pep-prompt="ok">CONTINUE</button>';
+      root.classList.add('show');setTimeout(()=>input.focus(),50);
+      actions.onclick=e=>{
+        const b=e.target.closest('[data-pep-prompt]');if(!b)return;
+        const val=b.dataset.pepPrompt==='ok'?input.value:null;
+        root.classList.remove('show');actions.onclick=null;resolve(val);
+      };
+    });
+  };
+})();
+</script>
+<script src="customer-experience.js?v=20260911-moq-v4"></script>
+<!-- soldout-products-visible.js intentionally not loaded on the customer index. -->
+
+<script id="pepmosa-final-product-renderer-v3">
+(function(){
+  function esc2(s){
+    return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function peso2(v){
+    return '₱'+(Number(v)||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+
+  function renderIndexProducts(){
+    const grid=document.getElementById('productGrid');
+    if(!grid) return;
+
+    /* Always use the live catalog populated by the storefront repair layer.
+       The base page and repair layer have separate `products` variables. */
+    const liveProducts=
+      (Array.isArray(window.products)&&window.products.length ? window.products : null) ||
+      (Array.isArray(window.__pepBaseProducts)&&window.__pepBaseProducts.length ? window.__pepBaseProducts : null) ||
+      (typeof products!=='undefined' && Array.isArray(products) && products.length ? products : []);
+    const input=document.getElementById('search');
+    const q=String(input?.value||'').toLowerCase().trim();
+
+    /* If the repair loader has not finished yet, NEVER replace the already
+       visible product cards with "No products found". Filter those existing
+       cards in place until the live catalog is ready. */
+    if(!liveProducts.length){
+      const existing=[...grid.querySelectorAll('.pepStoreCard')];
+      if(existing.length){
+        existing.forEach(card=>{
+          const hay=(card.innerText||'').toLowerCase();
+          card.style.display=(!q || hay.includes(q))?'':'none';
+        });
+        return;
+      }
+    }
+
+    const list=liveProducts;
+    const filtered=list.filter(p=>{
+      const hay=(String(p.product_name||'')+' '+String(p.description||'')).toLowerCase();
+      return !q || hay.includes(q);
+    });
+
+    if(!filtered.length){
+      grid.innerHTML='<div class="card"><div style="text-align:center;padding:35px"><div style="font-size:36px;margin-bottom:10px">🛍️</div><b>'+(q?'No products found':'No products available yet.')+'</b><p class="muted">'+(q?'Try another product name or clear your search.':'No products are available right now.')+'</p></div></div>';
+      return;
+    }
+
+    grid.innerHTML=filtered.map(p=>{
+      const variants=(Array.isArray(p.product_variants)?p.product_variants:[]).filter(v=>v.active!==false);
+      const prices=variants.map(v=>Number(v.price)||0).filter(v=>v>0);
+      const lowest=prices.length?Math.min(...prices):0;
+      return '<article class="card pepStoreCard" data-product-id="'+esc2(p.product_id)+'">'+
+        '<div class="productImg">'+
+          '<span class="pepVariantBadge">'+variants.length+' VARIANT'+(variants.length===1?'':'S')+'</span>'+
+          (p.image_url?'<img loading="lazy" decoding="async" src="'+esc2(p.image_url)+'" alt="'+esc2(p.product_name)+'">':esc2(p.product_name))+
+        '</div>'+
+        '<div class="pepStoreBody">'+
+          '<h3>'+esc2(p.product_name)+'</h3>'+
+          '<p class="muted">'+esc2(p.description||'')+'</p>'+
+          '<div class="pepStoreBottom">'+
+            '<div class="pepStarting"><small>Starting at</small><b>'+peso2(lowest)+'</b></div>'+
+            '<button class="btn primary pepSelectVariant" type="button" data-product-id="'+esc2(p.product_id)+'">SELECT VARIANT</button>'+
+          '</div>'+
+        '</div>'+
+      '</article>';
+    }).join('');
+
+    // Clicks are handled by the single delegated handler below.
+    // Do not attach a second per-button handler here.
+  }
+
+  window.renderProducts=renderIndexProducts;
+  window.pepRenderProductsFinal=renderIndexProducts;
+
+  /* One delegated click handler survives every search re-render. */
+  function bindProductClicks(){
+    const grid=document.getElementById('productGrid');
+    if(!grid || grid.dataset.pepClickBound) return;
+    grid.dataset.pepClickBound='1';
+    grid.addEventListener('click',function(e){
+      const btn=e.target.closest('.pepSelectVariant');
+      if(!btn || !grid.contains(btn)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const pid=btn.getAttribute('data-product-id') || btn.getAttribute('data-pid');
+      if(typeof window.openProductPicker==='function') window.openProductPicker(pid);
+    });
+  }
+
+  function bind(){
+    const input=document.getElementById('search');
+    if(input && !input.dataset.pepFinalBound){
+      input.dataset.pepFinalBound='1';
+      input.addEventListener('input',renderIndexProducts);
+    }
+    const clear=document.getElementById('pepSearchClear');
+    if(clear && !clear.dataset.pepFinalBound){
+      clear.dataset.pepFinalBound='1';
+      clear.addEventListener('click',function(){
+        const i=document.getElementById('search');
+        if(i){i.value='';renderIndexProducts();}
+      });
+    }
+  }
+
+  function boot(){
+    bind();
+    bindProductClicks();
+    renderIndexProducts();
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
+  setTimeout(()=>{bind();bindProductClicks();},800);
+  setTimeout(()=>{bind();bindProductClicks();},1800);
+})();
+</script>
+
+<!-- PEPMOSA LIGHTWEIGHT FAIRY GLITTER — canvas, straight down -->
+<style id="pepmosa-pink-fairy-glitter">
+#pepmosaFallingGlitter{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:40}
+</style>
+<script id="pepmosa-pink-fairy-glitter-script">(function(){function mount(){const old=document.getElementById('pepmosaFallingGlitter');if(old)old.remove();const c=document.createElement('canvas');c.id='pepmosaFallingGlitter';const ctx=c.getContext('2d',{alpha:true});let w=0,h=0,dpr=1,stars=[],raf=0,last=performance.now();function resize(){dpr=Math.min(window.devicePixelRatio||1,1.5);w=innerWidth;h=innerHeight;c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);c.style.width=w+'px';c.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0);stars=Array.from({length:w<700?48:88},()=>make(true))}function make(initial){const big=Math.random()<.09;return{x:Math.random()*w,y:initial?Math.random()*h:-10-Math.random()*40,size:big?5+Math.random()*4:1.7+Math.random()*3,alpha:big?.9:.35+Math.random()*.5,speed:initial?18+Math.random()*24:18+Math.random()*24,pink:Math.random()<.48,phase:Math.random()*Math.PI*2,twinkle:1.8+Math.random()*2.4,big}}function drawStar(s){const pulse=s.big?.78+.22*Math.sin(s.phase):.65+.35*Math.sin(s.phase);const a=s.alpha*Math.max(.18,pulse);ctx.save();ctx.translate(s.x,s.y);ctx.globalAlpha=a;ctx.fillStyle=s.pink?'#ff66ad':'#fff';ctx.shadowBlur=s.big?10:5;ctx.shadowColor=s.pink?'rgba(255,102,173,.9)':'rgba(255,255,255,.9)';ctx.beginPath();const r=s.size,inner=r*.22;for(let i=0;i<8;i++){const ang=-Math.PI/2+i*Math.PI/4;const rr=i%2?r*inner:r;const px=Math.cos(ang)*rr,py=Math.sin(ang)*rr;i?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.closePath();ctx.fill();ctx.restore()}function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;ctx.clearRect(0,0,w,h);for(const s of stars){s.y+=s.speed*dt;s.phase+=s.twinkle*dt;if(s.y>h+15){Object.assign(s,make(false));s.y=-10-Math.random()*30}drawStar(s)}raf=requestAnimationFrame(frame)}document.body.appendChild(c);resize();addEventListener('resize',resize,{passive:true});cancelAnimationFrame(raf);raf=requestAnimationFrame(frame)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount()})();</script>
+  <script src="customer-facing-polish.js?v=20260918"></script>
+
+<script id="pep-latest-proof-script">
+(function(){
+  async function loadLatestProof(){
+    const host=document.getElementById('pepLatestProofCard');
+    if(!host) return;
+    try{
+      const client=window.sb || (typeof initSupabase==='function' ? initSupabase() : null);
+      if(!client) throw new Error('Supabase unavailable');
+      const q=await client.from('buyer_proofs')
+        .select('id,image_path,caption,created_at')
+        .eq('is_published',true).eq('status','published')
+        .order('created_at',{ascending:false}).limit(1);
+      if(q.error) throw q.error;
+      const p=q.data?.[0];
+      if(!p){host.innerHTML='<div class="pepProofEmpty">No published proof yet ♡<br><a class="pepProofOpen" href="buyers-proof.html">VIEW BUYERS’ PROOF</a></div>';return}
+      const s=await client.storage.from('buyer-proofs').createSignedUrl(p.image_path,3600);
+      if(!s.data?.signedUrl) throw new Error('Image unavailable');
+      const safe=String(p.caption||'Verified buyer proof').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+      const date=p.created_at?new Date(p.created_at).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}):'';
+      host.innerHTML='<img class="pepProofImage" src="'+s.data.signedUrl+'" alt="Latest buyers proof"><div class="pepLatestProofInfo"><span class="pepLatestProofBadge">LATEST UPLOAD ♡</span><h3>'+safe+'</h3><p>Thank you for sharing your PEPMOSA experience with our community.</p><div class="pepLatestProofDate">'+date+'</div><a class="pepProofOpen" href="buyers-proof.html">SEE ALL BUYERS’ PROOF →</a></div>';
+    }catch(e){
+      console.error('PEPMOSA latest proof',e);
+      host.innerHTML='<div class="pepProofEmpty">Couldn’t load the latest proof right now. <a class="pepProofOpen" href="buyers-proof.html">OPEN BUYERS’ PROOF</a></div>';
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadLatestProof,{once:true});
+  else loadLatestProof();
+})();
+</script>
+<script id="pep-home-update-script">
+(function(){
+ async function loadHomeUpdate(){
+  const box=document.getElementById('pepHomeUpdate'); if(!box)return;
+  try{
+   const client=window.sb||(typeof initSupabase==='function'?initSupabase():null); if(!client)return;
+   const q=await client.from('site_notices').select('notice_id,title,message,button_url,active,starts_at,ends_at,updated_at').eq('active',true).order('updated_at',{ascending:false});
+   if(q.error)throw q.error;
+   const now=Date.now();
+   const n=(q.data||[]).find(x=>(!x.starts_at||new Date(x.starts_at).getTime()<=now)&&(!x.ends_at||new Date(x.ends_at).getTime()>=now));
+   if(!n){box.style.display='none';return}
+   document.getElementById('pepHomeUpdateTitle').textContent=n.title||'PEPMOSA NEWS';
+   document.getElementById('pepHomeUpdateMessage').textContent=n.message||'Latest PEPMOSA update.';
+   const a=document.getElementById('pepHomeUpdateLink');
+   if(n.button_url){a.href=n.button_url;a.style.display='inline-block'}else a.style.display='none';
+  }catch(e){console.warn('Home update unavailable',e);box.style.display='none'}
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadHomeUpdate,{once:true});else loadHomeUpdate();
+})();
+</script>
+
+<script id="pep-home-falling-hearts">
+(function(){
+  function mount(){
+    if(document.getElementById('pepHomeFallingHearts')) return;
+    const c=document.createElement('canvas');
+    c.id='pepHomeFallingHearts';
+    c.className='pepHomeFallingHearts';
+    const ctx=c.getContext('2d',{alpha:true});
+    let w=0,h=0,dpr=1,items=[],raf=0,last=performance.now();
+    const mobile=()=>innerWidth<700;
+    function make(initial){
+      const size=(mobile()?5.5:7)+Math.random()*(mobile()?6:9);
+      return {
+        x:Math.random()*w,
+        y:initial?Math.random()*h:-30-Math.random()*120,
+        size,
+        speed:18+Math.random()*30,
+        drift:(Math.random()-.5)*14,
+        sway:8+Math.random()*18,
+        phase:Math.random()*Math.PI*2,
+        rot:(Math.random()-.5)*.5,
+        spin:(Math.random()-.5)*.55,
+        alpha:.20+Math.random()*.48,
+        glossy:Math.random()<.24,
+        pink:Math.random()<.72
+      };
+    }
+    function resize(){
+      dpr=Math.min(devicePixelRatio||1,1.5);w=innerWidth;h=innerHeight;
+      c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);c.style.width=w+'px';c.style.height=h+'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      const count=mobile()?24:46;
+      items=Array.from({length:count},()=>make(true));
+    }
+    function heart(x,y,r,rot,alpha,glossy,pink){
+      ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.globalAlpha=alpha;
+      const fill=pink?'#f06aa9':'#e9a1c5';
+      const g=ctx.createLinearGradient(-r,-r,r,r);
+      g.addColorStop(0,glossy?'#ffd7e9':fill);g.addColorStop(.48,fill);g.addColorStop(1,'#d94f93');
+      ctx.fillStyle=g;ctx.shadowBlur=glossy?10:5;ctx.shadowColor='rgba(224,72,145,.20)';
+      ctx.beginPath();
+      ctx.moveTo(0,r*.9);
+      ctx.bezierCurveTo(-r*1.35,r*.05,-r*1.08,-r*.95,-r*.43,-r*.95);
+      ctx.bezierCurveTo(-r*.08,-r*.95,0,-r*.68,0,-r*.48);
+      ctx.bezierCurveTo(0,-r*.68,r*.08,-r*.95,r*.43,-r*.95);
+      ctx.bezierCurveTo(r*1.08,-r*.95,r*1.35,r*.05,0,r*.9);
+      ctx.closePath();ctx.fill();
+      if(glossy){ctx.globalAlpha=alpha*.72;ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-r*.36,-r*.48,r*.20,r*.10,-.45,0,Math.PI*2);ctx.fill();}
+      ctx.restore();
+    }
+    function frame(now){
+      const dt=Math.min(.05,(now-last)/1000);last=now;ctx.clearRect(0,0,w,h);
+      for(const s of items){
+        s.y+=s.speed*dt;s.phase+=dt*1.5;s.rot+=s.spin*dt;
+        s.x+=s.drift*dt+Math.sin(s.phase)*s.sway*dt*.28;
+        if(s.y>h+45){Object.assign(s,make(false));}
+        heart(s.x,s.y,s.size,s.rot,s.alpha,s.glossy,s.pink);
+      }
+      raf=requestAnimationFrame(frame);
+    }
+    document.body.appendChild(c);resize();addEventListener('resize',resize,{passive:true});cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
+})();
+</script>
+<script id="pep-home-remove-legacy-shortcuts">
+(function(){
+  function cleanLegacy(){
+    const els=[...document.querySelectorAll('section,div,nav')];
+    els.forEach(el=>{
+      if(el.dataset.pepmosaLegacyCleaned)return;
+      const t=(el.innerText||'').replace(/\s+/g,' ').trim().toUpperCase();
+      if(t.length>0 && t.length<500 &&
+         /SHOP/.test(t) && /TRACK/.test(t) && /PROOF/.test(t) && /INFO/.test(t) &&
+         /WHY PEPMOSA/.test(t)){
+        el.style.setProperty('display','none','important');
+        el.dataset.pepmosaLegacyCleaned='1';
+      }
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',cleanLegacy);
+  else cleanLegacy();
+  new MutationObserver(cleanLegacy).observe(document.body,{childList:true,subtree:true});
+})();
+</script></body>
+</html>

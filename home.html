@@ -1531,6 +1531,9 @@ main.wrap>.hero .heroLogo:after{
 main.wrap>.hero .heroLogo img{
   position:relative!important;z-index:2!important;
   max-width:475px!important;max-height:320px!important;
+  /* Keep only the circular PEPMOSA logo; remove the square image background. */
+  clip-path:circle(49% at 50% 50%)!important;
+  -webkit-clip-path:circle(49% at 50% 50%)!important;
   filter:drop-shadow(0 12px 18px rgba(83,34,64,.12))!important;
 }
 main.wrap>.hero .gbPanel{padding:12px 10px 10px 18px!important}

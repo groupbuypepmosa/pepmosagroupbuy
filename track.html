@@ -179,6 +179,22 @@ body{background:linear-gradient(145deg,#fffafd 0%,#fff4f9 45%,#fbf4ff 100%)}
 .orderStatus{font-weight:950}.thanks{background:linear-gradient(135deg,#fff0f7,#fff9fc)!important}
 @media(max-width:760px){.body{padding:18px 14px 25px}.trackerGreeting{padding:18px}.stat{border-top:1px solid #f0dce6}.orderFilters{padding:8px}.gbOrderHead{padding:16px}.gbOrderHead h3{font-size:18px}}
 </style>
+<style id="pep-global-rail-fix">
+.pepSideRail{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:9999;display:flex;flex-direction:column;gap:3px;padding:7px;border:1px solid rgba(221,158,190,.32);border-radius:20px;background:rgba(255,250,253,.88);backdrop-filter:blur(16px);box-shadow:0 16px 40px rgba(100,48,83,.13)}
+.pepSideRail a{width:58px;min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:#725866;border-radius:13px;transition:.18s ease}
+.pepSideRail a:hover{color:#c52f80;background:#fff0f7;transform:translateX(-2px)}
+.pepSideRail span{font-size:17px;line-height:1}.pepSideRail b{font-size:6.5px;letter-spacing:.04em;font-weight:950;white-space:nowrap}
+@media(max-width:900px){.pepSideRail{right:8px}}
+@media(max-width:760px){
+  html,body{overflow-x:hidden!important}
+  .pepSideRail{left:50%;right:auto;top:auto;bottom:9px;transform:translateX(-50%);width:calc(100vw - 16px);max-width:560px;box-sizing:border-box;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:2px;padding:5px;border-radius:16px}
+  .pepSideRail a{width:auto;min-width:0;min-height:45px;border-radius:11px}
+  .pepSideRail span{font-size:14px}.pepSideRail b{font-size:5px;letter-spacing:0}
+}
+@media(max-width:430px){
+  .pepSideRail a{min-height:43px}.pepSideRail span{font-size:13px}.pepSideRail b{font-size:4.6px}
+}
+</style>
 </head>
 <body>
 <div class="top"><a class="back" href="index.html">← <span>Back to Shop</span></a></div>
@@ -463,5 +479,15 @@ async function track(){
 window.addEventListener('pageshow',function(e){ if(e.persisted){ const out=$('out'); if(out) out.innerHTML=''; }});
 window.track=track;
 </script>
+<nav class="pepSideRail" aria-label="PEPMOSA shortcuts">
+  <a href="index.html" title="Home"><span>⌂</span><b>HOME</b></a>
+  <a href="shop.html" title="Products"><span>🛍</span><b>PRODUCTS</b></a>
+  <a href="calculator.html" title="Calculator"><span>⌗</span><b>CALCULATOR</b></a>
+  <a href="protocols.html" title="Protocols"><span>☷</span><b>PROTOCOLS</b></a>
+  <a href="track.html?v=20260913-global" title="Track"><span>⌁</span><b>TRACK</b></a>
+  <a href="coa.html" title="COA"><span>✓</span><b>COA</b></a>
+  <a href="buyers-proof.html" title="Buyers' Proof"><span>♥</span><b>PROOF</b></a>
+  <a href="https://chat.whatsapp.com/B5YNWxs2c7t0l08JzNgkek" target="_blank" rel="noopener noreferrer" title="Community"><span>👥</span><b>COMMUNITY</b></a>
+</nav>
 </body>
 </html>

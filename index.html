@@ -1115,6 +1115,108 @@ header{
 }
 </style>
 
+
+<style id="pep-home-final-clean">
+/* HOME FINAL CLEANUP */
+#pepFeeCard{display:none!important}
+#pepKitCompletionCard{display:none!important}
+
+main.wrap{
+  max-width:1180px!important;
+  padding-left:22px!important;
+  padding-right:22px!important;
+}
+main.wrap>.hero{
+  width:100%!important;
+  max-width:none!important;
+  min-height:360px!important;
+  margin:0 0 24px!important;
+  padding:24px 30px!important;
+  grid-template-columns:minmax(360px,44%) minmax(0,56%)!important;
+  gap:10px!important;
+}
+main.wrap>.hero .heroLogo{
+  min-height:315px!important;
+  padding:0!important;
+}
+main.wrap>.hero .heroLogo img{
+  max-width:510px!important;
+  max-height:325px!important;
+}
+main.wrap>.hero .gbPanel{
+  padding:12px 18px 12px 20px!important;
+}
+main.wrap>.hero .gbPanel h1{
+  font-size:clamp(42px,4.3vw,60px)!important;
+  margin:7px 0 11px!important;
+}
+main.wrap>.hero .gbPanel .muted{
+  font-size:13px!important;
+  line-height:1.5!important;
+}
+#gbStatus{
+  margin-top:18px!important;
+  padding:19px 22px 18px 24px!important;
+  border-radius:21px!important;
+  min-height:74px!important;
+}
+#gbStatus > b,#gbStatus .gb-name{
+  font-size:clamp(23px,2.7vw,32px)!important;
+  margin-bottom:8px!important;
+}
+.pepHomeTrustLite{
+  margin:0!important;
+  padding:18px 20px!important;
+  border-radius:21px!important;
+  box-shadow:0 9px 25px rgba(151,76,112,.055)!important;
+}
+.pepHomeTrustLiteHead{margin-bottom:12px!important}
+.pepHomeTrustLiteHead h2{font-size:20px!important}
+.pepHomeTrustLiteHead p{font-size:11px!important}
+.pepHomeTrustLiteGrid{gap:9px!important}
+.pepHomeTrustLiteCard{padding:11px 13px!important;border-radius:15px!important}
+.pepHomeTrustLiteIcon{width:34px!important;height:34px!important;flex-basis:34px!important}
+.pepSideRail{right:12px!important}
+@media(max-width:900px){
+  main.wrap>.hero{
+    grid-template-columns:1fr!important;
+    min-height:auto!important;
+  }
+  main.wrap>.hero .heroLogo{
+    min-height:245px!important;
+    height:245px!important;
+  }
+  main.wrap>.hero .heroLogo img{max-height:255px!important}
+  main.wrap>.hero .gbPanel{padding:4px 8px 8px!important}
+}
+@media(max-width:760px){
+  main.wrap{padding:10px 10px 92px!important}
+  main.wrap>.hero{
+    margin:0 0 14px!important;
+    padding:10px 10px 17px!important;
+    border-radius:21px!important;
+  }
+  main.wrap>.hero .heroLogo{
+    min-height:185px!important;
+    height:185px!important;
+  }
+  main.wrap>.hero .heroLogo img{max-height:195px!important;max-width:370px!important}
+  main.wrap>.hero .gbPanel h1{
+    font-size:30px!important;
+    line-height:1.02!important;
+  }
+  main.wrap>.hero .gbPanel .muted{
+    font-size:11px!important;
+    max-width:330px!important;
+  }
+  #gbStatus{
+    margin-top:12px!important;
+    padding:14px 14px 13px 17px!important;
+  }
+  #gbStatus > b,#gbStatus .gb-name{font-size:21px!important}
+  .pepHomeTrustLite{padding:14px 10px!important}
+}
+</style>
 </head>
 
 
@@ -1268,10 +1370,7 @@ header{
      PEPMOSA QUICK TOOLS
      ======================================================= -->
 
-<!-- =======================================================
-     PRODUCTS ARE NOW IN THE DEDICATED SHOP PAGE
-     ======================================================= -->
-     ======================================================= -->
+<!-- Products are available on the dedicated Shop page. -->
 
 
 

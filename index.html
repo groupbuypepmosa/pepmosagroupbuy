@@ -889,6 +889,30 @@ header{
  .pepFloatingRail{right:8px;top:auto;bottom:18px;transform:none;gap:7px}.pepFloatBtn{padding:10px 12px;font-size:9px}.pepFloatBtn span.label{display:none}
 }
 </style>
+<style id="pep-mobile-cleanup">
+@media(max-width:760px){
+  /* Keep mobile storefront clean: one compact floating action only. */
+  .pepFloatingRail{right:10px;bottom:12px;top:auto;transform:none;gap:0}
+  .pepFloatingRail .community{display:none}
+  .pepFloatBtn{padding:9px 13px;font-size:9px;box-shadow:0 6px 18px rgba(183,53,135,.18)}
+  .pepFloatBtn span.label{display:inline}
+  .pepHomeTrust{margin:18px 0 8px;padding:18px 12px;border-radius:20px}
+  .pepHomeTrustHead{margin-bottom:14px}
+  .pepHomeTrustHead h2{font-size:23px;line-height:1.15}
+  .pepHomeTrustHead p{font-size:12px}
+  .pepTrustGrid{grid-template-columns:1fr 1fr;gap:9px}
+  .pepTrustCard{padding:13px;border-radius:16px}
+  .pepTrustIcon{width:38px;height:38px;border-radius:12px;font-size:17px;margin-bottom:8px}
+  .pepTrustCard strong{font-size:12px;line-height:1.2}
+  .pepTrustCard span{font-size:10px;line-height:1.35}
+  .pepProofPreview{margin-top:16px}
+  .pepProofPreviewHead{margin-bottom:8px}
+  .pepProofPreviewHead h3{font-size:15px}
+  .pepProofMiniGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .pepProofMini img{height:135px}
+  .pepProofMini p{padding:8px 9px;font-size:9px}
+}
+</style>
 </head>
 
 
@@ -2951,97 +2975,3 @@ load();
         '</div>'+
       '</article>';
     }).join('');
-
-    // Clicks are handled by the single delegated handler below.
-    // Do not attach a second per-button handler here.
-  }
-
-  window.renderProducts=renderIndexProducts;
-  window.pepRenderProductsFinal=renderIndexProducts;
-
-  /* One delegated click handler survives every search re-render. */
-  function bindProductClicks(){
-    const grid=document.getElementById('productGrid');
-    if(!grid || grid.dataset.pepClickBound) return;
-    grid.dataset.pepClickBound='1';
-    grid.addEventListener('click',function(e){
-      const btn=e.target.closest('.pepSelectVariant');
-      if(!btn || !grid.contains(btn)) return;
-      e.preventDefault();
-      e.stopPropagation();
-      const pid=btn.getAttribute('data-product-id') || btn.getAttribute('data-pid');
-      if(typeof window.openProductPicker==='function') window.openProductPicker(pid);
-    });
-  }
-
-  function bind(){
-    const input=document.getElementById('search');
-    if(input && !input.dataset.pepFinalBound){
-      input.dataset.pepFinalBound='1';
-      input.addEventListener('input',renderIndexProducts);
-    }
-    const clear=document.getElementById('pepSearchClear');
-    if(clear && !clear.dataset.pepFinalBound){
-      clear.dataset.pepFinalBound='1';
-      clear.addEventListener('click',function(){
-        const i=document.getElementById('search');
-        if(i){i.value='';renderIndexProducts();}
-      });
-    }
-  }
-
-  function boot(){
-    bind();
-    bindProductClicks();
-    renderIndexProducts();
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
-  else boot();
-  setTimeout(()=>{bind();bindProductClicks();},800);
-  setTimeout(()=>{bind();bindProductClicks();},1800);
-})();
-</script>
-
-<!-- PEPMOSA LIGHTWEIGHT FAIRY GLITTER — canvas, straight down -->
-<style id="pepmosa-pink-fairy-glitter">
-#pepmosaFallingGlitter{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:40}
-</style>
-<script id="pepmosa-pink-fairy-glitter-script">(function(){function mount(){const old=document.getElementById('pepmosaFallingGlitter');if(old)old.remove();const c=document.createElement('canvas');c.id='pepmosaFallingGlitter';const ctx=c.getContext('2d',{alpha:true});let w=0,h=0,dpr=1,stars=[],raf=0,last=performance.now();function resize(){dpr=Math.min(window.devicePixelRatio||1,1.5);w=innerWidth;h=innerHeight;c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);c.style.width=w+'px';c.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0);stars=Array.from({length:w<700?48:88},()=>make(true))}function make(initial){const big=Math.random()<.09;return{x:Math.random()*w,y:initial?Math.random()*h:-10-Math.random()*40,size:big?5+Math.random()*4:1.7+Math.random()*3,alpha:big?.9:.35+Math.random()*.5,speed:initial?18+Math.random()*24:18+Math.random()*24,pink:Math.random()<.48,phase:Math.random()*Math.PI*2,twinkle:1.8+Math.random()*2.4,big}}function drawStar(s){const pulse=s.big?.78+.22*Math.sin(s.phase):.65+.35*Math.sin(s.phase);const a=s.alpha*Math.max(.18,pulse);ctx.save();ctx.translate(s.x,s.y);ctx.globalAlpha=a;ctx.fillStyle=s.pink?'#ff66ad':'#fff';ctx.shadowBlur=s.big?10:5;ctx.shadowColor=s.pink?'rgba(255,102,173,.9)':'rgba(255,255,255,.9)';ctx.beginPath();const r=s.size,inner=r*.22;for(let i=0;i<8;i++){const ang=-Math.PI/2+i*Math.PI/4;const rr=i%2?r*inner:r;const px=Math.cos(ang)*rr,py=Math.sin(ang)*rr;i?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.closePath();ctx.fill();ctx.restore()}function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;ctx.clearRect(0,0,w,h);for(const s of stars){s.y+=s.speed*dt;s.phase+=s.twinkle*dt;if(s.y>h+15){Object.assign(s,make(false));s.y=-10-Math.random()*30}drawStar(s)}raf=requestAnimationFrame(frame)}document.body.appendChild(c);resize();addEventListener('resize',resize,{passive:true});cancelAnimationFrame(raf);raf=requestAnimationFrame(frame)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount()})();</script>
-  
-<div class="pepFloatingRail" aria-label="Quick actions">
-  <a class="pepFloatBtn" href="#products">🛍️ <span class="label">SHOP NOW</span></a>
-  <a class="pepFloatBtn community" href="https://chat.whatsapp.com/B5YNWxs2c7t0l08JzNgkek" target="_blank" rel="noopener noreferrer">👥 <span class="label">JOIN OUR COMMUNITY</span></a>
-</div>
-
-<script id="pep-home-proof-loader">
-(function(){
-  async function loadHomeProofs(){
-    const grid=document.getElementById('pepHomeProofGrid');
-    if(!grid || typeof sb==='undefined') return;
-    try{
-      const {data,error}=await sb.from('buyer_proofs').select('id,image_path,caption,created_at').eq('is_published',true).eq('status','published').order('created_at',{ascending:false}).limit(3);
-      if(error || !data || !data.length){grid.innerHTML='<div class="pepProofEmpty" style="grid-column:1/-1">No published buyers’ proof yet. <a href="buyers-proof.html" style="color:#c52e7d;font-weight:800">View Buyers’ Proof →</a></div>';return;}
-      const cards=[];
-      for(const p of data){
-        const {data:signed}=await sb.storage.from('buyer-proofs').createSignedUrl(p.image_path,3600);
-        if(!signed?.signedUrl) continue;
-        const card=document.createElement('a');
-        card.className='pepProofMini'; card.href='buyers-proof.html'; card.style.textDecoration='none';
-        card.innerHTML='<img loading="lazy" decoding="async" alt="Buyer proof"><p></p>';
-        card.querySelector('img').src=signed.signedUrl;
-        card.querySelector('p').textContent=p.caption||'Verified buyer proof';
-        grid.appendChild(card);
-        cards.push(card);
-      }
-      const empty=grid.querySelector('.pepProofEmpty'); if(empty) empty.remove();
-      if(!cards.length) grid.innerHTML='<div class="pepProofEmpty" style="grid-column:1/-1">Published proof is currently unavailable. <a href="buyers-proof.html" style="color:#c52e7d;font-weight:800">VIEW ALL →</a></div>';
-    }catch(e){console.error(e);grid.innerHTML='<div class="pepProofEmpty" style="grid-column:1/-1">Could not load buyers’ proof. <a href="buyers-proof.html" style="color:#c52e7d;font-weight:800">VIEW ALL →</a></div>';}
-  }
-  function start(){setTimeout(loadHomeProofs,0);}
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true}); else start();
-})();
-</script>
-  <script src="customer-facing-polish.js?v=20260918"></script>
-</body>
-</html>

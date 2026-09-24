@@ -1700,6 +1700,16 @@ main.wrap>.hero .heroLogo img{
 .pepHomeCommunityCTA>a span{margin-left:6px}
 @media(max-width:760px){.pepHomeCommunityCTA{padding:15px 12px;display:block;border-radius:19px}.pepHomeCommunityCTA h2{font-size:17px}.pepHomeCommunityCTA p{font-size:8px}.pepHomeCommunityCTA>a{display:inline-block;margin-top:10px;font-size:7px}}
 </style>
+<style id="pep-home-update-why">
+.pepHomeUpdate{margin:0 0 18px;padding:16px 18px;display:flex;align-items:center;gap:13px;border:1px solid #efd6e3;border-radius:21px;background:linear-gradient(105deg,#fff2f8,#fff,#faf3ff);box-shadow:0 9px 25px rgba(151,76,112,.045)}
+.pepHomeUpdateIcon{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,#ffddea,#f0e5ff);color:#c73680;font-size:17px}
+.pepHomeUpdateText{min-width:0;flex:1}.pepHomeUpdateText .eyebrow{font-size:7px}.pepHomeUpdateText h2{margin:3px 0 2px;font-size:16px;color:#3d2b35}.pepHomeUpdateText p{margin:0;font-size:9px;color:#82717a;line-height:1.4}
+.pepHomeUpdate>a{flex:0 0 auto;text-decoration:none;padding:9px 12px;border-radius:999px;background:#fff;border:1px solid #ebc9da;color:#b32f76;font-size:7px;font-weight:950;letter-spacing:.04em}.pepHomeUpdate>a span{font-size:12px;margin-left:4px}
+.pepWhyP{margin:0 0 18px;padding:18px 20px;border:1px solid #efdce6;border-radius:23px;background:rgba(255,255,255,.78);box-shadow:0 8px 24px rgba(151,76,112,.035)}
+.pepWhyHead{margin-bottom:12px}.pepWhyHead h2{margin:3px 0 0;font-size:20px;color:#3d2b35}
+.pepWhyGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.pepWhyGrid>div{padding:10px 9px;border-radius:15px;background:linear-gradient(135deg,#fff,#fff8fb);border:1px solid #f0dfe7}.pepWhyGrid span{display:block;color:#cf4387;font-size:16px;margin-bottom:5px}.pepWhyGrid b{display:block;font-size:7px;color:#4b3942;letter-spacing:.05em}.pepWhyGrid small{display:block;margin-top:3px;font-size:7px;color:#8c7982}
+@media(max-width:760px){.pepHomeUpdate{padding:13px 11px;border-radius:18px;gap:9px}.pepHomeUpdateIcon{width:34px;height:34px;flex-basis:34px;font-size:14px}.pepHomeUpdateText h2{font-size:14px}.pepHomeUpdateText p{font-size:7.5px}.pepHomeUpdate>a{padding:8px 9px;font-size:6px}.pepWhyP{padding:14px 11px;border-radius:19px}.pepWhyHead h2{font-size:17px}.pepWhyGrid{gap:5px}.pepWhyGrid>div{padding:8px 5px;border-radius:12px;text-align:center}.pepWhyGrid span{font-size:13px}.pepWhyGrid b{font-size:6px}.pepWhyGrid small{font-size:5.5px}}
+</style>
 </head>
 
 
@@ -1823,6 +1833,29 @@ main.wrap>.hero .heroLogo img{
 
   </div>
 
+</section>
+
+<section class="pepHomeUpdate" id="pepHomeUpdate" aria-label="Latest PEPMOSA update">
+  <div class="pepHomeUpdateIcon">✦</div>
+  <div class="pepHomeUpdateText">
+    <div class="eyebrow">LATEST UPDATE</div>
+    <h2 id="pepHomeUpdateTitle">PEPMOSA NEWS</h2>
+    <p id="pepHomeUpdateMessage">Stay tuned for the latest Group Buy announcements and updates.</p>
+  </div>
+  <a id="pepHomeUpdateLink" href="shop.html">VIEW DETAILS <span>→</span></a>
+</section>
+
+<section class="pepWhyP" aria-label="Why PEPMOSA">
+  <div class="pepWhyHead">
+    <div class="eyebrow">WHY PEPMOSA ✦</div>
+    <h2>Simple. Clear. Connected.</h2>
+  </div>
+  <div class="pepWhyGrid">
+    <div><span>✓</span><b>VERIFIED</b><small>COA & verification access</small></div>
+    <div><span>♡</span><b>TRANSPARENT</b><small>Clear Group Buy updates</small></div>
+    <div><span>⌁</span><b>TRACKABLE</b><small>Order status anytime</small></div>
+    <div><span>✦</span><b>COMMUNITY</b><small>Real buyer updates</small></div>
+  </div>
 </section>
 
 <section class="pepLatestProof" aria-label="Latest buyers proof">
@@ -3716,6 +3749,26 @@ load();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadLatestProof,{once:true});
   else loadLatestProof();
+})();
+</script>
+<script id="pep-home-update-script">
+(function(){
+ async function loadHomeUpdate(){
+  const box=document.getElementById('pepHomeUpdate'); if(!box)return;
+  try{
+   const client=window.sb||(typeof initSupabase==='function'?initSupabase():null); if(!client)return;
+   const q=await client.from('site_notices').select('notice_id,title,message,button_url,active,starts_at,ends_at,updated_at').eq('active',true).order('updated_at',{ascending:false});
+   if(q.error)throw q.error;
+   const now=Date.now();
+   const n=(q.data||[]).find(x=>(!x.starts_at||new Date(x.starts_at).getTime()<=now)&&(!x.ends_at||new Date(x.ends_at).getTime()>=now));
+   if(!n){box.style.display='none';return}
+   document.getElementById('pepHomeUpdateTitle').textContent=n.title||'PEPMOSA NEWS';
+   document.getElementById('pepHomeUpdateMessage').textContent=n.message||'Latest PEPMOSA update.';
+   const a=document.getElementById('pepHomeUpdateLink');
+   if(n.button_url){a.href=n.button_url;a.style.display='inline-block'}else a.style.display='none';
+  }catch(e){console.warn('Home update unavailable',e);box.style.display='none'}
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadHomeUpdate,{once:true});else loadHomeUpdate();
 })();
 </script>
 </body>

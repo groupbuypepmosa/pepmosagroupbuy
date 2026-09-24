@@ -956,7 +956,15 @@ header{
 .pepHomeTrustLiteIcon{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#ffeaf3,#f5e9ff);font-size:20px;margin-bottom:10px}
 .pepHomeTrustLiteCard strong{display:block;font-size:14px;color:#3d2c35}.pepHomeTrustLiteCard span{display:block;margin-top:5px;font-size:11px;line-height:1.45;color:#88747e}
 @media(max-width:760px){.pepHomeTrustLite{padding:20px 12px;border-radius:22px}.pepHomeTrustLiteHead h2{font-size:21px}.pepHomeTrustLiteGrid{grid-template-columns:1fr}.pepHomeTrustLiteCard{padding:14px}}
-</style></head>
+</style><style id="pep-global-rail-fix">
+.pepSideRail{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:9999;display:flex;flex-direction:column;gap:3px;padding:7px;border:1px solid rgba(221,158,190,.32);border-radius:20px;background:rgba(255,250,253,.88);backdrop-filter:blur(16px);box-shadow:0 16px 40px rgba(100,48,83,.13)}
+.pepSideRail a{width:58px;min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:#725866;border-radius:13px;transition:.18s ease}
+.pepSideRail a:hover{color:#c52f80;background:#fff0f7;transform:translateX(-2px)}
+.pepSideRail span{font-size:17px;line-height:1}.pepSideRail b{font-size:6.5px;letter-spacing:.04em;font-weight:950;white-space:nowrap}
+@media(max-width:900px){.pepSideRail{right:8px}}
+@media(max-width:760px){html,body{overflow-x:hidden!important}.pepSideRail{left:50%;right:auto;top:auto;bottom:9px;transform:translateX(-50%);width:calc(100vw - 16px);max-width:560px;box-sizing:border-box;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:2px;padding:5px;border-radius:16px}.pepSideRail a{width:auto;min-width:0;min-height:45px;border-radius:11px}.pepSideRail span{font-size:14px}.pepSideRail b{font-size:5px;letter-spacing:0}}@media(max-width:430px){.pepSideRail a{min-height:43px}.pepSideRail span{font-size:13px}.pepSideRail b{font-size:4.6px}}
+</style>
+</head>
 
 
 <body>

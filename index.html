@@ -957,7 +957,165 @@ header{
 .pepHomeTrustLiteIcon{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,#ffeaf3,#f5e9ff);font-size:17px}
 .pepHomeTrustLiteCard strong{display:block;font-size:12px;color:#3d2c35}.pepHomeTrustLiteCard span{display:block;margin-top:3px;font-size:10px;line-height:1.35;color:#88747e}
 @media(max-width:760px){.pepHomeTrustLite{padding:18px 12px;border-radius:21px}.pepHomeTrustLiteHead h2{font-size:20px}.pepHomeTrustLiteGrid{grid-template-columns:1fr}.pepHomeTrustLiteCard{padding:12px}}
-</style></head>
+</style>
+<style id="pepmosa-clean-mobile-v2">
+/* CLEAN HOME LAYOUT — keeps existing functionality, only visual spacing */
+@media(max-width:760px){
+  body{padding-bottom:92px!important}
+  .pepAnnouncement{display:none!important}
+
+  header{
+    min-height:58px!important;
+    padding:8px 12px!important;
+    gap:8px!important;
+  }
+  header .brand{
+    flex:1 1 auto!important;
+    min-width:0!important;
+  }
+  header .brand span{font-size:14px!important}
+  header .brand img{width:40px!important;height:34px!important}
+  header .nav{display:none!important}
+  header .cart{
+    flex:0 0 auto!important;
+    min-height:38px!important;
+    padding:0 11px!important;
+    border-radius:12px!important;
+    font-size:10px!important;
+  }
+
+  main.wrap{padding-left:10px!important;padding-right:10px!important}
+  .hero{
+    display:block!important;
+    margin:10px 0 16px!important;
+    padding:10px 10px 18px!important;
+    border-radius:22px!important;
+  }
+  .heroLogo{
+    min-height:190px!important;
+    height:190px!important;
+    padding:0!important;
+  }
+  .heroLogo img{
+    width:92%!important;
+    max-width:390px!important;
+    max-height:205px!important;
+  }
+  .gbPanel{
+    padding:5px 5px 0!important;
+    text-align:center!important;
+  }
+  .gbPanel .eyebrow{font-size:9px!important}
+  .gbPanel h1{
+    margin:7px 0 9px!important;
+    font-size:29px!important;
+    line-height:1.02!important;
+    letter-spacing:-1.1px!important;
+  }
+  .gbPanel .muted{
+    font-size:12px!important;
+    line-height:1.45!important;
+    max-width:310px!important;
+  }
+
+  #gbStatus{
+    margin-top:13px!important;
+    padding:16px 15px 15px 18px!important;
+    border-radius:18px!important;
+    min-height:0!important;
+    text-align:left!important;
+  }
+  #gbStatus > b,#gbStatus .gb-name{
+    font-size:22px!important;
+    line-height:1.08!important;
+    margin:0 28px 9px 0!important;
+    letter-spacing:-.5px!important;
+  }
+  #gbStatus > b::before,#gbStatus .gb-name::before{
+    font-size:7px!important;
+    letter-spacing:1.4px!important;
+    margin-bottom:5px!important;
+  }
+  #gbStatus .status{
+    min-height:25px!important;
+    padding:6px 10px!important;
+    font-size:8px!important;
+  }
+  #gbStatus::after{right:12px!important;top:9px!important;font-size:24px!important}
+
+  .pepHomeTrustLite{
+    margin:0 0 8px!important;
+    padding:15px 11px!important;
+    border-radius:19px!important;
+    box-shadow:0 8px 22px rgba(151,76,112,.05)!important;
+  }
+  .pepHomeTrustLiteHead{margin-bottom:10px!important}
+  .pepHomeTrustLiteHead h2{
+    margin:3px 0 4px!important;
+    font-size:17px!important;
+  }
+  .pepHomeTrustLiteHead p{font-size:10px!important;line-height:1.35!important}
+  .pepHomeTrustLiteGrid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:7px!important;
+  }
+  .pepHomeTrustLiteCard{
+    min-width:0!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    text-align:center!important;
+    gap:5px!important;
+    padding:10px 5px!important;
+    border-radius:14px!important;
+  }
+  .pepHomeTrustLiteIcon{
+    width:30px!important;height:30px!important;flex-basis:30px!important;
+    border-radius:9px!important;font-size:14px!important;
+  }
+  .pepHomeTrustLiteCard strong{font-size:8px!important;line-height:1.15!important}
+  .pepHomeTrustLiteCard span{display:none!important}
+
+  .pepSideRail{
+    left:50%!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:9px!important;
+    transform:translateX(-50%)!important;
+    width:calc(100vw - 20px)!important;
+    max-width:430px!important;
+    box-sizing:border-box!important;
+    display:grid!important;
+    grid-template-columns:repeat(7,minmax(0,1fr))!important;
+    gap:3px!important;
+    padding:5px!important;
+    border-radius:16px!important;
+    overflow:visible!important;
+  }
+  .pepSideRail a{
+    width:auto!important;
+    min-width:0!important;
+    min-height:45px!important;
+    flex:none!important;
+    border-radius:11px!important;
+    gap:2px!important;
+  }
+  .pepSideRail span{font-size:15px!important}
+  .pepSideRail b{
+    font-size:5.5px!important;
+    letter-spacing:.02em!important;
+    white-space:nowrap!important;
+  }
+}
+@media(max-width:390px){
+  .pepSideRail a{min-height:42px!important}
+  .pepSideRail span{font-size:14px!important}
+  .pepSideRail b{font-size:5px!important}
+  .heroLogo{height:175px!important;min-height:175px!important}
+  .heroLogo img{max-height:190px!important}
+}
+</style>
+
+</head>
 
 
 <body>

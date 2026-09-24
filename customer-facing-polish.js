@@ -234,7 +234,6 @@
     addAnchors();
     injectTrustStrip();
     improveProductHeading();
-    injectMobileBar();
     addBackTop();
   });
 })();

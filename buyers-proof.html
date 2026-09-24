@@ -21,6 +21,47 @@ body{background:#fff9fc;color:#251a27}.proofWrap{width:min(1100px,94%);margin:28
   .pepSideRail a{min-height:43px}.pepSideRail span{font-size:13px}.pepSideRail b{font-size:4.6px}
 }
 </style>
+<style id="pep-rail-same-everywhere">
+/* SAME SHORTCUT RAIL ON DESKTOP + MOBILE */
+.pepSideRail{
+  position:fixed!important;
+  right:14px!important;
+  left:auto!important;
+  top:50%!important;
+  bottom:auto!important;
+  transform:translateY(-50%)!important;
+  width:auto!important;
+  max-width:none!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:3px!important;
+  padding:7px!important;
+  box-sizing:border-box!important;
+  border-radius:20px!important;
+  z-index:9999!important;
+}
+.pepSideRail a{
+  width:58px!important;
+  min-width:58px!important;
+  max-width:58px!important;
+  min-height:48px!important;
+  flex:none!important;
+  border-radius:13px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+}
+.pepSideRail span{font-size:17px!important;line-height:1!important}
+.pepSideRail b{font-size:6.5px!important;letter-spacing:.04em!important;white-space:nowrap!important}
+@media(max-width:430px){
+  .pepSideRail{right:7px!important;padding:5px!important;border-radius:18px!important}
+  .pepSideRail a{width:52px!important;min-width:52px!important;max-width:52px!important;min-height:45px!important;border-radius:11px!important}
+  .pepSideRail span{font-size:15px!important}
+  .pepSideRail b{font-size:5.5px!important}
+}
+</style>
 </head>
 <body>
 <header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a></header>

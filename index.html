@@ -705,6 +705,83 @@ header{
 
 }
 
+
+/* =========================================================
+   PEPMOSA SIDE SHORTCUT RAIL
+   ========================================================= */
+.pepSideRail{
+  position:fixed;
+  right:18px;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:60;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  padding:9px;
+  border:1px solid rgba(221,158,190,.32);
+  border-radius:22px;
+  background:rgba(255,250,253,.78);
+  backdrop-filter:blur(16px);
+  box-shadow:0 18px 45px rgba(100,48,83,.13);
+}
+.pepSideRail a{
+  width:54px;
+  min-height:50px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  text-decoration:none;
+  color:#725866;
+  border-radius:15px;
+  transition:.18s ease;
+}
+.pepSideRail a:hover{
+  color:#c52f80;
+  background:#fff0f7;
+  transform:translateX(-2px);
+}
+.pepSideRail span{
+  font-size:19px;
+  line-height:1;
+}
+.pepSideRail b{
+  font-size:7px;
+  letter-spacing:.06em;
+  font-weight:950;
+}
+@media(max-width:1100px){
+  .pepSideRail{right:10px}
+}
+@media(max-width:760px){
+  .pepSideRail{
+    left:50%;
+    right:auto;
+    top:auto;
+    bottom:12px;
+    transform:translateX(-50%);
+    width:min(calc(100vw - 22px),560px);
+    flex-direction:row;
+    justify-content:space-around;
+    gap:2px;
+    padding:7px;
+    border-radius:18px;
+  }
+  .pepSideRail a{
+    width:auto;
+    flex:1;
+    min-height:48px;
+    border-radius:13px;
+  }
+  .pepSideRail span{font-size:17px}
+  .pepSideRail b{font-size:6.5px}
+}
+@media(max-width:430px){
+  .pepSideRail{overflow-x:auto;justify-content:flex-start}
+  .pepSideRail a{flex:0 0 58px}
+}
 </style>
 
 <style id="pep-inline-picker-style">
@@ -911,8 +988,8 @@ header{
       HOME
     </a>
 
-    <a href="#products">
-      PRODUCTS
+    <a href="shop.html">
+      SHOP
     </a>
 
     <a href="calculator.html">
@@ -978,15 +1055,11 @@ header{
     </div>
 
 
-    <h1>
-      SHOP <span>PEPMOSA</span>
-    </h1>
+    <h1>WELCOME TO <span>PEPMOSA</span></h1>
 
 
     <p class="muted">
-      Choose your product and variant.
-      Products available here are controlled by the
-      categories opened for the current Group Buy.
+      Your Group Buy hub for updates, order tools, product information, and community access.
     </p>
 
 
@@ -1008,7 +1081,7 @@ header{
   <div class="pepHomeTrustLiteHead">
     <div class="eyebrow">PEPMOSA COMMUNITY</div>
     <h2>TRUSTED BY OUR COMMUNITY ✦</h2>
-    <p class="muted">Check our latest buyers' proof, join our community, or shop available products.</p>
+    <p class="muted">Check our latest buyers' proof, join our community, and verify your orders with PEPMOSA.</p>
   </div>
   <div class="pepHomeTrustLiteGrid">
     <a class="pepHomeTrustLiteCard" href="buyers-proof.html">
@@ -1021,10 +1094,10 @@ header{
       <strong>JOIN OUR COMMUNITY</strong>
       <span>Get updates, announcements, and Group Buy information.</span>
     </a>
-    <a class="pepHomeTrustLiteCard" href="#products">
-      <div class="pepHomeTrustLiteIcon">🛍️</div>
-      <strong>SHOP NOW</strong>
-      <span>Browse available products and variants.</span>
+    <a class="pepHomeTrustLiteCard" href="coa.html">
+      <div class="pepHomeTrustLiteIcon">✓</div>
+      <strong>COA & VERIFICATION</strong>
+      <span>Check available certificates and product verification.</span>
     </a>
   </div>
 </section>
@@ -1047,123 +1120,24 @@ header{
      PEPMOSA QUICK TOOLS
      ======================================================= -->
 
-<section class="pepTools" aria-label="PEPMOSA tools">
-
-  <div class="pepToolsHead">
-    <div class="eyebrow">PEPMOSA TOOLS</div>
-    <h2>QUICK ACCESS</h2>
-  </div>
-
-  <div class="pepToolsGrid">
-
-    <a class="pepToolCard" href="calculator.html">
-      <div class="pepToolIcon">⌗</div>
-      <div class="pepToolText">
-        <strong>PEPTIDE CALCULATOR</strong>
-        <span>Calculate concentration and syringe units.</span>
-      </div>
-      <div class="pepToolArrow">›</div>
-    </a>
-
-    <a class="pepToolCard" href="protocols.html">
-      <div class="pepToolIcon">☷</div>
-      <div class="pepToolText">
-        <strong>PROTOCOLS</strong>
-        <span>View available reference guides and information.</span>
-      </div>
-      <div class="pepToolArrow">›</div>
-    </a>
-
-    <a class="pepToolCard" href="track.html?v=20260913-global">
-      <div class="pepToolIcon">⌁</div>
-      <div class="pepToolText">
-        <strong>TRACK MY ORDERS</strong>
-        <span>Check your Group Buy order and delivery status.</span>
-      </div>
-      <div class="pepToolArrow">›</div>
-    </a>
-
-    <a class="pepToolCard" href="coa.html">
-      <div class="pepToolIcon">✓</div>
-      <div class="pepToolText">
-        <strong>COA</strong>
-        <span>Access available certificates and documents.</span>
-      </div>
-      <div class="pepToolArrow">›</div>
-    </a>
-    <a class="pepToolCard" href="buyers-proof">
-      <div class="pepToolIcon">♥</div>
-      <div class="pepToolText">
-        <strong>BUYERS' PROOF</strong>
-        <span>View buyer feedback and successful order proofs with private information protected.</span>
-      </div>
-      <div class="pepToolArrow">›</div>
-    </a>
-
-
-
-  </div>
-
-</section>
-
-
-
 <!-- =======================================================
-     PRODUCTS
+     PRODUCTS ARE NOW IN THE DEDICATED SHOP PAGE
+     ======================================================= -->
      ======================================================= -->
 
 
 
-<section id="products">
 
-
-  <div class="sectionHead">
-
-
-    <div>
-
-      <div class="eyebrow">
-        AVAILABLE NOW
-      </div>
-
-
-      <h2>
-        PRODUCTS
-      </h2>
-
-    </div>
-
-
-    <div class="pepSearchWrap">
-      <span class="pepSearchIcon">⌕</span>
-      <input
-        id="search"
-        class="search"
-        placeholder="Search products…"
-        oninput="window.renderProducts();pepSyncSearchClear()"
-      >
-      <button id="pepSearchClear" class="pepSearchClear" type="button" onclick="document.getElementById('search').value='';window.renderProducts();pepSyncSearchClear()" aria-label="Clear search">×</button>
-    </div>
-
-
-  </div>
-
-
-
-  <div
-    id="productGrid"
-    class="grid"
-  >
-
-    <div class="card">
-      Loading…
-    </div>
-
-  </div>
-
-</section>
-
-
+<!-- PEPMOSA SIDE SHORTCUTS -->
+<nav class="pepSideRail" aria-label="PEPMOSA shortcuts">
+  <a href="shop.html" title="Products"><span>🛍</span><b>PRODUCTS</b></a>
+  <a href="calculator.html" title="Calculator"><span>⌗</span><b>CALCULATOR</b></a>
+  <a href="protocols.html" title="Protocols"><span>☷</span><b>PROTOCOLS</b></a>
+  <a href="track.html?v=20260913-global" title="Track"><span>⌁</span><b>TRACK</b></a>
+  <a href="coa.html" title="COA"><span>✓</span><b>COA</b></a>
+  <a href="buyers-proof.html" title="Buyers' Proof"><span>♥</span><b>PROOF</b></a>
+  <a href="https://chat.whatsapp.com/B5YNWxs2c7t0l08JzNgkek" target="_blank" rel="noopener noreferrer" title="Community"><span>👥</span><b>COMMUNITY</b></a>
+</nav>
 
 <div class="footer">
   PEPMOSA • Group Buy

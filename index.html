@@ -454,105 +454,6 @@ header{
 }
 
 /* =========================================================
-   PEPMOSA QUICK TOOLS
-   ========================================================= */
-
-.pepTools{
-  margin:24px 0 6px;
-}
-
-.pepToolsHead{
-  margin-bottom:12px;
-}
-
-.pepToolsGrid{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:14px;
-}
-
-.pepToolCard{
-  position:relative;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  min-height:108px;
-  padding:18px 20px;
-  border:1px solid rgba(213,43,135,.18);
-  border-radius:22px;
-  background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(255,240,248,.92));
-  box-shadow:0 12px 32px rgba(150,70,130,.08);
-  transition:transform .2s ease,box-shadow .2s ease;
-}
-
-.pepToolCard:hover{
-  transform:translateY(-2px);
-  box-shadow:0 18px 40px rgba(150,70,130,.14);
-}
-
-.pepToolIcon{
-  flex:0 0 54px;
-  width:54px;
-  height:54px;
-  display:grid;
-  place-items:center;
-  border-radius:18px;
-  color:#fff;
-  background:linear-gradient(135deg,#ef5ba9,#b73da3);
-  font-size:25px;
-  box-shadow:0 9px 20px rgba(213,72,151,.22);
-}
-
-.pepToolText{
-  min-width:0;
-}
-
-.pepToolText strong{
-  display:block;
-  color:#392832;
-  font-size:15px;
-  letter-spacing:.02em;
-}
-
-.pepToolText span{
-  display:block;
-  margin-top:4px;
-  color:#806f79;
-  font-size:12px;
-  line-height:1.45;
-}
-
-.pepToolArrow{
-  margin-left:auto;
-  color:#d52b87;
-  font-size:22px;
-  font-weight:900;
-}
-
-@media(max-width:760px){
-  .pepTools{
-    margin:18px 0 4px;
-  }
-  .pepToolsGrid{
-    grid-template-columns:1fr;
-    gap:10px;
-  }
-  .pepToolCard{
-    min-height:86px;
-    padding:14px 16px;
-    border-radius:18px;
-  }
-  .pepToolIcon{
-    flex-basis:48px;
-    width:48px;
-    height:48px;
-    border-radius:15px;
-    font-size:22px;
-  }
-}
-
-/* =========================================================
    PRODUCTS
    ========================================================= */
 
@@ -4093,24 +3994,12 @@ load();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 })();
 </script>
-<script id="pep-home-remove-legacy-shortcuts">
+<script id="pep-home-bfcache-refresh">
 (function(){
-  function cleanLegacy(){
-    const els=[...document.querySelectorAll('section,div,nav')];
-    els.forEach(el=>{
-      if(el.dataset.pepmosaLegacyCleaned)return;
-      const t=(el.innerText||'').replace(/\s+/g,' ').trim().toUpperCase();
-      if(t.length>0 && t.length<500 &&
-         /SHOP/.test(t) && /TRACK/.test(t) && /PROOF/.test(t) && /INFO/.test(t) &&
-         /WHY PEPMOSA/.test(t)){
-        el.style.setProperty('display','none','important');
-        el.dataset.pepmosaLegacyCleaned='1';
-      }
-    });
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',cleanLegacy);
-  else cleanLegacy();
-  new MutationObserver(cleanLegacy).observe(document.body,{childList:true,subtree:true});
+  window.addEventListener("pageshow",function(e){
+    if(e.persisted){ window.location.reload(); }
+  });
 })();
-</script></body>
+</script>
+</body>
 </html>

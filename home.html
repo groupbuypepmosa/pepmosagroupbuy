@@ -4054,3 +4054,32 @@ main.wrap>.hero .heroLogo img{
   box-shadow:none!important;
 }
 </style>
+
+
+<style id="pep-home-logo-transparent-final">
+/* HOME HERO ONLY: remove the visible square around the PEPMOSA artwork */
+main.wrap>.hero .heroLogo{
+  background:transparent!important;
+}
+main.wrap>.hero .heroLogo:before{
+  display:none!important;
+}
+main.wrap>.hero .heroLogo img{
+  border-radius:0!important;
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+  mask-image:none!important;
+  -webkit-mask-image:none!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  mix-blend-mode:multiply!important;
+  object-fit:contain!important;
+  filter:drop-shadow(0 10px 16px rgba(83,34,64,.10))!important;
+}
+@media(max-width:760px){
+  main.wrap>.hero .heroLogo img{
+    object-fit:contain!important;
+    mix-blend-mode:multiply!important;
+  }
+}
+</style>

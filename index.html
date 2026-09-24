@@ -782,6 +782,10 @@ header{
   .pepSideRail{overflow-x:auto;justify-content:flex-start}
   .pepSideRail a{flex:0 0 58px}
 }
+.hero{min-height:360px}
+.heroLogo{min-height:320px}
+.heroLogo img{max-height:330px}
+@media(max-width:900px){.hero{min-height:auto}.heroLogo{min-height:270px}.heroLogo img{max-height:280px}}
 </style>
 
 <style id="pep-inline-picker-style">
@@ -945,14 +949,14 @@ header{
 .gb-remaining-copy em{font-style:normal;font-size:8px;font-weight:900;letter-spacing:.07em;color:#a45b7d}
 @media(max-width:700px){.gb-remaining.gb-remaining-final{margin:8px 0 0;padding:8px 12px}.gb-remaining-copy{gap:4px}.gb-remaining-copy small{font-size:7px}.gb-remaining-copy strong{font-size:16px}.gb-remaining-copy em{font-size:7px}}
 <style id="pep-home-trust-lite">
-.pepHomeTrustLite{margin:28px 0 22px;padding:26px;border:1px solid #efdbe5;border-radius:28px;background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,244,249,.92));box-shadow:0 14px 40px rgba(151,76,112,.07)}
-.pepHomeTrustLiteHead{text-align:center;margin-bottom:18px}.pepHomeTrustLiteHead h2{margin:5px 0;font-size:27px;color:#392b33}.pepHomeTrustLiteHead p{margin:0 auto;max-width:650px}
-.pepHomeTrustLiteGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.pepHomeTrustLiteCard{display:block;text-decoration:none;color:inherit;padding:18px;border:1px solid #efdae5;border-radius:20px;background:rgba(255,255,255,.92);transition:.2s ease}
-.pepHomeTrustLiteCard:hover{transform:translateY(-2px)}
-.pepHomeTrustLiteIcon{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#ffeaf3,#f5e9ff);font-size:20px;margin-bottom:10px}
-.pepHomeTrustLiteCard strong{display:block;font-size:14px;color:#3d2c35}.pepHomeTrustLiteCard span{display:block;margin-top:5px;font-size:11px;line-height:1.45;color:#88747e}
-@media(max-width:760px){.pepHomeTrustLite{padding:20px 12px;border-radius:22px}.pepHomeTrustLiteHead h2{font-size:21px}.pepHomeTrustLiteGrid{grid-template-columns:1fr}.pepHomeTrustLiteCard{padding:14px}}
+.pepHomeTrustLite{margin:24px 0 10px;padding:22px;border:1px solid #efdbe5;border-radius:26px;background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(255,244,249,.9));box-shadow:0 12px 32px rgba(151,76,112,.06)}
+.pepHomeTrustLiteHead{text-align:left;margin-bottom:14px}.pepHomeTrustLiteHead h2{margin:4px 0;font-size:23px;color:#392b33}.pepHomeTrustLiteHead p{margin:0;max-width:650px}
+.pepHomeTrustLiteGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pepHomeTrustLiteCard{display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit;padding:13px 14px;border:1px solid #efdae5;border-radius:17px;background:rgba(255,255,255,.82);transition:.2s ease}
+.pepHomeTrustLiteCard:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(151,76,112,.08)}
+.pepHomeTrustLiteIcon{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,#ffeaf3,#f5e9ff);font-size:17px}
+.pepHomeTrustLiteCard strong{display:block;font-size:12px;color:#3d2c35}.pepHomeTrustLiteCard span{display:block;margin-top:3px;font-size:10px;line-height:1.35;color:#88747e}
+@media(max-width:760px){.pepHomeTrustLite{padding:18px 12px;border-radius:21px}.pepHomeTrustLiteHead h2{font-size:20px}.pepHomeTrustLiteGrid{grid-template-columns:1fr}.pepHomeTrustLiteCard{padding:12px}}
 </style></head>
 
 
@@ -1101,20 +1105,6 @@ header{
     </a>
   </div>
 </section>
-
-<section id="howItWorks" class="pepHow" aria-label="How PEPMOSA Group Buy works">
-  <div class="pepHowHead">
-    <div class="eyebrow">SIMPLE & EASY</div>
-    <h2>HOW GROUP BUY WORKS <span>✿</span></h2>
-    <p class="muted">Everything you need in three simple steps.</p>
-  </div>
-  <div class="pepHowGrid">
-    <div class="pepHowCard"><div class="pepStep">01</div><div class="pepHowIcon">💳</div><h3>PAY ADMIN FEE</h3><p>Secure your slot by paying the required admin fee first.</p></div>
-    <div class="pepHowCard"><div class="pepStep">02</div><div class="pepHowIcon">🛍️</div><h3>PLACE YOUR ORDER</h3><p>Browse the available products, choose your variant, and submit your order.</p></div>
-    <div class="pepHowCard"><div class="pepStep">03</div><div class="pepHowIcon">📦</div><h3>WAIT FOR UPDATES</h3><p>Once your order is processed, wait for Group Buy and shipping updates.</p></div>
-  </div>
-</section>
-
 
 <!-- =======================================================
      PEPMOSA QUICK TOOLS

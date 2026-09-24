@@ -4093,5 +4093,24 @@ load();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 })();
 </script>
-</body>
+<script id="pep-home-remove-legacy-shortcuts">
+(function(){
+  function cleanLegacy(){
+    const els=[...document.querySelectorAll('section,div,nav')];
+    els.forEach(el=>{
+      if(el.dataset.pepmosaLegacyCleaned)return;
+      const t=(el.innerText||'').replace(/\s+/g,' ').trim().toUpperCase();
+      if(t.length>0 && t.length<500 &&
+         /SHOP/.test(t) && /TRACK/.test(t) && /PROOF/.test(t) && /INFO/.test(t) &&
+         /WHY PEPMOSA/.test(t)){
+        el.style.setProperty('display','none','important');
+        el.dataset.pepmosaLegacyCleaned='1';
+      }
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',cleanLegacy);
+  else cleanLegacy();
+  new MutationObserver(cleanLegacy).observe(document.body,{childList:true,subtree:true});
+})();
+</script></body>
 </html>

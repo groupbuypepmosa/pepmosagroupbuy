@@ -74,6 +74,46 @@ a{text-decoration:none;color:inherit}.top{max-width:1280px;margin:auto;padding:2
   .pepSideRail b{font-size:5.5px!important}
 }
 </style>
+<style id="pep-mobile-bottom-rail">
+/* Mobile: move the same shortcut rail to the bottom so it never blocks the page */
+@media(max-width:760px){
+  .pepSideRail{
+    left:50%!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:8px!important;
+    transform:translateX(-50%)!important;
+    width:calc(100vw - 16px)!important;
+    max-width:620px!important;
+    display:flex!important;
+    flex-direction:row!important;
+    justify-content:space-between!important;
+    overflow-x:auto!important;
+    gap:2px!important;
+    padding:5px!important;
+    border-radius:18px!important;
+    box-sizing:border-box!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  .pepSideRail a{
+    width:auto!important;
+    min-width:56px!important;
+    max-width:none!important;
+    min-height:45px!important;
+    flex:1 0 56px!important;
+    border-radius:12px!important;
+  }
+  .pepSideRail span{font-size:15px!important}
+  .pepSideRail b{font-size:5.5px!important}
+  body{padding-bottom:68px!important}
+}
+@media(max-width:390px){
+  .pepSideRail{bottom:6px!important;width:calc(100vw - 12px)!important}
+  .pepSideRail a{min-width:52px!important;flex-basis:52px!important;min-height:43px!important}
+  .pepSideRail span{font-size:14px!important}
+  .pepSideRail b{font-size:5px!important}
+}
+</style>
 </head>
 <body>
 <div class="top"><a class="back" href="index.html">← <span>Back to Shop</span></a></div>

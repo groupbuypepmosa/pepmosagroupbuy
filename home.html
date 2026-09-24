@@ -4024,3 +4024,33 @@ load();
 </script>
 </body>
 </html>
+
+
+<style id="pep-final-logo-fix">
+/* FINAL: hide the rectangular PEPMOSA image canvas; show only the circular artwork. */
+.heroLogo{
+  background:transparent!important;
+  border:0!important;
+  outline:0!important;
+}
+.heroLogo img,
+main.wrap>.hero .heroLogo img{
+  display:block!important;
+  width:285px!important;
+  height:285px!important;
+  max-width:285px!important;
+  max-height:285px!important;
+  object-fit:cover!important;
+  border:0!important;
+  outline:0!important;
+  border-radius:50%!important;
+  clip-path:circle(50% at 50% 50%)!important;
+  -webkit-clip-path:circle(50% at 50% 50%)!important;
+  mask-image:radial-gradient(circle at center,#000 0 50%,transparent 50.5%)!important;
+  -webkit-mask-image:radial-gradient(circle at center,#000 0 50%,transparent 50.5%)!important;
+  mask-repeat:no-repeat!important;
+  -webkit-mask-repeat:no-repeat!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+</style>

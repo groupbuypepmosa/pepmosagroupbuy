@@ -7,7 +7,12 @@ function msg(text,type=''){const el=$('message');if(!el)return;el.textContent=te
 function accountMsg(text,type=''){const el=$('accountMessage');if(el){el.textContent=text;el.className='notice '+type}}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function peso(v){return '₱'+Number(v||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function init(){sb=initSupabase();wire();refresh()}
+function init(){
+ sb=initSupabase();wire();
+ const tab=new URLSearchParams(location.search).get('tab');
+ if(tab==='signup')switchTab('signup'); else if(tab==='login')switchTab('login');
+ refresh()
+}
 function wire(){
  $('loginTab').onclick=()=>switchTab('login'); $('signupTab').onclick=()=>switchTab('signup');
  $('loginForm').onsubmit=login; $('signupForm').onsubmit=signup; $('verifyForm').onsubmit=verifyCode; $('resendCode').onclick=resendCode; $('profileEditForm').onsubmit=saveProfileDetails;

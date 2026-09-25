@@ -352,16 +352,18 @@ async async function loadActivityHistory(){
       return rows;
     }
 
-    const [ordersAll,feesAll]=await Promise.all([
+    const [ordersAll,feesAll,gbAll]=await Promise.all([
       fetchAll("orders","order_id,gb_number,email,total,payment_status,payment_reference,admin_note,created_at"),
-      fetchAll("admin_fee_payments","gb_number,email,amount,status,payment_reference,created_at")
+      fetchAll("admin_fee_payments","gb_number,email,amount,status,payment_reference,created_at"),
+      fetchAll("group_buys","gb_number,status,customer_facing_name,created_at")
     ]);
+    const gbStatus=new Map((gbAll||[]).map(g=>[String(g.gb_number||""),String(g.status||"")]));
 
     const rows=[];
     (ordersAll||[]).forEach(o=>{
       const manual=isManualOrder(o);
       const status=orderStatus(o);
-      const type=manual?"MANUAL ORDER":(String(o.gb_number||"").toUpperCase().includes("KIT")?"KIT COMPLETION ORDER":"ORDER");
+      const type=manual?"MANUAL ORDER":(gbStatus.get(String(o.gb_number||""))==="KIT_COMPLETION"?"KIT COMPLETION ORDER":"ORDER");
       rows.push({
         time:o.created_at,
         type,

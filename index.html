@@ -2023,7 +2023,23 @@ main.wrap>.hero .heroLogo img{
 </style>
 <style id="pep-mobile-account-link">
 .pepMobileAccount{display:none}.pepmosa-approved .pepMobileAccount{display:flex}@media(max-width:620px){.pepMobileAccount{position:absolute;left:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:52px;height:46px;color:#bd2d7e;border-radius:12px;background:#fff0f7;border:1px solid #efd0e0;text-decoration:none}.pepMobileAccount span{font-size:17px;line-height:1}.pepMobileAccount b{font-size:6px;letter-spacing:.05em}}
-</style></head>
+</style><style id="pep-home-auth-cta">
+.pepHomeAuthCTA{margin:20px 0 6px;padding:17px 19px 18px;border:1px solid rgba(224,82,150,.24);border-radius:22px;background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,235,247,.96));box-shadow:0 12px 30px rgba(204,57,131,.10)}
+.pepHomeAuthTitle{font-size:10px;font-weight:950;letter-spacing:.18em;color:#c52f80}
+.pepHomeAuthSub{margin-top:5px;font-size:11px;color:#806875}
+.pepHomeAuthBtns{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap}
+.pepHomeAuthBtns a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 17px;border-radius:999px;text-decoration:none;font-size:10px;font-weight:950;letter-spacing:.08em}
+.pepHomeLoginBtn{color:#c52f80;background:#fff;border:1px solid #e7b6d0;box-shadow:0 7px 18px rgba(205,47,126,.10)}
+.pepHomeSignupBtn{color:#fff;background:linear-gradient(135deg,#ed5ca4,#c52f80);border:1px solid #df4a96;box-shadow:0 8px 20px rgba(206,49,126,.22)}
+@media(max-width:600px){
+ .pepHomeAuthCTA{margin-top:16px;padding:15px;border-radius:19px}
+ .pepHomeAuthSub{font-size:10px;line-height:1.45}
+ .pepHomeAuthBtns{gap:7px}
+ .pepHomeAuthBtns a{flex:1;min-height:40px;padding:0 9px;font-size:8px}
+}
+.pepmosa-approved .pepHomeAuthCTA{display:none!important}
+</style>
+</head>
 
 
 <body>
@@ -2123,6 +2139,15 @@ main.wrap>.hero .heroLogo img{
       class="notice"
     >
       Loading current Group Buy…
+    </div>
+
+    <div class="pepHomeAuthCTA" aria-label="Customer account access">
+      <div class="pepHomeAuthTitle">♡ READY TO SHOP?</div>
+      <div class="pepHomeAuthSub">Log in to your PEPMOSA account or create one to get started.</div>
+      <div class="pepHomeAuthBtns">
+        <a href="account.html?tab=login" class="pepHomeLoginBtn">♡ LOG IN</a>
+        <a href="account.html?tab=signup" class="pepHomeSignupBtn">CREATE YOUR ACCOUNT ✦</a>
+      </div>
     </div>
 
     <div class="pepHomeShopNowWrap">

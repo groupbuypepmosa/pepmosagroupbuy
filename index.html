@@ -3019,9 +3019,9 @@ function openProductPicker(pid, productOverride){
           <button
             class="btn primary pepPickerAdd"
             type="button"
-            ${currentGB?.status==="CLOSED" ? 'disabled aria-disabled="true" title="Ordering is closed"' : 'onclick="window.__pepAddSelected()"'}
+            ${'onclick="window.__pepAddSelected()"'}
           >
-            ${currentGB?.status==="CLOSED" ? 'ORDERING CLOSED' : 'ADD TO CART'}
+            ${'ADD TO CART'}
           </button>
 
         </div>
@@ -3090,11 +3090,6 @@ function openProductPicker(pid, productOverride){
   window.__pepAddSelected =
     async () => {
 
-      /* HARD ADMIN FEE CHECK for OPEN GB Add to Cart */
-      if(typeof window.pepRequireApprovedFee !== "function" || !await window.pepRequireApprovedFee()){
-        return;
-      }
-
       const minimum =
         Math.max(
           1,
@@ -3143,7 +3138,7 @@ window.pepOpenProductPicker = function(pid, product){
 
 function addToCart(pid,vid){
 
-  if(currentGB?.status==="CLOSED"){
+  if(false && currentGB?.status==="CLOSED"){
     if(window.pepmosaPopup)window.pepmosaPopup("Ordering is currently closed. You can still browse variants and prices.");
     else alert("Ordering is currently closed. You can still browse variants and prices.");
     return;
@@ -3667,16 +3662,6 @@ load();
   }
   window.pepRequireApprovedFee=requireApprovedAdminFee;
   window.pepAdminFeeGuardReady=true;
-
-  // Block any direct click that would add an item before another script can write the cart.
-  document.addEventListener('click',async function(e){
-    var b=e.target.closest && e.target.closest('.pepPickerAdd,[onclick*="pepAddToCart"],.add-to-cart,.addCart');
-    if(!b) return;
-    if(b.dataset.pepFeePassed==='1') return;
-    e.preventDefault(); e.stopImmediatePropagation();
-    var ok=await requireApprovedAdminFee();
-    if(ok){ b.dataset.pepFeePassed='1'; b.click(); setTimeout(function(){delete b.dataset.pepFeePassed},0); }
-  },true);
 
   // Checkout is also protected even if a user somehow has old cart items.
   var tries=0, timer=setInterval(function(){

@@ -239,7 +239,6 @@
     // visibility and clearing them can make the underlying storefront behave oddly.
     if(typeof window.closeModal==='function') window.closeModal('cartModal');
     else $('cartModal')?.classList.remove('show');
-    const activeGB=getGB();
     const freshCart=cart.filter(i=>String(i.gb_number||'')===String(activeGB?.gb_number||''));
     if(freshCart.length!==cart.length){window.cart=freshCart;localStorage.setItem(CART_KEY,JSON.stringify(freshCart));localStorage.setItem(CART_GB_KEY,String(activeGB?.gb_number||''));}
     if(!freshCart.length){if(typeof window.openCart==='function')window.openCart();return}

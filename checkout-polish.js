@@ -217,5 +217,139 @@
     checkoutCustomer=await loadCheckoutCustomer();
     if(!checkoutCustomer?.email||!checkoutCustomer.customer_name||!checkoutCustomer.contact||!checkoutCustomer.address){if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Please complete your PEPMOSA account details before checkout.');else alert('Please complete your PEPMOSA account details before checkout.');return}
     buildCheckout();$('checkoutModal')?.classList.add('open')
+  };window.placeOrder=async()=>submitOrder();
+  async function submitOrder(){
+    const msg=$('pepCheckoutMsg'),btn=$('pepPlaceOrder'),{cart,subtotal}=totals(),gb=getGB(),s=S();if(!s||!gb||!cart.length){if(msg)msg.innerHTML='<div class="pepFinalError">Your checkout session is not ready. Please refresh and try again.</div>';return}
+    const latest=await s.from('group_buys').select('gb_number,status').eq('gb_number',gb.gb_number).maybeSingle();
+    if(latest.error||!latest.data||!['OPEN','KIT_COMPLETION'].includes(latest.data.status)){msg.innerHTML='<div class="pepFinalError">This Group Buy is no longer open. Please refresh the page.</div>';return}
+    const email=(checkoutCustomer?.email||'').trim().toLowerCase(),name=(checkoutCustomer?.customer_name||'').trim(),contact=(checkoutCustomer?.contact||'').trim(),address=(checkoutCustomer?.address||'').trim();
+    const file=$('pepOrderProof')?.files?.[0]||null;
+    const shipIndex=Number($('pepShippingMethod')?.value||0),shipNames=['J&T Express - Luzon','J&T Express - Visayas','J&T Express - Mindanao','Lalamove'],shipFees=[100,150,180,0];
+    const shippingMethod=shipNames[shipIndex]||'';
+    const shippingFee=shipFees[shipIndex]||0,total=subtotal+shippingFee;
+    const missing=[];if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))missing.push('Account Email');if(!name)missing.push('Full Name');if(!contact)missing.push('Contact Number');if(!shippingMethod)missing.push('Shipping Method');if(!address)missing.push('Delivery Address')
+    if(!file)missing.push('Payment Proof');if(missing.length){msg.innerHTML='<div class="pepFinalError"><b>Please complete the following:</b> '+missing.join(' • ')+'</div>';return}if(file.size>5*1024*1024){msg.innerHTML='<div class="pepFinalError">Payment proof must be 5MB or smaller.</div>';return}
+    btn.disabled=true;btn.textContent='SUBMITTING…';msg.innerHTML='';
+    try{
+      // Last-second inventory check: never submit a stale Kit Completion item.
+      const cleaned=await sanitizeKitCart(cart,gb);
+      if(cleaned.changed){
+        btn.disabled=false;btn.textContent='SUBMIT MY ORDER';
+        if(!cleaned.cart.length){
+          showSoldOutAndRefresh('Sorry! The remaining vial was just secured by another customer. This variant is now SOLD OUT. Refreshing the shop…');
+          return;
+        }else{
+          msg.innerHTML='<div class="pepFinalError"><b>Your cart was updated.</b><br>One or more items changed availability. Please review the updated cart and reopen Checkout before submitting payment.</div>';
+        }
+        return;
+      }
+      const oid=orderId(),ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg',path=`orders/${gb.gb_number}/${oid}-${Date.now()}.${ext}`;
+      const up=await s.storage.from('payment-proofs').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
+      if(up.error)throw new Error('Payment proof upload failed: '+up.error.message);
+      const proof=s.storage.from('payment-proofs').getPublicUrl(path).data.publicUrl;
+      const items=cart.map(i=>({product_id:itemProductId(i),variant_id:itemVariantId(i),product_name:itemName(i),strength:itemStrength(i)||null,qty:itemQty(i),unit_price:itemPrice(i),line_total:itemPrice(i)*itemQty(i)}));
+      const submitted=await s.rpc('submit_group_buy_order',{
+        p_order_id:oid,p_gb_number:gb.gb_number,p_email:email,p_customer_name:name,p_contact:contact,p_address:address,
+        p_total:total,p_shipping_method:shippingMethod,p_shipping_fee:shippingFee,p_payment_proof_url:proof,p_items:items
+      });
+      if(submitted.error)throw new Error(submitted.error.message||'Order could not be submitted.');
+      localStorage.setItem('pepmosa_last_order_id',oid);localStorage.setItem('pepmosa_customer_email',email);localStorage.setItem('pepmosa_customer_name',name);localStorage.setItem('pepmosa_phone',contact);
+      // Clear both in-memory and persisted cart state only AFTER the order RPC succeeds.
+      clearPersistedCart();
+      const cartModal=$('cartModal');if(cartModal)cartModal.classList.remove('show','open');closeCheckout();
+      const info=$('pepInfoModal');
+      if(info){
+        info.innerHTML=`<div class="pepSuccessCard">
+          <div class="pepSuccessIcon" aria-hidden="true"><span>✓</span></div>
+          <div class="pepSuccessBrand">PEPMOSA</div>
+          <h2 class="pepSuccessTitle">Payment Submitted</h2>
+          <div class="pepSuccessOrder">Order <b>${esc(oid)}</b></div>
+          <p class="pepSuccessText">Your order has been submitted successfully. Your payment proof is now <b>pending admin review</b>.</p>
+          <div class="pepSuccessNote"><span>✓</span><span>We’ll review your payment and update your order status once approved.</span></div>
+          <button type="button" id="pepInfoOk" class="pepSuccessDone">DONE</button>
+        </div>`;
+        info.classList.add('open');
+        const done=$('pepInfoOk');
+        if(done)done.onclick=()=>{info.classList.remove('open');info.setAttribute('aria-hidden','true')};
+      }else alert('Order submitted: '+oid)}catch(e){
+      console.error('PEPMOSA CHECKOUT ERROR',e);
+      const errorText=String(e?.message||'Please try again.');
+      const soldOut=/no longer available|only .* vial\(s\) remain|remaining vial|sold out|kit completion quantity|inventory/i.test(errorText);
+      if(soldOut){
+        showSoldOutAndRefresh('Sorry! Another customer secured the last remaining vial first. This variant is now SOLD OUT. Refreshing the shop…');
+      }else{
+        msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(errorText)+'<br><small>Your cart has not been cleared.</small></div>';
+      }
+    }finally{btn.disabled=false;btn.textContent='SUBMIT MY ORDER'}
+  }
+  async function repairStorefront(){const s=S();if(!s)return false;try{let gb=getGB();if(!gb){const r=await s.from('group_buys').select('*').in('status',['OPEN','KIT_COMPLETION']).order('created_at',{ascending:false}).limit(1).maybeSingle();if(r.error||!r.data)return false;gb=r.data;window.currentGB=gb;window.pepmosaCurrentGB=gb}const cr=await s.from('gb_categories').select('category_name').eq('gb_number',gb.gb_number);if(cr.error)throw cr.error;const categories=(cr.data||[]).map(x=>x.category_name).filter(Boolean);if(!categories.length){products=[];return true}const pr=await s.from('products').select('*').eq('active',true).in('category',categories).order('product_name');if(pr.error)throw pr.error;const base=pr.data||[],ids=base.map(p=>p.product_id).filter(Boolean);let variants=[];if(ids.length){const vr=await s.from('product_variants').select('*').in('product_id',ids).eq('active',true).order('price');if(vr.error)throw vr.error;variants=vr.data||[]}const mr=await s.from('gb_minimum_quantities').select('*').eq('gb_number',gb.gb_number);const mins=mr.error?[]:(mr.data||[]);
+    let kitMap=new Map();
+    if(gb.status==='KIT_COMPLETION'){
+      const kr=await s.rpc('get_kit_completion_inventory',{p_gb_number:gb.gb_number});
+      if(kr.error)throw kr.error;
+      kitMap=new Map((kr.data||[]).map(x=>[String(x.variant_id),Number(x.remaining_qty||0)]));
+    }
+    base.forEach(p=>{
+      p.product_variants=variants.filter(v=>v.product_id===p.product_id).map(v=>{
+        const m=mins.find(x=>x.variant_id===v.variant_id);
+        const remaining=kitMap.get(String(v.variant_id));
+        return {...v,
+          minimum_qty:gb.status==='KIT_COMPLETION'?1:Math.max(1,Number(m?.minimum_qty||1)),
+          remaining_qty:gb.status==='KIT_COMPLETION'?Number(remaining||0):null
+        };
+      }).filter(v=>gb.status!=='KIT_COMPLETION'||Number(v.remaining_qty)>0);
+    });
+    products=base.filter(p=>(p.product_variants||[]).length>0);
+    return true}catch(e){console.error('PEPMOSA STOREFRONT',e);return false}}
+  function renderProducts(){const host=$('productGrid');if(!host)return;const q=($('search')?.value||'').toLowerCase().trim();const list=products.filter(p=>(p.product_name+' '+(p.description||'')).toLowerCase().includes(q));if(!list.length){host.innerHTML='<div class="pepEmpty">No products available in this Group Buy.</div>';return}host.innerHTML=list.map(p=>{const vars=(p.product_variants||[]).filter(v=>v.active!==false);const image=p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.product_name)}" loading="lazy">`:`<div>${esc(p.product_name)}</div>`;const rows=vars.map(v=>{const kit=getGB()?.status==='KIT_COMPLETION';const rem=Number(v.remaining_qty||0);return `<div><div class="pepVariantRow"><div class="pepVariantInfo"><div class="pepVariantStrength">${esc(v.strength||'Standard')}</div><div class="pepVariantPrice">${peso(v.price)}</div></div><input class="pepVariantQty" type="number" min="${Number(v.minimum_qty||1)}" ${kit?`max="${rem}"`:''} value="${Number(v.minimum_qty||1)}" id="qty-${esc(v.variant_id)}"><button class="pepVariantAdd" type="button" onclick="addToCart('${esc(p.product_id)}','${esc(v.variant_id)}')">ADD</button></div><div class="pepMin">${kit?`Only ${rem} vial(s) remaining to complete this kit • minimum 1 vial`:`Minimum ${Number(v.minimum_qty||1)} pc`}</div></div>`}).join('');return`<article class="pepProductCard"><div class="pepProductImage${p.image_url?'':' noImage'}">${image}</div><div class="pepProductName">${esc(p.product_name)}</div><p class="pepProductDesc">${esc(p.description||'')}</p><div class="pepVariants">${rows||'<div class="pepMin">No variants available.</div>'}</div></article>`}).join('')}
+  window.renderProducts=renderProducts;
+  window.addToCart=function(pid,vid){
+    const gbNow=getGB();
+    // This file has its own product cache, while the main storefront and
+    // product picker may already have the same catalog in their own cache.
+    // Use those shared fallbacks so approving the Admin Fee never makes the
+    // immediately-following Add to Cart lose the selected product.
+    const shared=(Array.isArray(window.__pepBaseProducts)?window.__pepBaseProducts:[]);
+    const picked=window.__pepLastPickerProduct;
+    const product=products.find(p=>String(p.product_id)===String(pid))
+      || shared.find(p=>String(p.product_id)===String(pid))
+      || (picked&&String(picked.product_id)===String(pid)?picked:null);
+    const variant=product?.product_variants?.find(v=>String(v.variant_id)===String(vid))
+      || (picked&&String(picked.product_id)===String(pid)?(picked.product_variants||[]).find(v=>String(v.variant_id)===String(vid)):null);
+    if(!product||!variant){
+      console.error('PEPMOSA ADD TO CART: product/variant not found', {pid,vid,cache:products.length,shared:shared.length,picked:!!picked});
+      alert('Product not found. Please refresh the page and try again.');
+      return;
+    }
+    const input=$('qty-'+vid);
+    let qty=Math.max(Number(variant.minimum_qty||1),Number(input?.value||variant.minimum_qty||1));
+    // Never carry cart quantities across different Group Buys.
+    // A cart item belongs only to the GB where it was added.
+    const activeGBNumber=String(gbNow?.gb_number||'');
+    const cartNow=getCart().filter(x=>String(x.gb_number||'')===activeGBNumber);
+    const existing=cartNow.find(x=>
+      String(itemVariantId(x))===String(vid) &&
+      String(x.gb_number||'')===activeGBNumber
+    );
+    if(gbNow?.status==='KIT_COMPLETION'){
+      const remaining=Number(variant.remaining_qty||0),already=Number(existing?itemQty(existing):0);
+      if(remaining<1){alert('This variant is no longer available. Please refresh.');return;}
+      if(qty>remaining){qty=remaining;if(input)input.value=qty;alert('Only '+remaining+' vial(s) remain for this variant.');}
+      if(already+qty>remaining){alert('Only '+Math.max(0,remaining-already)+' more vial(s) can be added for this variant.');return;}
+    }
+    if(existing)existing.qty=itemQty(existing)+qty;
+    else cartNow.push({
+      gb_number:gbNow?.gb_number||null,
+      product_id:pid,variant_id:vid,product_name:product.product_name,
+      strength:variant.strength||'',price:Number(variant.price||0),qty
+    });
+    window.cart=cartNow;
+    localStorage.setItem(CART_KEY,JSON.stringify(cartNow));
+    localStorage.setItem(CART_GB_KEY,activeGBNumber);
+    if(typeof window.updateCart==='function')window.updateCart();
+    // ADD TO CART must stay on the storefront. Do not open an empty/stale cart
+    // and do not refresh or mutate Kit Completion inventory here.
+    window.dispatchEvent(new Event('pepmosa-cart-updated'));
   };
-;
+  function boot(){injectStyles();let tries=0;const t=setInterval(async()=>{tries++;if($('checkoutModal')){if(!products.length)await repairStorefront();clearInterval(t)}if(tries>=15)clearInterval(t)},500)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();

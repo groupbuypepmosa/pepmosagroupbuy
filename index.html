@@ -925,7 +925,16 @@ header{
     margin-top:10px!important;
   }
 }
-</style></style>
+<style id="pep-visible-auth-links">
+.pepAuthLinks{display:flex;align-items:center;gap:9px}
+.pepAuthLinks>a{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 15px;border-radius:999px;font-size:10px;font-weight:950;letter-spacing:.09em;white-space:nowrap}
+.pepAuthLogin{color:#c62e7e;background:#fff5fa;border:1px solid #edc5d9;box-shadow:0 5px 16px rgba(205,47,126,.08)}
+.pepAuthSignup{color:#fff;background:linear-gradient(135deg,#e63f91,#bd2d7e);border:1px solid #df4a96;box-shadow:0 7px 18px rgba(206,49,126,.2)}
+.pepAccountNav{display:none!important}
+.pepmosa-approved .pepAuthLinks .pepAuthLogin,.pepmosa-approved .pepAuthLinks .pepAuthSignup{display:none}
+.pepmosa-approved .pepAccountNav{display:inline-flex!important}
+@media(max-width:760px){.pepAuthLinks{gap:5px}.pepAuthLinks>a{min-height:35px;padding:0 9px;font-size:8px}.pepAuthSignup{max-width:115px;white-space:normal;text-align:center;line-height:1.1}.pepAuthLogin{font-size:9px}}
+</style></style></style>
 
 <style id="pep-inline-picker-style">
 .pepStoreCard{padding:0!important;overflow:hidden;border-radius:24px!important}
@@ -2033,9 +2042,13 @@ main.wrap>.hero .heroLogo img{
 
 
   <nav class="nav">
-    <a href="account.html" class="pepAccountNav" id="pepTopAccount">
-      <span>MY ACCOUNT</span>
-    </a>
+    <div class="pepAuthLinks" id="pepAuthLinks">
+      <a href="account.html?tab=login" class="pepAuthLogin">♡ LOG IN</a>
+      <a href="account.html?tab=signup" class="pepAuthSignup">CREATE ACCOUNT</a>
+      <a href="account.html" class="pepAccountNav" id="pepTopAccount">
+        <span>MY ACCOUNT</span>
+      </a>
+    </div>
   </nav>
   <a href="account.html" class="pepMobileAccount" id="pepMobileAccount" aria-label="My Account">
     <span>♡</span><b>ACCOUNT</b>

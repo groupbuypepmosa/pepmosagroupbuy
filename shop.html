@@ -1046,9 +1046,27 @@ header{
 }
 </style>
 <style id="pep-logged-in-welcome">
-.pepWelcomeBanner{display:none;width:min(1240px,calc(100% - 56px));margin:18px auto 4px;padding:22px 28px 20px;border:1px solid rgba(219,62,143,.18);border-radius:24px;background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(255,239,248,.96) 58%,rgba(248,240,255,.96));box-shadow:0 14px 38px rgba(150,70,130,.09)}
-.pepmosa-approved .pepWelcomeBanner{display:block}.pepmosa-approved .pepMobileAccount{display:flex}.pepWelcomeEyebrow{font-size:10px;font-weight:950;letter-spacing:.18em;color:#c03a7d}.pepWelcomeName{margin-top:4px;font-size:clamp(34px,4vw,52px);font-weight:950;line-height:1;color:#382631;letter-spacing:-1.8px}.pepWelcomeSub{margin-top:7px;font-size:12px;color:#806f79} .pepMobileAccount{display:none}
-@media(max-width:620px){.pepWelcomeBanner{width:calc(100% - 24px);margin:12px auto 2px;padding:18px;border-radius:20px}.pepWelcomeName{font-size:32px;letter-spacing:-1px}.pepWelcomeSub{font-size:11px}.pepMobileAccount{position:absolute;left:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:52px;height:46px;color:#bd2d7e;border-radius:12px;background:#fff0f7;border:1px solid #efd0e0;text-decoration:none}.pepMobileAccount span{font-size:17px;line-height:1}.pepMobileAccount b{font-size:6px;letter-spacing:.05em}}
+.pepWelcomeBanner{
+display:none;position:relative;isolation:isolate;overflow:hidden;
+width:min(1240px,calc(100% - 56px));margin:18px auto 10px;padding:27px 42px 25px;
+border:1px solid rgba(229,87,157,.28);border-radius:30px;
+background:radial-gradient(circle at 90% 35%,rgba(255,255,255,.95) 0 7%,transparent 22%),radial-gradient(circle at 12% 20%,rgba(255,255,255,.9) 0 5%,transparent 19%),linear-gradient(115deg,#fff 0%,#fff0f8 47%,#f8efff 100%);
+box-shadow:0 18px 45px rgba(195,72,137,.13),inset 0 1px 0 #fff}
+.pepWelcomeBanner::before{content:"🎀";position:absolute;left:-3px;top:-18px;z-index:-1;font-size:100px;line-height:1;transform:rotate(-9deg);opacity:.92;filter:drop-shadow(0 8px 10px rgba(226,67,143,.18))}
+.pepWelcomeBanner::after{content:"♡  ✦  ♡  ✧  ♡";position:absolute;right:24px;top:18px;color:#ed6da9;font-size:27px;letter-spacing:12px;opacity:.42;white-space:nowrap;transform:rotate(-4deg)}
+.pepmosa-approved .pepWelcomeBanner{display:block}.pepmosa-approved .pepMobileAccount{display:flex}
+.pepWelcomeEyebrow{position:relative;font-size:10px;font-weight:950;letter-spacing:.24em;color:#d43d88;text-transform:uppercase}
+.pepWelcomeName{position:relative;margin-top:2px;max-width:85%;font-family:"Brush Script MT","Segoe Script","Lucida Handwriting",cursive;font-size:clamp(48px,5.3vw,78px);font-weight:700;line-height:.98;color:#df4f96;letter-spacing:-1px;text-shadow:0 2px 0 rgba(255,255,255,.9),0 8px 24px rgba(210,56,132,.13)}
+.pepWelcomeName::after{content:" ♡";font-family:inherit;color:#f36eae}
+.pepWelcomeSub{position:relative;margin-top:9px;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#806675}
+.pepMobileAccount{display:none}
+@media(max-width:620px){
+.pepWelcomeBanner{width:calc(100% - 20px);margin:12px auto 8px;padding:22px 18px 20px;border-radius:23px}
+.pepWelcomeBanner::before{font-size:68px;left:-7px;top:-12px}.pepWelcomeBanner::after{right:-2px;top:9px;font-size:19px;letter-spacing:5px}
+.pepWelcomeEyebrow{font-size:8px;letter-spacing:.17em;padding-left:28px}.pepWelcomeName{font-size:43px;max-width:100%;margin-top:5px;letter-spacing:0}
+.pepWelcomeSub{font-size:8px;letter-spacing:.11em;line-height:1.5;padding-right:8px}
+.pepMobileAccount{position:absolute;left:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:52px;height:46px;color:#bd2d7e;border-radius:14px;background:#fff0f7;border:1px solid #efd0e0;text-decoration:none;box-shadow:0 5px 16px rgba(206,54,130,.1)}
+.pepMobileAccount span{font-size:17px;line-height:1}.pepMobileAccount b{font-size:6px;letter-spacing:.05em}}
 </style></head>
 
 

@@ -2031,35 +2031,9 @@ main.wrap>.hero .heroLogo img{
 
 
   <nav class="nav">
-
-    <a href="./?home=20260924fix">
-      HOME
+    <a href="account.html" class="pepAccountNav" id="pepTopAccount">
+      <span>MY ACCOUNT</span>
     </a>
-
-    <a href="shop.html">
-      SHOP
-    </a>
-
-    <a href="calculator.html">
-      CALCULATOR
-    </a>
-
-    <a href="protocols.html">
-      PROTOCOLS
-    </a>
-
-    <a id="trackLink" href="track.html?v=20260904-tracking-per-gb">
-      TRACK
-    </a>
-
-    <a href="coa.html">
-      COA
-    </a>
-
-    <a href="account.html" class="pepAccountNav">
-      MY ACCOUNT
-    </a>
-
   </nav>
 
 
@@ -4117,6 +4091,25 @@ load();
   window.addEventListener("pageshow",function(e){
     if(e.persisted){ window.location.reload(); }
   });
+})();
+</script>
+<script id="pep-top-account-name">
+(function(){
+  async function loadTopAccountName(){
+    const a=document.getElementById('pepTopAccount');
+    if(!a)return;
+    try{
+      const client=window.sb||(typeof initSupabase==='function'?initSupabase():null);
+      if(!client)return;
+      const {data:{user}}=await client.auth.getUser();
+      if(!user)return;
+      const {data:profile}=await client.from('profiles').select('full_name').eq('id',user.id).maybeSingle();
+      const name=(profile?.full_name||user.user_metadata?.full_name||user.user_metadata?.name||'').trim();
+      if(name)a.querySelector('span').textContent='MY ACCOUNT · '+name.toUpperCase();
+    }catch(e){console.warn('PEPMOSA account name',e)}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadTopAccountName,{once:true});
+  else loadTopAccountName();
 })();
 </script>
 <script src="customer-access-gate.js?v=20260925"></script>

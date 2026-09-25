@@ -17,8 +17,16 @@
     window.pepLogActivity=log;
     document.addEventListener('click',e=>{
       const el=e.target?.closest?.('[data-audit-action]');
-      if(!el)return;
-      log(el.dataset.auditAction,el.dataset.auditEntity||'UI',el.dataset.auditId||null,{text:(el.innerText||el.getAttribute('aria-label')||'').trim().slice(0,200)});
+      if(el){log(el.dataset.auditAction,el.dataset.auditEntity||'UI',el.dataset.auditId||null,{text:(el.innerText||el.getAttribute('aria-label')||'').trim().slice(0,200)});return}
+      const interactive=e.target?.closest?.('button,a,[role="button"],input[type="checkbox"],input[type="radio"]');
+      if(interactive){
+        log('UI_CLICK','UI',interactive.id||null,{text:(interactive.innerText||interactive.getAttribute('aria-label')||interactive.title||'').trim().slice(0,200),tag:interactive.tagName});
+      }
+    },true);
+    document.addEventListener('change',e=>{
+      const el=e.target;
+      if(!el||!['INPUT','SELECT','TEXTAREA'].includes(el.tagName))return;
+      log('FIELD_CHANGE','FORM',el.id||el.name||null,{field:el.id||el.name||'',type:el.type||el.tagName});
     },true);
     document.addEventListener('submit',e=>{
       const f=e.target;if(!f?.dataset?.auditAction)return;

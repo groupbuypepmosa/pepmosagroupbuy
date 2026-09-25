@@ -2608,8 +2608,35 @@ load();
 <!-- PEPMOSA universal Admin Fee guard: last-loaded so it covers OPEN GB and KIT COMPLETION -->
 <script>
 (function(){
+  function showAdminFeePayment(gb,email){
+    return new Promise(resolve=>{
+      const old=document.getElementById('pepAdminFeeModal'); if(old)old.remove();
+      const wrap=document.createElement('div'); wrap.id='pepAdminFeeModal';
+      wrap.style.cssText='position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(45,22,39,.58);backdrop-filter:blur(8px)';
+      const qr=gb?.admin_fee_qr_url?'<img src="'+String(gb.admin_fee_qr_url).replace(/"/g,'&quot;')+'" alt="Admin Fee QR" style="width:min(260px,78vw);height:auto;max-height:260px;object-fit:contain;background:#fff;padding:8px;border-radius:18px;box-shadow:0 10px 28px rgba(70,30,55,.12)">':'<div style="padding:20px;border-radius:15px;background:#fff4f9;color:#8a5a72;font-size:12px">Admin Fee QR is not available yet. Please contact PEPMOSA for payment instructions.</div>';
+      wrap.innerHTML='<div style="width:min(460px,100%);max-height:92vh;overflow:auto;border-radius:26px;background:linear-gradient(145deg,#fff,#fff7fb);border:1px solid #efcfe0;box-shadow:0 28px 90px rgba(45,18,40,.30);padding:25px;text-align:center;color:#3d2936"><div style="font-size:10px;letter-spacing:.18em;font-weight:950;color:#c72f80">PEPMOSA GROUP BUY</div><h2 style="margin:7px 0 5px;font-size:27px">Admin Fee Required ♡</h2><p style="margin:0 auto 16px;color:#806b77;font-size:12px;line-height:1.55">Pay the Admin Fee for <b>'+esc(gb?.customer_facing_name||gb?.gb_number||'this Group Buy')+'</b> first. Your cart will stay saved.</p><div style="font-size:22px;font-weight:950;color:#c52e80;margin-bottom:15px">₱'+Number(gb?.admin_fee||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'+qr+'<div style="text-align:left;margin-top:16px"><label style="display:block;font-size:10px;font-weight:950;letter-spacing:.06em;margin-bottom:6px">PAYMENT REFERENCE</label><input id="pepAdminFeeRef" type="text" placeholder="Enter transaction/reference number" style="width:100%;box-sizing:border-box;padding:13px;border:1px solid #e5d2df;border-radius:13px;outline:none"></div><div id="pepAdminFeeMsg" style="margin-top:10px;font-size:11px;color:#9a6a7f;min-height:16px"></div><div style="display:flex;gap:8px;margin-top:16px"><button id="pepAdminFeeCancel" type="button" style="flex:1;padding:13px;border-radius:13px;border:1px solid #e3d2dd;background:#fff;color:#674d59;font-weight:900">CANCEL</button><button id="pepAdminFeeSubmit" type="button" style="flex:1;padding:13px;border-radius:13px;border:0;background:linear-gradient(135deg,#e72c8d,#bb46b7);color:#fff;font-weight:900">I PAID — SUBMIT</button></div></div>';
+      document.body.appendChild(wrap);
+      const close=()=>{wrap.remove();resolve(false)};
+      wrap.querySelector('#pepAdminFeeCancel').onclick=close;
+      wrap.querySelector('#pepAdminFeeSubmit').onclick=async()=>{
+        const ref=wrap.querySelector('#pepAdminFeeRef').value.trim(),msg=wrap.querySelector('#pepAdminFeeMsg'),btn=wrap.querySelector('#pepAdminFeeSubmit');
+        if(!ref){msg.textContent='Enter your payment reference first.';return}
+        btn.disabled=true;btn.textContent='SUBMITTING…';
+        try{
+          const r=await window.sb.from('admin_fee_payments').insert({gb_number:gb.gb_number,email,amount:Number(gb.admin_fee||0),payment_reference:ref,status:'SUBMITTED'}).select('id').maybeSingle();
+          if(r.error)throw r.error;
+          wrap.remove();
+          if(window.pepmosaPopup)window.pepmosaPopup('Admin Fee payment submitted.\n\nPlease wait for PEPMOSA admin approval. Your cart is saved.');
+          resolve(false);
+        }catch(e){msg.textContent=e?.message||'Unable to submit Admin Fee payment.';btn.disabled=false;btn.textContent='I PAID — SUBMIT'}
+      };
+    });
+  }
+
   async function requireApprovedAdminFee(){
-    var email=(window.verifiedEmail||localStorage.getItem('pepmosa_verified_email')||localStorage.getItem('pepmosa_customer_email')||'').trim().toLowerCase();
+    var email='';
+    try{var authUser=(await window.sb?.auth?.getUser())?.data?.user;email=(authUser?.email||'').trim().toLowerCase()}catch(e){}
+    if(!email) email=(window.verifiedEmail||localStorage.getItem('pepmosa_verified_email')||localStorage.getItem('pepmosa_customer_email')||'').trim().toLowerCase();
 
     // If this device has no saved verified email, let an already-approved buyer enter it.
     // This avoids blocking customers simply because they changed device or cleared browser storage.
@@ -2635,7 +2662,7 @@ load();
       if(r.error) throw r.error;
       if(r.data!==true){
         localStorage.removeItem('pepmosa_verified_email');
-        if(window.pepmosaPopup) window.pepmosaPopup('Admin Fee Required\n\nNo approved Admin Fee was found for this email in the current Group Buy.'); else alert('Admin Fee Required.');
+        await showAdminFeePayment(gb,email);
         return false;
       }
       localStorage.setItem('pepmosa_verified_email',email);

@@ -43,8 +43,21 @@ async function signup(e){
  submit.disabled=false;submit.textContent='CREATE ACCOUNT';
  if(error)return msg(error.message,'error');
  if(data.user && !data.user.email_confirmed_at){
+   // Supabase can return an obfuscated existing user for an email that already
+   // has an unconfirmed signup. In that case, explicitly resend the signup OTP
+   // so old/unconfirmed accounts can receive a fresh verification email.
+   const {error:resendError}=await sb.auth.resend({type:'signup',email});
    showVerify(email);
-   msg('Check your email for the 6-digit verification code.','success');
+   if(resendError){
+     const text=(resendError.message||'').toLowerCase();
+     if(text.includes('already confirmed')||text.includes('already registered')||text.includes('confirmed')){
+       msg('This email already has an account. Please use Log In instead.','error');
+     }else{
+       msg(resendError.message,'error');
+     }
+   }else{
+     msg('A new 6-digit verification code has been sent to your email.','success');
+   }
    return;
  }
  if(data.session){await refresh();return}

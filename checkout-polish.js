@@ -8,24 +8,12 @@
   let products=[];
   let checkoutCustomer=null;
   async function loadCheckoutCustomer(){
-    const s=S();
-    if(!s)return null;
+    const s=S();if(!s)return null;
     try{
-      const {data:{user},error:userError}=await s.auth.getUser();
-      if(userError||!user)return null;
-      const {data:p,error:pError}=await s.from('profiles')
-        .select('email,full_name,address,contact_number,whatsapp_name,account_status,email_verified_at')
-        .eq('id',user.id).maybeSingle();
-      if(pError)throw pError;
-      if(!p || p.account_status!=='APPROVED' || !p.email_verified_at)return null;
-      return {
-        user_id:user.id,
-        email:(p.email||user.email||'').trim().toLowerCase(),
-        customer_name:(p.full_name||user.user_metadata?.full_name||'').trim(),
-        contact:(p.contact_number||'').trim(),
-        address:(p.address||'').trim(),
-        whatsapp_name:(p.whatsapp_name||'').trim()
-      };
+      const {data:{user},error:userError}=await s.auth.getUser();if(userError||!user)return null;
+      const {data:p,error:pError}=await s.from('profiles').select('email,full_name,address,contact_number,whatsapp_name,account_status,email_verified_at').eq('id',user.id).maybeSingle();
+      if(pError)throw pError;if(!p||p.account_status!=='APPROVED'||!p.email_verified_at)return null;
+      return {user_id:user.id,email:(p.email||user.email||'').trim().toLowerCase(),customer_name:(p.full_name||user.user_metadata?.full_name||'').trim(),contact:(p.contact_number||'').trim(),address:(p.address||'').trim(),whatsapp_name:(p.whatsapp_name||'').trim()};
     }catch(e){console.warn('PEPMOSA logged-in customer lookup',e);return null}
   }
   const CART_KEY='pepmosaCart', CART_GB_KEY='pepmosaCartGB';
@@ -195,21 +183,16 @@
 }
 
   function buildCheckout(){
-    const modal=$('checkoutModal'),box=modal?.querySelector('.modalbox'),{cart,subtotal}=totals();
-    if(!modal||!box||!cart.length)return;
-    const gb=getGB(),qr=gb?.final_payment_qr_url||'',adminFee=Number(gb?.admin_fee||0);
-    const customer=checkoutCustomer||{};
-    const email=customer.email||'';
+    const modal=$('checkoutModal'),box=modal?.querySelector('.modalbox'),{cart,subtotal}=totals();if(!modal||!box||!cart.length)return;
+    const gb=getGB(),qr=gb?.final_payment_qr_url||'',adminFee=Number(gb?.admin_fee||0),customer=checkoutCustomer||{},email=customer.email||'';
     const lines=cart.map(i=>`<div class="pepOrderLine"><div><b>${esc(itemName(i))}</b><small>${esc(itemStrength(i))}${itemStrength(i)?' • ':''}Qty ${itemQty(i)} × ${peso(itemPrice(i))}</small></div><div class="pepOrderAmount">${peso(itemPrice(i)*itemQty(i))}</div></div>`).join('');
     const qrBlock=qr?`<div class="pepFinalCard"><div class="pepFinalTitle">PAYMENT QR <span class="optional">Scan to pay</span></div><div class="pepQRWrap"><img src="${esc(qr)}" alt="PEPMOSA payment QR"><div class="pepQRText"><h3>Pay your order</h3><p>Complete the payment using the QR above, then upload your payment receipt or screenshot below.</p><div class="pepQRNote">Make sure the amount paid matches your order total.</div></div></div></div>`:`<div class="pepFinalCard"><div class="pepFinalTitle">PAYMENT</div><div class="pepQRText"><h3>Payment QR unavailable</h3><p>Please contact PEPMOSA before submitting your order.</p></div></div>`;
     box.innerHTML=`<div class="pepFinalHead"><div class="pepFinalKicker">PEPMOSA GROUP BUY</div><h2>Checkout ♡</h2><p>Review your order, choose your shipping method, pay, and upload your payment proof. Your saved account details are already filled in.</p></div><div class="pepFinalBody"><div class="pepStep"><span>1</span> ORDER REVIEW</div><div id="pepCheckoutMsg"></div><div class="pepFinalCard"><div class="pepFinalTitle">YOUR ORDER</div>${lines}</div><div class="pepFinalCard"><div class="pepFinalTitle">ORDER TOTAL</div><div class="pepTotalRows"><div class="pepTotalRow"><span>Products</span><b>${peso(subtotal)}</b></div><div class="pepTotalRow"><span>Admin fee <span class="pepPaid">CHECKED ON SUBMIT</span></span><b>${peso(adminFee)}</b></div><div class="pepTotalRow"><span>Shipping</span><b id="pepShippingFee">₱100.00</b></div><div class="pepTotalRow grand"><span>TOTAL</span><span id="pepGrandTotal">${peso(subtotal+100)}</span></div></div></div><div class="pepStep"><span>2</span> PAYMENT</div>${qrBlock}<div class="pepStep"><span>3</span> SAVED CUSTOMER DETAILS</div><div class="pepFinalCard"><div class="pepFields"><div class="pepField"><label>Full Name</label><input value="${esc(customer.customer_name)}" readonly></div><div class="pepField"><label>Contact Number</label><input value="${esc(customer.contact)}" readonly></div><div class="pepField"><label>Email</label><input value="${esc(email)}" readonly></div><div class="pepField"><label>WhatsApp Name</label><input value="${esc(customer.whatsapp_name)}" readonly></div><div class="pepField full"><label>Complete Delivery Address</label><textarea readonly>${esc(customer.address)}</textarea></div></div><div class="pepReturningNote">♡ Your PEPMOSA account details are saved and will be used automatically. You don't need to type them again.</div></div><div class="pepFinalCard"><div class="pepFinalTitle">SHIPPING METHOD <span class="optional">Required</span></div><div class="pepFields"><div class="pepField full"><select id="pepShippingMethod"><option value="0">J&T Express — Luzon • ₱100</option><option value="1">J&T Express — Visayas • ₱150</option><option value="2">J&T Express — Mindanao • ₱180</option><option value="3">Lalamove — APP RATE</option></select></div></div></div><div class="pepFinalCard"><div class="pepFinalTitle">PAYMENT PROOF <span class="optional">Required</span></div><div class="pepUpload"><input id="pepOrderProof" type="file" accept="image/*,.pdf"><div id="pepFileName" class="pepFileName"></div><div class="pepUploadHint">Upload your payment receipt or screenshot • JPG, PNG, or PDF • Maximum 5MB</div></div></div><div class="pepFinalActions"><button id="pepPlaceOrder" class="pepSubmit" type="button">SUBMIT MY ORDER</button><button id="pepCancelOrder" class="pepCancel" type="button">CANCEL</button></div></div>`;
     $('pepOrderProof')?.addEventListener('change',function(){const f=this.files?.[0],n=$('pepFileName');if(f){n.textContent='✓ '+f.name;n.classList.add('show')}else{n.textContent='';n.classList.remove('show')}});
-    $('pepShippingMethod')?.addEventListener('change',updateTotals);
-    $('pepPlaceOrder').onclick=submitOrder;$('pepCancelOrder').onclick=closeCheckout;updateTotals();
+    $('pepShippingMethod')?.addEventListener('change',updateTotals);$('pepPlaceOrder').onclick=submitOrder;$('pepCancelOrder').onclick=closeCheckout;updateTotals();
   }
   function updateTotals(){
-    const {subtotal}=totals();
-    const i=Number($('pepShippingMethod')?.value||0),fee=[100,150,180,0][i]??100;
+    const {subtotal}=totals();const i=Number($('pepShippingMethod')?.value||0),fee=[100,150,180,0][i]??100;
     if($('pepShippingFee'))$('pepShippingFee').textContent=fee?peso(fee):'APP RATE';
     if($('pepGrandTotal'))$('pepGrandTotal').textContent=fee?peso(subtotal+fee):peso(subtotal);
   }
@@ -223,35 +206,16 @@
     setTimeout(()=>window.location.reload(),1200);
   }
   window.checkout=async function(){
-    const activeGB=getGB();
-    if(!activeGB || !['OPEN','KIT_COMPLETION'].includes(String(activeGB.status||'').toUpperCase())){
-      if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Ordering is currently closed. You can still browse products and keep items in your cart.');
-      else alert('Ordering is currently closed.');
-      return;
-    }
-    if(typeof window.pepRequireApprovedFee==='function'){
-      const feeOk=await window.pepRequireApprovedFee();
-      if(!feeOk)return;
-    }
+    const activeGB=getGB();if(!activeGB||!['OPEN','KIT_COMPLETION'].includes(String(activeGB.status||'').toUpperCase())){if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Ordering is currently closed. You can still browse products and keep items in your cart.');else alert('Ordering is currently closed.');return}
+    if(typeof window.pepRequireApprovedFee==='function'){const feeOk=await window.pepRequireApprovedFee();if(!feeOk)return}
     const{cart}=totals();if(!cart.length){if(typeof window.openCart==='function')window.openCart();return}
     if(typeof window.closeModal==='function')window.closeModal('cartModal');else $('cartModal')?.classList.remove('show');
-    const freshCart=cart.filter(i=>String(i.gb_number||'')===String(activeGB?.gb_number||''));
-    if(freshCart.length!==cart.length){window.cart=freshCart;localStorage.setItem(CART_KEY,JSON.stringify(freshCart));localStorage.setItem(CART_GB_KEY,String(activeGB?.gb_number||''));}
+    const freshCart=cart.filter(i=>String(i.gb_number||'')===String(activeGB?.gb_number||''));if(freshCart.length!==cart.length){window.cart=freshCart;localStorage.setItem(CART_KEY,JSON.stringify(freshCart));localStorage.setItem(CART_GB_KEY,String(activeGB?.gb_number||''))}
     if(!freshCart.length){if(typeof window.openCart==='function')window.openCart();return}
-    let cleanCart=freshCart;
-    try{
-      const cleaned=await sanitizeKitCart(cleanCart,activeGB);cleanCart=cleaned.cart;
-      if(cleaned.changed){
-        if(!cleanCart.length){showSoldOutAndRefresh('Sorry! The remaining vial was just secured by another customer. This variant is now SOLD OUT. Refreshing the shop…');return}
-        alert('Your cart was updated because one of the variants is no longer available. Please review the remaining items.');
-      }
-    }catch(e){alert(e.message||'Unable to verify live remaining vials. Please try again.');return}
+    let cleanCart=freshCart;try{const cleaned=await sanitizeKitCart(cleanCart,activeGB);cleanCart=cleaned.cart;if(cleaned.changed){if(!cleanCart.length){showSoldOutAndRefresh('Sorry! The remaining vial was just secured by another customer. This variant is now SOLD OUT. Refreshing the shop…');return}alert('Your cart was updated because one of the variants is no longer available. Please review the remaining items.')}}catch(e){alert(e.message||'Unable to verify live remaining vials. Please try again.');return}
     if(!cleanCart.length){if(typeof window.openCart==='function')window.openCart();return}
     checkoutCustomer=await loadCheckoutCustomer();
-    if(!checkoutCustomer?.email || !checkoutCustomer.customer_name || !checkoutCustomer.contact || !checkoutCustomer.address){
-      if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Please complete your PEPMOSA account details before checkout.');else alert('Please complete your PEPMOSA account details before checkout.');
-      return;
-    }
-    buildCheckout();$('checkoutModal')?.classList.add('open');
+    if(!checkoutCustomer?.email||!checkoutCustomer.customer_name||!checkoutCustomer.contact||!checkoutCustomer.address){if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Please complete your PEPMOSA account details before checkout.');else alert('Please complete your PEPMOSA account details before checkout.');return}
+    buildCheckout();$('checkoutModal')?.classList.add('open')
   };
 ;

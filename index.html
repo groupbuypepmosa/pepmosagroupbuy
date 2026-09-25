@@ -1937,6 +1937,28 @@ main.wrap{position:relative;z-index:3}
   opacity:.55!important;
 }
 </style>
+
+<style id="pep-hero-logo-no-square">
+/* PEPMOSA hero logo cleanup — remove the square image canvas */
+main.wrap>.hero .heroLogo:before{display:none!important}
+main.wrap>.hero .heroLogo img{
+  border-radius:50%!important;
+  clip-path:circle(49% at 50% 50%)!important;
+  -webkit-clip-path:circle(49% at 50% 50%)!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+main.wrap>.hero .heroLogo{
+  background:transparent!important;
+}
+@media(max-width:900px){
+  main.wrap>.hero .heroLogo:before{display:none!important}
+  main.wrap>.hero .heroLogo img{
+    clip-path:circle(49% at 50% 50%)!important;
+    -webkit-clip-path:circle(49% at 50% 50%)!important;
+  }
+}
+</style>
 </head>
 
 

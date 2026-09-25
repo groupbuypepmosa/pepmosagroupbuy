@@ -1959,6 +1959,48 @@ main.wrap>.hero .heroLogo{
   }
 }
 </style>
+
+<style id="pep-hero-redesign-no-square">
+/* Final hero logo redesign: no square/canvas */
+main.wrap>.hero .heroLogo{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+main.wrap>.hero .heroLogo:before{display:none!important;content:none!important}
+main.wrap>.hero .heroLogo img{
+  width:340px!important;
+  height:340px!important;
+  max-width:340px!important;
+  max-height:340px!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  display:block!important;
+  margin:auto!important;
+  background:transparent!important;
+  mix-blend-mode:normal!important;
+  border:0!important;
+  border-radius:50%!important;
+  clip-path:circle(49% at 50% 50%)!important;
+  -webkit-clip-path:circle(49% at 50% 50%)!important;
+  box-shadow:0 12px 28px rgba(211,43,137,.12)!important;
+  filter:drop-shadow(0 10px 16px rgba(83,34,64,.12))!important;
+}
+@media(max-width:900px){
+  main.wrap>.hero .heroLogo img{
+    width:245px!important;height:245px!important;max-width:245px!important;max-height:245px!important;
+    border-radius:50%!important;
+    clip-path:circle(49% at 50% 50%)!important;
+    -webkit-clip-path:circle(49% at 50% 50%)!important;
+  }
+}
+@media(max-width:760px){
+  main.wrap>.hero .heroLogo img{
+    width:205px!important;height:205px!important;max-width:205px!important;max-height:205px!important;
+  }
+}
+</style>
 </head>
 
 

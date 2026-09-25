@@ -9,6 +9,40 @@
 body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 10%,rgba(255,105,180,.16),transparent 28%),radial-gradient(circle at 90% 10%,rgba(180,125,255,.15),transparent 30%),linear-gradient(135deg,#fff8fc,#fff3f9 48%,#f7efff);color:#342530}
 .accountWrap{width:min(1040px,92%);margin:40px auto 80px}.accountCard{max-width:520px;margin:0 auto;background:rgba(255,255,255,.95);border:1px solid #ead9e5;border-radius:28px;padding:30px;box-shadow:0 24px 70px rgba(100,45,85,.14)}.logo{text-align:center}.logo img{width:100px;height:70px;object-fit:contain}.title{text-align:center;margin:8px 0 4px;font-size:30px;font-weight:950}.sub{text-align:center;color:#806f79;font-size:13px;margin-bottom:24px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:5px;background:#fff3f8;border-radius:14px;margin-bottom:20px}.tab{border:0;background:transparent;padding:11px;border-radius:10px;font-weight:900;color:#7c6570;cursor:pointer}.tab.active{background:#fff;color:#c52e80;box-shadow:0 4px 14px rgba(160,65,120,.10)}.field{margin:12px 0}.field label{display:block;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}.field input{width:100%;box-sizing:border-box;padding:13px;border:1px solid #e4d3df;border-radius:12px;outline:none}.field input:focus{border-color:#d52b87;box-shadow:0 0 0 3px rgba(213,43,135,.08)}.btn{width:100%;border:0;border-radius:13px;padding:14px;background:linear-gradient(135deg,#e44b9e,#b83aa1);color:#fff;font-weight:950;cursor:pointer;margin-top:8px}.btn.secondary{background:#fff;color:#b72d7b;border:1px solid #e4d3df}.notice{padding:14px 15px;border-radius:14px;margin:15px 0;font-size:13px;line-height:1.5;background:#fff5fa;border:1px solid #efd4e2}.notice.success{background:#eefaf3;color:#176d41;border-color:#cbe8d6}.notice.error{background:#fff0f3;color:#a6243d;border-color:#f0cbd4}.notice.pending{background:#fff9ed;color:#795b00;border-color:#f0dfb7}.hidden{display:none!important}.accountPanel{display:none}.accountPanel.active{display:block}.profileBox{border:1px solid #ead9e5;border-radius:18px;padding:18px;background:#fffafd}.status{display:inline-flex;padding:7px 11px;border-radius:999px;font-size:10px;font-weight:950;letter-spacing:.05em}.status.approved{background:#e5f7ed;color:#147644}.status.pending{background:#fff1d2;color:#7a5b00}.status.rejected{background:#fde9ed;color:#b52842}.links{text-align:center;margin-top:18px;font-size:12px}.links a{color:#bd2d7e;font-weight:800;text-decoration:none}.passwordRow{display:flex;justify-content:space-between;align-items:center}.passwordRow a{font-size:11px;color:#bd2d7e;text-decoration:none;font-weight:800}.loading{opacity:.65;pointer-events:none}@media(max-width:560px){.accountWrap{width:calc(100% - 24px);margin-top:18px}.accountCard{padding:22px;border-radius:22px}.title{font-size:27px}}
 </style>
+
+<style id="pep-account-dashboard-style">
+.accountCard{max-width:920px!important}
+.accountWrap{width:min(1080px,94%)!important}
+.accountWelcome{position:relative;overflow:hidden;padding:30px;border-radius:26px;background:linear-gradient(135deg,#fff,#fff1f7 62%,#f8efff);border:1px solid #eed6e3;box-shadow:0 18px 55px rgba(100,45,85,.10);margin-bottom:16px}
+.accountWelcome:after{content:"♡";position:absolute;right:24px;top:-20px;font:900 110px Georgia;color:rgba(213,43,135,.08)}
+.welcomeEyebrow,.sectionEyebrow{font-size:10px;font-weight:950;letter-spacing:.16em;color:#c03a7d}
+.accountWelcome h1{position:relative;margin:7px 0 5px;font-size:36px;line-height:1.05;letter-spacing:-1.2px;color:#382630}
+.accountWelcome h1 span{color:#d52b87}
+.accountWelcome p{position:relative;margin:0;color:#806f79;font-size:13px}
+.welcomeMeta{position:relative;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px}
+.welcomeMeta>#accountEmail{font-size:11px;color:#806f79;background:#fff;border:1px solid #ead8e3;border-radius:999px;padding:7px 11px}
+.accountQuickGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 18px}
+.accountQuick{border:1px solid #ead8e3;background:#fff;border-radius:18px;padding:14px;text-align:left;cursor:pointer;display:grid;grid-template-columns:40px 1fr;column-gap:10px;align-items:center;color:#4a3440;box-shadow:0 8px 22px rgba(100,45,85,.055)}
+.accountQuick.active{border-color:#e2a1c2;background:#fff4f9;box-shadow:0 0 0 3px rgba(213,43,135,.06)}
+.accountQuick>span{grid-row:span 2;width:40px;height:40px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,#f7b0d1,#d75ca0);color:#fff;font-size:19px}
+.accountQuick b{font-size:10px;letter-spacing:.06em}.accountQuick small{color:#8b7480;font-size:10px;margin-top:2px}
+.accountSection{display:none}.accountSection.active{display:block}
+.sectionTop{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:4px 2px 11px}.sectionTop h2{margin:4px 0 0;font-size:23px;color:#3b2a34}.sectionAction{font-size:10px;font-weight:950;letter-spacing:.06em;color:#c22f7e;text-decoration:none}
+.accountList{display:grid;gap:10px}
+.accountLoading,.accountEmpty{padding:28px 18px;text-align:center;border:1px dashed #e5cddc;border-radius:18px;background:#fffafd;color:#806f79;font-size:12px}
+.orderCard{border:1px solid #ead8e3;border-radius:20px;background:#fff;padding:17px;box-shadow:0 8px 24px rgba(100,45,85,.05)}
+.orderTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.orderId{font-size:12px;font-weight:950;color:#3b2934}.orderDate{font-size:10px;color:#8b7480;margin-top:4px}
+.orderBadge{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:9px;font-weight:950;background:#fff0f6;color:#b62d75;border:1px solid #f0cadc}
+.orderItems{margin-top:13px;border-top:1px dashed #ead8e3;padding-top:10px;display:grid;gap:7px}
+.orderItem{display:flex;justify-content:space-between;gap:10px;font-size:11px}.orderItem span{color:#685360}.orderItem b{color:#3e2c35}
+.orderBottom{display:flex;justify-content:space-between;align-items:end;margin-top:13px;padding-top:11px;border-top:1px solid #f0e1e8}.orderTotal small{display:block;font-size:9px;color:#8b7480}.orderTotal b{font-size:17px;color:#c52e80}
+.orderGb{font-size:9px;color:#8b7480;text-align:right}
+.cartAccountCard{display:flex;align-items:center;gap:12px;border:1px solid #ead8e3;border-radius:18px;background:#fff;padding:13px}.cartAccountIcon{width:48px;height:48px;border-radius:14px;background:#fff1f7;display:grid;place-items:center;font-size:20px}.cartAccountMain{min-width:0;flex:1}.cartAccountMain b{display:block;font-size:12px}.cartAccountMain small{display:block;margin-top:3px;color:#8b7480;font-size:10px}.cartAccountPrice{text-align:right;font-weight:950;color:#c52e80;font-size:12px}.cartAccountTotal{display:flex;justify-content:space-between;padding:16px;border-radius:17px;background:linear-gradient(135deg,#fff0f7,#faf1ff);border:1px solid #ecd7e5;font-size:12px}.cartAccountTotal b{font-size:18px;color:#c52e80}
+.accountProfileBox{display:grid;gap:0;padding:0;overflow:hidden}.profileRow{display:flex;justify-content:space-between;gap:15px;padding:14px 16px;border-bottom:1px solid #f0e1e8}.profileRow:last-child{border-bottom:0}.profileRow span{font-size:9px;letter-spacing:.1em;color:#8b7480;font-weight:950}.profileRow b{font-size:11px;text-align:right;word-break:break-word}
+.status.approved{background:#e5f7ed;color:#147644}.status.pending{background:#fff1d2;color:#7a5b00}.status.rejected{background:#fde9ed;color:#b52842}
+@media(max-width:620px){.accountCard{padding:15px!important}.accountWelcome{padding:23px 19px}.accountWelcome h1{font-size:29px}.accountQuickGrid{grid-template-columns:1fr}.accountQuick{min-height:58px}.orderTop{display:block}.orderBadge{margin-top:8px}.orderBottom{align-items:flex-start}.cartAccountCard{align-items:flex-start}}
+</style>
 </head>
 <body>
 <div class="accountWrap"><div class="accountCard">
@@ -42,13 +76,60 @@ body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 10%,rgba
 </section>
 </div>
 <div id="accountArea" class="hidden">
-<div id="accountMessage" class="notice"></div>
-<div class="profileBox">
-<div style="font-size:11px;color:#8a7480;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Account</div>
-<div id="accountEmail" style="font-weight:900;margin-top:5px"></div>
-<div id="accountStatus" style="margin-top:12px"></div>
-</div>
-<button class="btn secondary" id="logout" style="margin-top:14px">LOG OUT</button>
+  <section class="accountWelcome">
+    <div class="welcomeEyebrow">MY PEPMOSA ACCOUNT ♡</div>
+    <h1>Welcome, <span id="accountName">PEPMOSA</span>!</h1>
+    <p>Manage your orders, cart, and account details in one place.</p>
+    <div class="welcomeMeta">
+      <span id="accountStatus"></span>
+      <span id="accountEmail"></span>
+    </div>
+  </section>
+
+  <div id="accountMessage" class="notice"></div>
+
+  <div class="accountQuickGrid">
+    <button class="accountQuick active" type="button" data-account-tab="orders">
+      <span>📦</span><b>ORDER HISTORY</b><small id="orderCount">0 orders</small>
+    </button>
+    <button class="accountQuick" type="button" data-account-tab="cart">
+      <span>🛒</span><b>MY CART</b><small id="cartCountAccount">0 items</small>
+    </button>
+    <button class="accountQuick" type="button" data-account-tab="profile">
+      <span>♡</span><b>ACCOUNT</b><small>Profile & status</small>
+    </button>
+  </div>
+
+  <section class="accountSection active" id="accountOrdersSection">
+    <div class="sectionTop">
+      <div><div class="sectionEyebrow">YOUR PURCHASES</div><h2>Order History</h2></div>
+      <a class="sectionAction" href="/shop.html">SHOP NOW →</a>
+    </div>
+    <div id="orderHistory" class="accountList">
+      <div class="accountLoading">Loading your orders…</div>
+    </div>
+  </section>
+
+  <section class="accountSection" id="accountCartSection">
+    <div class="sectionTop">
+      <div><div class="sectionEyebrow">SAVED ON THIS DEVICE</div><h2>My Cart</h2></div>
+      <a class="sectionAction" href="/shop.html">ADD PRODUCTS →</a>
+    </div>
+    <div id="accountCart" class="accountList"></div>
+  </section>
+
+  <section class="accountSection" id="accountProfileSection">
+    <div class="sectionTop">
+      <div><div class="sectionEyebrow">YOUR DETAILS</div><h2>Account</h2></div>
+    </div>
+    <div class="profileBox accountProfileBox">
+      <div class="profileRow"><span>NAME</span><b id="accountProfileName">—</b></div>
+      <div class="profileRow"><span>EMAIL</span><b id="accountProfileEmail">—</b></div>
+      <div class="profileRow"><span>STATUS</span><b id="accountProfileStatus">—</b></div>
+    </div>
+  </section>
+
+  <button class="btn secondary" id="logout" style="margin-top:18px">LOG OUT</button>
 </div>
 <div class="links"><a href="/">← Back to PEPMOSA</a></div>
 </div></div>

@@ -2592,7 +2592,7 @@ load();
         const badge = days !== null
           ? (days <= 0
               ? '<span class="status closed">ORDERING CLOSED</span>'
-              : '<span class="gb-remaining gb-remaining-final"><span class="gb-clock">◷</span><span class="gb-remaining-copy"><small>ORDERING CLOSES IN</small><strong>'+days+' DAY'+(days===1?'':'S')+'</strong><em>LEFT TO ORDER</em></span></span>
+              : '<span class="gb-remaining gb-remaining-final"><span class="gb-clock">◷</span><span class="gb-remaining-copy"><small>ORDERING CLOSES IN</small><strong>'+days+' DAY'+(days===1?'':'S')+'</strong><em>LEFT TO ORDER</em></span></span>'
           : '';
         el.innerHTML='<b class="gb-name">'+esc(gbName)+'</b> <span class="status open">OPEN</span>'+badge;
       }else if(st==='KIT_COMPLETION'){

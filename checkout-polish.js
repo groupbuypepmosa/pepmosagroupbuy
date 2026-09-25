@@ -223,6 +223,16 @@
     setTimeout(()=>window.location.reload(),1200);
   }
   window.checkout=async function(){
+    const activeGB=getGB();
+    if(!activeGB || !['OPEN','KIT_COMPLETION'].includes(String(activeGB.status||'').toUpperCase())){
+      if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Ordering is currently closed. You can still browse products and keep items in your cart.');
+      else alert('Ordering is currently closed.');
+      return;
+    }
+    if(typeof window.pepRequireApprovedFee==='function'){
+      const feeOk=await window.pepRequireApprovedFee();
+      if(!feeOk)return;
+    }
     const{cart}=totals();if(!cart.length){if(typeof window.openCart==='function')window.openCart();return}
     // Close the Cart modal using the storefront's normal modal helper.
     // Do not touch inline display styles, because the modal CSS controls

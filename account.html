@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PEPMOSA • My Account</title>
+<link rel="icon" href="pepmosa-no-name.png">
+<link rel="stylesheet" href="style.css">
+<style>
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 10%,rgba(255,105,180,.16),transparent 28%),radial-gradient(circle at 90% 10%,rgba(180,125,255,.15),transparent 30%),linear-gradient(135deg,#fff8fc,#fff3f9 48%,#f7efff);color:#342530}
+.accountWrap{width:min(1040px,92%);margin:40px auto 80px}.accountCard{max-width:520px;margin:0 auto;background:rgba(255,255,255,.95);border:1px solid #ead9e5;border-radius:28px;padding:30px;box-shadow:0 24px 70px rgba(100,45,85,.14)}.logo{text-align:center}.logo img{width:100px;height:70px;object-fit:contain}.title{text-align:center;margin:8px 0 4px;font-size:30px;font-weight:950}.sub{text-align:center;color:#806f79;font-size:13px;margin-bottom:24px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:5px;background:#fff3f8;border-radius:14px;margin-bottom:20px}.tab{border:0;background:transparent;padding:11px;border-radius:10px;font-weight:900;color:#7c6570;cursor:pointer}.tab.active{background:#fff;color:#c52e80;box-shadow:0 4px 14px rgba(160,65,120,.10)}.field{margin:12px 0}.field label{display:block;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}.field input{width:100%;box-sizing:border-box;padding:13px;border:1px solid #e4d3df;border-radius:12px;outline:none}.field input:focus{border-color:#d52b87;box-shadow:0 0 0 3px rgba(213,43,135,.08)}.btn{width:100%;border:0;border-radius:13px;padding:14px;background:linear-gradient(135deg,#e44b9e,#b83aa1);color:#fff;font-weight:950;cursor:pointer;margin-top:8px}.btn.secondary{background:#fff;color:#b72d7b;border:1px solid #e4d3df}.notice{padding:14px 15px;border-radius:14px;margin:15px 0;font-size:13px;line-height:1.5;background:#fff5fa;border:1px solid #efd4e2}.notice.success{background:#eefaf3;color:#176d41;border-color:#cbe8d6}.notice.error{background:#fff0f3;color:#a6243d;border-color:#f0cbd4}.notice.pending{background:#fff9ed;color:#795b00;border-color:#f0dfb7}.hidden{display:none!important}.accountPanel{display:none}.accountPanel.active{display:block}.profileBox{border:1px solid #ead9e5;border-radius:18px;padding:18px;background:#fffafd}.status{display:inline-flex;padding:7px 11px;border-radius:999px;font-size:10px;font-weight:950;letter-spacing:.05em}.status.approved{background:#e5f7ed;color:#147644}.status.pending{background:#fff1d2;color:#7a5b00}.status.rejected{background:#fde9ed;color:#b52842}.links{text-align:center;margin-top:18px;font-size:12px}.links a{color:#bd2d7e;font-weight:800;text-decoration:none}.passwordRow{display:flex;justify-content:space-between;align-items:center}.passwordRow a{font-size:11px;color:#bd2d7e;text-decoration:none;font-weight:800}.loading{opacity:.65;pointer-events:none}@media(max-width:560px){.accountWrap{width:calc(100% - 24px);margin-top:18px}.accountCard{padding:22px;border-radius:22px}.title{font-size:27px}}
+</style>
+</head>
+<body>
+<div class="accountWrap"><div class="accountCard">
+<div class="logo"><img src="pepmosa-no-name.png" alt="PEPMOSA"></div>
+<div class="title">My Account</div><div class="sub">Your PEPMOSA customer account</div>
+<div id="authArea">
+<div class="tabs"><button class="tab active" id="loginTab">Log In</button><button class="tab" id="signupTab">Create Account</button></div>
+<div id="message" class="notice hidden"></div>
+<section id="loginPanel" class="accountPanel active">
+<form id="loginForm">
+<div class="field"><label>Email</label><input id="loginEmail" type="email" autocomplete="email" required></div>
+<div class="field"><div class="passwordRow"><label>Password</label><a href="#" id="forgot">Forgot password?</a></div><input id="loginPassword" type="password" autocomplete="current-password" required></div>
+<button class="btn" type="submit">LOG IN</button>
+</form></section>
+<section id="signupPanel" class="accountPanel">
+<form id="signupForm">
+<div class="field"><label>Full Name</label><input id="signupName" required></div>
+<div class="field"><label>Email</label><input id="signupEmail" type="email" autocomplete="email" required></div>
+<div class="field"><label>Password</label><input id="signupPassword" type="password" minlength="6" autocomplete="new-password" required></div>
+<div class="field"><label>Confirm Password</label><input id="signupPassword2" type="password" minlength="6" autocomplete="new-password" required></div>
+<button class="btn" type="submit">CREATE ACCOUNT</button>
+</form>
+</section>
+</div>
+<div id="accountArea" class="hidden">
+<div id="accountMessage" class="notice"></div>
+<div class="profileBox">
+<div style="font-size:11px;color:#8a7480;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Account</div>
+<div id="accountEmail" style="font-weight:900;margin-top:5px"></div>
+<div id="accountStatus" style="margin-top:12px"></div>
+</div>
+<button class="btn secondary" id="logout" style="margin-top:14px">LOG OUT</button>
+</div>
+<div class="links"><a href="/">← Back to PEPMOSA</a></div>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script><script src="supabase.js"></script><script src="account.js"></script>
+</body></html>

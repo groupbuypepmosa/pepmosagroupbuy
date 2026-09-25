@@ -336,7 +336,7 @@ function showMessage(m,t=""){
 function closeGlobalPopup(){clearTimeout(popupTimer);const host=$("globalMsg"),toast=host?.querySelector(".popupToast");if(!toast)return;toast.classList.remove("show");setTimeout(()=>{if(host)host.innerHTML=""},300)}
 function showLoginMessage(m,t="error"){$("loginMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`}function previewFile(i,p){const f=$(i).files[0];if(!f)return;$(p).src=URL.createObjectURL(f);$(p).style.display="block"}
 
-async async function loadActivityHistory(){
+async function loadActivityHistory(){
   const box=$("activityHistory");if(!box)return;
   box.innerHTML='<div class="small">Loading history...</div>';
   try{

@@ -1415,6 +1415,38 @@ let cart =
 
 initSupabase();
 
+async function pepCloudCart(action){
+  try{
+    const sb=window.sb||initSupabase();if(!sb)return;
+    const u=(await sb.auth.getUser())?.data?.user;if(!u)return;
+    if(action==='load'){
+      const q=await sb.from('customer_carts').select('cart,updated_at').eq('user_id',u.id).maybeSingle();
+      if(q.error)throw q.error;
+      const remote=Array.isArray(q.data?.cart)?q.data.cart:[];
+      const local=JSON.parse(localStorage.getItem('pepmosaCart')||'[]');
+      if(!local.length&&remote.length){
+        localStorage.setItem('pepmosaCart',JSON.stringify(remote));
+        cart=remote;updateCart();window.dispatchEvent(new Event('pepmosa-cart-updated'));return;
+      }
+      if(local.length){
+        const map=new Map();
+        [...remote,...local].forEach(x=>{
+          const key=[x.gb_number||'',x.product_id||'',x.variant_id||x.strength||''].join('|');
+          const prev=map.get(key);
+          map.set(key,prev?{...prev,...x,qty:Math.max(Number(prev.qty||0),Number(x.qty||0))}:{...x});
+        });
+        const merged=[...map.values()].filter(x=>Number(x.qty||0)>0);
+        localStorage.setItem('pepmosaCart',JSON.stringify(merged));cart=merged;updateCart();
+        await sb.from('customer_carts').upsert({user_id:u.id,cart:merged,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+      }
+    }else{
+      const saved=JSON.parse(localStorage.getItem('pepmosaCart')||'[]');
+      await sb.from('customer_carts').upsert({user_id:u.id,cart:Array.isArray(saved)?saved:[],updated_at:new Date().toISOString()},{onConflict:'user_id'});
+    }
+  }catch(e){console.warn('PEPMOSA cloud cart sync',e)}
+}
+setTimeout(()=>pepCloudCart('load'),300);
+
 
 
 /* =========================================================
@@ -2250,6 +2282,7 @@ function addToCart(pid,vid){
   // Adding to cart must NOT navigate, reload inventory, or open the cart.
   // Inventory remains unchanged until a successful atomic order submission.
   window.dispatchEvent(new Event("pepmosa-cart-updated"));
+  pepCloudCart('save');
   window.pepLogActivity?.('ADD_TO_CART','CART',null,{items:cart.map(x=>({product:x.product_name,variant:x.strength,qty:x.qty}))});
 
 }
@@ -2365,6 +2398,7 @@ function clearCart(){
   localStorage.removeItem("pepmosaCart");
   updateCart();
   if($("cartItems")) openCart();
+  pepCloudCart('save');
   if(hadItems) window.pepLogActivity?.('CLEAR_CART','CART',null,{items:hadItems});
 }
 

@@ -340,10 +340,10 @@ async async function loadActivityHistory(){
   const box=$("activityHistory");if(!box)return;
   box.innerHTML='<div class="small">Loading history...</div>';
   try{
-    async function fetchAll(table,select){
+    async function fetchAll(table,select,orderColumn="created_at"){
       const rows=[];let from=0;const pageSize=1000;
       while(true){
-        const q=await sb.from(table).select(select).order("created_at",{ascending:false}).range(from,from+pageSize-1);
+        const q=await sb.from(table).select(select).order(orderColumn,{ascending:false}).range(from,from+pageSize-1);
         if(q.error)throw q.error;
         const page=q.data||[];rows.push(...page);
         if(page.length<pageSize)break;
@@ -356,7 +356,7 @@ async async function loadActivityHistory(){
       fetchAll("orders","order_id,gb_number,email,total,payment_status,payment_reference,admin_note,created_at"),
       fetchAll("admin_fee_payments","gb_number,email,amount,status,payment_reference,created_at"),
       fetchAll("group_buys","gb_number,status,customer_facing_name,created_at"),
-      fetchAll("customer_login_history","user_id,email,logged_in_at")
+      fetchAll("customer_login_history","user_id,email,logged_in_at","logged_in_at")
     ]);
     const gbStatus=new Map((gbAll||[]).map(g=>[String(g.gb_number||""),String(g.status||"")]));
 

@@ -67,7 +67,10 @@ body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 10%,rgba
 </section>
 <section id="signupPanel" class="accountPanel">
 <form id="signupForm">
-<div class="field"><label>Full Name</label><input id="signupName" required></div>
+<div class="field"><label>Full Name</label><input id="signupName" autocomplete="name" required></div>
+<div class="field"><label>Complete Address</label><textarea id="signupAddress" autocomplete="street-address" required style="width:100%;box-sizing:border-box;padding:13px;border:1px solid #e4d3df;border-radius:12px;min-height:82px;resize:vertical;outline:none"></textarea></div>
+<div class="field"><label>Contact Number</label><input id="signupContact" type="tel" autocomplete="tel" required></div>
+<div class="field"><label>WhatsApp Name</label><input id="signupWhatsapp" autocomplete="off" placeholder="Name used on WhatsApp" required></div>
 <div class="field"><label>Email</label><input id="signupEmail" type="email" autocomplete="email" required></div>
 <div class="field"><label>Password</label><input id="signupPassword" type="password" minlength="6" autocomplete="new-password" required></div>
 <div class="field"><label>Confirm Password</label><input id="signupPassword2" type="password" minlength="6" autocomplete="new-password" required></div>
@@ -125,8 +128,19 @@ body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 10%,rgba
     <div class="profileBox accountProfileBox">
       <div class="profileRow"><span>NAME</span><b id="accountProfileName">—</b></div>
       <div class="profileRow"><span>EMAIL</span><b id="accountProfileEmail">—</b></div>
+      <div class="profileRow"><span>CONTACT</span><b id="accountProfileContact">—</b></div>
+      <div class="profileRow"><span>WHATSAPP NAME</span><b id="accountProfileWhatsapp">—</b></div>
+      <div class="profileRow"><span>ADDRESS</span><b id="accountProfileAddress">—</b></div>
       <div class="profileRow"><span>STATUS</span><b id="accountProfileStatus">—</b></div>
     </div>
+    <form id="profileEditForm" class="profileBox" style="margin-top:12px;padding:16px">
+      <div class="sectionEyebrow" style="margin-bottom:10px">EDIT DETAILS</div>
+      <div class="field"><label>Full Name</label><input id="profileEditName" required></div>
+      <div class="field"><label>Complete Address</label><textarea id="profileEditAddress" required style="width:100%;box-sizing:border-box;padding:13px;border:1px solid #e4d3df;border-radius:12px;min-height:82px;resize:vertical;outline:none"></textarea></div>
+      <div class="field"><label>Contact Number</label><input id="profileEditContact" type="tel" required></div>
+      <div class="field"><label>WhatsApp Name</label><input id="profileEditWhatsapp" required></div>
+      <button class="btn" type="submit">SAVE DETAILS</button>
+    </form>
   </section>
 
   <button class="btn secondary" id="logout" style="margin-top:18px">LOG OUT</button>

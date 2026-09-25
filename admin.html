@@ -352,10 +352,11 @@ async async function loadActivityHistory(){
       return rows;
     }
 
-    const [ordersAll,feesAll,gbAll]=await Promise.all([
+    const [ordersAll,feesAll,gbAll,loginsAll]=await Promise.all([
       fetchAll("orders","order_id,gb_number,email,total,payment_status,payment_reference,admin_note,created_at"),
       fetchAll("admin_fee_payments","gb_number,email,amount,status,payment_reference,created_at"),
-      fetchAll("group_buys","gb_number,status,customer_facing_name,created_at")
+      fetchAll("group_buys","gb_number,status,customer_facing_name,created_at"),
+      fetchAll("customer_login_history","user_id,email,logged_in_at")
     ]);
     const gbStatus=new Map((gbAll||[]).map(g=>[String(g.gb_number||""),String(g.status||"")]));
 
@@ -369,6 +370,14 @@ async async function loadActivityHistory(){
         type,
         gb:o.gb_number||"—",
         text:(o.email||"Customer")+" • "+peso(o.total)+" • "+(status||"PENDING")
+      });
+    });
+    (loginsAll||[]).forEach(x=>{
+      rows.push({
+        time:x.logged_in_at,
+        type:"CUSTOMER LOGIN",
+        gb:"ACCOUNT",
+        text:(x.email||"Customer")+" • Successful login"
       });
     });
     (feesAll||[]).forEach(x=>{

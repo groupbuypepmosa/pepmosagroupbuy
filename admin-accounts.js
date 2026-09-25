@@ -18,7 +18,7 @@ function render(){
 async function load(){
  list.innerHTML='<div class="empty">Loading customer accounts…</div>';
  let q=sb.from('profiles').select('id,email,is_admin,account_status,email_verified_at,created_at,approved_at,rejected_at,full_name,contact_number,whatsapp_name,address').eq('is_admin',false).order('created_at',{ascending:false});
- if(filter!=='ALL')q=filter==='PENDING'?q.in('account_status',['PENDING_EMAIL','EMAIL_VERIFIED_PENDING_ADMIN']):q.eq('account_status',filter);
+ if(filter!=='ALL')q=filter==='PENDING'?q.eq('account_status','EMAIL_VERIFIED_PENDING_ADMIN'):q.eq('account_status',filter);
  const {data,error}=await q;if(error){list.innerHTML='<div class="empty">'+error.message+'</div>';return}allCustomers=data||[];render();
 }
 window.verifyUser=async(id,btn)=>{if(!confirm('Manually verify this customer email? This bypasses the email OTP.'))return;if(btn){btn.disabled=true;btn.textContent='VERIFYING...'}const {data,error}=await sb.functions.invoke('admin-verify-customer-email',{body:{user_id:id}});if(error||data?.error){alert(error?.message||data?.error||'Verification failed.');if(btn){btn.disabled=false;btn.textContent='VERIFY EMAIL'}return}load()};

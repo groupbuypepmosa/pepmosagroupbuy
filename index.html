@@ -454,6 +454,22 @@ header{
 }
 
 /* =========================================================
+   GB SCHEDULE
+   ========================================================= */
+#gbStatus{padding:22px 24px!important}
+.gbScheduleHead{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.gbScheduleEyebrow{display:block;color:#c13b83;font-size:9px;font-weight:950;letter-spacing:2px;margin-bottom:7px}
+.gbScheduleName{display:block;color:#382631;font-size:28px;line-height:1.05;font-weight:950}
+.gbScheduleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:16px}
+.gbScheduleRow{padding:11px 12px;border:1px solid #f0dce7;border-radius:13px;background:#fff8fc}
+.gbScheduleRow span,.gbScheduleEta span{display:block;font-size:8px;font-weight:950;letter-spacing:1.1px;color:#a05b7f}
+.gbScheduleRow b,.gbScheduleEta b{display:block;margin-top:4px;font-size:12px;color:#4a3442}
+.gbScheduleEta{margin-top:10px;padding:12px 14px;border-radius:14px;background:linear-gradient(135deg,#fff0f7,#f8efff);border:1px solid #efd5e3}
+.gbScheduleEmpty{display:flex;flex-direction:column;gap:5px;padding:10px 0;color:#806f79;font-size:12px}
+.gbScheduleEmpty b{color:#c13b83;letter-spacing:1.5px;font-size:10px}
+@media(max-width:600px){.gbScheduleName{font-size:23px}.gbScheduleGrid{grid-template-columns:1fr}.gbScheduleRow{padding:10px}.gbScheduleEta{margin-top:8px}}
+
+/* =========================================================
    PRODUCTS
    ========================================================= */
 
@@ -2330,6 +2346,14 @@ function syncOrderingControls(){
 
 function getOpenForAllProducts(){try{return JSON.parse(localStorage.getItem("pepmosa_open_for_all_products")||"[]")}catch(e){return []}}
 function renderOpenForAll(){const box=$("openForAllGrid");if(!box)return;const list=getOpenForAllProducts().filter(x=>x.status==="AVAILABLE");box.innerHTML=list.length?list.map(x=>`<article class="card" style="margin:0">${x.image_url?`<div style="height:180px;margin:-2px -2px 14px;border-radius:14px;overflow:hidden;background:#fff"><img loading="lazy" decoding="async" src="${esc(x.image_url)}" alt="${esc(x.name)}" style="width:100%;height:100%;object-fit:contain;display:block"></div>`:''}<h3>${esc(x.name)}</h3><div class="muted">MOQ: ${Number(x.moq||1)}</div><div style="font-size:22px;font-weight:800;margin-top:8px">₱${Number(x.amount||0).toLocaleString("en-PH",{minimumFractionDigits:2})}</div><div class="notice success" style="margin-top:10px">Open for All • No Admin Fee</div></article>`).join(""):`<div class="muted">No Open for All products available right now.</div>`}
+function formatGBScheduleDate(v){if(!v)return "";const d=new Date(v);if(Number.isNaN(d.getTime()))return "";return d.toLocaleString("en-PH",{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"});}
+function renderGBScheduleCard(g){
+  const el=document.getElementById("gbStatus");if(!el)return;
+  const s=g&&g.gb_schedule||{};
+  const rows=[["GB OPENS",s.open_at],["ADMIN FEE PAYMENT",s.admin_fee_at],["ORDER PLACEMENT",s.order_at],["FINAL PAYMENT",s.final_payment_at],["ORDER PLACED",s.order_placed_at]].filter(x=>x[1]);
+  if(!g){el.innerHTML='<div class="gbScheduleEmpty"><b>GB SCHEDULE</b><span>No Group Buy schedule available right now.</span></div>';return;}
+  el.innerHTML='<div class="gbScheduleHead"><div><span class="gbScheduleEyebrow">GB SCHEDULE</span><b class="gbScheduleName">'+esc(g.customer_facing_name||g.gb_number)+'</b></div><span class="status '+(g.status==="OPEN"?"open":"closed")+'">'+esc(g.status==="CLOSED"?"CLOSED":g.status)+'</span></div>'+(rows.length?'<div class="gbScheduleGrid">'+rows.map(x=>'<div class="gbScheduleRow"><span>'+esc(x[0])+'</span><b>'+esc(formatGBScheduleDate(x[1]))+'</b></div>').join("")+'</div>':'<div class="gbScheduleEmpty"><span>Schedule dates will be announced here.</span></div>')+(s.delivery_eta?'<div class="gbScheduleEta"><span>DELIVERY ETA</span><b>'+esc(s.delivery_eta)+'</b></div>':'');
+}
 async function load(){
 
   renderOpenForAll();
@@ -2410,20 +2434,9 @@ async function load(){
 
 
 
-    /* GROUP BUY NAME */
+    /* GROUP BUY SCHEDULE */
 
-    const isOrderOpen=["OPEN","KIT_COMPLETION"].includes(gb.status);
-    $("gbStatus").innerHTML =
-      '<b>' + esc(gb.customer_facing_name || gb.gb_number) + '</b> ' +
-      '<span class="status ' + (isOrderOpen?'open':'closed') + '">' +
-      esc(gb.status==="CLOSED" ? "CLOSED • PRICELIST VIEW" : gb.status) +
-      '</span>' +
-      (window.pepmosaGBDeadlineBadge ? window.pepmosaGBDeadlineBadge(gb) : '') +
-
-      (!isOrderOpen
-        ? '<div class="muted" style="margin-top:8px">Browsing is available. Ordering is currently closed.</div>'
-        : '');
-
+    renderGBScheduleCard(gb);
 
 
     /* =====================================================
@@ -2499,15 +2512,6 @@ async function load(){
       product_variants:variantData.filter(v=>String(v.product_id)===String(p.product_id))
     }));
     window.__pepBaseProducts = products;
-
-    if(gb.status==="CLOSED" && !categoryNames.length){
-      $("gbStatus").insertAdjacentHTML(
-        "beforeend",
-        '<div class="muted" style="margin-top:8px">Showing the full active pricelist.</div>'
-      );
-    }
-
-
 
     /* =====================================================
        LOAD GB MINIMUM QUANTITIES
@@ -3487,30 +3491,10 @@ load();
       const rows=r.data||[];
       const gb=rows.find(x=>['OPEN','KIT_COMPLETION'].includes(String(x.status||'').toUpperCase()))
         || rows.find(x=>String(x.status||'').toUpperCase()==='CLOSED') || null;
-      if(!gb) return;
+      if(!gb)return;
       window.currentGB=gb;
-      const el=document.getElementById('gbStatus');
-      if(!el) return;
-      const st=String(gb.status||'').toUpperCase();
-      const gbName=gb.customer_facing_name||gb.gb_number;
-      if(st==='CLOSED'){
-        el.style.display='';
-        el.innerHTML='<b class="gb-name">'+esc(gbName)+'</b> <span class="status closed">CLOSED • PRICELIST VIEW</span>';
-      }else if(st==='OPEN'){
-        el.style.display='';
-        const deadline = gb.order_deadline_at ? new Date(gb.order_deadline_at).getTime() : NaN;
-        const days = Number.isFinite(deadline) ? Math.ceil((deadline-Date.now())/86400000) : null;
-        const badge = days !== null
-          ? (days <= 0
-              ? '<span class="status closed">ORDERING CLOSED</span>'
-              : '<span class="gb-remaining gb-remaining-final"><span class="gb-clock">◷</span><span class="gb-remaining-copy"><small>ORDERING CLOSES IN</small><strong>'+days+' DAY'+(days===1?'':'S')+'</strong><em>LEFT TO ORDER</em></span></span>
-          : '';
-        el.innerHTML='<b class="gb-name">'+esc(gbName)+'</b> <span class="status open">OPEN</span>'+badge;
-      }else if(st==='KIT_COMPLETION'){
-        el.style.display='';
-        el.innerHTML='<b class="gb-name">'+esc(gbName)+'</b> <span class="status open">KIT COMPLETION</span>';
-      }
-    }catch(e){console.warn('Final GB status sync:',e)}
+      renderGBScheduleCard(gb);
+        }catch(e){console.warn('Final GB status sync:',e)}
   }
   window.pepmosaSyncPublicGBStatus=syncPublicGBStatus;
   let tries=0;

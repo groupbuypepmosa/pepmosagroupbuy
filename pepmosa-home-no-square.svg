@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 465" preserveAspectRatio="xMidYMid meet">
+<defs>
+  <clipPath id="logoCircle"><circle cx="330" cy="160" r="150"/></clipPath>
+  <clipPath id="logoText"><rect x="145" y="312" width="350" height="153"/></clipPath>
+  <filter id="removeLightBg" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+    <feColorMatrix type="matrix" values="
+      1 0 0 0 0
+      0 1 0 0 0
+      0 0 1 0 0
+      -0.60 -1.40 -0.20 0 1.60"/>
+  </filter>
+</defs>
+<image x="0" y="-20" width="500" height="500" preserveAspectRatio="none" href="pepmosa-no-name.png" xlink:href="pepmosa-no-name.png" clip-path="url(#logoCircle)"/>
+<image x="0" y="-20" width="500" height="500" preserveAspectRatio="none" href="pepmosa-no-name.png" xlink:href="pepmosa-no-name.png" clip-path="url(#logoText)" filter="url(#removeLightBg)"/>
+</svg>

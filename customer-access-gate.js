@@ -101,6 +101,11 @@
       protectSideRail(approved);
       if(approved){
         document.documentElement.classList.add('pepmosa-approved');
+        if(isHome()){
+          window.location.replace(SHOP);
+          return;
+        }
+        document.querySelectorAll('.pepSideRail a[title="Home"]').forEach(a=>a.remove());
         return;
       }
       if(isHome())protectHomeProducts(false);

@@ -2643,29 +2643,45 @@ load();
 (function(){
   function showAdminFeePayment(gb,email){
     return new Promise(resolve=>{
-      const old=document.getElementById('pepAdminFeeModal'); if(old)old.remove();
-      const wrap=document.createElement('div'); wrap.id='pepAdminFeeModal';
+      const old=document.getElementById('pepAdminFeeModal');if(old)old.remove();
+      const wrap=document.createElement('div');wrap.id='pepAdminFeeModal';
       wrap.style.cssText='position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(45,22,39,.58);backdrop-filter:blur(8px)';
       const qr=gb?.admin_fee_qr_url?'<img src="'+String(gb.admin_fee_qr_url).replace(/"/g,'&quot;')+'" alt="Admin Fee QR" style="width:min(260px,78vw);height:auto;max-height:260px;object-fit:contain;background:#fff;padding:8px;border-radius:18px;box-shadow:0 10px 28px rgba(70,30,55,.12)">':'<div style="padding:20px;border-radius:15px;background:#fff4f9;color:#8a5a72;font-size:12px">Admin Fee QR is not available yet. Please contact PEPMOSA for payment instructions.</div>';
-      wrap.innerHTML='<div style="width:min(460px,100%);max-height:92vh;overflow:auto;border-radius:26px;background:linear-gradient(145deg,#fff,#fff7fb);border:1px solid #efcfe0;box-shadow:0 28px 90px rgba(45,18,40,.30);padding:25px;text-align:center;color:#3d2936"><div style="font-size:10px;letter-spacing:.18em;font-weight:950;color:#c72f80">PEPMOSA GROUP BUY</div><h2 style="margin:7px 0 5px;font-size:27px">Admin Fee Required ♡</h2><p style="margin:0 auto 16px;color:#806b77;font-size:12px;line-height:1.55">Pay the Admin Fee for <b>'+esc(gb?.customer_facing_name||gb?.gb_number||'this Group Buy')+'</b> first. Your cart will stay saved.</p><div style="font-size:22px;font-weight:950;color:#c52e80;margin-bottom:15px">₱'+Number(gb?.admin_fee||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'+qr+'<div style="text-align:left;margin-top:16px"><label style="display:block;font-size:10px;font-weight:950;letter-spacing:.06em;margin-bottom:6px">PAYMENT REFERENCE</label><input id="pepAdminFeeRef" type="text" placeholder="Enter transaction/reference number" style="width:100%;box-sizing:border-box;padding:13px;border:1px solid #e5d2df;border-radius:13px;outline:none"></div><div id="pepAdminFeeMsg" style="margin-top:10px;font-size:11px;color:#9a6a7f;min-height:16px"></div><div style="display:flex;gap:8px;margin-top:16px"><button id="pepAdminFeeCancel" type="button" style="flex:1;padding:13px;border-radius:13px;border:1px solid #e3d2dd;background:#fff;color:#674d59;font-weight:900">CANCEL</button><button id="pepAdminFeeSubmit" type="button" style="flex:1;padding:13px;border-radius:13px;border:0;background:linear-gradient(135deg,#e72c8d,#bb46b7);color:#fff;font-weight:900">I PAID — SUBMIT</button></div></div>';
+      wrap.innerHTML='<div style="width:min(460px,100%);max-height:92vh;overflow:auto;border-radius:26px;background:linear-gradient(145deg,#fff,#fff7fb);border:1px solid #efcfe0;box-shadow:0 28px 90px rgba(45,18,40,.30);padding:25px;text-align:center;color:#3d2936"><div style="font-size:10px;letter-spacing:.18em;font-weight:950;color:#c72f80">PEPMOSA GROUP BUY</div><h2 style="margin:7px 0 5px;font-size:27px">Admin Fee Required ♡</h2><p style="margin:0 auto 16px;color:#806b77;font-size:12px;line-height:1.55">Pay the Admin Fee for <b>'+esc(gb?.customer_facing_name||gb?.gb_number||'this Group Buy')+'</b> first. Your cart will stay saved.</p><div style="font-size:22px;font-weight:950;color:#c52e80;margin-bottom:15px">₱'+Number(gb?.admin_fee||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'+qr+'<div style="text-align:left;margin-top:16px"><label style="display:block;font-size:10px;font-weight:950;letter-spacing:.06em;margin-bottom:6px">PAYMENT PROOF <span style="color:#c52e80">REQUIRED</span></label><input id="pepAdminFeeProof" type="file" accept="image/*,.pdf" style="width:100%;box-sizing:border-box;padding:11px;border:1px dashed #e4b6d0;border-radius:13px;background:#fff8fc"><div style="margin-top:6px;font-size:10px;color:#8a7380">Upload your receipt/screenshot • JPG, PNG, WEBP or PDF • Max 5MB</div></div><div style="text-align:left;margin-top:14px"><label style="display:block;font-size:10px;font-weight:950;letter-spacing:.06em;margin-bottom:6px">PAYMENT REFERENCE</label><input id="pepAdminFeeRef" type="text" placeholder="Enter transaction/reference number" style="width:100%;box-sizing:border-box;padding:13px;border:1px solid #e5d2df;border-radius:13px;outline:none"></div><div id="pepAdminFeeMsg" style="margin-top:10px;font-size:11px;color:#9a6a7f;min-height:16px"></div><div style="display:flex;gap:8px;margin-top:16px"><button id="pepAdminFeeCancel" type="button" style="flex:1;padding:13px;border-radius:13px;border:1px solid #e3d2dd;background:#fff;color:#674d59;font-weight:900">CANCEL</button><button id="pepAdminFeeSubmit" type="button" style="flex:1;padding:13px;border-radius:13px;border:0;background:linear-gradient(135deg,#e72c8d,#bb46b7);color:#fff;font-weight:900">I PAID — SUBMIT</button></div></div>';
       document.body.appendChild(wrap);
       const close=()=>{wrap.remove();resolve(false)};
       wrap.querySelector('#pepAdminFeeCancel').onclick=close;
       wrap.querySelector('#pepAdminFeeSubmit').onclick=async()=>{
-        const ref=wrap.querySelector('#pepAdminFeeRef').value.trim(),msg=wrap.querySelector('#pepAdminFeeMsg'),btn=wrap.querySelector('#pepAdminFeeSubmit');
+        const ref=wrap.querySelector('#pepAdminFeeRef').value.trim(),file=wrap.querySelector('#pepAdminFeeProof')?.files?.[0],msg=wrap.querySelector('#pepAdminFeeMsg'),btn=wrap.querySelector('#pepAdminFeeSubmit');
+        if(!file){msg.textContent='Upload your payment proof first.';return}
+        if(file.size>5*1024*1024){msg.textContent='Payment proof must be 5MB or smaller.';return}
         if(!ref){msg.textContent='Enter your payment reference first.';return}
-        btn.disabled=true;btn.textContent='SUBMITTING…';
+        btn.disabled=true;btn.textContent='UPLOADING…';
         try{
-          const r=await window.sb.from('admin_fee_payments').insert({gb_number:gb.gb_number,email,amount:Number(gb.admin_fee||0),payment_reference:ref,status:'SUBMITTED'}).select('id').maybeSingle();
-          if(r.error)throw r.error;
+          const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+          const path='admin-fee/'+String(gb.gb_number).replace(/[^a-zA-Z0-9_-]/g,'_')+'/'+Date.now()+'-'+crypto.randomUUID()+'-'+safe;
+          const up=await window.sb.storage.from('payment-proofs').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
+          if(up.error)throw up.error;
+          const pub=window.sb.storage.from('payment-proofs').getPublicUrl(path);
+          const proofUrl=pub?.data?.publicUrl||'';
+          let details={full_name:'',phone:'',whatsapp_name:''};
+          try{
+            const u=(await window.sb.auth.getUser())?.data?.user;
+            if(u){
+              const p=await window.sb.from('profiles').select('full_name,contact_number,whatsapp_name').eq('id',u.id).maybeSingle();
+              details={full_name:p?.data?.full_name||u.user_metadata?.full_name||'',phone:p?.data?.contact_number||'',whatsapp_name:p?.data?.whatsapp_name||''};
+            }
+          }catch(_){}
+          btn.textContent='SUBMITTING…';
+          const ins=await window.sb.from('admin_fee_payments').insert({gb_number:gb.gb_number,email,full_name:details.full_name,phone:details.phone,whatsapp_name:details.whatsapp_name,amount:Number(gb.admin_fee||0),payment_reference:ref,payment_proof_url:proofUrl,status:'SUBMITTED'}).select('id').maybeSingle();
+          if(ins.error)throw ins.error;
           wrap.remove();
-          if(window.pepmosaPopup)window.pepmosaPopup('Admin Fee payment submitted.\n\nPlease wait for PEPMOSA admin approval. Your cart is saved.');
+          if(window.pepmosaPopup)window.pepmosaPopup('Admin Fee payment submitted.\n\nPayment proof uploaded successfully. Please wait for PEPMOSA admin approval. Your cart is saved.');
           resolve(false);
-        }catch(e){msg.textContent=e?.message||'Unable to submit Admin Fee payment.';btn.disabled=false;btn.textContent='I PAID — SUBMIT'}
+        }catch(e){console.error('ADMIN FEE PROOF',e);msg.textContent=e?.message||'Unable to submit Admin Fee payment.';btn.disabled=false;btn.textContent='I PAID — SUBMIT'}
       };
     });
   }
-
   async function requireApprovedAdminFee(){
     var email='';
     try{var authUser=(await window.sb?.auth?.getUser())?.data?.user;email=(authUser?.email||'').trim().toLowerCase()}catch(e){}

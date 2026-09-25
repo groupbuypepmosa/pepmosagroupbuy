@@ -27,9 +27,9 @@ async function refresh(){
  const {data:{user}}=await sb.auth.getUser();currentUser=user;
  if(!user){show('authArea',true);show('accountArea',false);return}
  show('authArea',false);show('accountArea',true);
- const name=user.user_metadata?.full_name||user.user_metadata?.name||(user.email||'PEPMOSA').split('@')[0];
- $('accountName').textContent=profile?.full_name||name;$('accountProfileName').textContent=profile?.full_name||name;$('accountEmail').textContent=user.email||'';$('accountProfileEmail').textContent=user.email||'';$('accountProfileContact').textContent=profile?.contact_number||'—';$('accountProfileWhatsapp').textContent=profile?.whatsapp_name||'—';$('accountProfileAddress').textContent=profile?.address||'—';$('profileEditName').value=profile?.full_name||name;$('profileEditAddress').value=profile?.address||'';$('profileEditContact').value=profile?.contact_number||'';$('profileEditWhatsapp').value=profile?.whatsapp_name||'';
  const {data:profile}=await sb.from('profiles').select('account_status,email_verified_at,is_admin,full_name,address,contact_number,whatsapp_name').eq('id',user.id).maybeSingle();
+ const name=profile?.full_name||user.user_metadata?.full_name||user.user_metadata?.name||(user.email||'PEPMOSA').split('@')[0];
+ $('accountName').textContent=name;$('accountProfileName').textContent=name;$('accountEmail').textContent=user.email||'';$('accountProfileEmail').textContent=user.email||'';$('accountProfileContact').textContent=profile?.contact_number||'—';$('accountProfileWhatsapp').textContent=profile?.whatsapp_name||'—';$('accountProfileAddress').textContent=profile?.address||'—';$('profileEditName').value=name;$('profileEditAddress').value=profile?.address||'';$('profileEditContact').value=profile?.contact_number||'';$('profileEditWhatsapp').value=profile?.whatsapp_name||'';
  const approved=!!(profile?.is_admin||profile?.account_status==='APPROVED');
  const status=profile?.is_admin?'ADMIN':profile?.account_status||'PENDING';
  $('accountProfileStatus').textContent=status;

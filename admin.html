@@ -366,7 +366,7 @@ async function loadActivityHistory(){
       const proof=x.payment_proof_url?'<a href="'+esc(x.payment_proof_url)+'" target="_blank" rel="noopener" style="color:#d52f82;font-weight:900">VIEW PAYMENT PROOF</a>':'NO PROOF';
       rows.push({time:x.created_at,type:"ADMIN FEE",gb:x.gb_number||"—",html:(esc(x.full_name||x.email||"Customer")+" • "+peso(x.amount)+" • "+esc(String(x.status||"SUBMITTED"))+" • "+proof)});
     });
-    (auditAll||[]).forEach(x=>{
+    (auditAll||[]).filter(x=>!['orders','admin_fee_payments','group_buys'].includes(String(x.entity_type||''))).forEach(x=>{
       let detail="";
       try{
         const d=x.details||{};

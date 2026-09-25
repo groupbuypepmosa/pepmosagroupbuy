@@ -926,14 +926,25 @@ header{
   }
 }
 <style id="pep-visible-auth-links">
-.pepAuthLinks{display:flex;align-items:center;gap:9px}
-.pepAuthLinks>a{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 15px;border-radius:999px;font-size:10px;font-weight:950;letter-spacing:.09em;white-space:nowrap}
-.pepAuthLogin{color:#c62e7e;background:#fff5fa;border:1px solid #edc5d9;box-shadow:0 5px 16px rgba(205,47,126,.08)}
-.pepAuthSignup{color:#fff;background:linear-gradient(135deg,#e63f91,#bd2d7e);border:1px solid #df4a96;box-shadow:0 7px 18px rgba(206,49,126,.2)}
+.pepAuthLinks{display:flex!important;align-items:center;gap:9px}
+.pepAuthLinks>a{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 17px;border-radius:999px;font-size:10px;font-weight:950;letter-spacing:.09em;white-space:nowrap}
+.pepAuthLogin{color:#c62e7e!important;background:#fff!important;border:1px solid #edb8d2!important;box-shadow:0 7px 20px rgba(205,47,126,.12)}
+.pepAuthSignup{color:#fff!important;background:linear-gradient(135deg,#ed5ca4,#c52f80)!important;border:1px solid #df4a96!important;box-shadow:0 8px 22px rgba(206,49,126,.24)}
 .pepAccountNav{display:none!important}
-.pepmosa-approved .pepAuthLinks .pepAuthLogin,.pepmosa-approved .pepAuthLinks .pepAuthSignup{display:none}
+.pepmosa-approved .pepAuthLinks .pepAuthLogin,.pepmosa-approved .pepAuthLinks .pepAuthSignup{display:none!important}
 .pepmosa-approved .pepAccountNav{display:inline-flex!important}
-@media(max-width:760px){.pepAuthLinks{gap:5px}.pepAuthLinks>a{min-height:35px;padding:0 9px;font-size:8px}.pepAuthSignup{max-width:115px;white-space:normal;text-align:center;line-height:1.1}.pepAuthLogin{font-size:9px}}
+@media(max-width:760px){
+ header .nav{display:flex!important;position:absolute;right:64px;top:12px;z-index:50}
+ .pepAuthLinks{gap:5px!important}
+ .pepAuthLinks>a{min-height:34px!important;padding:0 10px!important;font-size:8px!important}
+ .pepAuthSignup{max-width:110px;white-space:normal!important;text-align:center;line-height:1.05}
+ .pepAuthLogin{font-size:8px!important}
+}
+@media(max-width:480px){
+ header .nav{right:58px;top:10px}
+ .pepAuthLinks>a{min-height:32px!important;padding:0 8px!important;font-size:7px!important}
+ .pepAuthSignup{max-width:94px}
+}
 </style></style></style>
 
 <style id="pep-inline-picker-style">

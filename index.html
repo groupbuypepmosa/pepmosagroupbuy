@@ -2001,7 +2001,9 @@ main.wrap>.hero .heroLogo img{
   }
 }
 </style>
-</head>
+<style id="pep-mobile-account-link">
+.pepMobileAccount{display:none}@media(max-width:620px){.pepMobileAccount{position:absolute;left:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:52px;height:46px;color:#bd2d7e;border-radius:12px;background:#fff0f7;border:1px solid #efd0e0;text-decoration:none}.pepMobileAccount span{font-size:17px;line-height:1}.pepMobileAccount b{font-size:6px;letter-spacing:.05em}}
+</style></head>
 
 
 <body>
@@ -2035,6 +2037,9 @@ main.wrap>.hero .heroLogo img{
       <span>MY ACCOUNT</span>
     </a>
   </nav>
+  <a href="account.html" class="pepMobileAccount" id="pepMobileAccount" aria-label="My Account">
+    <span>♡</span><b>ACCOUNT</b>
+  </a>
 
 
   <button
@@ -4105,7 +4110,7 @@ load();
       if(!user)return;
       const {data:profile}=await client.from('profiles').select('full_name').eq('id',user.id).maybeSingle();
       const name=(profile?.full_name||user.user_metadata?.full_name||user.user_metadata?.name||'').trim();
-      if(name)a.querySelector('span').textContent='MY ACCOUNT · '+name.toUpperCase();
+      if(name){const upper=name.toUpperCase();a.querySelector('span').textContent='MY ACCOUNT · '+upper;const m=document.getElementById('pepMobileAccount');if(m)m.setAttribute('aria-label','My Account · '+upper);}
     }catch(e){console.warn('PEPMOSA account name',e)}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadTopAccountName,{once:true});

@@ -2974,19 +2974,53 @@ load();
 (function(){
   async function loadTopAccountName(){
     const a=document.getElementById('pepTopAccount');
-    if(!a)return;
+    const w=document.getElementById('pepWelcomeName');
+    if(!a && !w)return;
     try{
-      const client=window.sb||(typeof initSupabase==='function'?initSupabase():null);
+      const client=window.sb || (typeof initSupabase==='function' ? initSupabase() : null);
       if(!client)return;
-      const {data:{user}}=await client.auth.getUser();
-      if(!user)return;
-      const {data:profile}=await client.from('profiles').select('full_name').eq('id',user.id).maybeSingle();
-      const name=(profile?.full_name||user.user_metadata?.full_name||user.user_metadata?.name||'').trim();
-      if(name){const upper=name.toUpperCase();a.querySelector('span').textContent='MY ACCOUNT · '+upper;const m=document.getElementById('pepMobileAccount');if(m)m.setAttribute('aria-label','My Account · '+upper);const w=document.getElementById('pepWelcomeName');if(w)w.textContent=upper;}
-    }catch(e){console.warn('PEPMOSA account name',e)}
+      const {data:{user},error:userError}=await client.auth.getUser();
+      if(userError || !user)return;
+
+      let name=(user.user_metadata?.full_name || user.user_metadata?.name || '').trim();
+
+      try{
+        const {data:profile}=await client.from('profiles')
+          .select('full_name')
+          .eq('id',user.id)
+          .maybeSingle();
+        name=(profile?.full_name || name || '').trim();
+      }catch(e){ console.warn('PEPMOSA profile name lookup',e); }
+
+      if(!name)return;
+      const upper=name.toUpperCase();
+
+      if(a){
+        const span=a.querySelector('span');
+        if(span)span.textContent='MY ACCOUNT · '+upper;
+      }
+
+      const m=document.getElementById('pepMobileAccount');
+      if(m)m.setAttribute('aria-label','My Account · '+upper);
+
+      if(w)w.textContent=upper;
+    }catch(e){
+      console.warn('PEPMOSA account name',e);
+    }
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadTopAccountName,{once:true});
-  else loadTopAccountName();
+
+  function boot(){
+    loadTopAccountName();
+    let tries=0;
+    const timer=setInterval(async()=>{
+      tries++;
+      await loadTopAccountName();
+      if(tries>=10)clearInterval(timer);
+    },500);
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
 })();
 </script>
 <script src="customer-access-gate.js?v=20260925"></script>

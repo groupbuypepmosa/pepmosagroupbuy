@@ -2250,6 +2250,7 @@ function addToCart(pid,vid){
   // Adding to cart must NOT navigate, reload inventory, or open the cart.
   // Inventory remains unchanged until a successful atomic order submission.
   window.dispatchEvent(new Event("pepmosa-cart-updated"));
+  window.pepLogActivity?.('ADD_TO_CART','CART',null,{items:cart.map(x=>({product:x.product_name,variant:x.strength,qty:x.qty}))});
 
 }
 
@@ -2359,10 +2360,12 @@ function openCart(){
 
 
 function clearCart(){
+  const hadItems=cart.length;
   cart=[];
   localStorage.removeItem("pepmosaCart");
   updateCart();
   if($("cartItems")) openCart();
+  if(hadItems) window.pepLogActivity?.('CLEAR_CART','CART',null,{items:hadItems});
 }
 
 window.clearCart=clearCart;

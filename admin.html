@@ -336,7 +336,57 @@ function showMessage(m,t=""){
 function closeGlobalPopup(){clearTimeout(popupTimer);const host=$("globalMsg"),toast=host?.querySelector(".popupToast");if(!toast)return;toast.classList.remove("show");setTimeout(()=>{if(host)host.innerHTML=""},300)}
 function showLoginMessage(m,t="error"){$("loginMsg").innerHTML=`<div class="notice ${t}">${esc(m)}</div>`}function previewFile(i,p){const f=$(i).files[0];if(!f)return;$(p).src=URL.createObjectURL(f);$(p).style.display="block"}
 
-async function loadActivityHistory(){const box=$("activityHistory");if(!box)return;box.innerHTML='<div class="small">Loading history...</div>';try{const [or,fr]=await Promise.all([sb.from("orders").select("order_id,email,total,payment_status,payment_reference,admin_note,created_at").order("created_at",{ascending:false}).limit(100),sb.from("admin_fee_payments").select("email,amount,status,created_at").order("created_at",{ascending:false}).limit(100)]);const rows=[];if(!or.error)(or.data||[]).forEach(o=>rows.push({time:o.created_at,type:isManualOrder(o)?"MANUAL ORDER":"ORDER",text:(o.email||"Customer")+" • "+peso(o.total)+" • "+orderStatus(o)}));if(!fr.error)(fr.data||[]).forEach(x=>rows.push({time:x.created_at,type:"ADMIN FEE",text:(x.email||"Customer")+" • "+peso(x.amount)+" • "+String(x.status||"PENDING")}));rows.sort((a,b)=>new Date(b.time||0)-new Date(a.time||0));box.innerHTML=rows.length?rows.map(x=>'<div class="historyRow"><div><div class="historyType">'+esc(x.type)+'</div><div class="historyText">'+esc(x.text)+'</div></div><div class="historyTime">'+(x.time?new Date(x.time).toLocaleString("en-PH"):"—")+'</div></div>').join(""):'<div class="historyEmpty">No activity yet.</div>';}catch(e){box.innerHTML='<div class="notice error">Unable to load history.</div>';}}
+async async function loadActivityHistory(){
+  const box=$("activityHistory");if(!box)return;
+  box.innerHTML='<div class="small">Loading history...</div>';
+  try{
+    async function fetchAll(table,select){
+      const rows=[];let from=0;const pageSize=1000;
+      while(true){
+        const q=await sb.from(table).select(select).order("created_at",{ascending:false}).range(from,from+pageSize-1);
+        if(q.error)throw q.error;
+        const page=q.data||[];rows.push(...page);
+        if(page.length<pageSize)break;
+        from+=pageSize;
+      }
+      return rows;
+    }
+
+    const [ordersAll,feesAll]=await Promise.all([
+      fetchAll("orders","order_id,gb_number,email,total,payment_status,payment_reference,admin_note,created_at"),
+      fetchAll("admin_fee_payments","gb_number,email,amount,status,payment_reference,created_at")
+    ]);
+
+    const rows=[];
+    (ordersAll||[]).forEach(o=>{
+      const manual=isManualOrder(o);
+      const status=orderStatus(o);
+      const type=manual?"MANUAL ORDER":(String(o.gb_number||"").toUpperCase().includes("KIT")?"KIT COMPLETION ORDER":"ORDER");
+      rows.push({
+        time:o.created_at,
+        type,
+        gb:o.gb_number||"—",
+        text:(o.email||"Customer")+" • "+peso(o.total)+" • "+(status||"PENDING")
+      });
+    });
+    (feesAll||[]).forEach(x=>{
+      rows.push({
+        time:x.created_at,
+        type:"ADMIN FEE",
+        gb:x.gb_number||"—",
+        text:(x.email||"Customer")+" • "+peso(x.amount)+" • "+String(x.status||"SUBMITTED")
+      });
+    });
+
+    rows.sort((a,b)=>new Date(b.time||0)-new Date(a.time||0));
+    box.innerHTML=rows.length
+      ? rows.map(x=>'<div class="historyRow"><div><div class="historyType">'+esc(x.type)+' · '+esc(x.gb)+'</div><div class="historyText">'+esc(x.text)+'</div></div><div class="historyTime">'+(x.time?new Date(x.time).toLocaleString("en-PH"):"—")+'</div></div>').join("")
+      : '<div class="historyEmpty">No activity yet.</div>';
+  }catch(e){
+    console.error("HISTORY LOAD ERROR:",e);
+    box.innerHTML='<div class="notice error">Unable to load history: '+esc(e.message||"Unknown error")+'</div>';
+  }
+}
 
 function getOpenForAllProducts(){try{return JSON.parse(localStorage.getItem("pepmosa_open_for_all_products")||"[]")}catch(e){return []}}
 function setOpenForAllProducts(v){localStorage.setItem("pepmosa_open_for_all_products",JSON.stringify(v))}

@@ -727,10 +727,7 @@ header{
     align-items:center!important;
     justify-content:center!important;
   }
-  main.wrap>.hero .heroLogo:before{
-    width:235px!important;
-    height:235px!important;
-  }
+  main.wrap>.hero .heroLogo:before{content:none!important;display:none!important}
   main.wrap>.hero .heroLogo img{
     width:min(100%,350px)!important;
     max-width:350px!important;
@@ -1553,16 +1550,12 @@ main.wrap>.hero .heroLogo{
   min-height:325px!important;
   position:relative!important;
 }
-main.wrap>.hero .heroLogo:before{
-  content:"";
-  position:absolute;width:285px;height:285px;border-radius:50%;
-  background:radial-gradient(circle,#fff 0,#fff0f7 55%,transparent 72%);
-  box-shadow:0 0 0 1px rgba(230,150,190,.16),0 16px 42px rgba(214,77,145,.09);
-}
+main.wrap>.hero .heroLogo:before,
 main.wrap>.hero .heroLogo:after{
-  content:"♡";
-  position:absolute;right:15%;top:12%;font-size:34px;color:#ef82b5;
-  transform:rotate(12deg);opacity:.7;
+  content:none!important;
+  display:none!important;
+  background:none!important;
+  box-shadow:none!important;
 }
 main.wrap>.hero .heroLogo img{
   position:relative!important;z-index:2!important;
@@ -1808,11 +1801,10 @@ main.wrap{width:100%!important;max-width:1120px!important;box-sizing:border-box!
 }
 </style>
 <style id="pep-remove-logo-square">
-/* Keep the PEPMOSA artwork circular — remove any rectangular edge/background from the logo asset */
 main.wrap>.hero .heroLogo img{
+  border-radius:50%!important;
   clip-path:circle(49% at 50% 50%)!important;
   -webkit-clip-path:circle(49% at 50% 50%)!important;
-  border-radius:50%!important;
   background:transparent!important;
   box-shadow:none!important;
 }

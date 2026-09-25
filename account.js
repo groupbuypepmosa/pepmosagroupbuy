@@ -50,7 +50,7 @@ async function signup(e){
  if(data.session){await refresh();return}
  msg('Account created. Please verify your email first.','success');
 }
-async function login(e){e.preventDefault();const email=$('loginEmail').value.trim(),password=$('loginPassword').value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)return msg(error.message,'error');await refresh()}
+async function login(e){e.preventDefault();const email=$('loginEmail').value.trim(),password=$('loginPassword').value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)return msg(error.message,'error');const {data:profile}=await sb.from('profiles').select('account_status,is_admin').eq('id',data.user.id).maybeSingle();if(profile?.is_admin===true||profile?.account_status==='APPROVED'){window.location.replace('/');return;}await refresh()}
 async function refresh(){
  const {data:{user}}=await sb.auth.getUser();
  if(!user){show('authArea',true);show('accountArea',false);return}

@@ -18,6 +18,7 @@
   function loginPrompt(){
     const grid=document.getElementById('productGrid');
     if(!grid)return;
+    grid.dataset.pepmosaLocked='1';
     grid.innerHTML=
       '<div class="card" style="grid-column:1/-1;text-align:center;padding:42px 24px;border:1px solid rgba(219,62,143,.18);border-radius:24px;background:linear-gradient(135deg,#fffafd,#fff4fa);box-shadow:0 14px 35px rgba(92,43,74,.10)">'+
       '<div style="font-size:34px;margin-bottom:10px">🔐</div>'+
@@ -26,8 +27,22 @@
       '<a class="btn primary" href="'+ACCOUNT+'">LOG IN / CREATE ACCOUNT</a>'+
       '</div>';
   }
+  function watchHomeProducts(){
+    const grid=document.getElementById('productGrid');
+    if(!grid || grid.dataset.pepmosaWatch==='1')return;
+    grid.dataset.pepmosaWatch='1';
+    const observer=new MutationObserver(()=>{
+      if(window.pepmosaCustomerApproved===false && !grid.dataset.pepmosaRebuilding){
+        grid.dataset.pepmosaRebuilding='1';
+        loginPrompt();
+        delete grid.dataset.pepmosaRebuilding;
+      }
+    });
+    observer.observe(grid,{childList:true,subtree:true});
+  }
   function protectHomeProducts(approved){
     if(approved)return;
+    watchHomeProducts();
     const products=document.getElementById('products');
     if(products){
       const heading=products.querySelector('h2,h1');

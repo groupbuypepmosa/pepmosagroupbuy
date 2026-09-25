@@ -338,61 +338,46 @@ function showLoginMessage(m,t="error"){$("loginMsg").innerHTML=`<div class="noti
 
 async function loadActivityHistory(){
   const box=$("activityHistory");if(!box)return;
-  box.innerHTML='<div class="small">Loading history...</div>';
+  box.innerHTML='<div class="small">Loading complete activity history...</div>';
   try{
     async function fetchAll(table,select,orderColumn="created_at"){
       const rows=[];let from=0;const pageSize=1000;
       while(true){
         const q=await sb.from(table).select(select).order(orderColumn,{ascending:false}).range(from,from+pageSize-1);
-        if(q.error)throw q.error;
-        const page=q.data||[];rows.push(...page);
-        if(page.length<pageSize)break;
-        from+=pageSize;
-      }
-      return rows;
+        if(q.error)throw q.error;const page=q.data||[];rows.push(...page);
+        if(page.length<pageSize)break;from+=pageSize;
+      }return rows;
     }
-
-    const [ordersAll,feesAll,gbAll,loginsAll]=await Promise.all([
+    const [ordersAll,feesAll,gbAll,loginsAll,auditAll]=await Promise.all([
       fetchAll("orders","order_id,gb_number,email,total,payment_status,payment_reference,admin_note,created_at"),
-      fetchAll("admin_fee_payments","gb_number,email,amount,status,payment_reference,created_at"),
+      fetchAll("admin_fee_payments","gb_number,email,full_name,phone,whatsapp_name,amount,status,payment_reference,payment_proof_url,created_at"),
       fetchAll("group_buys","gb_number,status,customer_facing_name,created_at"),
-      fetchAll("customer_login_history","user_id,email,logged_in_at","logged_in_at")
+      fetchAll("customer_login_history","user_id,email,logged_in_at","logged_in_at"),
+      fetchAll("site_activity_log","id,actor_user_id,actor_email,action,entity_type,entity_id,page,details,created_at")
     ]);
     const gbStatus=new Map((gbAll||[]).map(g=>[String(g.gb_number||""),String(g.status||"")]));
-
     const rows=[];
     (ordersAll||[]).forEach(o=>{
-      const manual=isManualOrder(o);
-      const status=orderStatus(o);
-      const type=manual?"MANUAL ORDER":(gbStatus.get(String(o.gb_number||""))==="KIT_COMPLETION"?"KIT COMPLETION ORDER":"ORDER");
-      rows.push({
-        time:o.created_at,
-        type,
-        gb:o.gb_number||"—",
-        text:(o.email||"Customer")+" • "+peso(o.total)+" • "+(status||"PENDING")
-      });
+      const manual=isManualOrder(o),status=orderStatus(o),type=manual?"MANUAL ORDER":(gbStatus.get(String(o.gb_number||""))==="KIT_COMPLETION"?"KIT COMPLETION ORDER":"ORDER");
+      rows.push({time:o.created_at,type,gb:o.gb_number||"—",text:(o.email||"Customer")+" • "+peso(o.total)+" • "+(status||"PENDING")});
     });
-    (loginsAll||[]).forEach(x=>{
-      rows.push({
-        time:x.logged_in_at,
-        type:"CUSTOMER LOGIN",
-        gb:"ACCOUNT",
-        text:(x.email||"Customer")+" • Successful login"
-      });
-    });
+    (loginsAll||[]).forEach(x=>rows.push({time:x.logged_in_at,type:"CUSTOMER LOGIN",gb:"ACCOUNT",text:(x.email||"Customer")+" • Successful login"}));
     (feesAll||[]).forEach(x=>{
-      rows.push({
-        time:x.created_at,
-        type:"ADMIN FEE",
-        gb:x.gb_number||"—",
-        text:(x.email||"Customer")+" • "+peso(x.amount)+" • "+String(x.status||"SUBMITTED")
-      });
+      const proof=x.payment_proof_url?'<a href="'+esc(x.payment_proof_url)+'" target="_blank" rel="noopener" style="color:#d52f82;font-weight:900">VIEW PAYMENT PROOF</a>':'NO PROOF';
+      rows.push({time:x.created_at,type:"ADMIN FEE",gb:x.gb_number||"—",html:(esc(x.full_name||x.email||"Customer")+" • "+peso(x.amount)+" • "+esc(String(x.status||"SUBMITTED"))+" • "+proof)});
     });
-
+    (auditAll||[]).forEach(x=>{
+      let detail="";
+      try{
+        const d=x.details||{};
+        if(d.email)detail+=" • "+String(d.email);
+        else if(x.actor_email)detail+=" • "+String(x.actor_email);
+        if(x.page)detail+=" • "+String(x.page);
+      }catch(_){}
+      rows.push({time:x.created_at,type:String(x.action||"SITE ACTIVITY"),gb:x.entity_type||"SITE",text:(x.actor_email||"Visitor")+detail,html:esc(x.actor_email||"Visitor")+detail.replace(/</g,'&lt;')});
+    });
     rows.sort((a,b)=>new Date(b.time||0)-new Date(a.time||0));
-    box.innerHTML=rows.length
-      ? rows.map(x=>'<div class="historyRow"><div><div class="historyType">'+esc(x.type)+' · '+esc(x.gb)+'</div><div class="historyText">'+esc(x.text)+'</div></div><div class="historyTime">'+(x.time?new Date(x.time).toLocaleString("en-PH"):"—")+'</div></div>').join("")
-      : '<div class="historyEmpty">No activity yet.</div>';
+    box.innerHTML=rows.length?rows.map(x=>'<div class="historyRow"><div><div class="historyType">'+esc(x.type)+' · '+esc(x.gb)+'</div><div class="historyText">'+(x.html||esc(x.text||""))+'</div></div><div class="historyTime">'+(x.time?new Date(x.time).toLocaleString("en-PH"):"—")+'</div></div>').join(""):'<div class="historyEmpty">No activity yet.</div>';
   }catch(e){
     console.error("HISTORY LOAD ERROR:",e);
     box.innerHTML='<div class="notice error">Unable to load history: '+esc(e.message||"Unknown error")+'</div>';

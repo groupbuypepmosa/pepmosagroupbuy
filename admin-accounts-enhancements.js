@@ -80,6 +80,7 @@ window.rejectUser=async function(id){if(!confirm('Reject this account?'))return;
 window.deleteUser=async function(id,btn){if(!confirm('PERMANENTLY DELETE this customer account? This will remove the login account and profile permanently. This cannot be undone.'))return;if(btn){btn.disabled=true;btn.textContent='DELETING...'}const r=await sb2.functions.invoke('delete-customer-account',{body:{user_id:id}});if(r.error||r.data?.error){alert(r.error?.message||r.data?.error||'Delete failed.');if(btn){btn.disabled=false;btn.textContent='DELETE PERMANENTLY'}return}alert('Customer account permanently deleted.');loadEnhanced()};
 window.viewEnhancedCustomer=viewEnhancedCustomer;
 addModal();
+const search=$('customerSearch');
 document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',function(){setTimeout(loadEnhanced,50)}));
 search?.addEventListener('input',function(){renderEnhanced()});
 setTimeout(loadEnhanced,150);

@@ -340,29 +340,62 @@ async function loadActivityHistory(){
   const box=$("activityHistory");if(!box)return;
   box.innerHTML='<div class="small">Loading history...</div>';
   try{
-    async function latest(table,select){
-      const q=await sb.from(table).select(select).order("created_at",{ascending:false}).limit(50);
+    async function latest(table,select,order="created_at"){
+      const q=await sb.from(table).select(select).order(order,{ascending:false}).limit(50);
       if(q.error)throw q.error;
       return q.data||[];
     }
-    const [ordersAll,feesAll,gbAll]=await Promise.all([
+    const [ordersAll,feesAll,gbAll,loginsAll,activityAll]=await Promise.all([
       latest("orders","order_id,gb_number,email,total,payment_status,created_at"),
       latest("admin_fee_payments","gb_number,email,full_name,amount,status,created_at"),
-      latest("group_buys","gb_number,status,created_at")
+      latest("group_buys","gb_number,status,created_at"),
+      latest("customer_login_history","email,logged_in_at","logged_in_at"),
+      latest("site_activity_log","actor_email,action,entity_type,entity_id,details,created_at")
     ]);
     const gbStatus=new Map((gbAll||[]).map(g=>[String(g.gb_number||""),String(g.status||"")]));
     const rows=[];
+    (loginsAll||[]).forEach(x=>{
+      rows.push({
+        time:x.logged_in_at,
+        type:"LOGIN",
+        gb:"—",
+        name:x.email||"Customer",
+        detail:"",
+        amount:"",
+        status:"SUCCESS"
+      });
+    });
+    (activityAll||[]).filter(x=>String(x.action||"").toUpperCase()==="ADD_TO_CART").forEach(x=>{
+      const d=x.details||{};
+      const product=d.product||"Product";
+      const variant=d.variant?(" • "+d.variant):"";
+      const qty=Number(d.qty||0);
+      rows.push({
+        time:x.created_at,
+        type:"ADD TO CART",
+        gb:d.gb_number||"—",
+        name:x.actor_email||"Customer",
+        detail:product+variant+" × "+qty,
+        amount:"",
+        status:""
+      });
+    });
     (ordersAll||[]).forEach(o=>{
       const manual=isManualOrder(o), status=orderStatus(o)||"PENDING";
       const type=manual?"MANUAL ORDER":(gbStatus.get(String(o.gb_number||""))==="KIT_COMPLETION"?"KIT ORDER":"ORDER");
-      rows.push({time:o.created_at,type,gb:o.gb_number||"—",name:o.email||"Customer",amount:peso(o.total),status});
+      rows.push({time:o.created_at,type,gb:o.gb_number||"—",name:o.email||"Customer",detail:"",amount:peso(o.total),status});
     });
-    (feesAll||[]).forEach(x=>rows.push({time:x.created_at,type:"ADMIN FEE",gb:x.gb_number||"—",name:x.full_name||x.email||"Customer",amount:peso(x.amount),status:String(x.status||"SUBMITTED")}));
+    (feesAll||[]).forEach(x=>rows.push({time:x.created_at,type:"ADMIN FEE",gb:x.gb_number||"—",name:x.full_name||x.email||"Customer",detail:"",amount:peso(x.amount),status:String(x.status||"SUBMITTED")}));
     rows.sort((a,b)=>new Date(b.time||0)-new Date(a.time||0));
-    const visible=rows.slice(0,50);
+    const visible=rows.slice(0,80);
     box.innerHTML=visible.length
-      ?visible.map(x=>'<div class="historyRow"><div class="historyMain"><div class="historyType">'+esc(x.type)+' · '+esc(x.gb)+'</div><div class="historyText">'+esc(x.name)+' <span class="historyAmount">'+esc(x.amount)+'</span></div></div><div class="historyRight"><span class="historyStatus">'+esc(x.status)+'</span><div class="historyTime">'+(x.time?new Date(x.time).toLocaleString("en-PH",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"—")+'</div></div></div>').join("")
-      :'<div class="historyEmpty">No order or payment history yet.</div>';
+      ?visible.map(x=>{
+        const detail=x.detail?'<div class="historyText">'+esc(x.detail)+'</div>':'';
+        const amount=x.amount?'<span class="historyAmount">'+esc(x.amount)+'</span>':'';
+        const status=x.status?'<span class="historyStatus">'+esc(x.status)+'</span>':'';
+        return '<div class="historyRow"><div class="historyMain"><div class="historyType">'+esc(x.type)+(x.gb&&x.gb!=="—"?' · '+esc(x.gb):'')+'</div><div class="historyText">'+esc(x.name)+' '+amount+'</div>'+detail+'</div><div class="historyRight">'+status+'<div class="historyTime">'+(x.time?new Date(x.time).toLocaleString("en-PH",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"—")+'</div></div></div>';
+      }).join("")
+      :'<div class="historyEmpty">No activity history yet.</div>';
   }catch(e){
     console.error("HISTORY LOAD ERROR:",e);
     box.innerHTML='<div class="notice error">Unable to load history.</div>';

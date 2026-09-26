@@ -227,7 +227,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 <section id="gbPanel" class="panel active"><div class="card"><h2>Create / Edit Group Buy</h2><input id="editingGBId" type="hidden"><div class="grid"><div class="field"><label>GB Number *</label><input id="gbNumber" placeholder="GB-001"></div><div class="field"><label>Customer-Facing Name</label><input id="gbName" placeholder="September Group Buy"></div><div class="field"><label>Admin Fee</label><input id="gbAdminFee" type="number" min="0" step="0.01" value="0"></div><div class="field"><label>Status *</label><select id="gbStatus"><option value="OPEN">OPEN</option><option value="CLOSED">CLOSED</option><option value="KIT_COMPLETION">KIT COMPLETION</option></select></div><div class="field"><label>ORDER DEADLINE</label><input id="gbDeadline" type="datetime-local"><div class="small">Customers can order until this date/time. Leave blank if there is no deadline.</div></div></div><div class="card" style="margin-top:18px;border-color:#efc5db;background:linear-gradient(135deg,#fffafd,#fff1f8)"><h3 style="margin-bottom:6px">GB SCHEDULE</h3><p class="muted" style="margin-top:0">Set the customer-facing timeline for this Group Buy. These dates appear on the Home page.</p><div class="grid"><div class="field"><label>GB OPENS</label><input id="gbScheduleOpen" type="datetime-local"></div><div class="field"><label>ADMIN FEE PAYMENT</label><input id="gbScheduleFee" type="datetime-local"></div><div class="field"><label>ORDER PLACEMENT</label><input id="gbScheduleOrder" type="datetime-local"></div><div class="field"><label>FINAL PAYMENT</label><input id="gbScheduleFinal" type="datetime-local"></div><div class="field"><label>ORDER PLACED</label><input id="gbSchedulePlaced" type="datetime-local"></div><div class="field"><label>DELIVERY ETA</label><input id="gbScheduleDelivery" type="text" placeholder="2–3 weeks"></div></div></div>
 <div class="field full" style="margin-top:14px"><label>Categories for this Group Buy</label><div id="gbCategoryPicker" class="checkList"><div class="small">Loading categories...</div></div><div class="small" style="margin-top:8px">Choose the categories that should appear in this Group Buy.</div></div>
 <hr><h3>Admin Fee QR</h3><div class="fileBox"><input id="adminQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('adminQrFile','adminQrPreview')"><br><br><img id="adminQrPreview" class="qrPreview" style="display:none"></div><br><h3>Final Payment QR</h3><div class="fileBox"><input id="finalQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('finalQrFile','finalQrPreview')"><br><br><img id="finalQrPreview" class="qrPreview" style="display:none"></div><div class="actions"><button class="btn primary" onclick="saveGroupBuy()">SAVE GROUP BUY</button><button class="btn secondary" onclick="clearGBForm()">NEW</button></div></div><div class="card"><h2>Group Buys</h2><div id="gbList">Loading...</div></div></section>
-<section id="historyPanel" class="panel"><div class="card"><div class="itemHead"><div><h2>Activity History</h2><p class="muted">Recent orders and payment activity.</p></div><button class="btn secondary" type="button" onclick="loadActivityHistory()">REFRESH</button></div><div id="activityHistory"><div class="small">Open HISTORY to load activity.</div></div></div></section><section id="categoriesPanel" class="panel"><div class="card"><h2>Categories</h2><div class="grid"><div class="field"><label>New Category</label><input id="newCategory" placeholder="Peptides"></div></div><div class="actions"><button class="btn primary" onclick="addCategory()">ADD CATEGORY</button></div><div id="categoryList"></div></div><div class="card"><h2>GB Category Minimum</h2><p class="muted">Set the minimum once per category for this GB. Every active product/variant inside that category automatically follows this minimum.</p><div class="field"><label>Select Group Buy</label><select id="minimumGB" onchange="loadCategoryMinimums()"><option value="">Select GB</option></select></div><br><div id="minimumList">Select a Group Buy.</div><div class="actions"><button class="btn primary" onclick="saveCategoryMinimums()">SAVE MINIMUMS</button></div></div></section>
+<section id="historyPanel" class="panel"><div class="card"><div class="itemHead"><div><h2>Activity History</h2><p class="muted">Orders and payment history only.</p></div><button class="btn secondary" type="button" onclick="loadActivityHistory()">REFRESH</button></div><div id="activityHistory"><div class="small">Open HISTORY to load activity.</div></div></div></section><section id="categoriesPanel" class="panel"><div class="card"><h2>Categories</h2><div class="grid"><div class="field"><label>New Category</label><input id="newCategory" placeholder="Peptides"></div></div><div class="actions"><button class="btn primary" onclick="addCategory()">ADD CATEGORY</button></div><div id="categoryList"></div></div><div class="card"><h2>GB Category Minimum</h2><p class="muted">Set the minimum once per category for this GB. Every active product/variant inside that category automatically follows this minimum.</p><div class="field"><label>Select Group Buy</label><select id="minimumGB" onchange="loadCategoryMinimums()"><option value="">Select GB</option></select></div><br><div id="minimumList">Select a Group Buy.</div><div class="actions"><button class="btn primary" onclick="saveCategoryMinimums()">SAVE MINIMUMS</button></div></div></section>
 <section id="productsPanel" class="panel"><div class="card"><h2>Add Product</h2><p class="muted">Product and variant IDs are generated automatically.</p><div class="grid"><div class="field"><label>Product Name *</label><input id="productName" placeholder="Tirzepatide"></div><div class="field"><label>Category *</label><select id="productCategory"><option value="">Select category</option></select></div><div class="field"><label>Product Image</label><input id="productImageFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('productImageFile','productImagePreview')"><img id="productImagePreview" class="qrPreview" style="display:none;max-width:140px;max-height:140px"></div><div class="field full"><label>Description</label><textarea id="productDescription"></textarea></div></div><div class="variantEditor"><div class="itemHead"><div><h3 style="margin-bottom:4px">Variants & Prices</h3><div class="small">Add all strengths/variants and their prices here.</div></div><button class="btn secondary" type="button" onclick="addVariantEditorRow()">+ ADD VARIANT</button></div><div id="variantEditorRows"></div></div><div class="actions"><button class="btn primary" onclick="addProduct()">ADD PRODUCT</button></div></div><div class="card"><h2>Products</h2><input id="productSearch" class="search" placeholder="Search product..." oninput="renderProducts()"><div id="productList">Loading...</div></div></section>
 <section id="openForAllPanel" class="panel">
   <div class="card" style="text-align:center;padding:38px 24px">
@@ -338,46 +338,52 @@ function showLoginMessage(m,t="error"){$("loginMsg").innerHTML=`<div class="noti
 
 async function loadActivityHistory(){
   const box=$("activityHistory");if(!box)return;
-  box.innerHTML='<div class="small">Loading complete activity history...</div>';
+  box.innerHTML='<div class="small">Loading order & payment history...</div>';
   try{
     async function fetchAll(table,select,orderColumn="created_at"){
       const rows=[];let from=0;const pageSize=1000;
       while(true){
         const q=await sb.from(table).select(select).order(orderColumn,{ascending:false}).range(from,from+pageSize-1);
-        if(q.error)throw q.error;const page=q.data||[];rows.push(...page);
-        if(page.length<pageSize)break;from+=pageSize;
-      }return rows;
+        if(q.error)throw q.error;
+        const page=q.data||[];rows.push(...page);
+        if(page.length<pageSize)break;
+        from+=pageSize;
+      }
+      return rows;
     }
-    const [ordersAll,feesAll,gbAll,loginsAll,auditAll]=await Promise.all([
+    const [ordersAll,feesAll,gbAll]=await Promise.all([
       fetchAll("orders","order_id,gb_number,email,total,payment_status,payment_reference,admin_note,created_at"),
-      fetchAll("admin_fee_payments","gb_number,email,full_name,phone,whatsapp_name,amount,status,payment_reference,payment_proof_url,created_at"),
-      fetchAll("group_buys","gb_number,status,customer_facing_name,created_at"),
-      fetchAll("customer_login_history","user_id,email,logged_in_at","logged_in_at"),
-      fetchAll("site_activity_log","id,actor_user_id,actor_email,action,entity_type,entity_id,page,details,created_at")
+      fetchAll("admin_fee_payments","gb_number,email,full_name,amount,status,payment_reference,payment_proof_url,created_at"),
+      fetchAll("group_buys","gb_number,status,customer_facing_name,created_at")
     ]);
     const gbStatus=new Map((gbAll||[]).map(g=>[String(g.gb_number||""),String(g.status||"")]));
     const rows=[];
     (ordersAll||[]).forEach(o=>{
-      const manual=isManualOrder(o),status=orderStatus(o),type=manual?"MANUAL ORDER":(gbStatus.get(String(o.gb_number||""))==="KIT_COMPLETION"?"KIT COMPLETION ORDER":"ORDER");
-      rows.push({time:o.created_at,type,gb:o.gb_number||"—",text:(o.email||"Customer")+" • "+peso(o.total)+" • "+(status||"PENDING")});
+      const manual=isManualOrder(o);
+      const status=orderStatus(o);
+      const type=manual?"MANUAL ORDER":(gbStatus.get(String(o.gb_number||""))==="KIT_COMPLETION"?"KIT COMPLETION ORDER":"ORDER");
+      rows.push({
+        time:o.created_at,
+        type,
+        gb:o.gb_number||"—",
+        text:(o.email||"Customer")+" • "+peso(o.total)+" • "+(status||"PENDING")
+      });
     });
-    (loginsAll||[]).forEach(x=>rows.push({time:x.logged_in_at,type:"CUSTOMER LOGIN",gb:"ACCOUNT",text:(x.email||"Customer")+" • Successful login"}));
     (feesAll||[]).forEach(x=>{
-      const proof=x.payment_proof_url?'<a href="'+esc(x.payment_proof_url)+'" target="_blank" rel="noopener" style="color:#d52f82;font-weight:900">VIEW PAYMENT PROOF</a>':'NO PROOF';
-      rows.push({time:x.created_at,type:"ADMIN FEE",gb:x.gb_number||"—",html:(esc(x.full_name||x.email||"Customer")+" • "+peso(x.amount)+" • "+esc(String(x.status||"SUBMITTED"))+" • "+proof)});
-    });
-    (auditAll||[]).filter(x=>!['orders','admin_fee_payments','group_buys'].includes(String(x.entity_type||''))).forEach(x=>{
-      let detail="";
-      try{
-        const d=x.details||{};
-        if(d.email)detail+=" • "+String(d.email);
-        else if(x.actor_email)detail+=" • "+String(x.actor_email);
-        if(x.page)detail+=" • "+String(x.page);
-      }catch(_){}
-      rows.push({time:x.created_at,type:String(x.action||"SITE ACTIVITY"),gb:x.entity_type||"SITE",text:(x.actor_email||"Visitor")+detail,html:esc(x.actor_email||"Visitor")+detail.replace(/</g,'&lt;')});
+      const proof=x.payment_proof_url
+        ?'<a href="'+esc(x.payment_proof_url)+'" target="_blank" rel="noopener" style="color:#d52f82;font-weight:900">VIEW PAYMENT PROOF</a>'
+        :'NO PROOF';
+      rows.push({
+        time:x.created_at,
+        type:"ADMIN FEE",
+        gb:x.gb_number||"—",
+        html:(esc(x.full_name||x.email||"Customer")+" • "+peso(x.amount)+" • "+esc(String(x.status||"SUBMITTED"))+" • "+proof)
+      });
     });
     rows.sort((a,b)=>new Date(b.time||0)-new Date(a.time||0));
-    box.innerHTML=rows.length?rows.map(x=>'<div class="historyRow"><div><div class="historyType">'+esc(x.type)+' · '+esc(x.gb)+'</div><div class="historyText">'+(x.html||esc(x.text||""))+'</div></div><div class="historyTime">'+(x.time?new Date(x.time).toLocaleString("en-PH"):"—")+'</div></div>').join(""):'<div class="historyEmpty">No activity yet.</div>';
+    box.innerHTML=rows.length
+      ?rows.map(x=>'<div class="historyRow"><div><div class="historyType">'+esc(x.type)+' · '+esc(x.gb)+'</div><div class="historyText">'+(x.html||esc(x.text||""))+'</div></div><div class="historyTime">'+(x.time?new Date(x.time).toLocaleString("en-PH"):"—")+'</div></div>').join("")
+      :'<div class="historyEmpty">No order or payment history yet.</div>';
   }catch(e){
     console.error("HISTORY LOAD ERROR:",e);
     box.innerHTML='<div class="notice error">Unable to load history: '+esc(e.message||"Unknown error")+'</div>';

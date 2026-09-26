@@ -205,7 +205,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 
 
 
-.historyRow{display:flex;justify-content:space-between;gap:14px;padding:13px 8px;border-bottom:1px solid #f0e3ea}.historyType{font-size:10px;font-weight:950;color:#a52b70}.historyText{font-size:12px;font-weight:750}.historyTime{font-size:10px;color:#907b86}.historyEmpty{padding:25px;text-align:center;color:#907b86}
+.historyRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 8px;border-bottom:1px solid #f0e3ea}.historyMain{min-width:0}.historyType{font-size:9px;font-weight:950;color:#a52b70;letter-spacing:.04em}.historyText{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}.historyAmount{font-weight:900;color:#4b3a44;margin-left:5px}.historyRight{text-align:right;flex:0 0 auto}.historyStatus{font-size:9px;font-weight:900;color:#765866}.historyTime{font-size:9px;color:#907b86;margin-top:2px}.historyEmpty{padding:22px;text-align:center;color:#907b86}
 
 
 .btn.warning{background:#fff3cd;color:#7a5a00;border-color:#efd98a}.btn.warning:hover{filter:brightness(.98)}
@@ -338,55 +338,34 @@ function showLoginMessage(m,t="error"){$("loginMsg").innerHTML=`<div class="noti
 
 async function loadActivityHistory(){
   const box=$("activityHistory");if(!box)return;
-  box.innerHTML='<div class="small">Loading order & payment history...</div>';
+  box.innerHTML='<div class="small">Loading history...</div>';
   try{
-    async function fetchAll(table,select,orderColumn="created_at"){
-      const rows=[];let from=0;const pageSize=1000;
-      while(true){
-        const q=await sb.from(table).select(select).order(orderColumn,{ascending:false}).range(from,from+pageSize-1);
-        if(q.error)throw q.error;
-        const page=q.data||[];rows.push(...page);
-        if(page.length<pageSize)break;
-        from+=pageSize;
-      }
-      return rows;
+    async function latest(table,select){
+      const q=await sb.from(table).select(select).order("created_at",{ascending:false}).limit(50);
+      if(q.error)throw q.error;
+      return q.data||[];
     }
     const [ordersAll,feesAll,gbAll]=await Promise.all([
-      fetchAll("orders","order_id,gb_number,email,total,payment_status,payment_reference,admin_note,created_at"),
-      fetchAll("admin_fee_payments","gb_number,email,full_name,amount,status,payment_reference,payment_proof_url,created_at"),
-      fetchAll("group_buys","gb_number,status,customer_facing_name,created_at")
+      latest("orders","order_id,gb_number,email,total,payment_status,created_at"),
+      latest("admin_fee_payments","gb_number,email,full_name,amount,status,created_at"),
+      latest("group_buys","gb_number,status,created_at")
     ]);
     const gbStatus=new Map((gbAll||[]).map(g=>[String(g.gb_number||""),String(g.status||"")]));
     const rows=[];
     (ordersAll||[]).forEach(o=>{
-      const manual=isManualOrder(o);
-      const status=orderStatus(o);
-      const type=manual?"MANUAL ORDER":(gbStatus.get(String(o.gb_number||""))==="KIT_COMPLETION"?"KIT COMPLETION ORDER":"ORDER");
-      rows.push({
-        time:o.created_at,
-        type,
-        gb:o.gb_number||"—",
-        text:(o.email||"Customer")+" • "+peso(o.total)+" • "+(status||"PENDING")
-      });
+      const manual=isManualOrder(o), status=orderStatus(o)||"PENDING";
+      const type=manual?"MANUAL ORDER":(gbStatus.get(String(o.gb_number||""))==="KIT_COMPLETION"?"KIT ORDER":"ORDER");
+      rows.push({time:o.created_at,type,gb:o.gb_number||"—",name:o.email||"Customer",amount:peso(o.total),status});
     });
-    (feesAll||[]).forEach(x=>{
-      const proof=x.payment_proof_url
-        ?'<a href="'+esc(x.payment_proof_url)+'" target="_blank" rel="noopener" style="color:#d52f82;font-weight:900">VIEW PAYMENT PROOF</a>'
-        :'NO PROOF';
-      rows.push({
-        time:x.created_at,
-        type:"ADMIN FEE",
-        gb:x.gb_number||"—",
-        html:(esc(x.full_name||x.email||"Customer")+" • "+peso(x.amount)+" • "+esc(String(x.status||"SUBMITTED"))+" • "+proof)
-      });
-    });
+    (feesAll||[]).forEach(x=>rows.push({time:x.created_at,type:"ADMIN FEE",gb:x.gb_number||"—",name:x.full_name||x.email||"Customer",amount:peso(x.amount),status:String(x.status||"SUBMITTED")}));
     rows.sort((a,b)=>new Date(b.time||0)-new Date(a.time||0));
-    box.innerHTML=rows.length
-      ?rows.map(x=>'<div class="historyRow"><div><div class="historyType">'+esc(x.type)+' · '+esc(x.gb)+'</div><div class="historyText">'+(x.html||esc(x.text||""))+'</div></div><div class="historyTime">'+(x.time?new Date(x.time).toLocaleString("en-PH"):"—")+'</div></div>').join("")
+    const visible=rows.slice(0,50);
+    box.innerHTML=visible.length
+      ?visible.map(x=>'<div class="historyRow"><div class="historyMain"><div class="historyType">'+esc(x.type)+' · '+esc(x.gb)+'</div><div class="historyText">'+esc(x.name)+' <span class="historyAmount">'+esc(x.amount)+'</span></div></div><div class="historyRight"><span class="historyStatus">'+esc(x.status)+'</span><div class="historyTime">'+(x.time?new Date(x.time).toLocaleString("en-PH",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"—")+'</div></div></div>').join("")
       :'<div class="historyEmpty">No order or payment history yet.</div>';
   }catch(e){
     console.error("HISTORY LOAD ERROR:",e);
-    box.innerHTML='<div class="notice error">Unable to load history: '+esc(e.message||"Unknown error")+'</div>';
+    box.innerHTML='<div class="notice error">Unable to load history.</div>';
   }
 }
 

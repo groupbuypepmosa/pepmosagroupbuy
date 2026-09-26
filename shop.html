@@ -2283,7 +2283,12 @@ function addToCart(pid,vid){
   // Inventory remains unchanged until a successful atomic order submission.
   window.dispatchEvent(new Event("pepmosa-cart-updated"));
   pepCloudCart('save');
-  window.pepLogActivity?.('ADD_TO_CART','CART',null,{items:cart.map(x=>({product:x.product_name,variant:x.strength,qty:x.qty}))});
+  window.pepLogActivity?.('ADD_TO_CART','CART',String(vid),{
+    product:product.product_name,
+    variant:variant.strength,
+    qty:qty,
+    cart_qty:existing ? existing.qty : qty
+  });
 
 }
 

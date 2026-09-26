@@ -19,12 +19,12 @@ function addModal(){
  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')});
 }
 async function loadEnhanced(){
- sb2=window.sb||initSupabase();if(!sb2)return;
+ try{ sb2=window.sb||initSupabase(); await requireAdmin(); }catch(e){ const list=$('list'); if(list) list.innerHTML='<div class="empty">'+esc2(e?.message||e||'Unable to load customer accounts.')+'</div>'; return; }
  const active=document.querySelector('.toolbar button.active');
- const f=active?.dataset?.filter||'PENDING';
+ const f=active?.dataset?.filter||'ALL';
  let q=sb2.from('profiles').select('id,email,is_admin,account_status,email_verified_at,created_at,approved_at,rejected_at,full_name,contact_number,whatsapp_name,address').eq('is_admin',false).order('created_at',{ascending:false});
  if(f!=='ALL')q=f==='PENDING'?q.eq('account_status','EMAIL_VERIFIED_PENDING_ADMIN'):q.eq('account_status',f);
- const r=await q;if(r.error)return;
+ const r=await q;if(r.error){const list=$('list');if(list)list.innerHTML='<div class="empty">'+esc2(r.error.message)+'</div>';return;}
  enhancedCustomers=r.data||[];enhancedStats=new Map();
  enhancedCustomers.forEach(u=>enhancedStats.set(u.id,{cart:[],orders:[],logins:[]}));
  if(!enhancedCustomers.length){window.__pepEnhancedRender&&window.__pepEnhancedRender();return}

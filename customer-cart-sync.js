@@ -60,7 +60,15 @@
       const {data,error}=await s.from('customer_carts').select('cart').eq('user_id',u.id).maybeSingle();
       if(error)throw error;
       const local=cleanCart(readLocal()), cloud=cleanCart(data?.cart||[]);
-      const merged=cloud.length?merge(cloud,local):local;
+      // Cloud cart is the source of truth on page load. The old code merged
+      // cloud + local on every refresh, so an already-synced item was added
+      // to itself again and again (2x, 3x, 4x...) after each refresh.
+      // Only preserve local quantities that are genuinely higher than cloud.
+      const byKey=new Map(cloud.map(i=>[String(i.gb_number||'')+'|'+String(i.variant_id||''),i]));
+      const merged=cloud.length ? cloud.map(i=>{
+        const k=String(i.gb_number||'')+'|'+String(i.variant_id||''), l=local.find(x=>String(x.gb_number||'')+'|'+String(x.variant_id||'')===k);
+        return l && Number(l.qty)>Number(i.qty) ? {...i,qty:Number(l.qty)} : {...i};
+      }).concat(local.filter(l=>!byKey.has(String(l.gb_number||'')+'|'+String(l.variant_id||'')))) : local;
       writeLocal(merged);
       lastSaved=sig(merged);
       if(!data || sig(merged)!==sig(cloud)) await saveCloud(merged);

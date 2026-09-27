@@ -1397,10 +1397,10 @@ letter-spacing:.16em;text-transform:uppercase;color:#806675;
       <div class="pepField pepShippingWrap">
        <label>SHIPPING METHOD</label>
        <select id="pepShippingMethod" class="pepShippingSelect">
-        <option value="0" data-fee="100">J&T Express — Luzon • ₱100</option>
-        <option value="1" data-fee="150">J&T Express — Visayas • ₱150</option>
-        <option value="2" data-fee="180">J&T Express — Mindanao • ₱180</option>
-        <option value="3" data-fee="0">Lalamove • App Rate</option>
+        <option value="J&T Express — Luzon" data-fee="100">J&T Express — Luzon • ₱100</option>
+        <option value="J&T Express — Visayas" data-fee="150">J&T Express — Visayas • ₱150</option>
+        <option value="J&T Express — Mindanao" data-fee="180">J&T Express — Mindanao • ₱180</option>
+        <option value="Lalamove" data-fee="0">Lalamove • App Rate</option>
        </select>
        <input id="shippingMethod" type="hidden">
       </div>
@@ -1415,7 +1415,7 @@ letter-spacing:.16em;text-transform:uppercase;color:#806675;
    </div>
 
    <div class="pepActions">
-    <button id="pepPlaceOrder" class="pepSubmit" type="button" onclick="window.pepmosaFinalSubmitOrder()">✈ SUBMIT ORDER</button>
+    <button id="pepPlaceOrder" class="pepSubmit" type="button" onclick="placeOrder()">✈ SUBMIT ORDER</button>
     <button class="pepCancel" onclick="closeModal('checkoutModal')">CANCEL</button>
    </div>
   </div>
@@ -2596,8 +2596,115 @@ function checkout(){
    PLACE ORDER
    ========================================================= */
 
-// Checkout submission is owned by checkout-polish.js.
-// Keep no legacy submitOrder implementation here to avoid handler shadowing.
+async function placeOrder(){
+
+  const submitBtn =
+    document.querySelector('#checkoutModal .pepSubmit, #checkoutModal .actions .btn.primary');
+
+  try{
+
+    if(!currentGB || !["OPEN","KIT_COMPLETION"].includes(String(currentGB.status||"").toUpperCase())){
+      return alert("Ordering is currently closed for this Group Buy.");
+    }
+
+    // Always read the latest shared cart. Add to Cart does NOT change inventory.
+    cart = JSON.parse(localStorage.pepmosaCart || "[]");
+
+    if(!cart.length){
+      return alert("Cart is empty.");
+    }
+
+    const email =
+      (
+        window.verifiedEmail ||
+        localStorage.getItem("pepmosa_verified_email") ||
+        $("email")?.value ||
+        ""
+      )
+      .trim()
+      .toLowerCase();
+
+    if(!email){
+      return alert("Enter the email used for your approved Admin Fee.");
+    }
+
+    if($("email")) $("email").value=email;
+
+    if(submitBtn){
+      submitBtn.disabled=true;
+      submitBtn.textContent="SUBMITTING…";
+    }
+
+    /*
+      ONE ATOMIC DATABASE SUBMISSION
+
+      Add to Cart does NOT decrement inventory.
+
+      For KIT COMPLETION, the database checks and decrements remaining_qty
+      only here. Inventory rows are locked during the check, so two customers
+      cannot successfully submit the same remaining vial(s).
+    */
+    const { data:result, error:submitError } =
+      await sb.rpc(
+        "submit_group_buy_order_atomic",
+        {
+          p_gb_number: currentGB.gb_number,
+          p_email: email,
+          p_customer_name: $("customerName")?.value?.trim() || null,
+          p_contact: $("contact")?.value?.trim() || null,
+          p_address: $("address")?.value?.trim() || null,
+          p_shipping_method: $("shippingMethod")?.value?.trim() || null,
+          p_items: cart.map(item => ({
+            product_id: item.product_id,
+            variant_id: item.variant_id,
+            qty: Math.max(1,Number(item.qty||0))
+          }))
+        }
+      );
+
+    if(submitError) throw submitError;
+
+    const submitted =
+      Array.isArray(result) ? result[0] : result;
+
+    if(!submitted?.ok || !submitted?.order_id){
+      throw new Error("Order could not be submitted. Please try again.");
+    }
+
+    $("checkoutMsg").style.display="block";
+    $("checkoutMsg").className="notice success";
+    $("checkoutMsg").textContent =
+      "Order submitted: " +
+      submitted.order_id +
+      ". Your order is now secured.";
+
+    // Cart clears ONLY after a successful database submission.
+    cart=[];
+    localStorage.removeItem("pepmosaCart");
+    updateCart();
+
+    window.dispatchEvent(new Event("pepmosa-order-submitted"));
+
+  }catch(e){
+
+    console.error("PEPMOSA ORDER SUBMIT",e);
+
+    $("checkoutMsg").style.display="block";
+    $("checkoutMsg").className="notice error";
+    $("checkoutMsg").textContent =
+      e?.message ||
+      "Unable to submit your order. Please try again.";
+
+  }finally{
+
+    if(submitBtn){
+      submitBtn.disabled=false;
+      submitBtn.textContent="SUBMIT ORDER";
+    }
+
+  }
+
+}
 
 
 /* =========================================================
@@ -2610,7 +2717,7 @@ load();
 
 <script src="storefront-repair.js?v=20260904-notice-scroll-v4"></script>
 <!-- Product picker version: 2026-09-02 -->
-<script src="checkout-polish.js?v=20260927-submit-final-v7"></script>
+<script src="checkout-polish.js?v=20260927-checkout-redesign-v3"></script>
 <script src="kit-completion-storefront.js?v=20260904-remove-duplicate-kit-hero-v2"></script>
 
 <!-- PEPMOSA custom popup system: design-only replacement for browser alerts -->

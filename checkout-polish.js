@@ -292,7 +292,8 @@
   };
   /* Keep the storefront's existing order-submission flow.
      The redesign must not replace the proven atomic checkout RPC. */
-  window.placeOrder=async function(){ return submitOrder(); };
+  window.pepmosaFinalSubmitOrder=async function(){ return submitOrder(); };
+  window.placeOrder=window.pepmosaFinalSubmitOrder;
   async function submitOrder(){
     if(typeof window.pepRequireApprovedFee==='function'){
       const feeApproved=await window.pepRequireApprovedFee();

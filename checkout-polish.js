@@ -7,6 +7,8 @@
   const peso=v=>'₱'+Number(v||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
   let products=[];
   let checkoutCustomer=null;
+  let checkoutShippingPaid=false;
+  let checkoutPaidShippingIndex=0;
   async function loadCheckoutCustomer(){
     const s=S();if(!s)return null;
     try{
@@ -199,6 +201,17 @@
   document.head.appendChild(s);
 }
 
+  async function checkPaidShipping(gbNumber,email){
+    const s=S();
+    if(!s||!gbNumber||!email)return {paid:false,index:0};
+    try{
+      const {data,error}=await s.from('orders').select('shipping_method,shipping_fee').eq('gb_number',gbNumber).eq('email',email).eq('payment_status','PAID').gt('shipping_fee',0).order('created_at',{ascending:false}).limit(1).maybeSingle();
+      if(error||!data)return {paid:false,index:0};
+      const method=String(data.shipping_method||'').toLowerCase();
+      const index=method.includes('visayas')?1:method.includes('mindanao')?2:method.includes('lalamove')?3:0;
+      return {paid:true,index};
+    }catch(e){console.warn('PEPMOSA paid shipping lookup',e);return {paid:false,index:0};}
+  }
   function buildCheckout(){
     const modal=$('checkoutModal'),box=modal?.querySelector('.modalbox'),{cart,subtotal}=totals();if(!modal||!box||!cart.length)return;
     const gb=getGB(),qr=gb?.final_payment_qr_url||'',adminFee=Number(gb?.admin_fee||0),customer=checkoutCustomer||{},email=customer.email||'',gbName=gb?.customer_facing_name||gb?.gb_number||'PEPMOSA GROUP BUY';
@@ -229,7 +242,7 @@
           </div>
           <div class="pepFinalCard">
             <div class="pepFinalTitle"><span>SHIPPING METHOD</span><span class="optional">REQUIRED</span></div>
-            <select id="pepShippingMethod" class="pepShippingSelect">
+            <select id="pepShippingMethod" class="pepShippingSelect"${checkoutShippingPaid?" disabled":""}>
               <option value="0">J&amp;T Express — Luzon • ₱100</option>
               <option value="1">J&amp;T Express — Visayas • ₱150</option>
               <option value="2">J&amp;T Express — Mindanao • ₱180</option>
@@ -260,10 +273,10 @@
       </div>
     </div>`;
     $('pepOrderProof')?.addEventListener('change',function(){const f=this.files?.[0],n=$('pepFileName');if(f){n.textContent='✓ '+f.name;n.classList.add('show')}else{n.textContent='';n.classList.remove('show')}});
-    $('pepShippingMethod')?.addEventListener('change',updateTotals);$('pepPlaceOrder').onclick=submitOrder;$('pepCancelOrder').onclick=closeCheckout;updateTotals();
+    if(checkoutShippingPaid&&$('pepShippingMethod'))$('pepShippingMethod').value=String(checkoutPaidShippingIndex);$('pepShippingMethod')?.addEventListener('change',updateTotals);$('pepPlaceOrder').onclick=submitOrder;$('pepCancelOrder').onclick=closeCheckout;updateTotals();
   }
   function updateTotals(){
-    const {subtotal}=totals();const i=Number($('pepShippingMethod')?.value||0),fee=[100,150,180,0][i]??100;
+    const {subtotal}=totals();const i=Number($('pepShippingMethod')?.value||0),fee=checkoutShippingPaid?0:([100,150,180,0][i]??100);
     if($('pepShippingFee'))$('pepShippingFee').textContent=fee?peso(fee):'APP RATE';
     if($('pepGrandTotal'))$('pepGrandTotal').textContent=fee?peso(subtotal+fee):peso(subtotal);
   }
@@ -287,6 +300,9 @@
     if(!cleanCart.length){if(typeof window.openCart==='function')window.openCart();return}
     checkoutCustomer=await loadCheckoutCustomer();
     if(!checkoutCustomer?.email||!checkoutCustomer.customer_name||!checkoutCustomer.contact||!checkoutCustomer.address){if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Please complete your PEPMOSA account details before checkout.');else alert('Please complete your PEPMOSA account details before checkout.');return}
+    checkoutShippingPaid=false;checkoutPaidShippingIndex=0;
+    const paidShipping=await checkPaidShipping(activeGB.gb_number,checkoutCustomer.email);
+    checkoutShippingPaid=paidShipping.paid;checkoutPaidShippingIndex=paidShipping.index;
     buildCheckout();$('checkoutModal')?.classList.add('open')
   };
   /* Keep the storefront's existing order-submission flow.
@@ -315,8 +331,8 @@
       const shipIndex=Number($('pepShippingMethod')?.value||0);
       const shipNames=['J&T Express - Luzon','J&T Express - Visayas','J&T Express - Mindanao','Lalamove'];
       const shipFees=[100,150,180,0];
-      const shippingMethod=shipNames[shipIndex]||'';
-      const shippingFee=shipFees[shipIndex]||0;
+      const shippingMethod=checkoutShippingPaid?(shipNames[checkoutPaidShippingIndex]||'J&T Express - Luzon'):(shipNames[shipIndex]||'');
+      const shippingFee=checkoutShippingPaid?0:(shipFees[shipIndex]||0);
       const total=subtotal+shippingFee;
       const missing=[];
       if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))missing.push('Account Email');

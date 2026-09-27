@@ -277,7 +277,7 @@
   }
   function updateTotals(){
     const {subtotal}=totals();const i=Number($('pepShippingMethod')?.value||0),fee=checkoutShippingPaid?0:([100,150,180,0][i]??100);
-    if($('pepShippingFee'))$('pepShippingFee').textContent=fee?peso(fee):'APP RATE';
+    if($('pepShippingFee'))$('pepShippingFee').textContent=checkoutShippingPaid?'PAID':peso(fee);
     if($('pepGrandTotal'))$('pepGrandTotal').textContent=fee?peso(subtotal+fee):peso(subtotal);
   }
   function closeCheckout(){const m=$('checkoutModal');if(m){m.classList.remove('open','show');m.style.removeProperty('display')}}

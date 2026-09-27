@@ -174,29 +174,28 @@
   const s=document.createElement('style');
   s.id='pep-success-popup-v2';
   s.textContent=`
-#pepInfoModal{position:fixed!important;inset:0!important;z-index:999998!important;display:none!important;align-items:center!important;justify-content:center!important;padding:20px!important;background:rgba(48,26,42,.22)!important}
+#pepInfoModal{position:fixed!important;inset:0!important;z-index:999998!important;display:none!important;align-items:center!important;justify-content:center!important;padding:16px!important;background:rgba(45,24,40,.42)!important;backdrop-filter:blur(5px)!important;-webkit-backdrop-filter:blur(5px)!important}
 #pepInfoModal.open{display:flex!important}
-#pepInfoModal>.pepSuccessCard,.pepSuccessCard{
- box-sizing:border-box!important;width:min(440px,calc(100vw - 34px))!important;
- padding:34px 34px 28px!important;border-radius:30px!important;
- border:1px solid rgba(218,91,161,.18)!important;
- background:linear-gradient(145deg,#fff 0%,#fff8fc 62%,#faf3ff 100%)!important;
- box-shadow:0 24px 70px rgba(70,34,56,.20)!important;
- text-align:center!important;position:relative!important;overflow:hidden!important;
-}
-.pepSuccessCard:before{content:"";position:absolute;inset:-80px -60px auto auto;width:190px;height:190px;border-radius:50%;background:rgba(242,143,195,.12);filter:blur(2px);pointer-events:none}
-.pepSuccessIcon{width:76px!important;height:76px!important;margin:0 auto 12px!important;border-radius:50%!important;background:linear-gradient(145deg,#e52b91,#c341bd)!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 12px 28px rgba(211,43,143,.22)!important}
-.pepSuccessIcon span{color:#fff!important;font-size:43px!important;font-weight:500!important;line-height:1!important}
-.pepSuccessBrand{font-size:10px!important;letter-spacing:3px!important;font-weight:950!important;color:#c92d88!important;margin-bottom:8px!important}
-.pepSuccessTitle{font-size:30px!important;line-height:1.12!important;letter-spacing:-.7px!important;color:#382934!important;margin:0 0 9px!important;font-weight:950!important}
-.pepSuccessOrder{display:inline-block!important;padding:7px 12px!important;border-radius:999px!important;background:#fcebf5!important;color:#8d5977!important;font-size:11px!important;letter-spacing:.2px!important;margin-bottom:17px!important}
-.pepSuccessOrder b{color:#572f48!important}
-.pepSuccessText{max-width:350px!important;margin:0 auto 17px!important;color:#756672!important;font-size:13px!important;line-height:1.65!important}
-.pepSuccessNote{display:flex!important;gap:9px!important;align-items:flex-start!important;text-align:left!important;max-width:350px!important;margin:0 auto 24px!important;padding:12px 13px!important;border-radius:15px!important;background:rgba(249,237,247,.72)!important;border:1px solid #f0dce9!important;color:#74566a!important;font-size:11px!important;line-height:1.5!important}
-.pepSuccessNote>span:first-child{flex:0 0 auto;width:19px;height:19px;border-radius:50%;background:#e83b95;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
-.pepSuccessDone{width:100%!important;min-height:50px!important;border:0!important;border-radius:15px!important;background:linear-gradient(135deg,#e72b8b,#bd3fba)!important;color:#fff!important;font-size:14px!important;font-weight:950!important;letter-spacing:.3px!important;cursor:pointer!important;box-shadow:0 10px 24px rgba(205,44,139,.20)!important}
-.pepSuccessDone:hover{transform:translateY(-1px)!important}
-@media(max-width:520px){#pepInfoModal{padding:14px!important}.pepSuccessCard{padding:29px 20px 22px!important;border-radius:25px!important}.pepSuccessIcon{width:68px!important;height:68px!important}.pepSuccessTitle{font-size:26px!important}}
+#pepInfoModal>.pepSuccessCard{box-sizing:border-box!important;width:min(520px,calc(100vw - 28px))!important;min-height:0!important;padding:34px 34px 30px!important;border:1.5px solid rgba(231,73,155,.28)!important;border-radius:30px!important;background:linear-gradient(145deg,#fff 0%,#fff9fc 58%,#fff0f8 100%)!important;box-shadow:0 30px 85px rgba(48,22,42,.28),0 0 0 1px rgba(255,255,255,.7) inset!important;text-align:center!important;position:relative!important;overflow:hidden!important}
+#pepInfoModal>.pepSuccessCard:before{content:"♡";position:absolute!important;right:-18px!important;top:34px!important;font:180px/1 Georgia,serif!important;color:rgba(237,101,177,.075)!important;transform:rotate(12deg)!important;pointer-events:none!important}
+#pepInfoModal>.pepSuccessCard:after{content:"";position:absolute!important;left:-75px!important;bottom:-95px!important;width:250px!important;height:190px!important;border-radius:50%!important;background:rgba(246,154,207,.08)!important;pointer-events:none!important}
+.pepSuccessIcon{position:relative!important;width:104px!important;height:104px!important;margin:0 auto 13px!important;border-radius:34% 66% 60% 40% / 42% 43% 57% 58%!important;transform:rotate(-4deg)!important;background:linear-gradient(145deg,#ff8bc9 0%,#f53a9d 48%,#c93ebc 100%)!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 15px 35px rgba(224,43,145,.25),0 0 0 6px rgba(255,161,214,.13)!important;border:2px solid rgba(255,255,255,.75)!important}
+.pepSuccessIcon:before{content:"✦  ♡  ✦";position:absolute!important;top:-12px!important;left:50%!important;transform:translateX(-50%) rotate(4deg)!important;white-space:nowrap!important;color:#ef70b4!important;font-size:16px!important;letter-spacing:11px!important}
+.pepSuccessIcon span{position:relative!important;color:#fff!important;font-size:57px!important;font-weight:500!important;line-height:1!important;transform:rotate(4deg) translateY(-2px)!important;text-shadow:0 2px 2px rgba(142,32,101,.12)!important}
+.pepSuccessBrand{position:relative!important;font-size:10px!important;letter-spacing:5px!important;font-weight:950!important;color:#d22f89!important;margin:0 0 8px!important}
+.pepSuccessTitle{position:relative!important;font-family:Georgia,"Times New Roman",serif!important;font-size:42px!important;line-height:1.05!important;letter-spacing:-1.2px!important;color:#9f175e!important;margin:0 0 17px!important;font-weight:800!important}
+.pepSuccessTitle:before,.pepSuccessTitle:after{content:"";display:inline-block!important;vertical-align:middle!important;width:65px!important;height:1px!important;background:#ef9bc7!important;margin:0 14px 10px!important}
+.pepSuccessOrder{position:relative!important;display:inline-flex!important;align-items:center!important;gap:5px!important;padding:10px 17px!important;border-radius:999px!important;background:linear-gradient(90deg,#fde8f4,#fff1f8)!important;border:1px solid #f5cfe3!important;color:#76536a!important;font-size:12px!important;letter-spacing:.1px!important;margin-bottom:20px!important;box-shadow:0 5px 15px rgba(208,72,143,.06)!important}
+.pepSuccessOrder b{color:#b01868!important;font-weight:900!important}
+.pepSuccessText{position:relative!important;max-width:410px!important;margin:0 auto 19px!important;color:#715d6b!important;font-size:13px!important;line-height:1.7!important}
+.pepSuccessText b{color:#c0186f!important;font-weight:900!important}
+.pepSuccessNote{position:relative!important;display:flex!important;gap:14px!important;align-items:center!important;text-align:left!important;max-width:430px!important;margin:0 auto 24px!important;padding:15px 17px!important;border-radius:18px!important;background:rgba(255,238,248,.82)!important;border:1px solid #f1c4dc!important;color:#72596a!important;font-size:12px!important;line-height:1.5!important;box-shadow:0 7px 20px rgba(202,70,139,.06)!important}
+.pepSuccessNote>span:first-child{flex:0 0 auto;width:38px!important;height:38px!important;border-radius:50%!important;background:linear-gradient(145deg,#ffd0e9,#f37bb9)!important;color:#b51c6b!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:19px!important;font-weight:900!important;box-shadow:0 4px 12px rgba(221,73,145,.12)!important}
+.pepSuccessNote>span:last-child{flex:1!important}
+.pepSuccessDone{position:relative!important;width:100%!important;min-height:56px!important;border:1px solid rgba(255,255,255,.65)!important;border-radius:19px!important;background:linear-gradient(100deg,#f82d92,#e13aaf 55%,#bf45c2)!important;color:#fff!important;font-size:14px!important;font-weight:950!important;letter-spacing:.5px!important;cursor:pointer!important;box-shadow:0 13px 28px rgba(205,44,139,.23),0 0 0 2px rgba(255,255,255,.16) inset!important;transition:transform .15s ease,box-shadow .15s ease!important}
+.pepSuccessDone:after{content:"→";font-size:22px!important;margin-left:13px!important;vertical-align:-2px!important}
+.pepSuccessDone:hover{transform:translateY(-1px)!important;box-shadow:0 16px 32px rgba(205,44,139,.28)!important}
+@media(max-width:560px){#pepInfoModal{padding:10px!important}#pepInfoModal>.pepSuccessCard{width:calc(100vw - 20px)!important;padding:27px 18px 22px!important;border-radius:25px!important}.pepSuccessIcon{width:82px!important;height:82px!important}.pepSuccessIcon span{font-size:47px!important}.pepSuccessTitle{font-size:31px!important}.pepSuccessTitle:before,.pepSuccessTitle:after{width:32px!important;margin-left:7px!important;margin-right:7px!important}.pepSuccessText{font-size:12px!important}.pepSuccessNote{padding:13px!important}.pepSuccessDone{min-height:52px!important}}
 `;
   document.head.appendChild(s);
 }

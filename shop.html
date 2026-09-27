@@ -2453,41 +2453,44 @@ function closeModal(id){
 
 function checkout(){
 
-  // Closed Group Buys are pricelist/browse only.
   if(!currentGB || !["OPEN","KIT_COMPLETION"].includes(String(currentGB.status||"").toUpperCase())){
     syncOrderingControls();
     return alert("Ordering is currently closed. Checkout is unavailable.");
   }
 
-  // Use the latest cart saved by Add to Cart before checking out.
-  cart = JSON.parse(localStorage.pepmosaCart || "[]");
+  try{ cart = JSON.parse(localStorage.pepmosaCart || "[]"); }catch(e){ cart=[]; }
 
-  if(!cart.length){
-
-    return alert(
-      "Cart is empty."
-    );
-
+  if(!Array.isArray(cart) || !cart.length){
+    return alert("Cart is empty.");
   }
 
+  closeModal("cartModal");
 
-  closeModal(
-    "cartModal"
-  );
+  const msg=$("checkoutMsg");
+  if(msg){ msg.textContent=""; msg.className="muted"; msg.style.display="none"; }
 
+  const list=$("pepShopOrderList");
+  const subtotal=cart.reduce((sum,item)=>sum + Number(item.price ?? item.unit_price ?? 0) * Number(item.qty ?? item.quantity ?? 0),0);
 
-  $("checkoutMsg")
-    .textContent = "";
+  if(list){
+    list.innerHTML=cart.map(item=>{
+      const price=Number(item.price ?? item.unit_price ?? 0);
+      const qty=Math.max(0,Number(item.qty ?? item.quantity ?? 0));
+      const name=esc(item.product_name || item.name || "Product");
+      const meta=esc((item.strength || "") + (item.variant_name ? " • "+item.variant_name : "") + " • ×"+qty);
+      return '<div class="pepOrderLine"><div><div class="pepOrderName">'+name+'</div><div class="pepOrderMeta">'+meta+'</div></div><div>₱'+(price*qty).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2})+'</div></div>';
+    }).join("");
+  }
 
+  const money="₱"+subtotal.toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2});
+  if($("pepShopSubtotal")) $("pepShopSubtotal").textContent=money;
+  if($("pepShopTotal")) $("pepShopTotal").textContent=money;
 
-  $("checkoutMsg")
-    .className = "muted";
+  const savedEmail=window.verifiedEmail || localStorage.getItem("pepmosa_verified_email") || "";
+  if($("email") && savedEmail) $("email").value=savedEmail;
 
-
-  $("checkoutModal")
-    .classList
-    .add("show");
-
+  $("checkoutModal").classList.add("show");
+  $("checkoutModal").classList.add("open");
 }
 
 
@@ -2499,7 +2502,7 @@ function checkout(){
 async function placeOrder(){
 
   const submitBtn =
-    document.querySelector('#checkoutModal .actions .btn.primary');
+    document.querySelector('#checkoutModal .pepSubmit, #checkoutModal .actions .btn.primary');
 
   try{
 
@@ -2571,6 +2574,7 @@ async function placeOrder(){
       throw new Error("Order could not be submitted. Please try again.");
     }
 
+    $("checkoutMsg").style.display="block";
     $("checkoutMsg").className="notice success";
     $("checkoutMsg").textContent =
       "Order submitted: " +
@@ -2588,6 +2592,7 @@ async function placeOrder(){
 
     console.error("PEPMOSA ORDER SUBMIT",e);
 
+    $("checkoutMsg").style.display="block";
     $("checkoutMsg").className="notice error";
     $("checkoutMsg").textContent =
       e?.message ||

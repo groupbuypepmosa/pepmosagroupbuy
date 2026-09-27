@@ -4067,5 +4067,28 @@ load();
 <script src="site-activity.js"></script>
 <!-- PEPMOSA FINAL CHECKOUT OVERRIDE: must load after all storefront scripts -->
 <script src="checkout-polish.js?v=20260927-checkout-final-override"></script>
+<script id="pep-static-checkout-fill">
+(function(){
+  function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])}
+  function money(v){return '₱'+Number(v||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})}
+  function fill(){
+    const m=document.getElementById('checkoutModal'), host=document.getElementById('pepStaticOrder');
+    if(!m||!host||!m.classList.contains('open'))return;
+    if(document.querySelector('#checkoutModal .pepFinalHead'))return;
+    const cart=Array.isArray(window.cart)?window.cart:JSON.parse(localStorage.getItem('pepmosaCart')||'[]');
+    const gb=window.currentGB||window.pepmosaCurrentGB||{};
+    host.innerHTML=cart.length?cart.map(i=>{const q=Number(i.qty??i.quantity??1),p=Number(i.unit_price??i.price??0);return '<div class="pepStaticOrderLine"><div><b>'+esc(i.product_name||i.productName||i.name||'Product')+'</b><small>'+esc(i.strength||i.variant_strength||i.variant||'')+' • Qty '+q+' × '+money(p)+'</small></div><strong>'+money(p*q)+'</strong></div>'}).join(''):'<div class="pepStaticEmpty">Your cart is empty.</div>';
+    const subtotal=cart.reduce((s,i)=>s+Number(i.unit_price??i.price??0)*Number(i.qty??i.quantity??1),0);
+    const shipping=100;
+    const qr=gb.final_payment_qr_url||gb.payment_qr_url||'';
+    const qh=document.getElementById('pepStaticQR');if(qh&&qr)qh.innerHTML='<img src="'+esc(qr)+'" alt="Payment QR">';
+    const a=document.getElementById('pepStaticProducts'),sh=document.getElementById('pepStaticShipping'),tot=document.getElementById('pepStaticTotal');if(a)a.textContent=money(subtotal);if(sh)sh.textContent=money(shipping);if(tot)tot.textContent=money(subtotal+shipping);
+    const u=window.__pepCheckoutCustomer||null;
+    if(u){if(document.getElementById('email'))document.getElementById('email').value=u.email||'';if(document.getElementById('customerName'))document.getElementById('customerName').value=u.customer_name||'';if(document.getElementById('contact'))document.getElementById('contact').value=u.contact||'';if(document.getElementById('address'))document.getElementById('address').value=u.address||'';}
+  }
+  const obs=new MutationObserver(fill);obs.observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['class']});setInterval(fill,500);
+})();
+</script>
+<style>#pepStaticOrderLine{}.pepStaticOrderLine{display:flex;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid #f0e0e8;border-radius:13px;background:#fff;margin-top:7px}.pepStaticOrderLine b{display:block;color:#392831;font-size:12px}.pepStaticOrderLine small{display:block;color:#927c87;font-size:9px;margin-top:3px}.pepStaticOrderLine>strong{white-space:nowrap;color:#3e2934;font-size:12px}.pepStaticQR img{width:145px;height:145px;object-fit:contain;border-radius:10px}</style>
 </body>
 </html>

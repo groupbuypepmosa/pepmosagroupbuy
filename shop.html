@@ -2821,7 +2821,7 @@ load();
           const ins=await window.sb.from('admin_fee_payments').insert({gb_number:gb.gb_number,email,full_name:details.full_name,phone:details.phone,whatsapp_name:details.whatsapp_name,amount:Number(gb.admin_fee||0),payment_proof_url:proofUrl,status:'SUBMITTED'}).select('id').maybeSingle();
           if(ins.error)throw ins.error;
           wrap.remove();
-          if(window.pepmosaPopup)window.pepmosaPopup('Admin Fee payment submitted.\n\nPayment proof uploaded successfully. Please wait for PEPMOSA admin approval. Your cart is saved.');
+          if(window.pepmosaPopup)window.pepmosaPopup('Your payment proof was uploaded successfully! ♡\n\nPlease wait for PEPMOSA admin approval. Your cart is safely saved.','Payment Submitted','✓');
           resolve(false);
         }catch(e){console.error('ADMIN FEE PROOF',e);msg.textContent=e?.message||'Unable to submit Admin Fee payment.';btn.disabled=false;btn.textContent='✦ I PAID — SUBMIT ✦'}
       };
@@ -2932,18 +2932,26 @@ load();
 
 <!-- PEPMOSA GLOBAL POPUP POLISH -->
 <style id="pepmosa-global-popup-style">
-#pepmosaGlobalPopup{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(47,25,40,.48);backdrop-filter:blur(8px)}
+#pepmosaGlobalPopup{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(49,27,45,.65);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 #pepmosaGlobalPopup.show{display:flex}
-.pepGlobalPopupCard{position:relative;width:min(460px,100%);overflow:hidden;border:1px solid rgba(255,255,255,.72);border-radius:28px;background:linear-gradient(145deg,#fff,#fff5fa 60%,#f8efff);box-shadow:0 30px 90px rgba(54,18,43,.30);transform:translateY(8px);animation:pepPopupIn .22s ease forwards}
-.pepGlobalPopupGlow{position:absolute;width:230px;height:230px;right:-80px;top:-105px;border-radius:50%;background:radial-gradient(circle,rgba(229,43,139,.17),transparent 70%)}
-.pepGlobalPopupBody{position:relative;padding:30px}
-.pepGlobalPopupMark{width:58px;height:58px;display:grid;place-items:center;border-radius:20px;background:linear-gradient(135deg,#e52b8b,#b93bb6);color:#fff;font-size:26px;font-weight:900;box-shadow:0 12px 28px rgba(205,43,139,.24)}
-.pepGlobalPopupTitle{margin:18px 0 8px;color:#402b36;font-size:25px;line-height:1.08;font-weight:950}
-.pepGlobalPopupText{margin:0;color:#765f6b;line-height:1.55;font-size:15px;white-space:pre-line}
-.pepGlobalPopupActions{display:flex;justify-content:flex-end;margin-top:22px}
-.pepGlobalPopupBtn{min-width:118px;border:0;border-radius:14px;padding:13px 20px;background:linear-gradient(135deg,#e52b8b,#b93bb6);color:#fff;font-weight:950;letter-spacing:.04em;cursor:pointer;box-shadow:0 10px 24px rgba(205,43,139,.22)}
-@keyframes pepPopupIn{to{transform:translateY(0)}}
-@media(max-width:560px){#pepmosaGlobalPopup{align-items:flex-end;padding:10px}.pepGlobalPopupCard{border-radius:26px 26px 20px 20px}.pepGlobalPopupBody{padding:24px 20px}.pepGlobalPopupActions{display:block}.pepGlobalPopupBtn{width:100%}}
+.pepGlobalPopupCard{position:relative;box-sizing:border-box;width:min(470px,100%);overflow:hidden;border:1px solid #f3c7df;border-radius:32px;background:radial-gradient(circle at 7% 8%,rgba(255,170,211,.30),transparent 34%),radial-gradient(circle at 94% 82%,rgba(238,175,227,.28),transparent 38%),linear-gradient(145deg,#fff,#fff8fc 58%,#ffedf7);box-shadow:0 32px 90px rgba(54,18,43,.34),inset 0 1px 0 #fff;animation:pepPopupIn .28s cubic-bezier(.2,.8,.2,1)}
+.pepGlobalPopupGlow{position:absolute;width:260px;height:260px;right:-85px;top:-125px;border-radius:50%;background:radial-gradient(circle,rgba(229,43,139,.14),transparent 72%);pointer-events:none}
+.pepGlobalPopupCard:before,.pepGlobalPopupCard:after{content:'♡';position:absolute;color:#f1a1c8;opacity:.25;font-size:86px;pointer-events:none}
+.pepGlobalPopupCard:before{top:-35px;left:13px;transform:rotate(-16deg)}
+.pepGlobalPopupCard:after{right:-12px;bottom:45px;transform:rotate(16deg)}
+.pepGlobalPopupBody{position:relative;padding:32px 30px 27px;text-align:center}
+.pepGlobalPopupEyebrow{color:#c72d80;font-size:10px;letter-spacing:.21em;font-weight:950;margin-bottom:13px}
+.pepGlobalPopupMark{position:relative;width:74px;height:74px;display:grid;place-items:center;margin:0 auto 16px;border-radius:24px;background:linear-gradient(135deg,#f349a0,#bb35a8);color:#fff;font-size:35px;font-weight:900;box-shadow:0 12px 28px rgba(205,43,139,.26)}
+.pepGlobalPopupMark:after{content:'✦';position:absolute;font-size:18px;color:#f2a3cb;right:-18px;top:-9px}
+.pepGlobalPopupTitle{margin:0 0 10px;color:#482d3c;font-size:29px;line-height:1.12;font-weight:950;letter-spacing:-.6px}
+.pepGlobalPopupText{margin:0 auto;color:#785e6d;line-height:1.7;font-size:14px;white-space:pre-line;max-width:370px}
+.pepGlobalPopupActions{display:flex;justify-content:center;margin-top:24px}
+.pepGlobalPopupBtn{width:min(240px,100%);border:0;border-radius:16px;padding:15px 24px;background:linear-gradient(135deg,#ee3195,#bb37ac);color:#fff;font-weight:950;letter-spacing:.06em;font-size:13px;cursor:pointer;box-shadow:0 12px 26px rgba(205,43,139,.25)}
+.pepGlobalPopupBtn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.pepGlobalPopupCard.is-payment-success .pepGlobalPopupTitle{color:#c3277a}
+.pepGlobalPopupCard.is-payment-success .pepGlobalPopupText{max-width:360px}
+@keyframes pepPopupIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+@media(max-width:560px){#pepmosaGlobalPopup{padding:14px}.pepGlobalPopupCard{border-radius:27px}.pepGlobalPopupBody{padding:28px 20px 24px}.pepGlobalPopupTitle{font-size:26px}.pepGlobalPopupBtn{width:100%}}
 </style>
 <script id="pepmosa-global-popup-script">
 (function(){
@@ -2953,7 +2961,7 @@ load();
     if(root)return root;
     root=document.createElement('div');
     root.id='pepmosaGlobalPopup';
-    root.innerHTML='<div class="pepGlobalPopupCard" role="dialog" aria-modal="true"><div class="pepGlobalPopupGlow"></div><div class="pepGlobalPopupBody"><div class="pepGlobalPopupMark" id="pepGlobalPopupMark">✦</div><div class="pepGlobalPopupTitle" id="pepGlobalPopupTitle">PEPMOSA</div><p class="pepGlobalPopupText" id="pepGlobalPopupText"></p><div class="pepGlobalPopupActions"><button type="button" class="pepGlobalPopupBtn" id="pepGlobalPopupBtn">OKAY</button></div></div></div>';
+    root.innerHTML='<div class="pepGlobalPopupCard" role="dialog" aria-modal="true" aria-labelledby="pepGlobalPopupTitle"><div class="pepGlobalPopupGlow"></div><div class="pepGlobalPopupBody"><div class="pepGlobalPopupEyebrow">PEPMOSA GROUP BUY ♡</div><div class="pepGlobalPopupMark" id="pepGlobalPopupMark">✦</div><div class="pepGlobalPopupTitle" id="pepGlobalPopupTitle">PEPMOSA</div><p class="pepGlobalPopupText" id="pepGlobalPopupText"></p><div class="pepGlobalPopupActions"><button type="button" class="pepGlobalPopupBtn" id="pepGlobalPopupBtn">OKAY ♡</button></div></div></div>';
     root.addEventListener('click',e=>{if(e.target===root)root.classList.remove('show')});
     document.body.appendChild(root);
     document.getElementById('pepGlobalPopupBtn').onclick=()=>root.classList.remove('show');
@@ -2962,16 +2970,19 @@ load();
   window.pepmosaPopup=function(message,title,icon){
     try{
       const root=ensure();
+      const success=title==='Payment Submitted';
+      root.querySelector('.pepGlobalPopupCard').classList.toggle('is-payment-success',success);
       document.getElementById('pepGlobalPopupText').textContent=String(message||'');
       document.getElementById('pepGlobalPopupTitle').textContent=title||'PEPMOSA';
-      document.getElementById('pepGlobalPopupMark').textContent=icon||'✦';
+      document.getElementById('pepGlobalPopupMark').textContent=icon||(success?'✓':'✦');
+      document.getElementById('pepGlobalPopupBtn').textContent=success?'GOT IT ♡':'OKAY ♡';
       root.classList.add('show');
+      document.getElementById('pepGlobalPopupBtn').focus();
     }catch(e){nativeAlert(String(message||''))}
   };
   window.alert=function(message){window.pepmosaPopup(message,'PEPMOSA','✦')};
 })();
 </script>
-
 
 <style id="pepmosa-kit-completion-force-style">
 #pepKitCompletionCard{position:relative!important;overflow:hidden!important;margin:22px 0 26px!important;padding:30px!important;border:1px solid rgba(220,47,142,.28)!important;border-radius:28px!important;background:linear-gradient(135deg,#fff 0%,#fff4f9 54%,#f8efff 100%)!important;box-shadow:0 20px 55px rgba(174,49,124,.13)!important}

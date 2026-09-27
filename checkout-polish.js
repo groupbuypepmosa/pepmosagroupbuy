@@ -150,8 +150,7 @@
  #pepInfoModal>div{width:100%!important;padding:29px 20px 23px!important;border-radius:25px!important}
  #pepInfoModal #pepInfoTitle{font-size:26px!important}
 }
-#pepInfoModal #pepInfoTitle{font-size:26px!important}@media(max-width:700px){.pepFinalBody{padding:17px 18px 23px}.pepFinalHead{padding:24px 20px 20px}.pepFinalHead h2{font-size:29px}.pepPaymentGrid{grid-template-columns:1fr 1fr}.pepQRWrap{grid-template-columns:1fr;text-align:center}.pepQRWrap img{margin:auto;width:210px;height:210px}.pepQRText{text-align:left}.pepFields{grid-template-columns:1fr}.pepField.full{grid-column:auto}.pepFinalActions{flex-direction:column}.pepCancel{order:2}}`;s.textContent += "\n
-/* PEPMOSA CHECKOUT V3 — complete visual redesign */
+#pepInfoModal #pepInfoTitle{font-size:26px!important}@media(max-width:700px){.pepFinalBody{padding:17px 18px 23px}.pepFinalHead{padding:24px 20px 20px}.pepFinalHead h2{font-size:29px}.pepPaymentGrid{grid-template-columns:1fr 1fr}.pepQRWrap{grid-template-columns:1fr;text-align:center}.pepQRWrap img{margin:auto;width:210px;height:210px}.pepQRText{text-align:left}.pepFields{grid-template-columns:1fr}.pepField.full{grid-column:auto}.pepFinalActions{flex-direction:column}.pepCancel{order:2}}`;s.textContent += `\n/* PEPMOSA CHECKOUT V3 — complete visual redesign */
 #checkoutModal .modalbox{width:min(960px,100%)!important;max-height:95vh!important;border-radius:30px!important;overflow:auto!important;background:#fff!important}
 .pepFinalHead{padding:26px 30px 20px!important;background:linear-gradient(135deg,#fff0f7 0%,#fff 55%,#f6edff 100%)!important}
 .pepHeadTop{display:flex;justify-content:space-between;align-items:center;gap:10px}.pepSecure{font-size:8px;letter-spacing:.1em;font-weight:900;color:#a25c82;background:#fff;border:1px solid #efd9e6;border-radius:999px;padding:7px 10px}
@@ -168,7 +167,7 @@
 .pepSummaryCard+.pepSubmit{width:100%;min-height:54px;margin-top:12px;border-radius:16px!important}.pepSubmit span{font-size:18px;margin-left:8px}.pepCheckoutSide .pepCancel{width:100%;min-height:45px;margin-top:8px}.pepSecureNote{text-align:center;margin-top:11px;font-size:8px;color:#9a8490;line-height:1.5}
 @media(max-width:760px){.pepFinalHead{padding:23px 18px 19px!important}.pepHeroTitle h2{font-size:32px!important}.pepHeroHeart{font-size:65px;padding-right:0}.pepFinalBody{padding:17px 16px 24px!important}.pepCheckoutGrid{grid-template-columns:1fr}.pepCheckoutSide{position:static;display:flex;flex-direction:column}.pepSummaryCard{order:0}.pepSubmit{order:1}.pepCancel{order:2}.pepSecureNote{order:3}.pepQRWrap{grid-template-columns:1fr!important}.pepQRFrame{width:185px;margin:0 auto}.pepQRText{text-align:left;margin-top:10px}.pepUploadLarge{flex-wrap:wrap}.pepUploadLarge input{max-width:100%;width:100%}.pepProgress{max-width:100%}}
 
-/* PEPMOSA CHECKOUT — glossy girly refresh */\n#checkoutModal{padding:14px!important;background:rgba(48,24,42,.64)!important;backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important}\n#checkoutModal .modalbox{width:min(900px,100%)!important;max-height:95vh!important;border-radius:34px!important;border:1px solid #f1c5dd!important;background:linear-gradient(145deg,#fff,#fff8fc 62%,#faefff)!important;box-shadow:0 35px 110px rgba(48,18,42,.34)!important}\n.pepFinalHead{padding:32px 34px 25px!important;background:radial-gradient(circle at 88% 20%,rgba(231,63,151,.13),transparent 22%),linear-gradient(135deg,#ffeaf6,#fff9fc 55%,#f6ecff)!important;border-bottom:1px solid #f1d5e4!important}\n.pepFinalHead:after{content:'♡';right:27px!important;bottom:-25px!important;font-size:112px!important;color:rgba(215,47,143,.12)!important}\n.pepFinalKicker{font-size:10px!important;letter-spacing:.22em!important;color:#cf2b83!important}.pepFinalHead h2{font-size:38px!important;color:#3b2634!important;letter-spacing:-1.5px!important}.pepFinalHead p{font-size:13px!important;color:#7e6975!important;max-width:650px!important}\n.pepFinalBody{padding:20px 34px 32px!important}.pepStep{margin:3px 0 13px!important;color:#b05c87!important;letter-spacing:.08em}.pepStep span{width:28px!important;height:28px!important;background:linear-gradient(135deg,#eb3195,#be42b6)!important;box-shadow:0 6px 14px rgba(211,44,139,.18)!important}\n.pepFinalCard{border:1px solid #f0d5e3!important;border-radius:23px!important;padding:18px!important;background:rgba(255,251,253,.88)!important;box-shadow:0 8px 26px rgba(103,42,76,.045)!important}\n.pepFinalTitle{color:#b02e78!important;font-size:11px!important;letter-spacing:.17em!important}.pepOrderLine{border-color:#f0dce7!important;border-radius:15px!important;padding:12px 13px!important}.pepOrderAmount{font-size:13px!important}\n.pepTotalRows{gap:9px!important}.pepTotalRow{font-size:13px!important}.pepTotalRow.grand{font-size:21px!important;color:#3b2634!important}.pepTotalRow.grand span:last-child{padding:7px 15px;border-radius:999px;background:#ffe4f2;color:#c5267c}\n.pepQRWrap{grid-template-columns:205px 1fr!important;gap:24px!important}.pepQRWrap img{width:205px!important;height:205px!important;border:9px solid #fff!important;border-radius:22px!important;box-shadow:0 12px 32px rgba(92,39,76,.12)!important}.pepQRText h3{font-size:18px!important}.pepQRText p{font-size:12px!important}.pepQRNote{padding:11px 13px!important;border-radius:13px!important;background:#ffedf7!important;color:#a04476!important}\n.pepFields{gap:13px!important}.pepField label{font-size:10px!important}.pepField input,.pepField textarea,.pepField select{min-height:48px!important;border:1px solid #e8d0df!important;border-radius:15px!important;background:#fff!important}.pepReturningNote{border-radius:15px!important;background:linear-gradient(135deg,#fff0f7,#faf1ff)!important;color:#a04476!important;border-color:#efd2e3!important}\n.pepUpload{border:1.5px dashed #dc8fba!important;border-radius:18px!important;background:#fff5fa!important;padding:16px!important}.pepUploadHint{font-size:10px!important}.pepFinalActions{margin-top:19px!important}.pepSubmit{min-height:54px!important;border-radius:17px!important;background:linear-gradient(135deg,#f02e95,#bd3db5)!important;box-shadow:0 13px 28px rgba(210,43,139,.24)!important;font-size:14px!important}.pepCancel{min-height:54px!important;border-radius:17px!important}\n@media(max-width:700px){.pepFinalHead{padding:25px 20px 21px!important}.pepFinalHead h2{font-size:31px!important}.pepFinalBody{padding:17px 16px 24px!important}.pepQRWrap{grid-template-columns:1fr!important}.pepQRWrap img{width:220px!important;height:220px!important}.pepQRText{text-align:left!important}.pepFinalCard{border-radius:20px!important}}\n";document.head.appendChild(s)}
+/* PEPMOSA CHECKOUT — glossy girly refresh */\n#checkoutModal{padding:14px!important;background:rgba(48,24,42,.64)!important;backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important}\n#checkoutModal .modalbox{width:min(900px,100%)!important;max-height:95vh!important;border-radius:34px!important;border:1px solid #f1c5dd!important;background:linear-gradient(145deg,#fff,#fff8fc 62%,#faefff)!important;box-shadow:0 35px 110px rgba(48,18,42,.34)!important}\n.pepFinalHead{padding:32px 34px 25px!important;background:radial-gradient(circle at 88% 20%,rgba(231,63,151,.13),transparent 22%),linear-gradient(135deg,#ffeaf6,#fff9fc 55%,#f6ecff)!important;border-bottom:1px solid #f1d5e4!important}\n.pepFinalHead:after{content:'♡';right:27px!important;bottom:-25px!important;font-size:112px!important;color:rgba(215,47,143,.12)!important}\n.pepFinalKicker{font-size:10px!important;letter-spacing:.22em!important;color:#cf2b83!important}.pepFinalHead h2{font-size:38px!important;color:#3b2634!important;letter-spacing:-1.5px!important}.pepFinalHead p{font-size:13px!important;color:#7e6975!important;max-width:650px!important}\n.pepFinalBody{padding:20px 34px 32px!important}.pepStep{margin:3px 0 13px!important;color:#b05c87!important;letter-spacing:.08em}.pepStep span{width:28px!important;height:28px!important;background:linear-gradient(135deg,#eb3195,#be42b6)!important;box-shadow:0 6px 14px rgba(211,44,139,.18)!important}\n.pepFinalCard{border:1px solid #f0d5e3!important;border-radius:23px!important;padding:18px!important;background:rgba(255,251,253,.88)!important;box-shadow:0 8px 26px rgba(103,42,76,.045)!important}\n.pepFinalTitle{color:#b02e78!important;font-size:11px!important;letter-spacing:.17em!important}.pepOrderLine{border-color:#f0dce7!important;border-radius:15px!important;padding:12px 13px!important}.pepOrderAmount{font-size:13px!important}\n.pepTotalRows{gap:9px!important}.pepTotalRow{font-size:13px!important}.pepTotalRow.grand{font-size:21px!important;color:#3b2634!important}.pepTotalRow.grand span:last-child{padding:7px 15px;border-radius:999px;background:#ffe4f2;color:#c5267c}\n.pepQRWrap{grid-template-columns:205px 1fr!important;gap:24px!important}.pepQRWrap img{width:205px!important;height:205px!important;border:9px solid #fff!important;border-radius:22px!important;box-shadow:0 12px 32px rgba(92,39,76,.12)!important}.pepQRText h3{font-size:18px!important}.pepQRText p{font-size:12px!important}.pepQRNote{padding:11px 13px!important;border-radius:13px!important;background:#ffedf7!important;color:#a04476!important}\n.pepFields{gap:13px!important}.pepField label{font-size:10px!important}.pepField input,.pepField textarea,.pepField select{min-height:48px!important;border:1px solid #e8d0df!important;border-radius:15px!important;background:#fff!important}.pepReturningNote{border-radius:15px!important;background:linear-gradient(135deg,#fff0f7,#faf1ff)!important;color:#a04476!important;border-color:#efd2e3!important}\n.pepUpload{border:1.5px dashed #dc8fba!important;border-radius:18px!important;background:#fff5fa!important;padding:16px!important}.pepUploadHint{font-size:10px!important}.pepFinalActions{margin-top:19px!important}.pepSubmit{min-height:54px!important;border-radius:17px!important;background:linear-gradient(135deg,#f02e95,#bd3db5)!important;box-shadow:0 13px 28px rgba(210,43,139,.24)!important;font-size:14px!important}.pepCancel{min-height:54px!important;border-radius:17px!important}\n@media(max-width:700px){.pepFinalHead{padding:25px 20px 21px!important}.pepFinalHead h2{font-size:31px!important}.pepFinalBody{padding:17px 16px 24px!important}.pepQRWrap{grid-template-columns:1fr!important}.pepQRWrap img{width:220px!important;height:220px!important}.pepQRText{text-align:left!important}.pepFinalCard{border-radius:20px!important}}\n`;document.head.appendChild(s)}
   if(!document.getElementById('pep-success-popup-v2')){
   const s=document.createElement('style');
   s.id='pep-success-popup-v2';
@@ -292,51 +291,104 @@
   };
   /* Keep the storefront's existing order-submission flow.
      The redesign must not replace the proven atomic checkout RPC. */
-  window.placeOrder=async function(){ return submitOrder(); };
+  window.pepmosaFinalSubmitOrder=async function(){ return submitOrder(); };
+  window.placeOrder=window.pepmosaFinalSubmitOrder;
   async function submitOrder(){
-    if(typeof window.pepRequireApprovedFee==='function'){
-      const feeApproved=await window.pepRequireApprovedFee();
-      if(!feeApproved)return;
-    }
-    if(!checkoutCustomer){ try{ checkoutCustomer=await loadCheckoutCustomer(); }catch(e){} }
-    const msg=$('pepCheckoutMsg'),btn=$('pepPlaceOrder'),{cart,subtotal}=totals(),gb=getGB(),s=S();if(!s||!gb||!cart.length){if(msg)msg.innerHTML='<div class="pepFinalError">Your checkout session is not ready. Please refresh and try again.</div>';return}
-    const latest=await s.from('group_buys').select('gb_number,status').eq('gb_number',gb.gb_number).maybeSingle();
-    if(latest.error||!latest.data||!['OPEN','KIT_COMPLETION'].includes(latest.data.status)){msg.innerHTML='<div class="pepFinalError">This Group Buy is no longer open. Please refresh the page.</div>';return}
-    const email=(checkoutCustomer?.email||'').trim().toLowerCase(),name=(checkoutCustomer?.customer_name||'').trim(),contact=(checkoutCustomer?.contact||'').trim(),address=(checkoutCustomer?.address||'').trim();
-    const file=$('pepOrderProof')?.files?.[0]||null;
-    const shipIndex=Number($('pepShippingMethod')?.value||0),shipNames=['J&T Express - Luzon','J&T Express - Visayas','J&T Express - Mindanao','Lalamove'],shipFees=[100,150,180,0];
-    const shippingMethod=shipNames[shipIndex]||'';
-    const shippingFee=shipFees[shipIndex]||0,total=subtotal+shippingFee;
-    const missing=[];if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))missing.push('Account Email');if(!name)missing.push('Full Name');if(!contact)missing.push('Contact Number');if(!shippingMethod)missing.push('Shipping Method');if(!address)missing.push('Delivery Address')
-    if(!file)missing.push('Payment Proof');if(missing.length){msg.innerHTML='<div class="pepFinalError"><b>Please complete the following:</b> '+missing.join(' • ')+'</div>';return}if(file.size>5*1024*1024){msg.innerHTML='<div class="pepFinalError">Payment proof must be 5MB or smaller.</div>';return}
-    btn.disabled=true;btn.textContent='SUBMITTING…';msg.innerHTML='';
+    const msg=$('pepCheckoutMsg'),btn=$('pepPlaceOrder');
     try{
-      // Last-second inventory check: never submit a stale Kit Completion item.
+      if(!checkoutCustomer){ try{ checkoutCustomer=await loadCheckoutCustomer(); }catch(e){} }
+      const {cart,subtotal}=totals(),gb=getGB(),s=S();
+      if(!s||!gb||!cart.length){
+        if(msg)msg.innerHTML='<div class="pepFinalError">Your checkout session is not ready. Please refresh and try again.</div>';
+        return;
+      }
+      const latest=await s.from('group_buys').select('gb_number,status').eq('gb_number',gb.gb_number).maybeSingle();
+      if(latest.error||!latest.data||!['OPEN','KIT_COMPLETION'].includes(latest.data.status)){
+        if(msg)msg.innerHTML='<div class="pepFinalError">This Group Buy is no longer open. Please refresh the page.</div>';
+        return;
+      }
+      const email=(checkoutCustomer?.email||'').trim().toLowerCase();
+      const name=(checkoutCustomer?.customer_name||'').trim();
+      const contact=(checkoutCustomer?.contact||'').trim();
+      const address=(checkoutCustomer?.address||'').trim();
+      const file=$('pepOrderProof')?.files?.[0]||null;
+      const shipIndex=Number($('pepShippingMethod')?.value||0);
+      const shipNames=['J&T Express - Luzon','J&T Express - Visayas','J&T Express - Mindanao','Lalamove'];
+      const shipFees=[100,150,180,0];
+      const shippingMethod=shipNames[shipIndex]||'';
+      const shippingFee=shipFees[shipIndex]||0;
+      const total=subtotal+shippingFee;
+      const missing=[];
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))missing.push('Account Email');
+      if(!name)missing.push('Full Name');
+      if(!contact)missing.push('Contact Number');
+      if(!shippingMethod)missing.push('Shipping Method');
+      if(!address)missing.push('Delivery Address');
+      if(!file)missing.push('Payment Proof');
+      if(missing.length){
+        msg.innerHTML='<div class="pepFinalError"><b>Please complete the following:</b> '+missing.join(' • ')+'</div>';
+        return;
+      }
+      if(file.size>5*1024*1024){
+        msg.innerHTML='<div class="pepFinalError">Payment proof must be 5MB or smaller.</div>';
+        return;
+      }
+      btn.disabled=true;
+      btn.textContent='SUBMITTING…';
+      msg.innerHTML='';
       const cleaned=await sanitizeKitCart(cart,gb);
       if(cleaned.changed){
-        btn.disabled=false;btn.textContent='SUBMIT MY ORDER';
+        btn.disabled=false;
+        btn.textContent='SUBMIT MY ORDER';
         if(!cleaned.cart.length){
           showSoldOutAndRefresh('Sorry! The remaining vial was just secured by another customer. This variant is now SOLD OUT. Refreshing the shop…');
           return;
-        }else{
-          msg.innerHTML='<div class="pepFinalError"><b>Your cart was updated.</b><br>One or more items changed availability. Please review the updated cart and reopen Checkout before submitting payment.</div>';
         }
+        msg.innerHTML='<div class="pepFinalError"><b>Your cart was updated.</b><br>One or more items changed availability. Please review the updated cart and reopen Checkout before submitting payment.</div>';
         return;
       }
-      const oid=orderId(),ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg',path=`orders/${gb.gb_number}/${oid}-${Date.now()}.${ext}`;
-      const up=await s.storage.from('payment-proofs').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
+      const oid=orderId();
+      const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+      const path=`orders/${gb.gb_number}/${oid}-${Date.now()}.${ext}`;
+      let up=await s.storage.from('payment-proofs').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
+      if(up.error){
+        try{await s.auth.refreshSession()}catch(_){}
+        up=await s.storage.from('payment-proofs').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
+      }
       if(up.error)throw new Error('Payment proof upload failed: '+up.error.message);
       const proof=s.storage.from('payment-proofs').getPublicUrl(path).data.publicUrl;
-      const items=cart.map(i=>({product_id:itemProductId(i),variant_id:itemVariantId(i),product_name:itemName(i),strength:itemStrength(i)||null,qty:itemQty(i),unit_price:itemPrice(i),line_total:itemPrice(i)*itemQty(i)}));
+      const items=cart.map(i=>({
+        product_id:itemProductId(i),
+        variant_id:itemVariantId(i),
+        product_name:itemName(i),
+        strength:itemStrength(i)||null,
+        qty:itemQty(i),
+        unit_price:itemPrice(i),
+        line_total:itemPrice(i)*itemQty(i)
+      }));
       const submitted=await s.rpc('submit_group_buy_order',{
-        p_order_id:oid,p_gb_number:gb.gb_number,p_email:email,p_customer_name:name,p_contact:contact,p_address:address,
-        p_total:total,p_shipping_method:shippingMethod,p_shipping_fee:shippingFee,p_payment_proof_url:proof,p_items:items
+        p_order_id:oid,
+        p_gb_number:gb.gb_number,
+        p_email:email,
+        p_customer_name:name,
+        p_contact:contact,
+        p_address:address,
+        p_total:total,
+        p_shipping_method:shippingMethod,
+        p_shipping_fee:shippingFee,
+        p_payment_proof_url:proof,
+        p_items:items
       });
       if(submitted.error)throw new Error(submitted.error.message||'Order could not be submitted.');
-      localStorage.setItem('pepmosa_last_order_id',oid);localStorage.setItem('pepmosa_customer_email',email);localStorage.setItem('pepmosa_customer_name',name);localStorage.setItem('pepmosa_phone',contact);
-      // Clear both in-memory and persisted cart state only AFTER the order RPC succeeds.
+      if(!submitted.data)throw new Error('The order server did not return a confirmation. Please try again.');
+      localStorage.setItem('pepmosa_last_order_id',oid);
+      localStorage.setItem('pepmosa_customer_email',email);
+      localStorage.setItem('pepmosa_customer_name',name);
+      localStorage.setItem('pepmosa_phone',contact);
       clearPersistedCart();
-      const cartModal=$('cartModal');if(cartModal)cartModal.classList.remove('show','open');closeCheckout();
+      const cartModal=$('cartModal');
+      if(cartModal)cartModal.classList.remove('show','open');
+      closeCheckout();
       const info=$('pepInfoModal');
       if(info){
         info.innerHTML=`<div class="pepSuccessCard">
@@ -351,16 +403,24 @@
         info.classList.add('open');
         const done=$('pepInfoOk');
         if(done)done.onclick=()=>{info.classList.remove('open');info.setAttribute('aria-hidden','true')};
-      }else alert('Order submitted: '+oid)}catch(e){
+      }else alert('Order submitted: '+oid);
+    }catch(e){
       console.error('PEPMOSA CHECKOUT ERROR',e);
       const errorText=String(e?.message||'Please try again.');
       const soldOut=/no longer available|only .* vial\(s\) remain|remaining vial|sold out|kit completion quantity|inventory/i.test(errorText);
       if(soldOut){
         showSoldOutAndRefresh('Sorry! Another customer secured the last remaining vial first. This variant is now SOLD OUT. Refreshing the shop…');
       }else{
-        msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(errorText)+'<br><small>Your cart has not been cleared.</small></div>';
+        if(msg){
+          msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(errorText)+'<br><small>Your cart has not been cleared. Please try SUBMIT ORDER again.</small></div>';
+          msg.scrollIntoView({behavior:'smooth',block:'center'});
+        }
+        if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Order was not submitted: '+errorText);
       }
-    }finally{btn.disabled=false;btn.textContent='SUBMIT MY ORDER'}
+    }finally{
+      btn.disabled=false;
+      btn.textContent='SUBMIT MY ORDER';
+    }
   }
   async function repairStorefront(){const s=S();if(!s)return false;try{let gb=getGB();if(!gb){const r=await s.from('group_buys').select('*').in('status',['OPEN','KIT_COMPLETION']).order('created_at',{ascending:false}).limit(1).maybeSingle();if(r.error||!r.data)return false;gb=r.data;window.currentGB=gb;window.pepmosaCurrentGB=gb}const cr=await s.from('gb_categories').select('category_name').eq('gb_number',gb.gb_number);if(cr.error)throw cr.error;const categories=(cr.data||[]).map(x=>x.category_name).filter(Boolean);if(!categories.length){products=[];return true}const pr=await s.from('products').select('*').eq('active',true).in('category',categories).order('product_name');if(pr.error)throw pr.error;const base=pr.data||[],ids=base.map(p=>p.product_id).filter(Boolean);let variants=[];if(ids.length){const vr=await s.from('product_variants').select('*').in('product_id',ids).eq('active',true).order('price');if(vr.error)throw vr.error;variants=vr.data||[]}const mr=await s.from('gb_minimum_quantities').select('*').eq('gb_number',gb.gb_number);const mins=mr.error?[]:(mr.data||[]);
     let kitMap=new Map();

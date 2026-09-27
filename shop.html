@@ -1254,135 +1254,127 @@ letter-spacing:.16em;text-transform:uppercase;color:#806675;
 
 
 <!-- =======================================================
-     CHECKOUT MODAL
+     PEPMOSA POLISHED CHECKOUT
      ======================================================= -->
+<style id="pep-shop-checkout-style">
+#checkoutModal .pepCheckoutBox{
+  width:min(920px,94vw); max-height:90vh; overflow:auto;
+  padding:0; border-radius:28px;
+  background:linear-gradient(180deg,#fff 0%,#fff7fc 100%);
+  border:1px solid #f4c5df; box-shadow:0 24px 70px rgba(157,48,112,.22);
+}
+#checkoutModal .pepCheckoutHead{
+  padding:24px 28px 18px; background:linear-gradient(135deg,#ff4fa3,#c94bff);
+  color:#fff; position:relative;
+}
+#checkoutModal .pepCheckoutBrand{font-size:12px;letter-spacing:2px;font-weight:800;opacity:.9}
+#checkoutModal .pepCheckoutTitle{font-size:30px;font-weight:900;margin:5px 0 0}
+#checkoutModal .pepCheckoutSub{font-size:13px;opacity:.92;margin-top:4px}
+#checkoutModal .pepSteps{display:flex;gap:8px;margin-top:18px}
+#checkoutModal .pepStep{flex:1;text-align:center;font-size:10px;font-weight:800;padding:8px 5px;border-radius:999px;background:rgba(255,255,255,.2)}
+#checkoutModal .pepStep.active{background:#fff;color:#d23a8c}
+#checkoutModal .pepCheckoutBody{padding:22px 28px 28px}
+#checkoutModal .pepCheckoutGrid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}
+#checkoutModal .pepCard{background:#fff;border:1px solid #f2d5e5;border-radius:20px;padding:18px;box-shadow:0 8px 25px rgba(160,60,120,.07)}
+#checkoutModal .pepCard h3{margin:0 0 13px;font-size:15px;color:#8d255f}
+#checkoutModal .pepOrderList{display:grid;gap:10px}
+#checkoutModal .pepOrderLine{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed #eccfe0;font-size:13px}
+#checkoutModal .pepOrderLine:last-child{border-bottom:0}
+#checkoutModal .pepOrderName{font-weight:800}
+#checkoutModal .pepOrderMeta{font-size:11px;color:#8d7890;margin-top:2px}
+#checkoutModal .pepTotal{display:flex;justify-content:space-between;margin-top:10px;padding-top:12px;border-top:2px solid #f0c7dc;font-size:18px;font-weight:900;color:#9b2465}
+#checkoutModal .pepField{margin-bottom:12px}
+#checkoutModal .pepField label{display:block;font-size:11px;font-weight:800;color:#7b5369;margin:0 0 5px}
+#checkoutModal .pepField input,#checkoutModal .pepField textarea{
+  width:100%;box-sizing:border-box;border:1px solid #e7c8da;border-radius:12px;padding:11px 12px;
+  background:#fff;color:#4d3442;outline:none;font:inherit;
+}
+#checkoutModal .pepField textarea{min-height:76px;resize:vertical}
+#checkoutModal .pepUpload{border:1.5px dashed #df7fb1;border-radius:15px;padding:15px;background:#fff7fc}
+#checkoutModal .pepUpload strong{display:block;color:#9b2465;font-size:13px}
+#checkoutModal .pepUpload span{display:block;color:#866d7b;font-size:11px;margin:3px 0 10px}
+#checkoutModal .pepQR{text-align:center;background:#fff0f8;border-radius:15px;padding:12px;margin-top:12px}
+#checkoutModal .pepQR img{width:150px;height:150px;object-fit:contain;border-radius:10px;background:#fff}
+#checkoutModal .pepActions{display:flex;gap:10px;margin-top:18px}
+#checkoutModal .pepActions button{flex:1;border:0;border-radius:14px;padding:13px 16px;font-weight:900;cursor:pointer}
+#checkoutModal .pepSubmit{background:linear-gradient(135deg,#ff4fa3,#c94bff);color:#fff}
+#checkoutModal .pepCancel{background:#fff0f7;color:#a13d70}
+@media(max-width:720px){
+  #checkoutModal .pepCheckoutGrid{grid-template-columns:1fr}
+  #checkoutModal .pepCheckoutHead,#checkoutModal .pepCheckoutBody{padding-left:18px;padding-right:18px}
+  #checkoutModal .pepCheckoutTitle{font-size:25px}
+}
+</style>
 
-<div
-  id="checkoutModal"
-  class="modal"
->
-
-
-  <div class="modalbox">
-
-
-    <h2>
-      Checkout
-    </h2>
-
-
-    <div
-      id="checkoutMsg"
-      class="muted"
-    ></div>
-
-
-    <div class="formGrid">
-
-
-      <div class="field">
-
-        <label>
-          Email
-        </label>
-
-        <input
-          id="email"
-          type="email"
-          required
-        >
-
+<div id="checkoutModal" class="modal">
+  <div class="modalbox pepCheckoutBox">
+    <div class="pepCheckoutHead">
+      <div class="pepCheckoutBrand">PEPMOSA GROUP BUY ♡</div>
+      <div class="pepCheckoutTitle">Checkout</div>
+      <div class="pepCheckoutSub">Review your order and complete payment details.</div>
+      <div class="pepSteps">
+        <div class="pepStep active">1 • REVIEW</div>
+        <div class="pepStep">2 • PAY</div>
+        <div class="pepStep">3 • SUBMIT</div>
       </div>
-
-
-
-      <div class="field">
-
-        <label>
-          Customer Name
-        </label>
-
-        <input
-          id="customerName"
-        >
-
-      </div>
-
-
-
-      <div class="field">
-
-        <label>
-          Contact
-        </label>
-
-        <input
-          id="contact"
-        >
-
-      </div>
-
-
-
-      <div class="field">
-
-        <label>
-          Shipping Method
-        </label>
-
-        <input
-          id="shippingMethod"
-          placeholder="e.g. J&T"
-        >
-
-      </div>
-
-
-
-      <div class="field full">
-
-        <label>
-          Delivery Address
-        </label>
-
-        <textarea
-          id="address"
-        ></textarea>
-
-      </div>
-
-
     </div>
 
+    <div class="pepCheckoutBody">
+      <div id="checkoutMsg" class="muted"></div>
 
+      <div class="pepCheckoutGrid">
+        <div class="pepCard">
+          <h3>YOUR ORDER ♡</h3>
+          <div id="pepShopOrderList" class="pepOrderList">
+            <div class="pepOrderLine"><div><div class="pepOrderName">Your cart</div><div class="pepOrderMeta">Order summary will appear here.</div></div><div id="pepShopSubtotal">₱0.00</div></div>
+          </div>
+          <div class="pepTotal"><span>ORDER TOTAL</span><span id="pepShopTotal">₱0.00</span></div>
+        </div>
 
-    <div class="actions">
+        <div class="pepCard">
+          <h3>DELIVERY DETAILS ♡</h3>
 
+          <div class="pepField">
+            <label>Email</label>
+            <input id="email" type="email" required>
+          </div>
+          <div class="pepField">
+            <label>Customer Name</label>
+            <input id="customerName">
+          </div>
+          <div class="pepField">
+            <label>Contact Number</label>
+            <input id="contact">
+          </div>
+          <div class="pepField">
+            <label>Shipping Method</label>
+            <input id="shippingMethod" placeholder="e.g. J&T / Lalamove">
+          </div>
+          <div class="pepField">
+            <label>Delivery Address</label>
+            <textarea id="address"></textarea>
+          </div>
 
-      <button
-        class="btn primary"
-        onclick="placeOrder()"
-      >
-        SUBMIT ORDER
-      </button>
+          <div class="pepUpload">
+            <strong>PAYMENT PROOF</strong>
+            <span>Upload your payment screenshot before submitting.</span>
+            <input id="pepOrderProof" type="file" accept="image/*,.pdf">
+          </div>
 
+          <div class="pepQR">
+            <div style="font-weight:800;color:#9b2465;font-size:12px;margin-bottom:7px">PAYMENT QR</div>
+            <div id="pepShopQR"><span style="font-size:11px;color:#8a7180">Payment QR will appear here.</span></div>
+          </div>
+        </div>
+      </div>
 
-      <button
-        class="btn secondary"
-        onclick="closeModal('checkoutModal')"
-      >
-        CANCEL
-      </button>
-
-
+      <div class="pepActions">
+        <button class="pepSubmit" onclick="placeOrder()">SUBMIT ORDER</button>
+        <button class="pepCancel" onclick="closeModal('checkoutModal')">CANCEL</button>
+      </div>
     </div>
-
-
   </div>
-
 </div>
-
-
 
 <!-- =======================================================
      SUPABASE

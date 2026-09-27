@@ -385,7 +385,7 @@
       localStorage.setItem('pepmosa_customer_email',email);
       localStorage.setItem('pepmosa_customer_name',name);
       localStorage.setItem('pepmosa_phone',contact);
-      clearPersistedCart();
+      // Keep the persistent cart after a successful checkout so the customer can continue shopping.
       const cartModal=$('cartModal');
       if(cartModal)cartModal.classList.remove('show','open');
       closeCheckout();

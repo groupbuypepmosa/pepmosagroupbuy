@@ -219,6 +219,10 @@
     buildCheckout();$('checkoutModal')?.classList.add('open')
   };window.placeOrder=async()=>submitOrder();
   async function submitOrder(){
+    if(typeof window.pepRequireApprovedFee==='function'){
+      const feeApproved=await window.pepRequireApprovedFee();
+      if(!feeApproved)return;
+    }
     const msg=$('pepCheckoutMsg'),btn=$('pepPlaceOrder'),{cart,subtotal}=totals(),gb=getGB(),s=S();if(!s||!gb||!cart.length){if(msg)msg.innerHTML='<div class="pepFinalError">Your checkout session is not ready. Please refresh and try again.</div>';return}
     const latest=await s.from('group_buys').select('gb_number,status').eq('gb_number',gb.gb_number).maybeSingle();
     if(latest.error||!latest.data||!['OPEN','KIT_COMPLETION'].includes(latest.data.status)){msg.innerHTML='<div class="pepFinalError">This Group Buy is no longer open. Please refresh the page.</div>';return}

@@ -170,10 +170,6 @@
 @media(max-width:760px){.pepFinalHead{padding:23px 18px 19px!important}.pepHeroTitle h2{font-size:32px!important}.pepHeroHeart{font-size:65px;padding-right:0}.pepFinalBody{padding:17px 16px 24px!important}.pepCheckoutGrid{grid-template-columns:1fr}.pepCheckoutSide{position:static;display:flex;flex-direction:column}.pepSummaryCard{order:0}.pepSubmit{order:1}.pepCancel{order:2}.pepSecureNote{order:3}.pepQRWrap{grid-template-columns:1fr!important}.pepQRFrame{width:185px;margin:0 auto}.pepQRText{text-align:left;margin-top:10px}.pepUploadLarge{flex-wrap:wrap}.pepUploadLarge input{max-width:100%;width:100%}.pepProgress{max-width:100%}}
 
 /* PEPMOSA CHECKOUT — glossy girly refresh */\n#checkoutModal{padding:14px!important;background:rgba(48,24,42,.64)!important;backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important}\n#checkoutModal .modalbox{width:min(900px,100%)!important;max-height:95vh!important;border-radius:34px!important;border:1px solid #f1c5dd!important;background:linear-gradient(145deg,#fff,#fff8fc 62%,#faefff)!important;box-shadow:0 35px 110px rgba(48,18,42,.34)!important}\n.pepFinalHead{padding:32px 34px 25px!important;background:radial-gradient(circle at 88% 20%,rgba(231,63,151,.13),transparent 22%),linear-gradient(135deg,#ffeaf6,#fff9fc 55%,#f6ecff)!important;border-bottom:1px solid #f1d5e4!important}\n.pepFinalHead:after{content:'♡';right:27px!important;bottom:-25px!important;font-size:112px!important;color:rgba(215,47,143,.12)!important}\n.pepFinalKicker{font-size:10px!important;letter-spacing:.22em!important;color:#cf2b83!important}.pepFinalHead h2{font-size:38px!important;color:#3b2634!important;letter-spacing:-1.5px!important}.pepFinalHead p{font-size:13px!important;color:#7e6975!important;max-width:650px!important}\n.pepFinalBody{padding:20px 34px 32px!important}.pepStep{margin:3px 0 13px!important;color:#b05c87!important;letter-spacing:.08em}.pepStep span{width:28px!important;height:28px!important;background:linear-gradient(135deg,#eb3195,#be42b6)!important;box-shadow:0 6px 14px rgba(211,44,139,.18)!important}\n.pepFinalCard{border:1px solid #f0d5e3!important;border-radius:23px!important;padding:18px!important;background:rgba(255,251,253,.88)!important;box-shadow:0 8px 26px rgba(103,42,76,.045)!important}\n.pepFinalTitle{color:#b02e78!important;font-size:11px!important;letter-spacing:.17em!important}.pepOrderLine{border-color:#f0dce7!important;border-radius:15px!important;padding:12px 13px!important}.pepOrderAmount{font-size:13px!important}\n.pepTotalRows{gap:9px!important}.pepTotalRow{font-size:13px!important}.pepTotalRow.grand{font-size:21px!important;color:#3b2634!important}.pepTotalRow.grand span:last-child{padding:7px 15px;border-radius:999px;background:#ffe4f2;color:#c5267c}\n.pepQRWrap{grid-template-columns:205px 1fr!important;gap:24px!important}.pepQRWrap img{width:205px!important;height:205px!important;border:9px solid #fff!important;border-radius:22px!important;box-shadow:0 12px 32px rgba(92,39,76,.12)!important}.pepQRText h3{font-size:18px!important}.pepQRText p{font-size:12px!important}.pepQRNote{padding:11px 13px!important;border-radius:13px!important;background:#ffedf7!important;color:#a04476!important}\n.pepFields{gap:13px!important}.pepField label{font-size:10px!important}.pepField input,.pepField textarea,.pepField select{min-height:48px!important;border:1px solid #e8d0df!important;border-radius:15px!important;background:#fff!important}.pepReturningNote{border-radius:15px!important;background:linear-gradient(135deg,#fff0f7,#faf1ff)!important;color:#a04476!important;border-color:#efd2e3!important}\n.pepUpload{border:1.5px dashed #dc8fba!important;border-radius:18px!important;background:#fff5fa!important;padding:16px!important}.pepUploadHint{font-size:10px!important}.pepFinalActions{margin-top:19px!important}.pepSubmit{min-height:54px!important;border-radius:17px!important;background:linear-gradient(135deg,#f02e95,#bd3db5)!important;box-shadow:0 13px 28px rgba(210,43,139,.24)!important;font-size:14px!important}.pepCancel{min-height:54px!important;border-radius:17px!important}\n@media(max-width:700px){.pepFinalHead{padding:25px 20px 21px!important}.pepFinalHead h2{font-size:31px!important}.pepFinalBody{padding:17px 16px 24px!important}.pepQRWrap{grid-template-columns:1fr!important}.pepQRWrap img{width:220px!important;height:220px!important}.pepQRText{text-align:left!important}.pepFinalCard{border-radius:20px!important}}\n`;document.head.appendChild(s)}
-
-<style id="pep-new-checkout-style">
-.pepNewCheckout{font-family:inherit;background:linear-gradient(135deg,#fff9fc,#fff4fa 55%,#fffaff);border-radius:28px;overflow:hidden;color:#493844}.pepNewHeader{display:flex;justify-content:space-between;align-items:center;padding:28px 30px 23px;background:radial-gradient(circle at 85% 10%,#fde3f1 0,transparent 30%),linear-gradient(135deg,#fff,#fff4fa)}.pepNewBrand{font-size:11px;letter-spacing:4px;font-weight:950;color:#cf2c87}.pepNewBrand span{font-size:15px;margin-left:4px}.pepNewHeader h2{margin:4px 0 2px;font-family:Georgia,serif;font-size:36px;line-height:1;color:#a71863}.pepNewHeader p{margin:8px 0 0;color:#7c6875;font-size:12px}.pepNewHeaderHeart{width:62px;height:62px;border-radius:20px;background:linear-gradient(145deg,#ffb3d9,#e93d9e);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 12px 26px rgba(216,48,139,.18);transform:rotate(8deg)}.pepNewGrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.75fr);gap:16px;padding:0 20px 22px}.pepNewMain{display:flex;flex-direction:column;gap:14px}.pepNewCard,.pepNewSummary{background:rgba(255,255,255,.9);border:1px solid #f0cfe0;border-radius:22px;padding:19px;box-shadow:0 8px 25px rgba(196,71,137,.055)}.pepNewCardHead,.pepNewSummaryHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:15px}.pepNewCardHead small,.pepNewSummaryHead small{display:block;font-size:9px;letter-spacing:2px;font-weight:900;color:#d13a8e;margin-bottom:4px}.pepNewCardHead h3,.pepNewSummaryHead h3{margin:0;font-size:19px;color:#4b3341}.pepNewCardHead>span,.pepNewSummaryHead>span{font-size:9px;font-weight:900;color:#b54c82;background:#fff0f7;border:1px solid #f2d4e4;padding:6px 9px;border-radius:999px}.pepNewFields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pepNewFields>div{min-width:0}.pepNewFields .pepNewFull{grid-column:1/-1}.pepNewFields label{display:block;font-size:10px;font-weight:800;color:#796674;margin:0 0 6px 3px}.pepNewFields input,.pepNewFields textarea,.pepNewFields select{box-sizing:border-box;width:100%;min-height:46px;border:1px solid #e8d2df;border-radius:13px;background:#fff9fc;padding:11px 13px;color:#443642;font:inherit;font-size:12px;outline:none}.pepNewFields textarea{min-height:70px;resize:none}.pepNewFields select{cursor:pointer}.pepNewFields select:disabled{opacity:.78;cursor:not-allowed}.pepNewPaid{margin-top:12px;padding:11px 13px;border-radius:13px;background:#fff0f7;border:1px solid #f0d1e1;color:#a04476;font-size:10px;font-weight:750}.pepNewHint{margin-top:12px;padding:10px 12px;border-radius:12px;background:#fff8fc;color:#a06783;font-size:10px}.pepNewPayment{padding-bottom:17px}.pepNewPayGrid{display:grid;grid-template-columns:180px 1fr;gap:17px;align-items:center}.pepNewQR{background:#fff;border:1px solid #efd6e4;border-radius:17px;padding:9px;width:180px;height:180px;box-sizing:border-box}.pepNewQR img{width:100%;height:100%;object-fit:contain;border-radius:10px}.pepNewPayCopy strong{font-size:17px;color:#4b3341}.pepNewPayCopy p{font-size:11px;line-height:1.6;color:#776571;margin:7px 0 10px}.pepNewPayHint{padding:10px 12px;border-radius:12px;background:#fff2f8;border:1px solid #f2d5e5;color:#9b5377;font-size:10px;line-height:1.5}.pepUploadLarge{margin-top:14px!important}.pepNewSummary{padding:21px;position:sticky;top:10px}.pepNewItems{display:flex;flex-direction:column;gap:8px}.pepNewItem{display:flex;align-items:center;gap:9px;padding:10px;border-radius:13px;background:#fff3f8}.pepNewItemIcon{width:34px;height:34px;flex:0 0 34px;border-radius:10px;background:#fff;color:#df3a95;display:flex;align-items:center;justify-content:center;font-size:17px}.pepNewItemInfo{min-width:0;flex:1}.pepNewItemInfo strong{display:block;font-size:11px;color:#4d3744;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pepNewItemInfo span{display:block;font-size:9px;color:#987c8b;margin-top:3px}.pepNewItem>b{font-size:11px;color:#4d3343}.pepNewDivider{height:1px;background:#f1d9e5;margin:14px 0}.pepNewRow{display:flex;justify-content:space-between;gap:10px;padding:7px 0;font-size:11px;color:#756471}.pepNewRow b{color:#493440}.pepNewRow small{display:inline-block;margin-left:4px;font-size:6px;background:#dff6e9;color:#287b50;border-radius:99px;padding:3px 5px;vertical-align:2px}.pepNewGrand{display:flex;justify-content:space-between;align-items:end;border-top:1px solid #efd8e5;margin-top:8px;padding-top:15px}.pepNewGrand span{font-size:11px;font-weight:800;color:#705e68}.pepNewGrand strong{font-size:25px;color:#d12482}.pepNewReminder{display:flex;flex-direction:column;gap:6px;margin-top:12px;padding:15px;border-radius:16px;background:#fff0f7;border:1px solid #f0d0e1;color:#816875;font-size:9px;line-height:1.5}.pepNewReminder strong{font-size:11px;color:#b72a77}.pepNewSubmit{width:100%;min-height:54px;margin-top:13px;border:0;border-radius:16px;background:linear-gradient(105deg,#ee2990,#c03fbd);color:#fff;font-size:13px;font-weight:950;letter-spacing:.3px;box-shadow:0 13px 27px rgba(207,42,139,.22);cursor:pointer}.pepNewSubmit span{font-size:19px;margin-left:7px}.pepNewCancel{width:100%;min-height:43px;margin-top:8px;border:1px solid #ead4df;border-radius:14px;background:#fff;color:#715f69;font-weight:800;cursor:pointer}.pepNewCheckout #pepCheckoutMsg{margin:0 20px 12px}.pepNewCheckout .pepFinalError{margin:0!important}.pepNewCheckout .pepUpload{border-radius:14px!important}.pepNewCheckout .pepFileName{margin-top:7px}@media(max-width:850px){.pepNewGrid{grid-template-columns:1fr}.pepNewSummary{position:static}.pepNewHeader{padding:23px 20px}.pepNewHeader h2{font-size:31px}.pepNewGrid{padding:0 12px 16px}.pepNewPayGrid{grid-template-columns:150px 1fr}.pepNewQR{width:150px;height:150px}}@media(max-width:560px){.pepNewFields{grid-template-columns:1fr}.pepNewFields .pepNewFull{grid-column:auto}.pepNewPayGrid{grid-template-columns:1fr}.pepNewQR{width:190px;height:190px;margin:auto}.pepNewHeaderHeart{width:50px;height:50px;font-size:25px}.pepNewHeader h2{font-size:28px}.pepNewCard,.pepNewSummary{padding:15px;border-radius:18px}}
-</style>
   if(!document.getElementById('pep-success-popup-v2')){
   const s=document.createElement('style');
   s.id='pep-success-popup-v2';
@@ -218,59 +214,65 @@
   function buildCheckout(){
     const modal=$('checkoutModal'),box=modal?.querySelector('.modalbox'),{cart,subtotal}=totals();if(!modal||!box||!cart.length)return;
     const gb=getGB(),qr=gb?.final_payment_qr_url||'',adminFee=Number(gb?.admin_fee||0),customer=checkoutCustomer||{},email=customer.email||'',gbName=gb?.customer_facing_name||gb?.gb_number||'PEPMOSA GROUP BUY';
-    const lines=cart.map(i=>`<div class="pepNewOrderItem"><div class="pepNewItemIcon">♡</div><div class="pepNewItemInfo"><strong>${esc(itemName(i))}</strong><span>${esc(itemStrength(i))}${itemStrength(i)?' • ':''}Qty ${itemQty(i)}</span></div><b>${peso(itemPrice(i)*itemQty(i))}</b></div>`).join('');
-    const qrBlock=qr?`<div class="pepNewCard pepNewPayment"><div class="pepNewCardHead"><div><small>STEP 3</small><h3>Payment Method</h3></div><span>SECURE</span></div><div class="pepNewPayGrid"><div class="pepNewQR"><img src="${esc(qr)}" alt="PEPMOSA payment QR"></div><div class="pepNewPayCopy"><strong>Scan to Pay</strong><p>Pay the exact total shown in your order summary, then upload your payment proof below.</p><div class="pepNewPayHint">♡ Make sure your receipt shows the amount and payment reference clearly.</div></div></div><div class="pepUpload pepUploadLarge"><div class="pepUploadIcon">↑</div><div class="pepUploadCopy"><strong>Upload payment proof</strong><span>JPG, PNG, WEBP or PDF • Maximum 5MB</span></div><input id="pepOrderProof" type="file" accept="image/*,.pdf"></div><div id="pepFileName" class="pepFileName"></div></div>`:`<div class="pepNewCard pepNewPayment"><div class="pepNewCardHead"><div><small>STEP 3</small><h3>Payment Method</h3></div></div><div class="pepNewPayHint">Payment QR is currently unavailable. Please contact PEPMOSA before submitting your order.</div><div class="pepUpload pepUploadLarge"><div class="pepUploadIcon">↑</div><div class="pepUploadCopy"><strong>Upload payment proof</strong><span>JPG, PNG, WEBP or PDF • Maximum 5MB</span></div><input id="pepOrderProof" type="file" accept="image/*,.pdf"></div><div id="pepFileName" class="pepFileName"></div></div>`;
-    box.innerHTML=`<div class="pepNewCheckout">
-      <div class="pepNewHeader">
-        <div><div class="pepNewBrand">PEPMOSA <span>♡</span></div><h2>Checkout</h2><p>Review your details before submitting your order.</p></div>
-        <div class="pepNewHeaderHeart">♡</div>
-      </div>
-      <div id="pepCheckoutMsg"></div>
-      <div class="pepNewGrid">
-        <main class="pepNewMain">
-          <div class="pepNewCard">
-            <div class="pepNewCardHead"><div><small>STEP 1</small><h3>Customer Information</h3></div><span>✓ SAVED</span></div>
-            <div class="pepNewFields">
-              <div><label>Full Name</label><input value="${esc(customer.customer_name)}" readonly></div>
-              <div><label>Email Address</label><input value="${esc(email)}" readonly></div>
-              <div><label>Contact Number</label><input value="${esc(customer.contact)}" readonly></div>
-              <div><label>WhatsApp Name</label><input value="${esc(customer.whatsapp_name)}" readonly></div>
-            </div>
-          </div>
-          <div class="pepNewCard">
-            <div class="pepNewCardHead"><div><small>STEP 2</small><h3>Shipping Details</h3></div><span>REQUIRED</span></div>
-            <div class="pepNewFields">
-              <div class="pepNewFull"><label>Complete Delivery Address</label><textarea readonly>${esc(customer.address)}</textarea></div>
-              <div class="pepNewFull"><label>Shipping Method</label><select id="pepShippingMethod" ${checkoutShippingPaid?'disabled':''}>
-                <option value="0">J&amp;T Express — Luzon • ₱100</option>
-                <option value="1">J&amp;T Express — Visayas • ₱150</option>
-                <option value="2">J&amp;T Express — Mindanao • ₱180</option>
-                <option value="3">Lalamove — APP RATE</option>
-              </select></div>
-            </div>
-            ${checkoutShippingPaid?'<div class="pepNewPaid">♡ Shipping fee already paid for this Group Buy — no shipping fee will be added.</div>':'<div class="pepNewHint">♡ Your order total updates automatically when you change shipping.</div>'}
-          </div>
+    const lines=cart.map(i=>`<div class="pepOrderLine"><div class="pepOrderInfo"><div class="pepProductName">${esc(itemName(i))}</div><small>${esc(itemStrength(i))}${itemStrength(i)?' • ':''}Qty ${itemQty(i)} × ${peso(itemPrice(i))}</small></div><div class="pepOrderAmount">${peso(itemPrice(i)*itemQty(i))}</div></div>`).join('');
+    const qrBlock=qr?`<div class="pepFinalCard pepPaymentCard"><div class="pepFinalTitle"><span>PAYMENT</span><span class="pepLiveDot">SECURE PAYMENT</span></div><div class="pepQRWrap"><div class="pepQRFrame"><img src="${esc(qr)}" alt="PEPMOSA payment QR"></div><div class="pepQRText"><div class="pepPayLabel">SCAN TO PAY</div><h3>Complete your payment</h3><p>Scan the QR code, pay the exact order total, then upload your receipt below.</p><div class="pepQRNote">✓ Make sure the amount paid matches your final total.</div></div></div></div>`:`<div class="pepFinalCard pepPaymentCard"><div class="pepFinalTitle"><span>PAYMENT</span></div><div class="pepQRText"><h3>Payment QR unavailable</h3><p>Please contact PEPMOSA before submitting your order.</p></div></div>`;
+    box.innerHTML=`<div class="pepFinalHead">
+      <div class="pepHeadTop"><div class="pepFinalKicker">PEPMOSA GROUP BUY</div><div class="pepSecure">♡ SAVED ACCOUNT</div></div>
+      <div class="pepHeroTitle"><div><h2>Checkout</h2><p>You're almost done. Review your order, choose shipping, make payment, and send your proof.</p></div><div class="pepHeroHeart">♡</div></div>
+      <div class="pepProgress"><div class="active"><span>1</span> REVIEW</div><i></i><div class="active"><span>2</span> PAY</div><i></i><div><span>3</span> SUBMIT</div></div>
+    </div>
+    <div class="pepFinalBody">
+      <div class="pepCheckoutGrid">
+        <main class="pepCheckoutMain">
+          <div id="pepCheckoutMsg"></div>
+          <div class="pepSectionLabel">YOUR ORDER <span>${esc(gbName)}</span></div>
+          <div class="pepFinalCard pepOrderCard">${lines}</div>
           ${qrBlock}
-        </main>
-        <aside class="pepNewSide">
-          <div class="pepNewSummary">
-            <div class="pepNewSummaryHead"><div><small>YOUR ORDER</small><h3>Order Summary</h3></div><span>${cart.length} item${cart.length===1?'':'s'}</span></div>
-            <div class="pepNewItems">${lines}</div>
-            <div class="pepNewDivider"></div>
-            <div class="pepNewRow"><span>Products</span><b>${peso(subtotal)}</b></div>
-            <div class="pepNewRow"><span>Admin fee <small>CHECKED ON SUBMIT</small></span><b>${peso(adminFee)}</b></div>
-            <div class="pepNewRow"><span>Shipping</span><b id="pepShippingFee">${checkoutShippingPaid?'PAID':'₱100.00'}</b></div>
-            <div class="pepNewGrand"><span>Total to pay</span><strong id="pepGrandTotal">${checkoutShippingPaid?peso(subtotal):peso(subtotal+100)}</strong></div>
+          <div class="pepFinalCard">
+            <div class="pepFinalTitle"><span>DELIVERY DETAILS</span><span class="optional">FROM YOUR ACCOUNT</span></div>
+            <div class="pepFields">
+              <div class="pepField"><label>FULL NAME</label><input value="${esc(customer.customer_name)}" readonly></div>
+              <div class="pepField"><label>CONTACT NUMBER</label><input value="${esc(customer.contact)}" readonly></div>
+              <div class="pepField"><label>EMAIL</label><input value="${esc(email)}" readonly></div>
+              <div class="pepField"><label>WHATSAPP NAME</label><input value="${esc(customer.whatsapp_name)}" readonly></div>
+              <div class="pepField full"><label>COMPLETE DELIVERY ADDRESS</label><textarea readonly>${esc(customer.address)}</textarea></div>
+            </div>
+            <div class="pepReturningNote">♡ Your saved PEPMOSA account details are automatically used for this order.</div>
           </div>
-          <div class="pepNewReminder"><strong>♡ Important Reminder</strong><span>Please double-check your order and shipping details before submitting.</span><span>Your payment proof will be reviewed by PEPMOSA admin.</span></div>
-          <button id="pepPlaceOrder" class="pepNewSubmit" type="button">SUBMIT MY ORDER <span>→</span></button>
-          <button id="pepCancelOrder" class="pepNewCancel" type="button">CANCEL</button>
+          <div class="pepFinalCard">
+            <div class="pepFinalTitle"><span>SHIPPING METHOD</span><span class="optional">REQUIRED</span></div>
+            <select id="pepShippingMethod" class="pepShippingSelect"${checkoutShippingPaid?" disabled":""}>
+              <option value="0">J&amp;T Express — Luzon • ₱100</option>
+              <option value="1">J&amp;T Express — Visayas • ₱150</option>
+              <option value="2">J&amp;T Express — Mindanao • ₱180</option>
+              <option value="3">Lalamove — APP RATE</option>
+            </select>
+          </div>
+          <div class="pepFinalCard">
+            <div class="pepFinalTitle"><span>PAYMENT PROOF</span><span class="optional">REQUIRED</span></div>
+            <div class="pepUpload pepUploadLarge"><div class="pepUploadIcon">↑</div><div class="pepUploadCopy"><strong>Upload your payment receipt</strong><span>JPG, PNG, WEBP or PDF • Maximum 5MB</span></div><input id="pepOrderProof" type="file" accept="image/*,.pdf"></div>
+            <div id="pepFileName" class="pepFileName"></div>
+          </div>
+        </main>
+        <aside class="pepCheckoutSide">
+          <div class="pepSummaryCard">
+            <div class="pepSummaryEyebrow">ORDER SUMMARY</div>
+            <div class="pepTotalRows">
+              <div class="pepTotalRow"><span>Products</span><b>${peso(subtotal)}</b></div>
+              <div class="pepTotalRow"><span>Admin fee <small>CHECKED ON SUBMIT</small></span><b>${peso(adminFee)}</b></div>
+              <div class="pepTotalRow"><span>Shipping</span><b id="pepShippingFee">₱100.00</b></div>
+            </div>
+            <div class="pepGrand"><span>Total to pay</span><strong id="pepGrandTotal">${peso(subtotal+100)}</strong></div>
+            <div class="pepSummaryNote">♡ Your order total updates automatically when you change shipping.</div>
+          </div>
+          <button id="pepPlaceOrder" class="pepSubmit" type="button">SUBMIT MY ORDER <span>→</span></button>
+          <button id="pepCancelOrder" class="pepCancel" type="button">CANCEL</button>
+          <div class="pepSecureNote">🔒 Your payment proof is securely submitted for PEPMOSA admin review.</div>
         </aside>
       </div>
     </div>`;
     $('pepOrderProof')?.addEventListener('change',function(){const f=this.files?.[0],n=$('pepFileName');if(f){n.textContent='✓ '+f.name;n.classList.add('show')}else{n.textContent='';n.classList.remove('show')}});
-    if(checkoutShippingPaid&&$('pepShippingMethod'))$('pepShippingMethod').value=String(checkoutPaidShippingIndex);
-    $('pepShippingMethod')?.addEventListener('change',updateTotals);$('pepPlaceOrder').onclick=submitOrder;$('pepCancelOrder').onclick=closeCheckout;updateTotals();
+    if(checkoutShippingPaid&&$('pepShippingMethod'))$('pepShippingMethod').value=String(checkoutPaidShippingIndex);$('pepShippingMethod')?.addEventListener('change',updateTotals);$('pepPlaceOrder').onclick=submitOrder;$('pepCancelOrder').onclick=closeCheckout;updateTotals();
   }
   function updateTotals(){
     const {subtotal}=totals();const i=Number($('pepShippingMethod')?.value||0),fee=checkoutShippingPaid?0:([100,150,180,0][i]??100);

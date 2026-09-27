@@ -295,12 +295,11 @@
   window.pepmosaFinalSubmitOrder=async function(){ return submitOrder(); };
   window.placeOrder=window.pepmosaFinalSubmitOrder;
   async function submitOrder(){
-    if(typeof window.pepRequireApprovedFee==='function'){
-      const feeApproved=await window.pepRequireApprovedFee();
-      if(!feeApproved)return;
-    }
-    if(!checkoutCustomer){ try{ checkoutCustomer=await loadCheckoutCustomer(); }catch(e){} }
-    const msg=$('pepCheckoutMsg'),btn=$('pepPlaceOrder'),{cart,subtotal}=totals(),gb=getGB(),s=S();if(!s||!gb||!cart.length){if(msg)msg.innerHTML='<div class="pepFinalError">Your checkout session is not ready. Please refresh and try again.</div>';return}
+    const msg=$('pepCheckoutMsg'),btn=$('pepPlaceOrder');
+    try{
+      if(!checkoutCustomer){ try{ checkoutCustomer=await loadCheckoutCustomer(); }catch(e){} }
+      const {cart,subtotal}=totals(),gb=getGB(),s=S();
+      if(!s||!gb||!cart.length){if(msg)msg.innerHTML='<div class="pepFinalError">Your checkout session is not ready. Please refresh and try again.</div>';return}
     const latest=await s.from('group_buys').select('gb_number,status').eq('gb_number',gb.gb_number).maybeSingle();
     if(latest.error||!latest.data||!['OPEN','KIT_COMPLETION'].includes(latest.data.status)){msg.innerHTML='<div class="pepFinalError">This Group Buy is no longer open. Please refresh the page.</div>';return}
     const email=(checkoutCustomer?.email||'').trim().toLowerCase(),name=(checkoutCustomer?.customer_name||'').trim(),contact=(checkoutCustomer?.contact||'').trim(),address=(checkoutCustomer?.address||'').trim();
@@ -311,7 +310,6 @@
     const missing=[];if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))missing.push('Account Email');if(!name)missing.push('Full Name');if(!contact)missing.push('Contact Number');if(!shippingMethod)missing.push('Shipping Method');if(!address)missing.push('Delivery Address')
     if(!file)missing.push('Payment Proof');if(missing.length){msg.innerHTML='<div class="pepFinalError"><b>Please complete the following:</b> '+missing.join(' • ')+'</div>';return}if(file.size>5*1024*1024){msg.innerHTML='<div class="pepFinalError">Payment proof must be 5MB or smaller.</div>';return}
     btn.disabled=true;btn.textContent='SUBMITTING…';msg.innerHTML='';
-    try{
       // Last-second inventory check: never submit a stale Kit Completion item.
       const cleaned=await sanitizeKitCart(cart,gb);
       if(cleaned.changed){
@@ -369,6 +367,15 @@
         if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Order was not submitted: '+errorText);
       }
     }finally{btn.disabled=false;btn.textContent='SUBMIT MY ORDER'}
+    }catch(e){
+      console.error('PEPMOSA CHECKOUT ERROR',e);
+      const errorText=String(e?.message||'Please try again.');
+      if(msg){
+        msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(errorText)+'<br><small>Your cart has not been cleared. Please try SUBMIT ORDER again.</small></div>';
+        msg.scrollIntoView({behavior:'smooth',block:'center'});
+      }
+      if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Order was not submitted: '+errorText);
+    }
   }
   async function repairStorefront(){const s=S();if(!s)return false;try{let gb=getGB();if(!gb){const r=await s.from('group_buys').select('*').in('status',['OPEN','KIT_COMPLETION']).order('created_at',{ascending:false}).limit(1).maybeSingle();if(r.error||!r.data)return false;gb=r.data;window.currentGB=gb;window.pepmosaCurrentGB=gb}const cr=await s.from('gb_categories').select('category_name').eq('gb_number',gb.gb_number);if(cr.error)throw cr.error;const categories=(cr.data||[]).map(x=>x.category_name).filter(Boolean);if(!categories.length){products=[];return true}const pr=await s.from('products').select('*').eq('active',true).in('category',categories).order('product_name');if(pr.error)throw pr.error;const base=pr.data||[],ids=base.map(p=>p.product_id).filter(Boolean);let variants=[];if(ids.length){const vr=await s.from('product_variants').select('*').in('product_id',ids).eq('active',true).order('price');if(vr.error)throw vr.error;variants=vr.data||[]}const mr=await s.from('gb_minimum_quantities').select('*').eq('gb_number',gb.gb_number);const mins=mr.error?[]:(mr.data||[]);
     let kitMap=new Map();

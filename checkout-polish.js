@@ -172,30 +172,37 @@
   const s=document.createElement('style');
   s.id='pep-success-popup-v2';
   s.textContent=`
-#pepInfoModal{position:fixed!important;inset:0!important;z-index:999998!important;display:none!important;align-items:center!important;justify-content:center!important;padding:20px!important;background:rgba(48,26,42,.22)!important}
+#pepInfoModal{position:fixed!important;inset:0!important;z-index:999998!important;display:none!important;align-items:center!important;justify-content:center!important;padding:18px!important;background:rgba(55,28,48,.26)!important;backdrop-filter:blur(3px)!important}
 #pepInfoModal.open{display:flex!important}
 #pepInfoModal>.pepSuccessCard,.pepSuccessCard{
- box-sizing:border-box!important;width:min(440px,calc(100vw - 34px))!important;
- padding:34px 34px 28px!important;border-radius:30px!important;
- border:1px solid rgba(218,91,161,.18)!important;
- background:linear-gradient(145deg,#fff 0%,#fff8fc 62%,#faf3ff 100%)!important;
- box-shadow:0 24px 70px rgba(70,34,56,.20)!important;
+ box-sizing:border-box!important;width:min(470px,calc(100vw - 28px))!important;
+ padding:30px 30px 27px!important;border-radius:28px!important;
+ border:1px solid #f0d7e6!important;
+ background:linear-gradient(155deg,#fff 0%,#fffafd 55%,#fff3fa 100%)!important;
+ box-shadow:0 28px 80px rgba(67,28,54,.18)!important;
  text-align:center!important;position:relative!important;overflow:hidden!important;
 }
-.pepSuccessCard:before{content:"";position:absolute;inset:-80px -60px auto auto;width:190px;height:190px;border-radius:50%;background:rgba(242,143,195,.12);filter:blur(2px);pointer-events:none}
-.pepSuccessIcon{width:76px!important;height:76px!important;margin:0 auto 12px!important;border-radius:50%!important;background:linear-gradient(145deg,#e52b91,#c341bd)!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 12px 28px rgba(211,43,143,.22)!important}
-.pepSuccessIcon span{color:#fff!important;font-size:43px!important;font-weight:500!important;line-height:1!important}
-.pepSuccessBrand{font-size:10px!important;letter-spacing:3px!important;font-weight:950!important;color:#c92d88!important;margin-bottom:8px!important}
-.pepSuccessTitle{font-size:30px!important;line-height:1.12!important;letter-spacing:-.7px!important;color:#382934!important;margin:0 0 9px!important;font-weight:950!important}
-.pepSuccessOrder{display:inline-block!important;padding:7px 12px!important;border-radius:999px!important;background:#fcebf5!important;color:#8d5977!important;font-size:11px!important;letter-spacing:.2px!important;margin-bottom:17px!important}
-.pepSuccessOrder b{color:#572f48!important}
-.pepSuccessText{max-width:350px!important;margin:0 auto 17px!important;color:#756672!important;font-size:13px!important;line-height:1.65!important}
-.pepSuccessNote{display:flex!important;gap:9px!important;align-items:flex-start!important;text-align:left!important;max-width:350px!important;margin:0 auto 24px!important;padding:12px 13px!important;border-radius:15px!important;background:rgba(249,237,247,.72)!important;border:1px solid #f0dce9!important;color:#74566a!important;font-size:11px!important;line-height:1.5!important}
-.pepSuccessNote>span:first-child{flex:0 0 auto;width:19px;height:19px;border-radius:50%;background:#e83b95;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
-.pepSuccessDone{width:100%!important;min-height:50px!important;border:0!important;border-radius:15px!important;background:linear-gradient(135deg,#e72b8b,#bd3fba)!important;color:#fff!important;font-size:14px!important;font-weight:950!important;letter-spacing:.3px!important;cursor:pointer!important;box-shadow:0 10px 24px rgba(205,44,139,.20)!important}
-.pepSuccessDone:hover{transform:translateY(-1px)!important}
-@media(max-width:520px){#pepInfoModal{padding:14px!important}.pepSuccessCard{padding:29px 20px 22px!important;border-radius:25px!important}.pepSuccessIcon{width:68px!important;height:68px!important}.pepSuccessTitle{font-size:26px!important}}
-`;
+.pepSuccessCard:before{content:"";position:absolute;right:-75px;top:-75px;width:190px;height:190px;border-radius:50%;background:rgba(238,117,181,.10);pointer-events:none}
+.pepSuccessCard:after{content:"♡";position:absolute;left:-18px;bottom:-43px;font:110px/1 Georgia,serif;color:rgba(222,65,151,.055);pointer-events:none}
+.pepSuccessIcon{position:relative;width:72px!important;height:72px!important;margin:0 auto 14px!important;border-radius:50%!important;background:linear-gradient(145deg,#df2b92,#c73ebd)!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 13px 30px rgba(211,43,143,.22)!important}
+.pepSuccessIcon span{color:#fff!important;font-size:40px!important;font-weight:500!important;line-height:1!important;transform:translateY(-2px)}
+.pepSuccessBrand{font-size:9px!important;letter-spacing:3.5px!important;font-weight:950!important;color:#c72c87!important;margin-bottom:7px!important}
+.pepSuccessTitle{font-size:29px!important;line-height:1.12!important;letter-spacing:-.8px!important;color:#35262f!important;margin:0 0 10px!important;font-weight:950!important}
+.pepSuccessOrder{display:inline-block!important;padding:7px 13px!important;border-radius:999px!important;background:#fcebf5!important;color:#91647d!important;font-size:10px!important;letter-spacing:.15px!important;margin-bottom:16px!important;border:1px solid #f4dce9!important}
+.pepSuccessOrder b{color:#63334f!important}
+.pepSuccessText{max-width:365px!important;margin:0 auto 17px!important;color:#766873!important;font-size:12px!important;line-height:1.65!important}
+.pepSuccessNote{display:flex!important;gap:10px!important;align-items:flex-start!important;text-align:left!important;max-width:365px!important;margin:0 auto 22px!important;padding:12px 13px!important;border-radius:14px!important;background:#fff4fa!important;border:1px solid #f0dce8!important;color:#76596b!important;font-size:10px!important;line-height:1.55!important}
+.pepSuccessNote>span:first-child{flex:0 0 auto;width:19px;height:19px;border-radius:50%;background:#e63b95;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+.pepSuccessDone{position:relative;width:100%!important;min-height:49px!important;border:0!important;border-radius:15px!important;background:linear-gradient(135deg,#e82b8d,#c33fbb)!important;color:#fff!important;font-size:13px!important;font-weight:950!important;letter-spacing:.35px!important;cursor:pointer!important;box-shadow:0 11px 25px rgba(205,44,139,.19)!important}
+.pepSuccessDone:hover{transform:translateY(-1px)!important;box-shadow:0 14px 28px rgba(205,44,139,.23)!important}
+@media(max-width:520px){
+ #pepInfoModal{padding:12px!important}
+ .pepSuccessCard{width:min(430px,calc(100vw - 24px))!important;padding:27px 19px 21px!important;border-radius:24px!important}
+ .pepSuccessIcon{width:66px!important;height:66px!important;margin-bottom:12px!important}
+ .pepSuccessIcon span{font-size:37px!important}
+ .pepSuccessTitle{font-size:25px!important}
+ .pepSuccessText,.pepSuccessNote{max-width:100%!important}
+}
   document.head.appendChild(s);
 }
 

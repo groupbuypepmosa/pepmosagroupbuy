@@ -2852,6 +2852,19 @@ load();
       if(!gb||!gb.gb_number) throw new Error('No active Group Buy');
       // Use a secure database function because public visitors cannot directly SELECT
       // rows from admin_fee_payments under RLS.
+      var accessCheck=null;
+      try{
+        var ar=await sb.rpc('check_group_buy_access',{p_gb_number:gb.gb_number,p_email:email,p_payment_id:localStorage.getItem('pepmosa_fee_payment_id')||null});
+        if(!ar.error){
+          var ax=Array.isArray(ar.data)?ar.data[0]:ar.data;
+          accessCheck=ax&&ax.status?String(ax.status).toUpperCase():null;
+        }
+      }catch(_){}
+      if(accessCheck==='SUBMITTED'){
+        localStorage.setItem('pepmosa_customer_email',email);
+        if(window.pepmosaPopup) window.pepmosaPopup('Your Admin Fee payment is still pending approval. ♡\\n\\nPlease wait for PEPMOSA admin approval before you can place an order.','WAITING FOR ADMIN FEE APPROVAL','⌛');
+        return false;
+      }
       var r=await sb.rpc('has_approved_admin_fee',{p_email:email,p_gb_number:gb.gb_number});
       if(r.error) throw r.error;
       if(r.data!==true){

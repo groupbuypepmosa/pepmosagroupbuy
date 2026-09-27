@@ -1317,7 +1317,7 @@ letter-spacing:.16em;text-transform:uppercase;color:#806675;
 #checkoutModal .pepShippingWrap{margin-top:12px}
 #checkoutModal .pepShippingSelect{width:100%;box-sizing:border-box;border:1px solid #e7c8da;border-radius:12px;padding:11px 12px;background:#fff;color:#4d3442;font:inherit}
 #checkoutModal .pepSummarySmall{font-size:11px;color:#8a7180;margin-top:7px}
-#checkoutModal .pepQR img{display:block;margin:8px auto 0;width:155px;height:155px;object-fit:contain;background:#fff;border-radius:10px}
+#checkoutModal .pepQR img{display:block;margin:8px auto 0;width:155px;height:155px;object-fit:contain;background:#fff;border-radius:10px};#checkoutModal .pepAccountFilled{background:#fff8fc!important;color:#6e5061!important;cursor:default}#checkoutModal .pepField:has(.pepAccountFilled) label::after{content:'  • SAVED';font-size:8px;color:#d24a91;font-weight:900}
 </style>
 
 <div id="checkoutModal" class="modal">
@@ -1418,6 +1418,37 @@ letter-spacing:.16em;text-transform:uppercase;color:#806675;
     var st=document.getElementById('pepShopSubtotal'); if(st)st.textContent=money(subtotal);
     var email=window.verifiedEmail||localStorage.getItem('pepmosa_verified_email')||'';
     if(email&&document.getElementById('email'))document.getElementById('email').value=email;
+
+    /* Logged-in accounts: checkout should use the saved PEPMOSA profile.
+       Do not make customers re-type their account details. */
+    (async function(){
+      try{
+        var db=window.sb||window.__sb;
+        if(!db||!db.auth) return;
+        var auth=await db.auth.getUser();
+        var u=auth&&auth.data&&auth.data.user;
+        if(!u) return;
+        var pr=await db.from('profiles')
+          .select('email,full_name,address,contact_number,whatsapp_name,account_status,email_verified_at')
+          .eq('id',u.id).maybeSingle();
+        var p=pr&&pr.data;
+        if(!p) return;
+        var vals={
+          email:(p.email||u.email||'').trim(),
+          customerName:(p.full_name||u.user_metadata?.full_name||'').trim(),
+          contact:(p.contact_number||'').trim(),
+          address:(p.address||'').trim()
+        };
+        Object.keys(vals).forEach(function(id){
+          var el=document.getElementById(id);
+          if(el&&vals[id]){
+            el.value=vals[id];
+            el.readOnly=true;
+            el.classList.add('pepAccountFilled');
+          }
+        });
+      }catch(e){ console.warn('PEPMOSA checkout profile autofill',e); }
+    })();
 
     var gb=getGB()||{};
     var qr=gb.final_payment_qr_url||gb.payment_qr_url||gb.final_qr_url||gb.qr_url||gb.payment_qr||'';

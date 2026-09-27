@@ -324,7 +324,11 @@
         return;
       }
       const oid=orderId(),ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg',path=`orders/${gb.gb_number}/${oid}-${Date.now()}.${ext}`;
-      const up=await s.storage.from('payment-proofs').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
+      let up=await s.storage.from('payment-proofs').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
+      if(up.error){
+        try{await s.auth.refreshSession()}catch(_){}
+        up=await s.storage.from('payment-proofs').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
+      }
       if(up.error)throw new Error('Payment proof upload failed: '+up.error.message);
       const proof=s.storage.from('payment-proofs').getPublicUrl(path).data.publicUrl;
       const items=cart.map(i=>({product_id:itemProductId(i),variant_id:itemVariantId(i),product_name:itemName(i),strength:itemStrength(i)||null,qty:itemQty(i),unit_price:itemPrice(i),line_total:itemPrice(i)*itemQty(i)}));
@@ -333,6 +337,7 @@
         p_total:total,p_shipping_method:shippingMethod,p_shipping_fee:shippingFee,p_payment_proof_url:proof,p_items:items
       });
       if(submitted.error)throw new Error(submitted.error.message||'Order could not be submitted.');
+      if(!submitted.data)throw new Error('The order server did not return a confirmation. Please try again.');
       localStorage.setItem('pepmosa_last_order_id',oid);localStorage.setItem('pepmosa_customer_email',email);localStorage.setItem('pepmosa_customer_name',name);localStorage.setItem('pepmosa_phone',contact);
       // Clear both in-memory and persisted cart state only AFTER the order RPC succeeds.
       clearPersistedCart();
@@ -358,7 +363,9 @@
       if(soldOut){
         showSoldOutAndRefresh('Sorry! Another customer secured the last remaining vial first. This variant is now SOLD OUT. Refreshing the shop…');
       }else{
-        msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(errorText)+'<br><small>Your cart has not been cleared.</small></div>';
+        msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(errorText)+'<br><small>Your cart has not been cleared. Please try SUBMIT ORDER again.</small></div>';
+        msg.scrollIntoView({behavior:'smooth',block:'center'});
+        if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Order was not submitted: '+errorText);
       }
     }finally{btn.disabled=false;btn.textContent='SUBMIT MY ORDER'}
   }

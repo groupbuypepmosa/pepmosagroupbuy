@@ -263,7 +263,26 @@
     $('pepOrderProof')?.addEventListener('change',function(){const f=this.files?.[0],n=$('pepFileName');if(f){n.textContent='✓ '+f.name;n.classList.add('show')}else{n.textContent='';n.classList.remove('show')}});
     $('pepShippingMethod')?.addEventListener('change',updateTotals);$('pepPlaceOrder').onclick=submitOrder;$('pepCancelOrder').onclick=closeCheckout;updateTotals();
   }
-  function updateTotals(){
+
+  /* Success popup design override — design only */
+  const polish=document.createElement('style');
+  polish.id='pep-success-popup-design-only';
+  polish.textContent=`
+  #pepInfoModal{background:rgba(43,25,38,.34)!important;backdrop-filter:blur(4px)!important;padding:16px!important}
+  #pepInfoModal>.pepSuccessCard,.pepSuccessCard{width:min(410px,calc(100vw - 30px))!important;padding:29px 28px 24px!important;border-radius:28px!important;border:1px solid #efd8e6!important;background:linear-gradient(155deg,#fff 0%,#fffafd 58%,#fff3fa 100%)!important;box-shadow:0 24px 65px rgba(45,22,39,.24)!important}
+  .pepSuccessCard:before{right:-75px!important;top:-75px!important;width:175px!important;height:175px!important;background:rgba(239,120,183,.10)!important;filter:none!important}
+  .pepSuccessIcon{width:68px!important;height:68px!important;margin:0 auto 11px!important;box-shadow:0 10px 24px rgba(211,43,143,.20)!important}
+  .pepSuccessIcon span{font-size:38px!important}
+  .pepSuccessBrand{font-size:9px!important;letter-spacing:3.2px!important;margin-bottom:6px!important}
+  .pepSuccessTitle{font-size:27px!important;letter-spacing:-.55px!important;margin-bottom:8px!important}
+  .pepSuccessOrder{padding:6px 12px!important;font-size:10px!important;margin-bottom:15px!important;border:1px solid #f3dce8!important}
+  .pepSuccessText{max-width:330px!important;margin-bottom:15px!important;font-size:12px!important;line-height:1.6!important}
+  .pepSuccessNote{max-width:330px!important;margin-bottom:20px!important;padding:11px 12px!important;border-radius:13px!important;font-size:10px!important;line-height:1.5!important;background:#fff4fa!important}
+  .pepSuccessNote>span:first-child{width:18px!important;height:18px!important;font-size:10px!important}
+  .pepSuccessDone{min-height:47px!important;border-radius:14px!important;font-size:12px!important;box-shadow:0 9px 22px rgba(205,44,139,.18)!important}
+  @media(max-width:520px){#pepInfoModal{padding:10px!important}.pepSuccessCard{width:min(390px,calc(100vw - 20px))!important;padding:25px 17px 20px!important;border-radius:23px!important}.pepSuccessIcon{width:62px!important;height:62px!important}.pepSuccessIcon span{font-size:35px!important}.pepSuccessTitle{font-size:24px!important}.pepSuccessText,.pepSuccessNote{max-width:100%!important}}
+  `;
+  document.head.appendChild(polish);  function updateTotals(){
     const {subtotal}=totals();const i=Number($('pepShippingMethod')?.value||0),fee=[100,150,180,0][i]??100;
     if($('pepShippingFee'))$('pepShippingFee').textContent=fee?peso(fee):'APP RATE';
     if($('pepGrandTotal'))$('pepGrandTotal').textContent=fee?peso(subtotal+fee):peso(subtotal);

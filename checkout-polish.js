@@ -30,12 +30,19 @@
     }catch(e){return[]}
   }
   function clearPersistedCart(){
+    // Clear the completed order from the shared cart and immediately notify
+    // the storefront. Do not call window.clearCart() here because that opens
+    // the cart modal and starts a second sync cycle.
     window.cart=[];
-    try{localStorage.removeItem(CART_KEY);localStorage.removeItem(CART_GB_KEY)}catch(e){}
-    if(typeof window.clearCart==='function'){try{window.clearCart()}catch(e){}}
+    try{
+      localStorage.removeItem(CART_KEY);
+      localStorage.removeItem(CART_GB_KEY);
+    }catch(e){}
     ['cartCount','cart-count'].forEach(id=>{const el=$(id);if(el)el.textContent='0'});
     document.querySelectorAll('[data-cart-count]').forEach(el=>el.textContent='0');
     if(typeof window.updateCart==='function'){try{window.updateCart()}catch(e){}}
+    if(typeof window.pepSyncCartBadge==='function'){try{window.pepSyncCartBadge()}catch(e){}}
+    window.dispatchEvent(new Event('pepmosa-cart-updated'));
   }
   function getCart(){
     const raw=getCartRaw(),gb=getGB(),gbn=String(gb?.gb_number||'');

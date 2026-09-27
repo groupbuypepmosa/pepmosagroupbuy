@@ -2687,17 +2687,120 @@ load();
     return new Promise(resolve=>{
       const old=document.getElementById('pepAdminFeeModal');if(old)old.remove();
       const wrap=document.createElement('div');wrap.id='pepAdminFeeModal';
-      wrap.style.cssText='position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(45,22,39,.58);backdrop-filter:blur(8px)';
-      const qr=gb?.admin_fee_qr_url?'<img src="'+String(gb.admin_fee_qr_url).replace(/"/g,'&quot;')+'" alt="Admin Fee QR" style="width:min(260px,78vw);height:auto;max-height:260px;object-fit:contain;background:#fff;padding:8px;border-radius:18px;box-shadow:0 10px 28px rgba(70,30,55,.12)">':'<div style="padding:20px;border-radius:15px;background:#fff4f9;color:#8a5a72;font-size:12px">Admin Fee QR is not available yet. Please contact PEPMOSA for payment instructions.</div>';
-      wrap.innerHTML='<div style="width:min(460px,100%);max-height:92vh;overflow:auto;border-radius:26px;background:linear-gradient(145deg,#fff,#fff7fb);border:1px solid #efcfe0;box-shadow:0 28px 90px rgba(45,18,40,.30);padding:25px;text-align:center;color:#3d2936"><div style="font-size:10px;letter-spacing:.18em;font-weight:950;color:#c72f80">PEPMOSA GROUP BUY</div><h2 style="margin:7px 0 5px;font-size:27px">Admin Fee Required ♡</h2><p style="margin:0 auto 16px;color:#806b77;font-size:12px;line-height:1.55">Pay the Admin Fee for <b>'+esc(gb?.customer_facing_name||gb?.gb_number||'this Group Buy')+'</b> first. Your cart will stay saved.</p><div style="font-size:22px;font-weight:950;color:#c52e80;margin-bottom:15px">₱'+Number(gb?.admin_fee||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'+qr+'<div style="text-align:left;margin-top:16px"><label style="display:block;font-size:10px;font-weight:950;letter-spacing:.06em;margin-bottom:6px">PAYMENT PROOF <span style="color:#c52e80">REQUIRED</span></label><input id="pepAdminFeeProof" type="file" accept="image/*,.pdf" style="width:100%;box-sizing:border-box;padding:11px;border:1px dashed #e4b6d0;border-radius:13px;background:#fff8fc"><div style="margin-top:6px;font-size:10px;color:#8a7380">Upload your receipt/screenshot • JPG, PNG, WEBP or PDF • Max 5MB</div></div><div style="text-align:left;margin-top:14px"><label style="display:block;font-size:10px;font-weight:950;letter-spacing:.06em;margin-bottom:6px">PAYMENT REFERENCE</label><input id="pepAdminFeeRef" type="text" placeholder="Enter transaction/reference number" style="width:100%;box-sizing:border-box;padding:13px;border:1px solid #e5d2df;border-radius:13px;outline:none"></div><div id="pepAdminFeeMsg" style="margin-top:10px;font-size:11px;color:#9a6a7f;min-height:16px"></div><div style="display:flex;gap:8px;margin-top:16px"><button id="pepAdminFeeCancel" type="button" style="flex:1;padding:13px;border-radius:13px;border:1px solid #e3d2dd;background:#fff;color:#674d59;font-weight:900">CANCEL</button><button id="pepAdminFeeSubmit" type="button" style="flex:1;padding:13px;border-radius:13px;border:0;background:linear-gradient(135deg,#e72c8d,#bb46b7);color:#fff;font-weight:900">I PAID — SUBMIT</button></div></div>';
+      wrap.innerHTML=`
+        <style>
+          #pepAdminFeeModal{
+            position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;
+            padding:18px;background:rgba(48,27,45,.66);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+            animation:pepFeeFade .2s ease;
+          }
+          #pepAdminFeeModal .pepFeeCard{
+            width:min(500px,100%);max-height:min(94vh,820px);overflow:auto;position:relative;
+            box-sizing:border-box;padding:30px 28px 24px;text-align:center;color:#3d2936;
+            border:1px solid rgba(232,78,154,.28);border-radius:32px;
+            background:
+              radial-gradient(circle at 8% 7%,rgba(255,170,211,.22),transparent 22%),
+              radial-gradient(circle at 94% 18%,rgba(212,153,255,.16),transparent 24%),
+              linear-gradient(145deg,#fff 0%,#fff9fc 52%,#fff0f8 100%);
+            box-shadow:0 32px 100px rgba(43,18,38,.38),inset 0 1px 0 rgba(255,255,255,.95);
+            animation:pepFeePop .3s cubic-bezier(.2,.8,.2,1);
+          }
+          #pepAdminFeeModal .pepFeeCard:before,
+          #pepAdminFeeModal .pepFeeCard:after{
+            content:'♡';position:absolute;pointer-events:none;color:#ed8fbd;opacity:.16;font-size:86px;line-height:1;
+          }
+          #pepAdminFeeModal .pepFeeCard:before{left:-10px;bottom:92px;transform:rotate(-14deg)}
+          #pepAdminFeeModal .pepFeeCard:after{right:-12px;top:145px;transform:rotate(16deg)}
+          #pepAdminFeeModal .pepFeeClose{
+            position:absolute;right:16px;top:14px;width:40px;height:40px;border-radius:50%;
+            border:1px solid #efc3da;background:rgba(255,255,255,.86);color:#c92b82;
+            font-size:24px;line-height:1;cursor:pointer;box-shadow:0 6px 18px rgba(198,45,126,.10);
+          }
+          #pepAdminFeeModal .pepFeeSpark{position:absolute;color:#f2a2c9;font-size:24px;opacity:.65;pointer-events:none}
+          #pepAdminFeeModal .pepFeeSpark.s1{left:25px;top:25px}
+          #pepAdminFeeModal .pepFeeSpark.s2{right:42px;bottom:150px}
+          #pepAdminFeeModal .pepFeeEyebrow{font-size:10px;letter-spacing:.2em;font-weight:950;color:#cf2d83}
+          #pepAdminFeeModal .pepFeeTitle{margin:8px 35px 6px;font-size:30px;line-height:1.05;font-weight:950;letter-spacing:-.7px;color:#422c3b}
+          #pepAdminFeeModal .pepFeeTitle span{color:#d62984}
+          #pepAdminFeeModal .pepFeeSub{margin:0 auto 15px;max-width:390px;color:#846f7c;font-size:12px;line-height:1.6}
+          #pepAdminFeeModal .pepFeeAmount{
+            display:inline-flex;align-items:center;justify-content:center;gap:10px;
+            min-width:145px;padding:9px 22px;margin:0 auto 17px;border-radius:999px;
+            background:linear-gradient(135deg,#fff,#ffeaf5);border:1px solid #f4c4dc;
+            box-shadow:0 8px 22px rgba(209,43,130,.10),inset 0 1px 0 #fff;
+            color:#d12682;font-size:24px;font-weight:1000;
+          }
+          #pepAdminFeeModal .pepFeeAmount i{font-style:normal;font-size:15px;color:#f09bc3}
+          #pepAdminFeeModal .pepFeeQr{
+            display:flex;align-items:center;justify-content:center;position:relative;
+            width:min(290px,82vw);margin:0 auto 19px;padding:18px;box-sizing:border-box;
+            border-radius:26px;background:rgba(255,255,255,.84);border:1px solid #f0d7e4;
+            box-shadow:0 16px 38px rgba(103,42,76,.10),inset 0 1px 0 #fff;
+          }
+          #pepAdminFeeModal .pepFeeQr:before{content:'♡';position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:28px;height:28px;border-radius:50%;background:#fff0f7;color:#df3a91;display:grid;place-items:center;font-size:17px}
+          #pepAdminFeeModal .pepFeeQr img{display:block;width:100%;max-width:250px;max-height:250px;height:auto;object-fit:contain;background:#fff;padding:7px;border-radius:18px}
+          #pepAdminFeeModal .pepFeeMissingQr{padding:22px;border-radius:18px;background:#fff3f8;color:#8a5a72;font-size:12px;line-height:1.5}
+          #pepAdminFeeModal .pepFeeUpload{
+            text-align:left;padding:15px;border:1px solid #f0d7e4;border-radius:22px;background:rgba(255,255,255,.72);
+            box-shadow:0 8px 22px rgba(112,53,84,.05);
+          }
+          #pepAdminFeeModal .pepFeeLabel{display:flex;align-items:center;gap:7px;margin-bottom:8px;font-size:10px;letter-spacing:.08em;font-weight:950;color:#4b3441}
+          #pepAdminFeeModal .pepFeeLabel b{color:#d12b82}
+          #pepAdminFeeModal .pepFeeFile{
+            width:100%;box-sizing:border-box;padding:10px;border:1px dashed #e9a9ca;border-radius:15px;background:#fff8fc;
+            color:#765d6a;font-size:12px;
+          }
+          #pepAdminFeeModal .pepFeeHint{margin-top:7px;font-size:9px;line-height:1.45;color:#917b87}
+          #pepAdminFeeModal .pepFeeMsg{margin-top:9px;min-height:16px;font-size:11px;color:#bd397c;font-weight:700}
+          #pepAdminFeeModal .pepFeeActions{display:flex;gap:9px;margin-top:13px}
+          #pepAdminFeeModal .pepFeeBtn{
+            flex:1;padding:14px 12px;border-radius:15px;font-weight:950;font-size:13px;cursor:pointer;
+            transition:transform .15s ease,box-shadow .15s ease;
+          }
+          #pepAdminFeeModal .pepFeeBtn:hover{transform:translateY(-1px)}
+          #pepAdminFeeModal .pepFeeCancel{border:1px solid #e6d3de;background:#fff;color:#654c59;box-shadow:0 5px 14px rgba(85,48,68,.05)}
+          #pepAdminFeeModal .pepFeeSubmit{border:0;background:linear-gradient(135deg,#e72c8d,#bf39a9);color:#fff;box-shadow:0 9px 22px rgba(202,42,132,.25)}
+          @keyframes pepFeeFade{from{opacity:0}to{opacity:1}}
+          @keyframes pepFeePop{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+          @media(max-width:520px){
+            #pepAdminFeeModal{padding:10px}
+            #pepAdminFeeModal .pepFeeCard{padding:26px 16px 18px;border-radius:27px;max-height:96vh}
+            #pepAdminFeeModal .pepFeeTitle{font-size:26px}
+            #pepAdminFeeModal .pepFeeQr{width:min(270px,84vw);padding:14px}
+            #pepAdminFeeModal .pepFeeActions{gap:7px}
+            #pepAdminFeeModal .pepFeeBtn{font-size:12px;padding:13px 8px}
+          }
+        </style>
+        <div class="pepFeeCard">
+          <button class="pepFeeClose" id="pepAdminFeeClose" type="button" aria-label="Close">×</button>
+          <span class="pepFeeSpark s1">✦</span><span class="pepFeeSpark s2">✦</span>
+          <div class="pepFeeEyebrow">PEPMOSA GROUP BUY</div>
+          <h2 class="pepFeeTitle">Admin Fee <span>Required</span> ♡</h2>
+          <p class="pepFeeSub">Pay the Admin Fee for <b>${esc(gb?.customer_facing_name||gb?.gb_number||'this Group Buy')}</b> first. Your cart will stay saved.</p>
+          <div class="pepFeeAmount"><i>♥</i> ₱${Number(gb?.admin_fee||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})} <i>♥</i></div>
+          <div class="pepFeeQr">${gb?.admin_fee_qr_url
+            ? '<img src="'+String(gb.admin_fee_qr_url).replace(/"/g,'&quot;')+'" alt="Admin Fee QR">'
+            : '<div class="pepFeeMissingQr">Admin Fee QR is not available yet.<br>Please contact PEPMOSA for payment instructions.</div>'}
+          </div>
+          <div class="pepFeeUpload">
+            <label class="pepFeeLabel">▣ PAYMENT PROOF <b>REQUIRED</b></label>
+            <input id="pepAdminFeeProof" class="pepFeeFile" type="file" accept="image/*,.pdf">
+            <div class="pepFeeHint">Upload your receipt or payment screenshot • JPG, PNG, WEBP or PDF • Max 5MB</div>
+          </div>
+          <div id="pepAdminFeeMsg" class="pepFeeMsg"></div>
+          <div class="pepFeeActions">
+            <button id="pepAdminFeeCancel" class="pepFeeBtn pepFeeCancel" type="button">CANCEL</button>
+            <button id="pepAdminFeeSubmit" class="pepFeeBtn pepFeeSubmit" type="button">✦ I PAID — SUBMIT ✦</button>
+          </div>
+        </div>`;
       document.body.appendChild(wrap);
       const close=()=>{wrap.remove();resolve(false)};
       wrap.querySelector('#pepAdminFeeCancel').onclick=close;
+      wrap.querySelector('#pepAdminFeeClose').onclick=close;
       wrap.querySelector('#pepAdminFeeSubmit').onclick=async()=>{
-        const ref=wrap.querySelector('#pepAdminFeeRef').value.trim(),file=wrap.querySelector('#pepAdminFeeProof')?.files?.[0],msg=wrap.querySelector('#pepAdminFeeMsg'),btn=wrap.querySelector('#pepAdminFeeSubmit');
+        const file=wrap.querySelector('#pepAdminFeeProof')?.files?.[0],msg=wrap.querySelector('#pepAdminFeeMsg'),btn=wrap.querySelector('#pepAdminFeeSubmit');
         if(!file){msg.textContent='Upload your payment proof first.';return}
         if(file.size>5*1024*1024){msg.textContent='Payment proof must be 5MB or smaller.';return}
-        if(!ref){msg.textContent='Enter your payment reference first.';return}
         btn.disabled=true;btn.textContent='UPLOADING…';
         try{
           const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
@@ -2715,12 +2818,12 @@ load();
             }
           }catch(_){}
           btn.textContent='SUBMITTING…';
-          const ins=await window.sb.from('admin_fee_payments').insert({gb_number:gb.gb_number,email,full_name:details.full_name,phone:details.phone,whatsapp_name:details.whatsapp_name,amount:Number(gb.admin_fee||0),payment_reference:ref,payment_proof_url:proofUrl,status:'SUBMITTED'}).select('id').maybeSingle();
+          const ins=await window.sb.from('admin_fee_payments').insert({gb_number:gb.gb_number,email,full_name:details.full_name,phone:details.phone,whatsapp_name:details.whatsapp_name,amount:Number(gb.admin_fee||0),payment_proof_url:proofUrl,status:'SUBMITTED'}).select('id').maybeSingle();
           if(ins.error)throw ins.error;
           wrap.remove();
           if(window.pepmosaPopup)window.pepmosaPopup('Admin Fee payment submitted.\n\nPayment proof uploaded successfully. Please wait for PEPMOSA admin approval. Your cart is saved.');
           resolve(false);
-        }catch(e){console.error('ADMIN FEE PROOF',e);msg.textContent=e?.message||'Unable to submit Admin Fee payment.';btn.disabled=false;btn.textContent='I PAID — SUBMIT'}
+        }catch(e){console.error('ADMIN FEE PROOF',e);msg.textContent=e?.message||'Unable to submit Admin Fee payment.';btn.disabled=false;btn.textContent='✦ I PAID — SUBMIT ✦'}
       };
     });
   }

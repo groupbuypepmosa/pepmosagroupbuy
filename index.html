@@ -2293,133 +2293,37 @@ main.wrap>.hero .heroLogo img{
      CHECKOUT MODAL
      ======================================================= -->
 
-<div
-  id="checkoutModal"
-  class="modal"
->
-
-
+<div id="checkoutModal" class="modal pepCheckoutFallback">
   <div class="modalbox">
-
-
-    <h2>
-      Checkout
-    </h2>
-
-
-    <div
-      id="checkoutMsg"
-      class="muted"
-    ></div>
-
-
-    <div class="formGrid">
-
-
-      <div class="field">
-
-        <label>
-          Email
-        </label>
-
-        <input
-          id="email"
-          type="email"
-          required
-        >
-
-      </div>
-
-
-
-      <div class="field">
-
-        <label>
-          Customer Name
-        </label>
-
-        <input
-          id="customerName"
-        >
-
-      </div>
-
-
-
-      <div class="field">
-
-        <label>
-          Contact
-        </label>
-
-        <input
-          id="contact"
-        >
-
-      </div>
-
-
-
-      <div class="field">
-
-        <label>
-          Shipping Method
-        </label>
-
-        <input
-          id="shippingMethod"
-          placeholder="e.g. J&T"
-        >
-
-      </div>
-
-
-
-      <div class="field full">
-
-        <label>
-          Delivery Address
-        </label>
-
-        <textarea
-          id="address"
-        ></textarea>
-
-      </div>
-
-
+    <div class="pepStaticHead">
+      <div class="pepStaticKicker">PEPMOSA GROUP BUY ♡</div>
+      <div class="pepStaticTitleRow"><div><h2>Checkout</h2><p>Review your order, complete your delivery details, and submit your payment proof.</p></div><span>♡</span></div>
+      <div class="pepStaticSteps"><b>1&nbsp; REVIEW</b><i></i><b>2&nbsp; PAY</b><i></i><b>3&nbsp; SUBMIT</b></div>
     </div>
-
-
-
-    <div class="actions">
-
-
-      <button
-        class="btn primary"
-        onclick="placeOrder()"
-      >
-        SUBMIT ORDER
-      </button>
-
-
-      <button
-        class="btn secondary"
-        onclick="closeModal('checkoutModal')"
-      >
-        CANCEL
-      </button>
-
-
+    <div class="pepStaticBody">
+      <div id="checkoutMsg" class="muted"></div>
+      <section class="pepStaticCard"><div class="pepStaticLabel">YOUR ORDER</div><div id="pepStaticOrder"><div class="pepStaticEmpty">Your selected items will appear here.</div></div></section>
+      <section class="pepStaticCard"><div class="pepStaticLabel">ORDER TOTAL</div><div class="pepStaticRows"><div><span>Products</span><b id="pepStaticProducts">₱0.00</b></div><div><span>Shipping</span><b id="pepStaticShipping">₱0.00</b></div><strong><span>TOTAL</span><em id="pepStaticTotal">₱0.00</em></strong></div></section>
+      <section class="pepStaticCard"><div class="pepStaticLabel">PAYMENT QR</div><div class="pepStaticPay"><div class="pepStaticQR" id="pepStaticQR">QR</div><div><h3>Pay your order</h3><p>Complete payment using the QR code, then upload your payment proof.</p><div class="pepStaticNote">♡ Make sure the amount paid matches your order total.</div></div></div></section>
+      <section class="pepStaticCard"><div class="pepStaticLabel">DELIVERY DETAILS <small>SAVED ACCOUNT</small></div>
+        <div class="pepStaticFields">
+          <label>Email<input id="email" type="email"></label><label>Customer Name<input id="customerName"></label>
+          <label>Contact<input id="contact"></label><label>Shipping Method<input id="shippingMethod" placeholder="e.g. J&T"></label>
+          <label class="full">Delivery Address<textarea id="address"></textarea></label>
+        </div>
+      </section>
+      <section class="pepStaticCard"><div class="pepStaticLabel">PAYMENT PROOF <small>REQUIRED</small></div><div class="pepStaticUpload"><span>↑</span><div><b>Upload your payment receipt</b><small>JPG, PNG, WEBP or PDF • Max 5MB</small></div><input id="pepOrderProof" type="file" accept="image/*,.pdf"></div></section>
+      <div class="pepStaticActions"><button class="btn primary pepStaticSubmit" onclick="placeOrder()">SUBMIT ORDER&nbsp; →</button><button class="btn secondary" onclick="closeModal('checkoutModal')">CANCEL</button></div>
     </div>
-
-
   </div>
-
 </div>
 
-
-
+<style id="pep-static-checkout-style">
+#checkoutModal.pepCheckoutFallback{padding:12px!important;background:rgba(47,22,41,.66)!important;backdrop-filter:blur(10px)!important}
+#checkoutModal.pepCheckoutFallback .modalbox{width:min(900px,100%)!important;max-height:94vh!important;overflow:auto!important;padding:0!important;border-radius:30px!important;border:1px solid #f0cddd!important;background:#fff9fc!important;box-shadow:0 30px 90px rgba(48,18,42,.35)!important}
+.pepStaticHead{padding:27px 30px 22px;background:linear-gradient(135deg,#ffe8f4,#fff9fc 57%,#f5edff);border-bottom:1px solid #efd5e3;position:relative;overflow:hidden}
+.pepStaticKicker{font-size:9px;letter-spacing:.21em;font-weight:950;color:#ce2b82}.pepStaticTitleRow{display:flex;justify-content:space-between;align-items:center}.pepStaticTitleRow h2{margin:5px 0 3px;font-size:35px;line-height:1;color:#35242f;letter-spacing:-1px}.pepStaticTitleRow p{margin:0;color:#806d77;font-size:11px}.pepStaticTitleRow>span{font:88px/1 Georgia;color:#df79b1;opacity:.22;margin-right:5px}.pepStaticSteps{display:flex;align-items:center;gap:8px;margin-top:17px;max-width:500px}.pepStaticSteps b{font-size:8px;letter-spacing:.08em;color:#a26d87}.pepStaticSteps b:first-child{color:#c72b80}.pepStaticSteps i{height:1px;background:#e7d2df;flex:1}.pepStaticBody{padding:20px 30px 28px}.pepStaticCard{border:1px solid #efd9e5;border-radius:20px;background:#fffafd;padding:16px;margin-bottom:12px;box-shadow:0 7px 22px rgba(87,35,67,.04)}.pepStaticLabel{font-size:9px;letter-spacing:.16em;font-weight:950;color:#a63c75;margin-bottom:11px}.pepStaticLabel small{float:right;font-size:7px;letter-spacing:.05em;color:#ae95a2}.pepStaticEmpty{padding:14px;border-radius:13px;background:#fff;border:1px solid #f0e2e9;color:#9a8590;font-size:11px}.pepStaticRows{display:grid;gap:8px;font-size:11px;color:#77656e}.pepStaticRows>div,.pepStaticRows>strong{display:flex;justify-content:space-between}.pepStaticRows strong{border-top:1px solid #ead6e1;margin-top:5px;padding-top:13px;font-size:18px;color:#34242e}.pepStaticRows em{font-style:normal;color:#c4267b}.pepStaticPay{display:grid;grid-template-columns:175px 1fr;gap:20px;align-items:center}.pepStaticQR{height:155px;border-radius:18px;background:#fff;border:1px solid #ecdce5;display:grid;place-items:center;color:#c72b80;font-weight:900}.pepStaticPay h3{margin:0 0 5px;color:#3a2932}.pepStaticPay p{margin:0 0 10px;color:#826d78;font-size:11px}.pepStaticNote{background:#ffedf7;color:#a14475;border-radius:11px;padding:9px;font-size:9px}.pepStaticFields{display:grid;grid-template-columns:1fr 1fr;gap:11px}.pepStaticFields label{font-size:9px;font-weight:900;color:#5b4652}.pepStaticFields .full{grid-column:1/-1}.pepStaticFields input,.pepStaticFields textarea{display:block;width:100%;box-sizing:border-box;margin-top:5px;min-height:45px;border:1px solid #e6d2de;border-radius:13px;background:#fff;padding:10px 12px;font:inherit;color:#3d2c35}.pepStaticFields textarea{min-height:75px;resize:vertical}.pepStaticUpload{display:flex;align-items:center;gap:12px;padding:14px;border:1.5px dashed #db91ba;border-radius:15px;background:#fff5fa}.pepStaticUpload>span{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#f5bddd,#dfc6ef);color:#a72b77;font-size:21px}.pepStaticUpload div{flex:1}.pepStaticUpload b,.pepStaticUpload small{display:block}.pepStaticUpload b{font-size:11px}.pepStaticUpload small{font-size:8px;color:#927b86;margin-top:3px}.pepStaticUpload input{max-width:210px}.pepStaticActions{display:flex;gap:9px;margin-top:16px}.pepStaticSubmit{min-height:50px;border-radius:15px!important;background:linear-gradient(135deg,#e92d91,#bd3ead)!important;color:#fff!important;border:0!important;box-shadow:0 10px 24px rgba(203,43,137,.22)!important}.pepStaticActions .btn.secondary{min-height:50px;border-radius:15px!important}@media(max-width:650px){.pepStaticHead{padding:23px 18px 20px}.pepStaticBody{padding:16px}.pepStaticTitleRow h2{font-size:31px}.pepStaticTitleRow>span{font-size:62px}.pepStaticPay{grid-template-columns:1fr}.pepStaticQR{width:180px;margin:auto}.pepStaticFields{grid-template-columns:1fr}.pepStaticFields .full{grid-column:auto}.pepStaticUpload{flex-wrap:wrap}.pepStaticUpload input{max-width:100%;width:100%}}
+</style>
 <!-- =======================================================
      SUPABASE
      ======================================================= -->

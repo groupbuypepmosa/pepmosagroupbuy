@@ -113,6 +113,7 @@
   function itemPrice(i){return Number(i.unit_price??i.price??0)}
   function itemProductId(i){return i.product_id||i.productId||null}
   function itemVariantId(i){return i.variant_id||i.variantId||null}
+  async function getShippingStatus(gb,email){const s=S();if(!s||!gb||!email)return{paid:false,method:'',fee:0};try{const r=await s.from('orders').select('shipping_method,shipping_fee').eq('gb_number',gb.gb_number).eq('email',email.toLowerCase()).order('created_at',{ascending:true}).limit(1).maybeSingle();if(r.error||!r.data)return{paid:false,method:'',fee:0};return{paid:true,method:r.data.shipping_method||'',fee:Number(r.data.shipping_fee||0)}}catch(e){return{paid:false,method:'',fee:0}}}
   function totals(){const cart=getCart();return{cart,subtotal:cart.reduce((s,i)=>s+itemPrice(i)*itemQty(i),0)}}
   function orderId(){const gb=getGB();const n=(gb?.gb_number||'GB').replace(/[^A-Za-z0-9-]/g,'');return n+'-ORD-'+Date.now().toString(36).toUpperCase()}
   function uuid(){try{return crypto.randomUUID()}catch(e){return'OI-'+Date.now()+'-'+Math.random().toString(36).slice(2)}}
@@ -199,9 +200,9 @@
   document.head.appendChild(s);
 }
 
-  function buildCheckout(){
+  async function buildCheckout(){
     const modal=$('checkoutModal'),box=modal?.querySelector('.modalbox'),{cart,subtotal}=totals();if(!modal||!box||!cart.length)return;
-    const gb=getGB(),qr=gb?.final_payment_qr_url||'',adminFee=Number(gb?.admin_fee||0),customer=checkoutCustomer||{},email=customer.email||'',gbName=gb?.customer_facing_name||gb?.gb_number||'PEPMOSA GROUP BUY';
+    const gb=getGB(),shippingState=await getShippingStatus(gb,(checkoutCustomer?.email||'').trim()),shippingAlreadyPaid=shippingState.paid,qr=gb?.final_payment_qr_url||'',adminFee=Number(gb?.admin_fee||0),customer=checkoutCustomer||{},email=customer.email||'',gbName=gb?.customer_facing_name||gb?.gb_number||'PEPMOSA GROUP BUY';
     const lines=cart.map(i=>`<div class="pepOrderLine"><div class="pepOrderInfo"><div class="pepProductName">${esc(itemName(i))}</div><small>${esc(itemStrength(i))}${itemStrength(i)?' • ':''}Qty ${itemQty(i)} × ${peso(itemPrice(i))}</small></div><div class="pepOrderAmount">${peso(itemPrice(i)*itemQty(i))}</div></div>`).join('');
     const qrBlock=qr?`<div class="pepFinalCard pepPaymentCard"><div class="pepFinalTitle"><span>PAYMENT</span><span class="pepLiveDot">SECURE PAYMENT</span></div><div class="pepQRWrap"><div class="pepQRFrame"><img src="${esc(qr)}" alt="PEPMOSA payment QR"></div><div class="pepQRText"><div class="pepPayLabel">SCAN TO PAY</div><h3>Complete your payment</h3><p>Scan the QR code, pay the exact order total, then upload your receipt below.</p><div class="pepQRNote">✓ Make sure the amount paid matches your final total.</div></div></div></div>`:`<div class="pepFinalCard pepPaymentCard"><div class="pepFinalTitle"><span>PAYMENT</span></div><div class="pepQRText"><h3>Payment QR unavailable</h3><p>Please contact PEPMOSA before submitting your order.</p></div></div>`;
     box.innerHTML=`<div class="pepFinalHead">
@@ -228,13 +229,8 @@
             <div class="pepReturningNote">♡ Your saved PEPMOSA account details are automatically used for this order.</div>
           </div>
           <div class="pepFinalCard">
-            <div class="pepFinalTitle"><span>SHIPPING METHOD</span><span class="optional">REQUIRED</span></div>
-            <select id="pepShippingMethod" class="pepShippingSelect">
-              <option value="0">J&amp;T Express — Luzon • ₱100</option>
-              <option value="1">J&amp;T Express — Visayas • ₱150</option>
-              <option value="2">J&amp;T Express — Mindanao • ₱180</option>
-              <option value="3">Lalamove — APP RATE</option>
-            </select>
+            <div class="pepFinalTitle"><span>SHIPPING METHOD</span><span class="optional">${shippingAlreadyPaid?'ALREADY PAID':'REQUIRED'}</span></div>
+            ${shippingAlreadyPaid ? '<div class="pepReturningNote">♡ Shipping was already paid on your first checkout for this Group Buy. No shipping fee will be added to this order.</div><select id="pepShippingMethod" class="pepShippingSelect" disabled><option value="4">Shipping already paid</option></select>' : '<select id="pepShippingMethod" class="pepShippingSelect"><option value="0">J&amp;T Express — Luzon • ₱100</option><option value="1">J&amp;T Express — Visayas • ₱150</option><option value="2">J&amp;T Express — Mindanao • ₱180</option><option value="3">Lalamove — APP RATE</option></select>'}
           </div>
           <div class="pepFinalCard">
             <div class="pepFinalTitle"><span>PAYMENT PROOF</span><span class="optional">REQUIRED</span></div>
@@ -248,9 +244,9 @@
             <div class="pepTotalRows">
               <div class="pepTotalRow"><span>Products</span><b>${peso(subtotal)}</b></div>
               <div class="pepTotalRow"><span>Admin fee <small>CHECKED ON SUBMIT</small></span><b>${peso(adminFee)}</b></div>
-              <div class="pepTotalRow"><span>Shipping</span><b id="pepShippingFee">₱100.00</b></div>
+              <div class="pepTotalRow"><span>Shipping</span><b id="pepShippingFee">${shippingAlreadyPaid?'₱0.00':'₱100.00'}</b></div>
             </div>
-            <div class="pepGrand"><span>Total to pay</span><strong id="pepGrandTotal">${peso(subtotal+100)}</strong></div>
+            <div class="pepGrand"><span>Total to pay</span><strong id="pepGrandTotal">${peso(subtotal+(shippingAlreadyPaid?0:100))}</strong></div>
             <div class="pepSummaryNote">♡ Your order total updates automatically when you change shipping.</div>
           </div>
           <button id="pepPlaceOrder" class="pepSubmit" type="button">SUBMIT MY ORDER <span>→</span></button>
@@ -263,7 +259,7 @@
     $('pepShippingMethod')?.addEventListener('change',updateTotals);$('pepPlaceOrder').onclick=submitOrder;$('pepCancelOrder').onclick=closeCheckout;updateTotals();
   }
   function updateTotals(){
-    const {subtotal}=totals();const i=Number($('pepShippingMethod')?.value||0),fee=[100,150,180,0][i]??100;
+    const {subtotal}=totals();const i=Number($('pepShippingMethod')?.value||0),fee=i===4?0:([100,150,180,0][i]??100);
     if($('pepShippingFee'))$('pepShippingFee').textContent=fee?peso(fee):'APP RATE';
     if($('pepGrandTotal'))$('pepGrandTotal').textContent=fee?peso(subtotal+fee):peso(subtotal);
   }
@@ -287,7 +283,7 @@
     if(!cleanCart.length){if(typeof window.openCart==='function')window.openCart();return}
     checkoutCustomer=await loadCheckoutCustomer();
     if(!checkoutCustomer?.email||!checkoutCustomer.customer_name||!checkoutCustomer.contact||!checkoutCustomer.address){if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Please complete your PEPMOSA account details before checkout.');else alert('Please complete your PEPMOSA account details before checkout.');return}
-    buildCheckout();$('checkoutModal')?.classList.add('open')
+    await buildCheckout();$('checkoutModal')?.classList.add('open')
   };
   /* Keep the storefront's existing order-submission flow.
      The redesign must not replace the proven atomic checkout RPC. */
@@ -313,8 +309,8 @@
       const address=(checkoutCustomer?.address||'').trim();
       const file=$('pepOrderProof')?.files?.[0]||null;
       const shipIndex=Number($('pepShippingMethod')?.value||0);
-      const shipNames=['J&T Express - Luzon','J&T Express - Visayas','J&T Express - Mindanao','Lalamove'];
-      const shipFees=[100,150,180,0];
+      const shipNames=['J&T Express - Luzon','J&T Express - Visayas','J&T Express - Mindanao','Lalamove','Shipping already paid'];
+      const shipFees=[100,150,180,0,0];
       const shippingMethod=shipNames[shipIndex]||'';
       const shippingFee=shipFees[shipIndex]||0;
       const total=subtotal+shippingFee;
@@ -385,17 +381,16 @@
       localStorage.setItem('pepmosa_customer_email',email);
       localStorage.setItem('pepmosa_customer_name',name);
       localStorage.setItem('pepmosa_phone',contact);
-      // Keep the persistent cart after a successful checkout and immediately refresh the UI/cloud copy.
-      // This prevents the cart badge/modal from looking empty until the page is refreshed.
+      // Clear submitted cart contents after success, while keeping the cart component available for the next order.
       try{
-        const remainingCart=getCartRaw();
-        window.cart=remainingCart;
-        localStorage.setItem(CART_KEY,JSON.stringify(remainingCart));
+        localStorage.setItem(CART_KEY,JSON.stringify([]));
+        localStorage.setItem(CART_GB_KEY,String(gb.gb_number||''));
+        window.cart=[];
         if(typeof window.updateCart==='function')window.updateCart();
         if(typeof window.pepSyncCartBadge==='function')window.pepSyncCartBadge();
         if(typeof window.pepCloudCart==='function')window.pepCloudCart('save');
         window.dispatchEvent(new Event('pepmosa-cart-updated'));
-      }catch(cartRefreshError){console.warn('PEPMOSA cart refresh after checkout',cartRefreshError)}
+      }catch(cartRefreshError){console.warn('PEPMOSA cart clear after checkout',cartRefreshError)}
       const cartModal=$('cartModal');
       if(cartModal)cartModal.classList.remove('show','open');
       closeCheckout();

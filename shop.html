@@ -1305,6 +1305,20 @@ letter-spacing:.16em;text-transform:uppercase;color:#806675;
   #checkoutModal .pepCheckoutTitle{font-size:25px}
 }
 </style>
+<style id="pep-shop-checkout-fix">
+/* Kill conflicting checkout-polish rules on the static checkout */
+#checkoutModal .pepSteps{display:flex!important;gap:8px!important;margin-top:18px!important}
+#checkoutModal .pepSteps .pepStep{display:block!important;flex:1!important;text-align:center!important;font-size:10px!important;font-weight:800!important;letter-spacing:0!important;padding:8px 5px!important;border-radius:999px!important;background:rgba(255,255,255,.2)!important;color:#fff!important}
+#checkoutModal .pepSteps .pepStep.active{background:#fff!important;color:#d23a8c!important}
+#checkoutModal .pepCheckoutBrand{display:block!important;font-size:12px!important;line-height:1.2!important;letter-spacing:2px!important;color:#fff!important;opacity:.92!important}
+#checkoutModal .pepCheckoutTitle{display:block!important;color:#fff!important;line-height:1.05!important}
+#checkoutModal .pepCheckoutSub{display:block!important;color:#fff!important}
+#checkoutModal #checkoutMsg{display:none!important}
+#checkoutModal .pepShippingWrap{margin-top:12px}
+#checkoutModal .pepShippingSelect{width:100%;box-sizing:border-box;border:1px solid #e7c8da;border-radius:12px;padding:11px 12px;background:#fff;color:#4d3442;font:inherit}
+#checkoutModal .pepSummarySmall{font-size:11px;color:#8a7180;margin-top:7px}
+#checkoutModal .pepQR img{display:block;margin:8px auto 0;width:155px;height:155px;object-fit:contain;background:#fff;border-radius:10px}
+</style>
 
 <div id="checkoutModal" class="modal">
   <div class="modalbox pepCheckoutBox">
@@ -1346,9 +1360,16 @@ letter-spacing:.16em;text-transform:uppercase;color:#806675;
             <label>Contact Number</label>
             <input id="contact">
           </div>
-          <div class="pepField">
+          <div class="pepField pepShippingWrap">
             <label>Shipping Method</label>
-            <input id="shippingMethod" placeholder="e.g. J&T / Lalamove">
+            <select id="pepShippingSelect" class="pepShippingSelect">
+              <option value="J&T Express — Luzon" data-fee="100">J&T Express — Luzon • ₱100</option>
+              <option value="J&T Express — Visayas" data-fee="150">J&T Express — Visayas • ₱150</option>
+              <option value="J&T Express — Mindanao" data-fee="180">J&T Express — Mindanao • ₱180</option>
+              <option value="Lalamove" data-fee="0">Lalamove • App Rate</option>
+            </select>
+            <input id="shippingMethod" type="hidden">
+            <div id="pepShippingNote" class="pepSummarySmall">Shipping fee: ₱100.00</div>
           </div>
           <div class="pepField">
             <label>Delivery Address</label>
@@ -1363,12 +1384,57 @@ letter-spacing:.16em;text-transform:uppercase;color:#806675;
 
           <div class="pepQR">
             <div style="font-weight:800;color:#9b2465;font-size:12px;margin-bottom:7px">PAYMENT QR</div>
-            <div id="pepShopQR"><span style="font-size:11px;color:#8a7180">Payment QR will appear here.</span></div>
+            <div id="pepShopQR"><span style="font-size:11px;color:#8a7180">Loading payment QR…</span></div>
           </div>
         </div>
       </div>
 
-      <div class="pepActions">
+      <script id="pep-static-checkout-runtime">
+(function(){
+  function money(v){return '₱'+Number(v||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function getGB(){return window.currentGB||window.pepmosaCurrentGB||null;}
+  function fillCheckout(){
+    var m=document.getElementById('checkoutModal');
+    if(!m) return;
+    var open=m.classList.contains('show')||m.classList.contains('open');
+    if(!open) return;
+    var cart=[];
+    try{cart=JSON.parse(localStorage.getItem('pepmosaCart')||'[]');}catch(e){cart=[];}
+    if(!Array.isArray(cart))cart=[];
+    var list=document.getElementById('pepShopOrderList');
+    var subtotal=cart.reduce(function(s,i){return s+Number(i.price??i.unit_price??0)*Number(i.qty??i.quantity??0)},0);
+    if(list&&cart.length){
+      list.innerHTML=cart.map(function(i){
+        var p=Number(i.price??i.unit_price??0),q=Number(i.qty??i.quantity??0);
+        return '<div class="pepOrderLine"><div><div class="pepOrderName">'+String(i.product_name||i.name||'Product').replace(/[&<>]/g,function(x){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[x]})+'</div><div class="pepOrderMeta">'+(String(i.strength||''))+' • ×'+q+'</div></div><div>'+money(p*q)+'</div></div>';
+      }).join('');
+    }
+    var sel=document.getElementById('pepShippingSelect');
+    var fee=Number(sel?.selectedOptions?.[0]?.dataset?.fee||100);
+    var sm=document.getElementById('shippingMethod');
+    if(sm)sm.value=sel?.value||'J&T Express — Luzon';
+    var note=document.getElementById('pepShippingNote'); if(note)note.textContent=fee?('Shipping fee: '+money(fee)):'Shipping fee: Lalamove app rate';
+    var total=document.getElementById('pepShopTotal'); if(total)total.textContent=money(subtotal+fee);
+    var st=document.getElementById('pepShopSubtotal'); if(st)st.textContent=money(subtotal);
+    var email=window.verifiedEmail||localStorage.getItem('pepmosa_verified_email')||'';
+    if(email&&document.getElementById('email'))document.getElementById('email').value=email;
+
+    var gb=getGB()||{};
+    var qr=gb.final_payment_qr_url||gb.payment_qr_url||gb.final_qr_url||gb.qr_url||gb.payment_qr||'';
+    var q=document.getElementById('pepShopQR');
+    if(q){
+      if(qr) q.innerHTML='<img src="'+String(qr).replace(/"/g,'&quot;')+'" alt="Payment QR">';
+      else q.innerHTML='<span style="font-size:11px;color:#8a7180">Payment QR is not configured for this Group Buy.</span>';
+    }
+  }
+  document.addEventListener('change',function(e){
+    if(e.target&&e.target.id==='pepShippingSelect')fillCheckout();
+  });
+  setInterval(fillCheckout,500);
+  window.pepRefreshStaticCheckout=fillCheckout;
+})();
+</script>
+<div class="pepActions">
         <button class="pepSubmit" onclick="placeOrder()">SUBMIT ORDER</button>
         <button class="pepCancel" onclick="closeModal('checkoutModal')">CANCEL</button>
       </div>

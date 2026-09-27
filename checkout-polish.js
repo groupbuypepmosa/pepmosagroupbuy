@@ -299,30 +299,58 @@
     try{
       if(!checkoutCustomer){ try{ checkoutCustomer=await loadCheckoutCustomer(); }catch(e){} }
       const {cart,subtotal}=totals(),gb=getGB(),s=S();
-      if(!s||!gb||!cart.length){if(msg)msg.innerHTML='<div class="pepFinalError">Your checkout session is not ready. Please refresh and try again.</div>';return}
-    const latest=await s.from('group_buys').select('gb_number,status').eq('gb_number',gb.gb_number).maybeSingle();
-    if(latest.error||!latest.data||!['OPEN','KIT_COMPLETION'].includes(latest.data.status)){msg.innerHTML='<div class="pepFinalError">This Group Buy is no longer open. Please refresh the page.</div>';return}
-    const email=(checkoutCustomer?.email||'').trim().toLowerCase(),name=(checkoutCustomer?.customer_name||'').trim(),contact=(checkoutCustomer?.contact||'').trim(),address=(checkoutCustomer?.address||'').trim();
-    const file=$('pepOrderProof')?.files?.[0]||null;
-    const shipIndex=Number($('pepShippingMethod')?.value||0),shipNames=['J&T Express - Luzon','J&T Express - Visayas','J&T Express - Mindanao','Lalamove'],shipFees=[100,150,180,0];
-    const shippingMethod=shipNames[shipIndex]||'';
-    const shippingFee=shipFees[shipIndex]||0,total=subtotal+shippingFee;
-    const missing=[];if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))missing.push('Account Email');if(!name)missing.push('Full Name');if(!contact)missing.push('Contact Number');if(!shippingMethod)missing.push('Shipping Method');if(!address)missing.push('Delivery Address')
-    if(!file)missing.push('Payment Proof');if(missing.length){msg.innerHTML='<div class="pepFinalError"><b>Please complete the following:</b> '+missing.join(' • ')+'</div>';return}if(file.size>5*1024*1024){msg.innerHTML='<div class="pepFinalError">Payment proof must be 5MB or smaller.</div>';return}
-    btn.disabled=true;btn.textContent='SUBMITTING…';msg.innerHTML='';
-      // Last-second inventory check: never submit a stale Kit Completion item.
+      if(!s||!gb||!cart.length){
+        if(msg)msg.innerHTML='<div class="pepFinalError">Your checkout session is not ready. Please refresh and try again.</div>';
+        return;
+      }
+      const latest=await s.from('group_buys').select('gb_number,status').eq('gb_number',gb.gb_number).maybeSingle();
+      if(latest.error||!latest.data||!['OPEN','KIT_COMPLETION'].includes(latest.data.status)){
+        if(msg)msg.innerHTML='<div class="pepFinalError">This Group Buy is no longer open. Please refresh the page.</div>';
+        return;
+      }
+      const email=(checkoutCustomer?.email||'').trim().toLowerCase();
+      const name=(checkoutCustomer?.customer_name||'').trim();
+      const contact=(checkoutCustomer?.contact||'').trim();
+      const address=(checkoutCustomer?.address||'').trim();
+      const file=$('pepOrderProof')?.files?.[0]||null;
+      const shipIndex=Number($('pepShippingMethod')?.value||0);
+      const shipNames=['J&T Express - Luzon','J&T Express - Visayas','J&T Express - Mindanao','Lalamove'];
+      const shipFees=[100,150,180,0];
+      const shippingMethod=shipNames[shipIndex]||'';
+      const shippingFee=shipFees[shipIndex]||0;
+      const total=subtotal+shippingFee;
+      const missing=[];
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))missing.push('Account Email');
+      if(!name)missing.push('Full Name');
+      if(!contact)missing.push('Contact Number');
+      if(!shippingMethod)missing.push('Shipping Method');
+      if(!address)missing.push('Delivery Address');
+      if(!file)missing.push('Payment Proof');
+      if(missing.length){
+        msg.innerHTML='<div class="pepFinalError"><b>Please complete the following:</b> '+missing.join(' • ')+'</div>';
+        return;
+      }
+      if(file.size>5*1024*1024){
+        msg.innerHTML='<div class="pepFinalError">Payment proof must be 5MB or smaller.</div>';
+        return;
+      }
+      btn.disabled=true;
+      btn.textContent='SUBMITTING…';
+      msg.innerHTML='';
       const cleaned=await sanitizeKitCart(cart,gb);
       if(cleaned.changed){
-        btn.disabled=false;btn.textContent='SUBMIT MY ORDER';
+        btn.disabled=false;
+        btn.textContent='SUBMIT MY ORDER';
         if(!cleaned.cart.length){
           showSoldOutAndRefresh('Sorry! The remaining vial was just secured by another customer. This variant is now SOLD OUT. Refreshing the shop…');
           return;
-        }else{
-          msg.innerHTML='<div class="pepFinalError"><b>Your cart was updated.</b><br>One or more items changed availability. Please review the updated cart and reopen Checkout before submitting payment.</div>';
         }
+        msg.innerHTML='<div class="pepFinalError"><b>Your cart was updated.</b><br>One or more items changed availability. Please review the updated cart and reopen Checkout before submitting payment.</div>';
         return;
       }
-      const oid=orderId(),ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg',path=`orders/${gb.gb_number}/${oid}-${Date.now()}.${ext}`;
+      const oid=orderId();
+      const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+      const path=`orders/${gb.gb_number}/${oid}-${Date.now()}.${ext}`;
       let up=await s.storage.from('payment-proofs').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
       if(up.error){
         try{await s.auth.refreshSession()}catch(_){}
@@ -330,17 +358,38 @@
       }
       if(up.error)throw new Error('Payment proof upload failed: '+up.error.message);
       const proof=s.storage.from('payment-proofs').getPublicUrl(path).data.publicUrl;
-      const items=cart.map(i=>({product_id:itemProductId(i),variant_id:itemVariantId(i),product_name:itemName(i),strength:itemStrength(i)||null,qty:itemQty(i),unit_price:itemPrice(i),line_total:itemPrice(i)*itemQty(i)}));
+      const items=cart.map(i=>({
+        product_id:itemProductId(i),
+        variant_id:itemVariantId(i),
+        product_name:itemName(i),
+        strength:itemStrength(i)||null,
+        qty:itemQty(i),
+        unit_price:itemPrice(i),
+        line_total:itemPrice(i)*itemQty(i)
+      }));
       const submitted=await s.rpc('submit_group_buy_order',{
-        p_order_id:oid,p_gb_number:gb.gb_number,p_email:email,p_customer_name:name,p_contact:contact,p_address:address,
-        p_total:total,p_shipping_method:shippingMethod,p_shipping_fee:shippingFee,p_payment_proof_url:proof,p_items:items
+        p_order_id:oid,
+        p_gb_number:gb.gb_number,
+        p_email:email,
+        p_customer_name:name,
+        p_contact:contact,
+        p_address:address,
+        p_total:total,
+        p_shipping_method:shippingMethod,
+        p_shipping_fee:shippingFee,
+        p_payment_proof_url:proof,
+        p_items:items
       });
       if(submitted.error)throw new Error(submitted.error.message||'Order could not be submitted.');
       if(!submitted.data)throw new Error('The order server did not return a confirmation. Please try again.');
-      localStorage.setItem('pepmosa_last_order_id',oid);localStorage.setItem('pepmosa_customer_email',email);localStorage.setItem('pepmosa_customer_name',name);localStorage.setItem('pepmosa_phone',contact);
-      // Clear both in-memory and persisted cart state only AFTER the order RPC succeeds.
+      localStorage.setItem('pepmosa_last_order_id',oid);
+      localStorage.setItem('pepmosa_customer_email',email);
+      localStorage.setItem('pepmosa_customer_name',name);
+      localStorage.setItem('pepmosa_phone',contact);
       clearPersistedCart();
-      const cartModal=$('cartModal');if(cartModal)cartModal.classList.remove('show','open');closeCheckout();
+      const cartModal=$('cartModal');
+      if(cartModal)cartModal.classList.remove('show','open');
+      closeCheckout();
       const info=$('pepInfoModal');
       if(info){
         info.innerHTML=`<div class="pepSuccessCard">
@@ -355,26 +404,23 @@
         info.classList.add('open');
         const done=$('pepInfoOk');
         if(done)done.onclick=()=>{info.classList.remove('open');info.setAttribute('aria-hidden','true')};
-      }else alert('Order submitted: '+oid)}catch(e){
+      }else alert('Order submitted: '+oid);
+    }catch(e){
       console.error('PEPMOSA CHECKOUT ERROR',e);
       const errorText=String(e?.message||'Please try again.');
       const soldOut=/no longer available|only .* vial\(s\) remain|remaining vial|sold out|kit completion quantity|inventory/i.test(errorText);
       if(soldOut){
         showSoldOutAndRefresh('Sorry! Another customer secured the last remaining vial first. This variant is now SOLD OUT. Refreshing the shop…');
       }else{
-        msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(errorText)+'<br><small>Your cart has not been cleared. Please try SUBMIT ORDER again.</small></div>';
-        msg.scrollIntoView({behavior:'smooth',block:'center'});
+        if(msg){
+          msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(errorText)+'<br><small>Your cart has not been cleared. Please try SUBMIT ORDER again.</small></div>';
+          msg.scrollIntoView({behavior:'smooth',block:'center'});
+        }
         if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Order was not submitted: '+errorText);
       }
-    }finally{btn.disabled=false;btn.textContent='SUBMIT MY ORDER'}
-    }catch(e){
-      console.error('PEPMOSA CHECKOUT ERROR',e);
-      const errorText=String(e?.message||'Please try again.');
-      if(msg){
-        msg.innerHTML='<div class="pepFinalError"><b>Order was not submitted.</b><br>'+esc(errorText)+'<br><small>Your cart has not been cleared. Please try SUBMIT ORDER again.</small></div>';
-        msg.scrollIntoView({behavior:'smooth',block:'center'});
-      }
-      if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Order was not submitted: '+errorText);
+    }finally{
+      btn.disabled=false;
+      btn.textContent='SUBMIT MY ORDER';
     }
   }
   async function repairStorefront(){const s=S();if(!s)return false;try{let gb=getGB();if(!gb){const r=await s.from('group_buys').select('*').in('status',['OPEN','KIT_COMPLETION']).order('created_at',{ascending:false}).limit(1).maybeSingle();if(r.error||!r.data)return false;gb=r.data;window.currentGB=gb;window.pepmosaCurrentGB=gb}const cr=await s.from('gb_categories').select('category_name').eq('gb_number',gb.gb_number);if(cr.error)throw cr.error;const categories=(cr.data||[]).map(x=>x.category_name).filter(Boolean);if(!categories.length){products=[];return true}const pr=await s.from('products').select('*').eq('active',true).in('category',categories).order('product_name');if(pr.error)throw pr.error;const base=pr.data||[],ids=base.map(p=>p.product_id).filter(Boolean);let variants=[];if(ids.length){const vr=await s.from('product_variants').select('*').in('product_id',ids).eq('active',true).order('price');if(vr.error)throw vr.error;variants=vr.data||[]}const mr=await s.from('gb_minimum_quantities').select('*').eq('gb_number',gb.gb_number);const mins=mr.error?[]:(mr.data||[]);

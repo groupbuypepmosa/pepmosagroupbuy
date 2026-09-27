@@ -243,7 +243,7 @@
     const s=S();
     if(!s||!gbNumber||!email)return {paid:false,index:0};
     try{
-      const {data,error}=await s.from('orders').select('shipping_method,shipping_fee').eq('gb_number',gbNumber).eq('email',email).eq('payment_status','PAID').gt('shipping_fee',0).order('created_at',{ascending:false}).limit(1).maybeSingle();
+      const {data,error}=await s.from('orders').select('shipping_method,shipping_fee,payment_status').eq('gb_number',gbNumber).eq('email',email).gt('shipping_fee',0).not('payment_status','in','("REJECTED","CANCELLED","CANCELED")').order('created_at',{ascending:false}).limit(1).maybeSingle();
       if(error||!data)return {paid:false,index:0};
       const method=String(data.shipping_method||'').toLowerCase();
       const index=method.includes('visayas')?1:method.includes('mindanao')?2:method.includes('lalamove')?3:0;

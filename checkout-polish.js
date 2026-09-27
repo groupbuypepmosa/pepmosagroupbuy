@@ -289,7 +289,9 @@
     checkoutCustomer=await loadCheckoutCustomer();
     if(!checkoutCustomer?.email||!checkoutCustomer.customer_name||!checkoutCustomer.contact||!checkoutCustomer.address){if(typeof window.pepmosaPopup==='function')window.pepmosaPopup('Please complete your PEPMOSA account details before checkout.');else alert('Please complete your PEPMOSA account details before checkout.');return}
     buildCheckout();$('checkoutModal')?.classList.add('open')
-  };window.placeOrder=async()=>submitOrder();
+  };
+  /* Keep the storefront's existing order-submission flow.
+     The redesign must not replace the proven atomic checkout RPC. */
   async function submitOrder(){
     if(typeof window.pepRequireApprovedFee==='function'){
       const feeApproved=await window.pepRequireApprovedFee();

@@ -223,12 +223,37 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
       <a class="btn primary" href="admin-orders.html" style="margin-left:auto;text-decoration:none;display:inline-flex;align-items:center">📦 ADMIN ORDERS</a>
     </div>
   </div>
-  <div class="tabs"><button class="tab active" data-panel="gbPanel" onclick="openTab(this)">GROUP BUY</button><button class="tab" data-panel="historyPanel" onclick="openTab(this)">HISTORY</button><button class="tab" data-panel="categoriesPanel" onclick="openTab(this)">CATEGORIES</button><button class="tab" data-panel="productsPanel" onclick="openTab(this)">PRODUCTS</button><button class="tab" data-panel="openForAllPanel" onclick="openTab(this)">OPEN FOR ALL</button><button class="tab" data-panel="feesPanel" onclick="openTab(this)">PAYMENTS</button><button class="tab" data-panel="ordersPanel" onclick="openTab(this)">ORDERS</button><button class="tab" data-panel="trackingPanel" onclick="openTab(this)">TRACKING</button><button class="tab" data-panel="waybillPanel" onclick="openTab(this)">WAYBILL</button><button class="tab" data-panel="vialTrackerPanel" onclick="openTab(this)">VIAL TRACKER</button><button class="tab" data-panel="documentsPanel" onclick="openTab(this)">COA & PROTOCOLS</button><button class="tab" data-panel="siteNoticePanel" onclick="openTab(this)">SITE NOTICE ♥</button><a class="tab" href="buyers-proof-admin-v6.html" style="text-decoration:none;display:inline-flex;align-items:center">♥ BUYERS' PROOF</a><a class="tab financeTab" href="finance.html" style="text-decoration:none;display:inline-flex;align-items:center">💰 FINANCE</a><a class="tab" href="manufacturer-orders.html" style="text-decoration:none;display:inline-flex;align-items:center">🏭 MANUFACTURER ORDERS</a><a class="tab customerAccountsTab" href="admin-accounts.html" style="text-decoration:none;display:inline-flex;align-items:center">👤 CUSTOMER ACCOUNT APPROVALS</a></div>
+  <div class="tabs"><button class="tab active" data-panel="gbPanel" onclick="openTab(this)">GROUP BUY</button><button class="tab" data-panel="historyPanel" onclick="openTab(this)">HISTORY</button><button class="tab" data-panel="categoriesPanel" onclick="openTab(this)">CATEGORIES</button><button class="tab" data-panel="productsPanel" onclick="openTab(this)">PRODUCTS</button><button class="tab" data-panel="stockPanel" onclick="openTab(this)">📦 STOCKS</button><button class="tab" data-panel="openForAllPanel" onclick="openTab(this)">OPEN FOR ALL</button><button class="tab" data-panel="feesPanel" onclick="openTab(this)">PAYMENTS</button><button class="tab" data-panel="ordersPanel" onclick="openTab(this)">ORDERS</button><button class="tab" data-panel="trackingPanel" onclick="openTab(this)">TRACKING</button><button class="tab" data-panel="waybillPanel" onclick="openTab(this)">WAYBILL</button><button class="tab" data-panel="vialTrackerPanel" onclick="openTab(this)">VIAL TRACKER</button><button class="tab" data-panel="documentsPanel" onclick="openTab(this)">COA & PROTOCOLS</button><button class="tab" data-panel="siteNoticePanel" onclick="openTab(this)">SITE NOTICE ♥</button><a class="tab" href="buyers-proof-admin-v6.html" style="text-decoration:none;display:inline-flex;align-items:center">♥ BUYERS' PROOF</a><a class="tab financeTab" href="finance.html" style="text-decoration:none;display:inline-flex;align-items:center">💰 FINANCE</a><a class="tab" href="manufacturer-orders.html" style="text-decoration:none;display:inline-flex;align-items:center">🏭 MANUFACTURER ORDERS</a><a class="tab customerAccountsTab" href="admin-accounts.html" style="text-decoration:none;display:inline-flex;align-items:center">👤 CUSTOMER ACCOUNT APPROVALS</a></div>
 <section id="gbPanel" class="panel active"><div class="card"><h2>Create / Edit Group Buy</h2><input id="editingGBId" type="hidden"><div class="grid"><div class="field"><label>GB Number *</label><input id="gbNumber" placeholder="GB-001"></div><div class="field"><label>Customer-Facing Name</label><input id="gbName" placeholder="September Group Buy"></div><div class="field"><label>Admin Fee</label><input id="gbAdminFee" type="number" min="0" step="0.01" value="0"></div><div class="field"><label>Status *</label><select id="gbStatus"><option value="OPEN">OPEN</option><option value="CLOSED">CLOSED</option><option value="KIT_COMPLETION">KIT COMPLETION</option></select></div><div class="field"><label>ORDER DEADLINE</label><input id="gbDeadline" type="datetime-local"><div class="small">Customers can order until this date/time. Leave blank if there is no deadline.</div></div></div><div class="card" style="margin-top:18px;border-color:#efc5db;background:linear-gradient(135deg,#fffafd,#fff1f8)"><h3 style="margin-bottom:6px">GB SCHEDULE</h3><p class="muted" style="margin-top:0">Set the customer-facing timeline for this Group Buy. These dates appear on the Home page.</p><div class="grid"><div class="field"><label>GB OPENS</label><input id="gbScheduleOpen" type="datetime-local"></div><div class="field"><label>ADMIN FEE PAYMENT</label><input id="gbScheduleFee" type="datetime-local"></div><div class="field"><label>ORDER PLACEMENT</label><input id="gbScheduleOrder" type="datetime-local"></div><div class="field"><label>FINAL PAYMENT</label><input id="gbScheduleFinal" type="datetime-local"></div><div class="field"><label>ORDER PLACED</label><input id="gbSchedulePlaced" type="datetime-local"></div><div class="field"><label>DELIVERY ETA</label><input id="gbScheduleDelivery" type="text" placeholder="2–3 weeks"></div></div></div>
 <div class="field full" style="margin-top:14px"><label>Categories for this Group Buy</label><div id="gbCategoryPicker" class="checkList"><div class="small">Loading categories...</div></div><div class="small" style="margin-top:8px">Choose the categories that should appear in this Group Buy.</div></div>
 <hr><h3>Admin Fee QR</h3><div class="fileBox"><input id="adminQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('adminQrFile','adminQrPreview')"><br><br><img id="adminQrPreview" class="qrPreview" style="display:none"></div><br><h3>Final Payment QR</h3><div class="fileBox"><input id="finalQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('finalQrFile','finalQrPreview')"><br><br><img id="finalQrPreview" class="qrPreview" style="display:none"></div><div class="actions"><button class="btn primary" onclick="saveGroupBuy()">SAVE GROUP BUY</button><button class="btn secondary" onclick="clearGBForm()">NEW</button></div></div><div class="card"><h2>Group Buys</h2><div id="gbList">Loading...</div></div></section>
 <section id="historyPanel" class="panel"><div class="card"><div class="itemHead"><div><h2>Activity History</h2><p class="muted">Orders and payment history only.</p></div><button class="btn secondary" type="button" onclick="loadActivityHistory()">REFRESH</button></div><div id="activityHistory"><div class="small">Open HISTORY to load activity.</div></div></div></section><section id="categoriesPanel" class="panel"><div class="card"><h2>Categories</h2><div class="grid"><div class="field"><label>New Category</label><input id="newCategory" placeholder="Peptides"></div></div><div class="actions"><button class="btn primary" onclick="addCategory()">ADD CATEGORY</button></div><div id="categoryList"></div></div><div class="card"><h2>GB Category Minimum</h2><p class="muted">Set the minimum once per category for this GB. Every active product/variant inside that category automatically follows this minimum.</p><div class="field"><label>Select Group Buy</label><select id="minimumGB" onchange="loadCategoryMinimums()"><option value="">Select GB</option></select></div><br><div id="minimumList">Select a Group Buy.</div><div class="actions"><button class="btn primary" onclick="saveCategoryMinimums()">SAVE MINIMUMS</button></div></div></section>
-<section id="productsPanel" class="panel"><div class="card"><h2>Add Product</h2><p class="muted">Product and variant IDs are generated automatically.</p><div class="grid"><div class="field"><label>Product Name *</label><input id="productName" placeholder="Tirzepatide"></div><div class="field"><label>Category *</label><select id="productCategory"><option value="">Select category</option></select></div><div class="field"><label>Product Image</label><input id="productImageFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('productImageFile','productImagePreview')"><img id="productImagePreview" class="qrPreview" style="display:none;max-width:140px;max-height:140px"></div><div class="field full"><label>Description</label><textarea id="productDescription"></textarea></div></div><div class="variantEditor"><div class="itemHead"><div><h3 style="margin-bottom:4px">Variants & Prices</h3><div class="small">Add all strengths/variants and their prices here.</div></div><button class="btn secondary" type="button" onclick="addVariantEditorRow()">+ ADD VARIANT</button></div><div id="variantEditorRows"></div></div><div class="actions"><button class="btn primary" onclick="addProduct()">ADD PRODUCT</button></div></div><div class="card"><h2>Products</h2><input id="productSearch" class="search" placeholder="Search product..." oninput="renderProducts()"><div id="productList">Loading...</div></div></section>
+<section id="stockPanel" class="panel">
+<div class="card">
+  <div class="itemHead">
+    <div><h2>📦 Available Stocks</h2><p class="muted">Separate stock list for your available inventory. This does not change cart, checkout, orders, GB, MOQ, kit completion, or finance.</p></div>
+  </div>
+  <div class="grid">
+    <div class="field"><label>Product *</label><select id="stockProduct" onchange="loadStockVariants()"><option value="">Select product</option></select></div>
+    <div class="field"><label>Variant / Strength</label><select id="stockVariant"><option value="">Product-level stock</option></select></div>
+    <div class="field"><label>Available Stock *</label><input id="stockQty" type="number" min="0" step="1" placeholder="0"></div>
+  </div>
+  <div class="actions">
+    <button class="btn primary" type="button" onclick="saveStock()">SAVE STOCK</button>
+    <button class="btn secondary" type="button" onclick="resetStockForm()">CLEAR</button>
+  </div>
+</div>
+<div class="card">
+  <div class="itemHead">
+    <div><h2>Current Stock List</h2><p class="muted">Only products you add here appear in this list.</p></div>
+    <button class="btn secondary" type="button" onclick="loadStockInventory()">↻ REFRESH</button>
+  </div>
+  <div class="grid" style="margin-bottom:12px">
+    <div class="field full"><label>Product Dropdown</label><select id="stockFilterProduct" onchange="renderStockInventory()"><option value="">All products</option></select></div>
+  </div>
+  <div id="stockInventoryList">Loading...</div>
+</div>
+</section><section id="productsPanel" class="panel"><div class="card"><h2>Add Product</h2><p class="muted">Product and variant IDs are generated automatically.</p><div class="grid"><div class="field"><label>Product Name *</label><input id="productName" placeholder="Tirzepatide"></div><div class="field"><label>Category *</label><select id="productCategory"><option value="">Select category</option></select></div><div class="field"><label>Product Image</label><input id="productImageFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('productImageFile','productImagePreview')"><img id="productImagePreview" class="qrPreview" style="display:none;max-width:140px;max-height:140px"></div><div class="field full"><label>Description</label><textarea id="productDescription"></textarea></div></div><div class="variantEditor"><div class="itemHead"><div><h3 style="margin-bottom:4px">Variants & Prices</h3><div class="small">Add all strengths/variants and their prices here.</div></div><button class="btn secondary" type="button" onclick="addVariantEditorRow()">+ ADD VARIANT</button></div><div id="variantEditorRows"></div></div><div class="actions"><button class="btn primary" onclick="addProduct()">ADD PRODUCT</button></div></div><div class="card"><h2>Products</h2><input id="productSearch" class="search" placeholder="Search product..." oninput="renderProducts()"><div id="productList">Loading...</div></div></section>
 <section id="openForAllPanel" class="panel">
   <div class="card" style="text-align:center;padding:38px 24px">
     <div style="font-size:42px;margin-bottom:8px">🌐</div>
@@ -408,7 +433,7 @@ function renderOpenForAllAdmin(){const box=$("ofaAdminList");if(!box)return;cons
 async function addOpenForAll(){const name=$("ofaName").value.trim(),amount=Number($("ofaAmount").value||0),moq=Math.max(1,Number($("ofaMOQ").value||1)),status=$("ofaStatus").value;if(!name||!Number.isFinite(amount)||amount<0)return showMessage("Name and valid Amount are required.","error");try{let image_url=null;const file=$("ofaImageFile").files[0];if(file)image_url=await uploadAsset(file,"open-for-all");const list=getOpenForAllProducts();list.unshift({id:"ofa-"+Date.now(),name,amount,moq,status,image_url,created_at:new Date().toISOString()});setOpenForAllProducts(list);$("ofaName").value="";$("ofaAmount").value="";$("ofaMOQ").value="1";$("ofaImageFile").value="";$("ofaImagePreview").src="";$("ofaImagePreview").style.display="none";renderOpenForAllAdmin();showMessage("Open for All product added.","success")}catch(e){console.error(e);showMessage(e.message||"Image upload failed.","error")}}
 function toggleOpenForAll(id){const list=getOpenForAllProducts();const x=list.find(a=>a.id===id);if(!x)return;x.status=x.status==="AVAILABLE"?"SOLD_OUT":"AVAILABLE";setOpenForAllProducts(list);renderOpenForAllAdmin()}
 function deleteOpenForAll(id){if(!confirm("Delete this Open for All product?"))return;setOpenForAllProducts(getOpenForAllProducts().filter(x=>x.id!==id));renderOpenForAllAdmin()}
-function openTab(b){const target=b.dataset.panel;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(target)?.classList.add("active");if(target==="vialTrackerPanel")loadVialTracker();if(target==="ordersPanel")loadOrdersCenter();if(target==="trackingPanel")loadTrackingDashboard();if(target==="waybillPanel")loadWaybillCenter();if(target==="documentsPanel")loadLibraryDocuments();if(target==="historyPanel")loadActivityHistory();if(target==="siteNoticePanel")loadSiteNotices();if(target==="openForAllPanel")renderOpenForAllAdmin()}
+function openTab(b){const target=b.dataset.panel;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(target)?.classList.add("active");if(target==="vialTrackerPanel")loadVialTracker();if(target==="ordersPanel")loadOrdersCenter();if(target==="trackingPanel")loadTrackingDashboard();if(target==="waybillPanel")loadWaybillCenter();if(target==="documentsPanel")loadLibraryDocuments();if(target==="historyPanel")loadActivityHistory();if(target==="siteNoticePanel")loadSiteNotices();if(target==="openForAllPanel")renderOpenForAllAdmin();if(target==="stockPanel"){loadStockProducts();loadStockInventory();}}
 function enterAdmin(user){
   const loginScreen=$("loginScreen"), adminApp=$("adminApp");
   if(loginScreen) loginScreen.style.display="none";
@@ -517,7 +542,7 @@ async function loadEverything(){
   try{
     await loadGroupBuys();
     if(typeof renderActiveGroupBuySelector==="function")renderActiveGroupBuySelector();
-    await Promise.all([loadCategories(),loadProducts(),loadFees(),loadOrders(),loadOrdersCenter()]);
+    await Promise.all([loadCategories(),loadProducts(),loadFees(),loadOrders(),loadOrdersCenter()]);\n    await loadStockProducts();\n    await loadStockInventory();
     // Populate the GB category picker immediately on admin load.
     // Without this, the form can remain stuck on "Loading categories..." until
     // the user manually creates/edits a GB.
@@ -791,6 +816,96 @@ async function saveCategoryMinimums(){
     console.error("CATEGORY MINIMUM SAVE",e);
     showMessage(e.message||"Unable to save category minimums.","error");
   }
+}
+let stockInventory=[];
+async function loadStockProducts(){
+  const sel=$("stockProduct"), filter=$("stockFilterProduct");
+  if(!sel||!filter)return;
+  const activeProducts=(products||[]).filter(p=>p.active!==false);
+  const opts=activeProducts.map(p=>'<option value="'+esc(p.product_id)+'">'+esc(p.product_name)+'</option>').join("");
+  sel.innerHTML='<option value="">Select product</option>'+opts;
+  filter.innerHTML='<option value="">All products</option>'+opts;
+  loadStockVariants();
+}
+function loadStockVariants(){
+  const pid=$("stockProduct")?.value||"", sel=$("stockVariant");
+  if(!sel)return;
+  const p=(products||[]).find(x=>String(x.product_id)===String(pid));
+  const vs=(p?.product_variants||[]).filter(v=>v.active!==false);
+  sel.innerHTML='<option value="">Product-level stock</option>'+vs.map(v=>'<option value="'+esc(v.variant_id)+'">'+esc(v.strength||"Variant")+'</option>').join("");
+}
+function resetStockForm(){
+  if($("stockProduct"))$("stockProduct").value="";
+  loadStockVariants();
+  if($("stockQty"))$("stockQty").value="";
+}
+async function loadStockInventory(){
+  const host=$("stockInventoryList"); if(!host)return;
+  try{
+    const {data,error}=await sb.from("stock_inventory")
+      .select("stock_id,product_id,variant_id,quantity,updated_at")
+      .order("updated_at",{ascending:false});
+    if(error)throw error;
+    stockInventory=data||[];
+    renderStockInventory();
+  }catch(e){
+    console.error(e);
+    host.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load stock inventory.")+'</div>';
+  }
+}
+function renderStockInventory(){
+  const host=$("stockInventoryList"); if(!host)return;
+  const filter=$("stockFilterProduct")?.value||"";
+  const rows=stockInventory.filter(r=>!filter||String(r.product_id)===String(filter));
+  if(!rows.length){host.innerHTML='<div class="empty">No stock entries yet. Select a product above and save its available quantity.</div>';return;}
+  host.innerHTML=rows.map(r=>{
+    const p=(products||[]).find(x=>String(x.product_id)===String(r.product_id));
+    const v=(p?.product_variants||[]).find(x=>String(x.variant_id)===String(r.variant_id));
+    const qty=Number(r.quantity||0);
+    const status=qty<=0?'SOLD OUT':qty<=5?'LOW STOCK':'AVAILABLE';
+    const cls=qty<=0?'red':qty<=5?'yellow':'green';
+    return '<div class="item productCompact"><div class="productCompactHead">'+
+      (p?.image_url?'<img class="productThumb" loading="lazy" decoding="async" src="'+esc(p.image_url)+'" alt="'+esc(p.product_name)+'">':'<div class="productThumb placeholder">STOCK</div>')+
+      '<div class="productMeta"><h3>'+esc(p?.product_name||r.product_id)+'</h3>'+
+      '<div class="small">'+esc(v?.strength||'Product-level stock')+'</div>'+
+      '<div class="productStats"><span class="statChip">'+qty+' available</span><span class="badge '+cls+'">'+status+'</span></div></div>'+
+      '<div class="productCompactActions"><button class="btn secondary" onclick="editStock(\''+esc(r.stock_id)+'\')">EDIT</button><button class="btn danger" onclick="deleteStock(\''+esc(r.stock_id)+'\')">DELETE</button></div>'+
+      '</div></div>';
+  }).join("");
+}
+async function saveStock(){
+  const pid=$("stockProduct")?.value||"", vid=$("stockVariant")?.value||null, qty=Number($("stockQty")?.value);
+  if(!pid)return showMessage("Please select a product.","error");
+  if(!Number.isInteger(qty)||qty<0)return showMessage("Stock quantity must be a whole number 0 or higher.","error");
+  try{
+    const {error}=await sb.from("stock_inventory").upsert({product_id:pid,variant_id:vid,quantity:qty,updated_at:new Date().toISOString()},{onConflict:"product_id,variant_id"});
+    if(error)throw error;
+    await loadStockInventory();
+    resetStockForm();
+    showMessage("Stock saved successfully.","success");
+  }catch(e){console.error(e);showMessage(e.message||"Unable to save stock.","error")}
+}
+async function editStock(stockId){
+  const r=stockInventory.find(x=>String(x.stock_id)===String(stockId)); if(!r)return;
+  const qty=prompt("Available stock quantity:",String(r.quantity??0));
+  if(qty===null)return;
+  const n=Number(qty);
+  if(!Number.isInteger(n)||n<0)return showMessage("Enter a whole number 0 or higher.","error");
+  try{
+    const {error}=await sb.from("stock_inventory").update({quantity:n,updated_at:new Date().toISOString()}).eq("stock_id",stockId);
+    if(error)throw error;
+    await loadStockInventory();
+    showMessage("Stock updated.","success");
+  }catch(e){console.error(e);showMessage(e.message||"Unable to update stock.","error")}
+}
+async function deleteStock(stockId){
+  if(!confirm("Remove this stock entry from the list?"))return;
+  try{
+    const {error}=await sb.from("stock_inventory").delete().eq("stock_id",stockId);
+    if(error)throw error;
+    await loadStockInventory();
+    showMessage("Stock entry removed.","success");
+  }catch(e){console.error(e);showMessage(e.message||"Unable to remove stock.","error")}
 }
 async function loadProducts(){
   const {data:productData,error:productError}=await sb.from("products").select("*").order("product_name");

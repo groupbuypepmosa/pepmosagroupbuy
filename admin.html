@@ -497,8 +497,8 @@ async function checkExistingSession(){
     // Finance return fallback: restore the same authenticated session if iOS/browser
     // did not restore Supabase local storage quickly enough.
     try{
-      const returningFromFinance=new URLSearchParams(location.search).get("return")==="finance"||localStorage.getItem("pepmosa_admin_return")==="1";
-      if(returningFromFinance){
+      const returningFromAdminChild=localStorage.getItem("pepmosa_admin_return")==="1";
+      if(returningFromAdminChild){
         const backup=JSON.parse(sessionStorage.getItem("pepmosa_admin_session_backup")||"null");
         if(backup?.access_token&&backup?.refresh_token){
           await sb.auth.setSession({access_token:backup.access_token,refresh_token:backup.refresh_token});

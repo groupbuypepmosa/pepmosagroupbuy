@@ -9,12 +9,18 @@
 .purchaseHistorySummary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:15px}
 .purchaseHistorySummary span{padding:10px;border:1px solid #ead9e5;border-radius:11px;background:#fff;font-size:12px;color:#654c59}
 .purchaseHistorySummary b{display:block;font-size:9px;letter-spacing:.08em;color:#ad668c;margin-bottom:3px}
-.purchaseOrder{border:1px solid #ead9e5;border-radius:15px;padding:14px;margin-top:10px;background:#fff}
-.purchaseOrderHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.purchaseOrderTitle{font-weight:950;color:#46343e}
-.purchaseOrderMeta{font-size:11px;color:#806c77;margin-top:4px}
-.purchaseOrderProducts{margin-top:10px;padding:10px 12px;border-radius:11px;background:#fff4fa;color:#604a56;font-size:12px;line-height:1.65}
-.purchaseOrderTotal{text-align:right;margin-top:9px;font-weight:950;color:#a33a70}
+.purchaseOrder{border:1px solid #edc4d9;border-radius:20px;padding:14px;margin-top:12px;background:linear-gradient(180deg,#fff 0%,#fff9fc 100%);box-shadow:0 7px 22px rgba(137,58,103,.07);overflow:hidden}
+.purchaseOrderHead{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:stretch}
+.purchaseOrderIdentity{display:flex;align-items:center;gap:14px;min-width:0}
+.purchaseOrderGb{min-width:92px;padding:10px 12px;border-radius:16px;background:linear-gradient(135deg,#ffd9e9,#f6b5d2);text-align:center;border:1px solid #f0a8c9;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.purchaseOrderGb small{display:block;font-size:9px;font-weight:900;letter-spacing:.16em;color:#9f3f6e;text-transform:uppercase}
+.purchaseOrderGb strong{display:block;font-size:30px;line-height:1;color:#bd2365;margin-top:2px}
+.purchaseOrderTitle{font-weight:950;color:#46343e;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.purchaseOrderMeta{font-size:11px;color:#806c77;margin-top:5px}
+.purchaseOrderMeta .gbText{font-weight:900;color:#ad3d72}
+.purchaseOrderProducts{margin-top:12px;padding:12px 14px;border-radius:14px;background:#fff2f8;color:#604a56;font-size:12px;line-height:1.7;border:1px solid #f4d9e6}
+.purchaseOrderTotal{text-align:right;margin-top:11px;padding-top:10px;border-top:1px dashed #e7bfd3;font-weight:950;color:#a33a70;font-size:15px}
+@media(max-width:600px){.purchaseOrderHead{grid-template-columns:1fr}.purchaseOrderIdentity{align-items:flex-start}.purchaseOrderGb{min-width:78px}.purchaseOrderGb strong{font-size:26px}}
 .purchaseHistoryLoading{text-align:center;padding:30px;color:#7d6d77}
 @media(max-width:600px){.purchaseHistorySummary{grid-template-columns:1fr 1fr}.purchaseHistoryCard{padding:16px}.purchaseOrderHead{flex-direction:column}}
 </style></head><body><div class="wrap"><div class="head"><div><h1>Customer Account Approvals</h1><div style="color:#7d6d77;margin-top:4px">PEPMOSA • email verification + admin approval</div></div><a href="/admin.html">← Admin</a></div><div class="card"><div class="searchBar"><input id="customerSearch" type="search" placeholder="Search name, email, contact, WhatsApp, or address…" autocomplete="off"><span id="customerCount" class="count"></span></div><div class="toolbar"><button data-filter="PENDING">Pending</button><button class="active" data-filter="ALL">All</button><button data-filter="APPROVED">Approved</button><button data-filter="REJECTED">Rejected</button></div><div id="list" class="list"></div></div></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script><script src="site-activity.js"></script><script src="admin-accounts.js?v=20260927"></script>

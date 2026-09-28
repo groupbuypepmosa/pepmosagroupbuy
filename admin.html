@@ -439,8 +439,21 @@ function enterAdmin(user){
   if(loginScreen) loginScreen.style.display="none";
   if(adminApp) adminApp.style.display="block";
   if($("signedInAs")) $("signedInAs").textContent="Signed in as "+(user?.email||"");
-  // Data loading must never block a successful login.
-  Promise.resolve().then(()=>loadEverything()).catch(e=>{
+  // Keep a tab-scoped backup so returning from Admin sub-pages does not force
+  // the admin to log in again if Supabase has not restored its session yet.
+  Promise.resolve().then(async()=>{
+    try{
+      const {data}=await sb.auth.getSession();
+      const session=data?.session;
+      if(session?.access_token&&session?.refresh_token){
+        sessionStorage.setItem("pepmosa_admin_session_backup",JSON.stringify({
+          access_token:session.access_token,
+          refresh_token:session.refresh_token
+        }));
+      }
+    }catch(e){console.warn("Admin session backup skipped",e)}
+    await loadEverything();
+  }).catch(e=>{
     console.error("Admin data load error:",e);
     showMessage(e.message||"Logged in, but some admin data could not be loaded.","error");
   });
@@ -506,16 +519,28 @@ async function checkExistingSession(){
       }
     }catch(e){console.warn("Admin return session restore skipped",e)}
 
-    // Give Supabase enough time to restore the persisted session after returning
-    // from Finance / Buyers' Proof / Admin Orders.
+    // Restore the current tab's admin session before showing the login screen.
+    // This prevents Admin sub-pages from forcing a second login.
     for(const wait of [0,300,900,1800,3000]){
       if(wait)await new Promise(r=>setTimeout(r,wait));
-      const {data,error}=await sb.auth.getSession();
+      let {data,error}=await sb.auth.getSession();
       if(error)throw error;
-      const user=data?.session?.user;
+      let user=data?.session?.user;
+      if(!user){
+        try{
+          const backup=JSON.parse(sessionStorage.getItem("pepmosa_admin_session_backup")||"null");
+          if(backup?.access_token&&backup?.refresh_token){
+            const restored=await sb.auth.setSession({
+              access_token:backup.access_token,
+              refresh_token:backup.refresh_token
+            });
+            if(!restored.error) user=restored.data?.user||restored.data?.session?.user;
+          }
+        }catch(e){console.warn("Admin session backup restore failed",e)}
+      }
       if(user){
         await verifyAdmin(user);
-        try{localStorage.removeItem("pepmosa_admin_return");sessionStorage.removeItem("pepmosa_admin_session_backup");history.replaceState(null,"",location.pathname)}catch(e){}
+        try{localStorage.removeItem("pepmosa_admin_return");}catch(e){}
         return;
       }
     }

@@ -68,7 +68,6 @@ async function refresh(){
    accountMsg('Your account is approved. Welcome to PEPMOSA.','success');
    setStatus('approved',profile?.is_admin?'ADMIN':'APPROVED');
    showDashboardSections();
-   startInactivityWatch();
    await Promise.all([loadOrders(user.email),renderCart()]);
    return
  }
@@ -78,25 +77,6 @@ async function refresh(){
 async function savePendingProfileDetails(){try{const raw=sessionStorage.getItem('pepmosa_pending_profile');if(!raw||!sb)return;const p=JSON.parse(raw);const r=await sb.rpc('update_customer_profile_details',{p_full_name:p.full_name||'',p_address:p.address||'',p_contact_number:p.contact_number||'',p_whatsapp_name:p.whatsapp_name||''});if(r.error)throw r.error;sessionStorage.removeItem('pepmosa_pending_profile')}catch(e){console.warn('PEPMOSA profile save',e)}}
 async function saveProfileDetails(e){e.preventDefault();const btn=$('profileEditForm').querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='SAVING...';const r=await sb.rpc('update_customer_profile_details',{p_full_name:$('profileEditName').value.trim(),p_address:$('profileEditAddress').value.trim(),p_contact_number:$('profileEditContact').value.trim(),p_whatsapp_name:$('profileEditWhatsapp').value.trim()});btn.disabled=false;btn.textContent='SAVE DETAILS';if(r.error)return accountMsg(r.error.message,'error');accountMsg('Your account details have been saved.','success');await refresh()}
 function setStatus(type,label){$('accountStatus').innerHTML='<span class="status '+type+'">'+esc(label)+'</span>'}
-
-// PEPMOSA CUSTOMER SESSION — auto logout after 5 minutes of inactivity.
-let inactivityTimer=null;
-const INACTIVITY_LIMIT=5*60*1000;
-function resetInactivityTimer(){
- clearTimeout(inactivityTimer);
- if(!currentUser)return;
- inactivityTimer=setTimeout(async()=>{
-   if(!currentUser)return;
-   try{await sb.auth.signOut()}finally{
-     sessionStorage.setItem('pepmosa_auto_logout','1');
-     location.reload();
-   }
- },INACTIVITY_LIMIT);
-}
-function startInactivityWatch(){
- ['mousemove','mousedown','keydown','touchstart','scroll','click'].forEach(evt=>window.addEventListener(evt,resetInactivityTimer,{passive:true}));
- resetInactivityTimer();
-}
 
 function showDashboardSections(){document.querySelector('.accountQuickGrid').classList.remove('hidden');document.querySelectorAll('.accountSection').forEach(x=>x.classList.remove('hidden'));showAccountTab('orders')}
 function hideDashboardSections(){document.querySelector('.accountQuickGrid').classList.add('hidden');document.querySelectorAll('.accountSection').forEach(x=>x.classList.add('hidden'))}

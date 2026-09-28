@@ -82,13 +82,31 @@ function showDashboardSections(){document.querySelector('.accountQuickGrid').cla
 function hideDashboardSections(){document.querySelector('.accountQuickGrid').classList.add('hidden');document.querySelectorAll('.accountSection').forEach(x=>x.classList.add('hidden'))}
 function showAccountTab(tab){document.querySelectorAll('[data-account-tab]').forEach(b=>b.classList.toggle('active',b.dataset.accountTab===tab));document.querySelectorAll('.accountSection').forEach(s=>s.classList.remove('active'));const map={orders:'accountOrdersSection',cart:'accountCartSection',profile:'accountProfileSection'};$(map[tab])?.classList.add('active')}
 async function loadOrders(email){
- const box=$('orderHistory');box.innerHTML='<div class="accountLoading">Loading your orders…</div>';
- const {data,error}=await sb.from('orders').select('order_id,gb_number,total,payment_status,shipping_method,shipping_fee,created_at,shipment_id,order_items(product_name,strength,qty,unit_price,line_total)').eq('email',email).order('created_at',{ascending:false});
- if(error){box.innerHTML='<div class="accountEmpty">We could not load your order history right now.</div>';return}
- const orders=data||[];$('orderCount').textContent=orders.length+' '+(orders.length===1?'order':'orders');
- if(!orders.length){box.innerHTML='<div class="accountEmpty"><div style="font-size:28px">📦</div><b>No orders yet</b><br><span>Your completed orders will appear here.</span><br><a class="sectionAction" href="/shop.html">SHOP PRODUCTS →</a></div>';return}
- box.innerHTML=orders.map(o=>{const items=Array.isArray(o.order_items)?o.order_items:[];return '<article class="orderCard"><div class="orderTop"><div><div class="orderId">'+esc(o.order_id)+'</div><div class="orderDate">'+new Date(o.created_at).toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'})+'</div></div><span class="orderBadge">'+esc(o.payment_status||'PENDING')+'</span></div><div class="orderItems">'+(items.length?items.map(i=>'<div class="orderItem"><span>'+esc(i.product_name)+(i.strength?' • '+esc(i.strength):'')+' × '+Number(i.qty||0)+'</span><b>'+peso(i.line_total)+'</b></div>').join(''):'<div class="orderItem"><span>Order items</span><b>—</b></div>')+'</div><div class="orderBottom"><div class="orderTotal"><small>TOTAL</small><b>'+peso(Number(o.total||0)+Number(o.shipping_fee||0))+'</b></div><div class="orderGb">'+esc(o.gb_number||'')+(o.shipping_method?' • '+esc(o.shipping_method):'')+(o.shipment_id?'<br>Shipment: '+esc(o.shipment_id):'')+'</div></div></article>'}).join('')
+ const box=$('orderHistory');box.innerHTML='<div class="accountLoading">Loading your order history…</div>';
+ const [gbRes,moqRes]=await Promise.all([
+  sb.from('orders').select('order_id,gb_number,total,payment_status,shipping_method,shipping_fee,created_at,shipment_id,order_items(product_name,strength,qty,unit_price,line_total)').eq('email',email).order('created_at',{ascending:false}),
+  sb.from('ofa_orders').select('order_id,gb_id,total,payment_status,shipping_method,shipping_fee,created_at').eq('email',email).order('created_at',{ascending:false})
+ ]);
+ if(gbRes.error||moqRes.error){box.innerHTML='<div class="accountEmpty">We could not load your order history right now.</div>';return}
+ const regular=gbRes.data||[], moq=moqRes.data||[], moqIds=moq.map(o=>o.order_id).filter(Boolean), moqGbIds=moq.map(o=>o.gb_id).filter(Boolean);
+ let moqItems=[], moqGbs=[];
+ if(moqIds.length){const r=await sb.from('ofa_order_items').select('order_id,product_name,qty,unit_price,line_total').in('order_id',moqIds);if(r.error){box.innerHTML='<div class="accountEmpty">We could not load your MOQ history right now.</div>';return}moqItems=r.data||[]}
+ if(moqGbIds.length){const r=await sb.from('ofa_group_buys').select('gb_id,gb_number,customer_facing_name').in('gb_id',moqGbIds);if(r.error){box.innerHTML='<div class="accountEmpty">We could not load your MOQ details right now.</div>';return}moqGbs=r.data||[]}
+ const gbMap=new Map(moqGbs.map(g=>[String(g.gb_id),g])), itemMap=new Map();
+ moqItems.forEach(i=>{if(!itemMap.has(i.order_id))itemMap.set(i.order_id,[]);itemMap.get(i.order_id).push(i)});
+ const rows=[...regular.map(o=>({...o,historyType:'GB'})),...moq.map(o=>({...o,historyType:'MOQ'}))].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+ $('orderCount').textContent=rows.length+' '+(rows.length===1?'order':'orders');
+ if(!rows.length){box.innerHTML='<div class="accountEmpty"><div style="font-size:28px">📦</div><b>No orders yet</b><br><span>Your completed orders will appear here.</span><br><a class="sectionAction" href="/shop.html">SHOP PRODUCTS →</a></div>';return}
+ box.innerHTML=rows.map(o=>{
+  const isMoq=o.historyType==='MOQ', g=isMoq?gbMap.get(String(o.gb_id)):null;
+  const items=isMoq?(itemMap.get(o.order_id)||[]):(Array.isArray(o.order_items)?o.order_items:[]);
+  const raw=isMoq?(g?.gb_number||'—'):(o.gb_number||'—');
+  const products=items.length?items.map(i=>'<div class="orderItem"><span>'+esc(i.product_name||'Product')+(i.strength?' • '+esc(i.strength):'')+' × '+Number(i.qty||0)+'</span><b>'+peso(i.line_total)+'</b></div>').join(''):'<div class="orderItem"><span>Order items</span><b>—</b></div>';
+  const total=Number(o.total||0)+Number(o.shipping_fee||0);
+  return '<article class="orderCard '+(isMoq?'moqOrderCard':'')+'"><div class="orderTop"><div><div class="orderId">'+(isMoq?'MOQ • ':'')+esc(o.order_id)+'</div><div class="orderDate">'+new Date(o.created_at).toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'})+'</div></div><span class="orderBadge">'+esc(o.payment_status||'PENDING')+'</span></div><div class="orderItems">'+products+'</div><div class="orderBottom"><div class="orderTotal"><small>TOTAL</small><b>'+peso(total)+'</b></div><div class="orderGb"><strong>'+(isMoq?'MOQ':'GROUP BUY')+'</strong><br>'+esc(raw)+(isMoq&&g?.customer_facing_name?'<br>'+esc(g.customer_facing_name):'')+(o.shipping_method?' • '+esc(o.shipping_method):'')+(o.shipment_id?'<br>Shipment: '+esc(o.shipment_id):'')+'</div></div></article>';
+ }).join('')
 }
+
 function renderCart(){
  let cart=[];try{cart=JSON.parse(localStorage.getItem('pepmosaCart')||'[]')}catch(e){}
  const count=cart.reduce((n,i)=>n+Number(i.qty||0),0);$('cartCountAccount').textContent=count+' '+(count===1?'item':'items');

@@ -1358,7 +1358,7 @@ async function loadWaybillCenter(){
         customer_name:customer.customer_name||latest.full_name||g.email,
         contact:customer.contact||latest.contact_number||"",
         address:customer.address||latest.address||"Address not yet saved",
-        shipping_method:latest.shipping_method||"",
+        shipping_method:latest.shipping_method||shipment.courier||"",
         courier:shipment.courier||latest.shipping_method||"To be assigned",
         waybill_number:shipment.waybill_number||shipment.tracking_number||"",
         tracking_number:shipment.tracking_number||shipment.waybill_number||"",
@@ -1408,7 +1408,7 @@ function renderSelectedWaybill(){
         '<div class="waybillBlock"><div class="waybillLabel">FROM</div><b>PEPMOSA</b><div>PEPMOSA Group Buy<br>Philippines</div></div>'+
         '<div class="waybillBlock"><div class="waybillLabel">SHIP TO</div><b>'+esc(r.customer_name)+'</b><div>'+esc(r.contact||"Contact not set")+'<br>'+esc(r.address||"Address not set")+'</div></div>'+
       '</div><div class="waybillBarcodeWrap"><div class="waybillBarcode"><span>'+esc(barcode)+'</span></div></div>'+
-      '<div class="waybillBlock" style="margin-bottom:12px"><div class="waybillLabel">CONSOLIDATED SHIPPING DETAILS</div><div><b>Courier:</b> '+esc(r.courier||"To be assigned")+' &nbsp; • &nbsp; <b>Waybill / Tracking:</b> '+esc(r.waybill_number||"To be assigned")+'<br><b>Orders:</b> '+esc(r.orders.map(o=>o.order_id).join(", "))+'<br><b>Payment:</b> '+esc(r.payment)+' &nbsp; • &nbsp; <b>Consolidated Total:</b> '+peso(r.total)+'</div></div>'+
+      '<div class="waybillBlock" style="margin-bottom:12px"><div class="waybillLabel">CONSOLIDATED SHIPPING DETAILS</div><div><b>Shipping Option:</b> '+esc(r.shipping_method||r.courier||"To be assigned")+' &nbsp; • &nbsp; <b>Waybill / Tracking:</b> '+esc(r.waybill_number||"To be assigned")+'<br><b>Orders:</b> '+esc(r.orders.map(o=>o.order_id).join(", "))+'<br><b>Payment:</b> '+esc(r.payment)+' &nbsp; • &nbsp; <b>Consolidated Total:</b> '+peso(r.total)+'</div></div>'+
 
       '<table class="waybillTable"><thead><tr><th>Qty</th><th>Product</th><th>Variant</th><th>Price</th><th>Total</th></tr></thead><tbody>'+
         r.products.map(p=>{

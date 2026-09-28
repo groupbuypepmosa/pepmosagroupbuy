@@ -67,6 +67,8 @@
     const orderIds=(r.orders||[]).map(o=>o.order_id).filter(Boolean);
     const waybillNo=r.waybill_number||('WB-PEPMOSA-'+slug);
     const shippingFee=Number(r.shipping||0);
+    const paidShippingFee=Number(r.shipping_fee_paid||shippingFee||0);
+    const shippingLabel=(r.shipping_method||'Shipping option not recorded')+' • '+peso(paidShippingFee);
     const total=Number(r.total||0);
     const consolidatedTotal=total;
     const status=r.shipment_status||'PAYMENT CONFIRMED';
@@ -97,14 +99,14 @@
             '<div><div class="pwLabel">Waybill</div><div class="pwWaybillNo">'+esc(waybillNo)+'</div></div>'+
             '<div class="pwCustomerEmail"><div class="pwLabel">Customer Email</div><b>'+esc(email||'—')+'</b></div>'+
           '</div>'+
-          '<div class="pwShippingHighlight"><div class="pwLabel">SHIPPING OPTION</div><b>'+esc(r.shipping_method||r.courier||'To be assigned')+'</b></div>'+
+          '<div class="pwShippingHighlight"><div class="pwLabel">SHIPPING OPTION</div><b>'+esc(shippingLabel)+'</b></div>'+
           '<div class="pwGrid">'+
             '<div class="pwField"><div class="pwLabel">Customer</div><b>'+esc(r.customer_name||email||'—')+'</b></div>'+
             '<div class="pwField"><div class="pwLabel">Contact</div><b>'+esc(r.contact||'Not set')+'</b></div>'+
             '<div class="pwField"><div class="pwLabel">Email</div><b>'+esc(email||'—')+'</b></div>'+
             '<div class="pwField"><div class="pwLabel">GB / Orders</div><b>'+esc(String((r.orders||[]).length||0))+' consolidated order(s)</b></div>'+
             '<div class="pwField full"><div class="pwLabel">Delivery Address</div><div>'+esc(r.address||'Address not set')+'</div></div>'+
-            '<div class="pwField"><div class="pwLabel">Shipping</div><b>'+esc(r.shipping_method||r.courier||'To be assigned')+'</b></div>'+
+            '<div class="pwField"><div class="pwLabel">Shipping Paid</div><b>'+esc(shippingLabel)+'</b></div>'+
             '<div class="pwField"><div class="pwLabel">Tracking No.</div><b>'+esc(r.tracking_number||'—')+'</b></div>'+
           '</div>'+
           '<table class="pwTable"><thead><tr><th>Product</th><th>Strength / Variant</th><th class="num">Qty</th><th class="num">Total</th></tr></thead><tbody>'+productRows+'</tbody></table>'+

@@ -1319,7 +1319,18 @@ async function loadWaybillCenter(){
     waybillRows=[...grouped.values()].map(g=>{
       const customer=customersByEmail.get(g.email)||{};
       const latest=g.orders.slice().sort((x,y)=>new Date(y.created_at||0)-new Date(x.created_at||0))[0]||{};
-      const shippingOrder=g.orders.slice().sort((x,y)=>new Date(y.created_at||0)-new Date(x.created_at||0)).find(x=>String(x.shipping_method||"").trim());
+      // Use the actual checkout shipping selection/fee first. Some legacy orders
+      // have a blank shipping_method, so recover the method from the paid fee.
+      const shippingOrder=g.orders.slice().sort((x,y)=>new Date(y.created_at||0)-new Date(x.created_at||0))
+        .find(x=>String(x.shipping_method||"").trim() || Number(x.shipping_fee||0)>0) || latest;
+      const checkoutShippingMethod=String(shippingOrder.shipping_method||"").trim();
+      const checkoutShippingFee=Number(shippingOrder.shipping_fee||0);
+      const derivedShippingMethod=checkoutShippingMethod ||
+        (checkoutShippingFee===100 ? "J&T Express - Luzon" :
+         checkoutShippingFee===150 ? "J&T Express - Visayas" :
+         checkoutShippingFee===180 ? "J&T Express - Mindanao" :
+         checkoutShippingFee===0 && String(shippingOrder.shipping_method||"").trim()==="" ? "" : "");
+      const shippingDisplay=derivedShippingMethod || "Shipping option not recorded";
       const shipment=shipmentsByEmail.get(g.email)||{};
       const merged=new Map();
       for(const i of g.items){
@@ -1359,7 +1370,8 @@ async function loadWaybillCenter(){
         customer_name:customer.customer_name||latest.full_name||g.email,
         contact:customer.contact||latest.contact_number||"",
         address:customer.address||latest.address||"Address not yet saved",
-        shipping_method:shippingOrder?.shipping_method||latest.shipping_method||shipment.courier||"",
+        shipping_method:shippingDisplay,
+        shipping_fee_paid:checkoutShippingFee,
         courier:shipment.courier||latest.shipping_method||"To be assigned",
         waybill_number:shipment.waybill_number||shipment.tracking_number||"",
         tracking_number:shipment.tracking_number||shipment.waybill_number||"",

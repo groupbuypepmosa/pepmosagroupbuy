@@ -446,7 +446,7 @@ function enterAdmin(user){
       const {data}=await sb.auth.getSession();
       const session=data?.session;
       if(session?.access_token&&session?.refresh_token){
-        sessionStorage.setItem("pepmosa_admin_session_backup",JSON.stringify({
+        localStorage.setItem("pepmosa_admin_session_backup",JSON.stringify({
           access_token:session.access_token,
           refresh_token:session.refresh_token
         }));
@@ -512,7 +512,7 @@ async function checkExistingSession(){
     try{
       const returningFromAdminChild=localStorage.getItem("pepmosa_admin_return")==="1";
       if(returningFromAdminChild){
-        const backup=JSON.parse(sessionStorage.getItem("pepmosa_admin_session_backup")||"null");
+        const backup=JSON.parse(localStorage.getItem("pepmosa_admin_session_backup")||sessionStorage.getItem("pepmosa_admin_session_backup")||"null");
         if(backup?.access_token&&backup?.refresh_token){
           await sb.auth.setSession({access_token:backup.access_token,refresh_token:backup.refresh_token});
         }
@@ -540,7 +540,7 @@ async function checkExistingSession(){
       }
       if(user){
         await verifyAdmin(user);
-        try{localStorage.removeItem("pepmosa_admin_return");}catch(e){}
+        try{localStorage.removeItem("pepmosa_admin_return");localStorage.removeItem("pepmosa_admin_session_backup");sessionStorage.removeItem("pepmosa_admin_session_backup");}catch(e){}
         return;
       }
     }

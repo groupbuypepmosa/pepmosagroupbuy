@@ -15,7 +15,9 @@ function init(){
 }
 function wire(){
  $('loginTab').onclick=()=>switchTab('login'); $('signupTab').onclick=()=>switchTab('signup');
- $('loginForm').onsubmit=login; $('signupForm').onsubmit=signup; $('verifyForm').onsubmit=verifyCode; $('resendCode').onclick=resendCode; $('profileEditForm').onsubmit=saveProfileDetails;
+ $('loginForm').onsubmit=login; $('signupForm').onsubmit=signup;
+ $('toggleLoginPassword').onclick=()=>{const input=$('loginPassword'),btn=$('toggleLoginPassword');const showPassword=input.type==='password';input.type=showPassword?'text':'password';btn.textContent=showPassword?'HIDE':'SHOW';btn.setAttribute('aria-label',showPassword?'Hide password':'Show password')};
+ $('verifyForm').onsubmit=verifyCode; $('resendCode').onclick=resendCode; $('profileEditForm').onsubmit=saveProfileDetails;
  $('forgot').onclick=async e=>{e.preventDefault();const email=$('loginEmail').value.trim();if(!email)return msg('Enter your email first.','error');const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/account.html'});msg(error?.message||'Password reset email sent. Check your inbox.','success')};
  $('logout').onclick=async()=>{await sb.auth.signOut();location.reload()};
  document.querySelectorAll('[data-account-tab]').forEach(btn=>btn.onclick=()=>showAccountTab(btn.dataset.accountTab));
@@ -27,7 +29,30 @@ function showVerify(email){$('verifyEmail').textContent=email;$('verifyCode').va
 async function verifyCode(e){e.preventDefault();const email=$('verifyEmail').textContent.trim(),token=$('verifyCode').value.trim();if(!/^\d{6}$/.test(token))return msg('Enter the 6-digit verification code.','error');const btn=$('verifyForm').querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='VERIFYING...';const {data,error}=await sb.auth.verifyOtp({email,token,type:'email'});btn.disabled=false;btn.textContent='VERIFY EMAIL';if(error)return msg(error.message,'error');await savePendingProfileDetails();msg('Email verified. Your account is now waiting for PEPMOSA admin approval.','success');await refresh()}
 async function resendCode(){const email=$('verifyEmail').textContent.trim(),btn=$('resendCode');btn.disabled=true;btn.textContent='SENDING...';const {error}=await sb.auth.resend({type:'signup',email});btn.disabled=false;btn.textContent='RESEND CODE';msg(error?.message||'A new verification code has been sent to your email.','success')}
 async function signup(e){e.preventDefault();const name=$('signupName').value.trim(),address=$('signupAddress').value.trim(),contact=$('signupContact').value.trim(),whatsapp=$('signupWhatsapp').value.trim(),email=$('signupEmail').value.trim(),p=$('signupPassword').value,p2=$('signupPassword2').value;if(!name||!address||!contact||!whatsapp)return msg('Please complete your name, address, contact number, and WhatsApp name.','error');if(p!==p2)return msg('Passwords do not match.','error');const submit=$('signupForm').querySelector('button[type="submit"]');submit.disabled=true;submit.textContent='CREATING...';sessionStorage.setItem('pepmosa_pending_profile',JSON.stringify({full_name:name,address,contact_number:contact,whatsapp_name:whatsapp}));const {data,error}=await sb.auth.signUp({email,password:p,options:{data:{full_name:name,address,contact_number:contact,whatsapp_name:whatsapp},emailRedirectTo:location.origin+'/account.html'}});submit.disabled=false;submit.textContent='CREATE ACCOUNT';if(error)return msg(error.message,'error');if(data.user&&!data.user.email_confirmed_at){const {error:resendError}=await sb.auth.resend({type:'signup',email});showVerify(email);if(resendError){const text=(resendError.message||'').toLowerCase();if(text.includes('already confirmed')||text.includes('already registered')||text.includes('confirmed'))msg('This email already has an account. Please use Log In instead.','error');else msg(resendError.message,'error')}else msg('A new 6-digit verification code has been sent to your email.','success');return}if(data.session){await savePendingProfileDetails();await refresh();return}msg('Account created. Please verify your email first.','success')}
-async function login(e){e.preventDefault();const email=$('loginEmail').value.trim(),password=$('loginPassword').value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)return msg(error.message,'error');try{await sb.rpc('record_customer_login')}catch(e){console.warn('PEPMOSA login history',e)}const {data:profile}=await sb.from('profiles').select('account_status,is_admin').eq('id',data.user.id).maybeSingle();if(profile?.is_admin===true||profile?.account_status==='APPROVED'){window.location.replace('/#products');return}await refresh()}
+async function login(e){
+ e.preventDefault();
+ const email=$('loginEmail').value.trim(),password=$('loginPassword').value;
+ if(!email||!password)return msg('Please enter your email and password.','error');
+ const btn=$('loginSubmit');if(btn){btn.disabled=true;btn.textContent='LOGGING IN...';btn.classList.add('loginBusy')}
+ const {data,error}=await sb.auth.signInWithPassword({email,password});
+ if(error){
+   if(btn){btn.disabled=false;btn.textContent='LOG IN';btn.classList.remove('loginBusy')}
+   const raw=(error.message||'').toLowerCase();
+   if(raw.includes('email not confirmed'))return msg('Please verify your email first. Check your inbox for the PEPMOSA verification code.','error');
+   if(raw.includes('invalid login credentials'))return msg('Incorrect email or password. Please try again.','error');
+   return msg(error.message,'error');
+ }
+ try{await sb.rpc('record_customer_login')}catch(e){console.warn('PEPMOSA login history',e)}
+ const {data:profile}=await sb.from('profiles').select('account_status,is_admin,full_name,email_verified_at').eq('id',data.user.id).maybeSingle();
+ if(profile?.is_admin===true||profile?.account_status==='APPROVED'){
+   const name=profile?.full_name||data.user.user_metadata?.full_name||email.split('@')[0];
+   localStorage.setItem('pepmosa_logged_in_name',name);
+   window.location.replace('/shop.html');
+   return;
+ }
+ if(btn){btn.disabled=false;btn.textContent='LOG IN';btn.classList.remove('loginBusy')}
+ await refresh();
+}
 async function refresh(){
  const {data:{user}}=await sb.auth.getUser();currentUser=user;
  if(!user){show('authArea',true);show('accountArea',false);return}
@@ -39,13 +64,40 @@ async function refresh(){
  const status=profile?.is_admin?'ADMIN':profile?.account_status||'PENDING';
  $('accountProfileStatus').textContent=status;
  if(!user.email_confirmed_at){accountMsg('Please verify your email address. Check your inbox for the PEPMOSA verification email.','pending');setStatus('pending','EMAIL VERIFICATION REQUIRED');hideDashboardSections();return}
- if(approved){accountMsg('Your account is approved. Welcome to PEPMOSA.','success');setStatus('approved',profile?.is_admin?'ADMIN':'APPROVED');showDashboardSections();await Promise.all([loadOrders(user.email),renderCart()]);return}
+ if(approved){
+   accountMsg('Your account is approved. Welcome to PEPMOSA.','success');
+   setStatus('approved',profile?.is_admin?'ADMIN':'APPROVED');
+   showDashboardSections();
+   startInactivityWatch();
+   await Promise.all([loadOrders(user.email),renderCart()]);
+   return
+ }
  if(profile?.account_status==='REJECTED'){accountMsg('Your account application was not approved. Please contact PEPMOSA admin if you believe this is an error.','error');setStatus('rejected','NOT APPROVED');hideDashboardSections();return}
  accountMsg('Your email is verified. Your account is now waiting for PEPMOSA admin approval.','pending');setStatus('pending','WAITING FOR ADMIN APPROVAL');hideDashboardSections()
 }
 async function savePendingProfileDetails(){try{const raw=sessionStorage.getItem('pepmosa_pending_profile');if(!raw||!sb)return;const p=JSON.parse(raw);const r=await sb.rpc('update_customer_profile_details',{p_full_name:p.full_name||'',p_address:p.address||'',p_contact_number:p.contact_number||'',p_whatsapp_name:p.whatsapp_name||''});if(r.error)throw r.error;sessionStorage.removeItem('pepmosa_pending_profile')}catch(e){console.warn('PEPMOSA profile save',e)}}
 async function saveProfileDetails(e){e.preventDefault();const btn=$('profileEditForm').querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='SAVING...';const r=await sb.rpc('update_customer_profile_details',{p_full_name:$('profileEditName').value.trim(),p_address:$('profileEditAddress').value.trim(),p_contact_number:$('profileEditContact').value.trim(),p_whatsapp_name:$('profileEditWhatsapp').value.trim()});btn.disabled=false;btn.textContent='SAVE DETAILS';if(r.error)return accountMsg(r.error.message,'error');accountMsg('Your account details have been saved.','success');await refresh()}
 function setStatus(type,label){$('accountStatus').innerHTML='<span class="status '+type+'">'+esc(label)+'</span>'}
+
+// PEPMOSA CUSTOMER SESSION — auto logout after 5 minutes of inactivity.
+let inactivityTimer=null;
+const INACTIVITY_LIMIT=5*60*1000;
+function resetInactivityTimer(){
+ clearTimeout(inactivityTimer);
+ if(!currentUser)return;
+ inactivityTimer=setTimeout(async()=>{
+   if(!currentUser)return;
+   try{await sb.auth.signOut()}finally{
+     sessionStorage.setItem('pepmosa_auto_logout','1');
+     location.reload();
+   }
+ },INACTIVITY_LIMIT);
+}
+function startInactivityWatch(){
+ ['mousemove','mousedown','keydown','touchstart','scroll','click'].forEach(evt=>window.addEventListener(evt,resetInactivityTimer,{passive:true}));
+ resetInactivityTimer();
+}
+
 function showDashboardSections(){document.querySelector('.accountQuickGrid').classList.remove('hidden');document.querySelectorAll('.accountSection').forEach(x=>x.classList.remove('hidden'));showAccountTab('orders')}
 function hideDashboardSections(){document.querySelector('.accountQuickGrid').classList.add('hidden');document.querySelectorAll('.accountSection').forEach(x=>x.classList.add('hidden'))}
 function showAccountTab(tab){document.querySelectorAll('[data-account-tab]').forEach(b=>b.classList.toggle('active',b.dataset.accountTab===tab));document.querySelectorAll('.accountSection').forEach(s=>s.classList.remove('active'));const map={orders:'accountOrdersSection',cart:'accountCartSection',profile:'accountProfileSection'};$(map[tab])?.classList.add('active')}

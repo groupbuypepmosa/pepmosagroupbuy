@@ -23,6 +23,7 @@
       .pwWaybillBar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid #efd7e4;border-radius:15px;padding:14px 16px;background:#fffafd;margin-bottom:12px}
       .pwWaybillNo{font-size:21px;font-weight:950;word-break:break-word;color:#2d2830;margin-top:4px}
       .pwCustomerEmail{text-align:right;font-size:13px;color:#5c5057}
+      .pwShippingHighlight{border:2px solid #d98ab3;border-radius:15px;padding:13px 15px;margin:0 0 12px;background:linear-gradient(135deg,#fff1f8,#fff);display:flex;justify-content:space-between;align-items:center;gap:12px}.pwShippingHighlight b{font-size:17px;color:#b51f61;text-align:right}
       .pwGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
       .pwField{border:1px solid #efdce7;border-radius:13px;padding:11px 12px;background:#fff}
       .pwField.full{grid-column:1/-1}
@@ -96,6 +97,7 @@
             '<div><div class="pwLabel">Waybill</div><div class="pwWaybillNo">'+esc(waybillNo)+'</div></div>'+
             '<div class="pwCustomerEmail"><div class="pwLabel">Customer Email</div><b>'+esc(email||'—')+'</b></div>'+
           '</div>'+
+          '<div class="pwShippingHighlight"><div class="pwLabel">SHIPPING OPTION</div><b>'+esc(r.shipping_method||r.courier||'To be assigned')+'</b></div>'+
           '<div class="pwGrid">'+
             '<div class="pwField"><div class="pwLabel">Customer</div><b>'+esc(r.customer_name||email||'—')+'</b></div>'+
             '<div class="pwField"><div class="pwLabel">Contact</div><b>'+esc(r.contact||'Not set')+'</b></div>'+

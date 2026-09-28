@@ -44,7 +44,7 @@ window.viewPurchaseHistory=async(id)=>{
  const email=String(user.email||'').trim().toLowerCase();
  if(!email){body.innerHTML='<div class="empty mini">No email linked to this account.</div>';return}
  try{
-   const {data:ordersData,error:ordersError}=await sb.from('orders').select('order_id,gb_number,total,payment_status,status,created_at').ilike('email',email).order('created_at',{ascending:false});
+   const {data:ordersData,error:ordersError}=await sb.from('orders').select('order_id,gb_number,total,payment_status,created_at').ilike('email',email).order('created_at',{ascending:false});
    if(ordersError)throw ordersError;
    const rows=ordersData||[];
    if(!rows.length){body.innerHTML='<div class="empty mini">No previous purchases found for this customer.</div>';return}

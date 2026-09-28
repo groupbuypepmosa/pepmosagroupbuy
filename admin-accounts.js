@@ -33,43 +33,39 @@ async function load(){
 }
 window.closePurchaseHistory=()=>{document.getElementById('purchaseHistoryModal')?.classList.remove('show')};
 window.viewPurchaseHistory=async(id)=>{
- const user=allCustomers.find(x=>String(x.id)===String(id));
- if(!user)return;
- const modal=document.getElementById('purchaseHistoryModal'),body=document.getElementById('purchaseHistoryBody');
- if(!modal||!body)return;
+ const user=allCustomers.find(x=>String(x.id)===String(id)); if(!user)return;
+ const modal=document.getElementById('purchaseHistoryModal'),body=document.getElementById('purchaseHistoryBody'); if(!modal||!body)return;
  document.getElementById('purchaseHistoryTitle').textContent=(user.full_name||'Customer')+' — Purchase History';
  document.getElementById('purchaseHistoryEmail').textContent=user.email||'';
- body.innerHTML='<div class="purchaseHistoryLoading">Loading purchase history…</div>';
- modal.classList.add('show');
- const email=String(user.email||'').trim().toLowerCase();
- if(!email){body.innerHTML='<div class="empty mini">No email linked to this account.</div>';return}
+ body.innerHTML='<div class="purchaseHistoryLoading">Loading purchase history…</div>'; modal.classList.add('show');
+ const email=String(user.email||'').trim().toLowerCase(); if(!email){body.innerHTML='<div class="empty mini">No email linked to this account.</div>';return}
  try{
-   const {data:ordersData,error:ordersError}=await sb.from('orders').select('order_id,gb_number,total,payment_status,created_at').ilike('email',email).order('created_at',{ascending:false});
-   if(ordersError)throw ordersError;
-   const rows=ordersData||[];
-   if(!rows.length){body.innerHTML='<div class="empty mini">No previous purchases found for this customer.</div>';return}
-   const ids=rows.map(o=>o.order_id).filter(Boolean);
-   let items=[];
-   if(ids.length){
-     const {data:itemData,error:itemError}=await sb.from('order_items').select('order_id,product_name,strength,qty,unit_price,line_total').in('order_id',ids);
-     if(itemError)throw itemError;
-     items=itemData||[];
-   }
-   const byOrder=new Map();
-   items.forEach(item=>{if(!byOrder.has(item.order_id))byOrder.set(item.order_id,[]);byOrder.get(item.order_id).push(item)});
-   const spent=rows.reduce((n,o)=>n+Number(o.total||0),0);
-   body.innerHTML='<div class="purchaseHistorySummary"><span><b>ORDERS</b>'+rows.length+'</span><span><b>TOTAL SPENT</b>₱'+spent.toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span><span><b>CUSTOMER</b>'+esc(user.full_name||'—')+'</span></div>'+
-   rows.map(o=>{
-     const its=byOrder.get(o.order_id)||[];
-     const products=its.length?its.map(i=>esc(i.product_name||'Product')+(i.strength?' — '+esc(i.strength):'')+' × '+Number(i.qty||0)+' @ ₱'+Number(i.unit_price||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})).join('<br>'):'Order items unavailable';
-     const status=esc(o.payment_status||o.status||'—');
-     const gbRaw=String(o.gb_number||'—'); const gbMatch=gbRaw.match(/(\\d+)/); const gbDisplay=gbMatch?gbMatch[1]:gbRaw;
-     return '<div class="purchaseOrder"><div class="purchaseOrderHead"><div class="purchaseOrderIdentity"><div class="purchaseOrderGb"><small>GROUP BUY</small><strong>#'+esc(gbDisplay)+'</strong></div><div><div class="purchaseOrderTitle">Order '+esc(o.order_id||'—')+'</div><div class="purchaseOrderMeta">'+(o.created_at?new Date(o.created_at).toLocaleString():'—')+' <span class="gbText">• GB '+esc(gbRaw)+'</span></div></div></div><span class="badge '+(String(o.payment_status||'').toLowerCase()==='paid'?'approved':'pending')+'">'+status+'</span></div><div class="purchaseOrderProducts">'+products+'</div><div class="purchaseOrderTotal">Total: ₱'+Number(o.total||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div></div>';
-   }).join('');
- }catch(e){
-   console.error('Purchase history error:',e);
-   body.innerHTML='<div class="empty mini">Unable to load purchase history: '+esc(e.message||'Unknown error')+'</div>';
- }
+  const {data:gbOrders,error:gbError}=await sb.from('orders').select('order_id,gb_number,total,payment_status,created_at').ilike('email',email).order('created_at',{ascending:false});
+  if(gbError)throw gbError;
+  const {data:moqOrders,error:moqError}=await sb.from('ofa_orders').select('order_id,gb_id,total,payment_status,created_at').ilike('email',email).order('created_at',{ascending:false});
+  if(moqError)throw moqError;
+  const regular=(gbOrders||[]).map(o=>({...o,historyType:'GB'})), moq=(moqOrders||[]).map(o=>({...o,historyType:'MOQ'}));
+  const rows=[...regular,...moq].sort((x,y)=>new Date(y.created_at||0)-new Date(x.created_at||0));
+  if(!rows.length){body.innerHTML='<div class="empty mini">No previous purchases found for this customer.</div>';return}
+  const ids=regular.map(o=>o.order_id).filter(Boolean), moqIds=moq.map(o=>o.order_id).filter(Boolean);
+  const [ri,mi,mg]=await Promise.all([
+   ids.length?sb.from('order_items').select('order_id,product_name,strength,qty,unit_price,line_total').in('order_id',ids):Promise.resolve({data:[],error:null}),
+   moqIds.length?sb.from('ofa_order_items').select('order_id,product_name,qty,unit_price,line_total').in('order_id',moqIds):Promise.resolve({data:[],error:null}),
+   moq.some(o=>o.gb_id)?sb.from('ofa_group_buys').select('gb_id,gb_number,customer_facing_name').in('gb_id',moq.map(o=>o.gb_id).filter(Boolean)):Promise.resolve({data:[],error:null})
+  ]);
+  if(ri.error)throw ri.error;if(mi.error)throw mi.error;if(mg.error)throw mg.error;
+  const byOrder=new Map();
+  [...(ri.data||[]),...(mi.data||[])].forEach(item=>{if(!byOrder.has(item.order_id))byOrder.set(item.order_id,[]);byOrder.get(item.order_id).push(item)});
+  const moqGbMap=new Map((mg.data||[]).map(g=>[String(g.gb_id),g]));
+  const spent=rows.reduce((n,o)=>n+Number(o.total||0),0);
+  body.innerHTML='<div class="purchaseHistorySummary"><span><b>ALL ORDERS</b>'+rows.length+'</span><span><b>GB ORDERS</b>'+regular.length+'</span><span><b>MOQ ORDERS</b>'+moq.length+'</span><span><b>TOTAL SPENT</b>₱'+spent.toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span></div>'+
+  rows.map(o=>{
+   const isMoq=o.historyType==='MOQ', its=byOrder.get(o.order_id)||[], g=isMoq?moqGbMap.get(String(o.gb_id)):null;
+   const products=its.length?its.map(i=>esc(i.product_name||'Product')+(i.strength?' — '+esc(i.strength):'')+' × '+Number(i.qty||0)+' @ ₱'+Number(i.unit_price||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})).join('<br>'):'Order items unavailable';
+   const raw=isMoq?(g?.gb_number||'—'):(o.gb_number||'—'), num=String(raw).match(/(\d+)/)?.[1]||raw;
+   return '<div class="purchaseOrder '+(isMoq?'purchaseOrderMoq':'')+'"><div class="purchaseOrderHead"><div class="purchaseOrderIdentity"><div class="purchaseOrderGb"><small>'+(isMoq?'MOQ':'GROUP BUY')+'</small><strong>#'+esc(num)+'</strong></div><div><div class="purchaseOrderTitle">'+(isMoq?'MOQ Order ':'Order ')+esc(o.order_id||'—')+'</div><div class="purchaseOrderMeta">'+esc(isMoq?(g?.customer_facing_name||'MOQ'):('GB '+raw))+' • '+(o.created_at?new Date(o.created_at).toLocaleString():'—')+'</div></div></div><span class="badge '+(String(o.payment_status||'').toLowerCase()==='paid'?'approved':'pending')+'">'+esc(o.payment_status||'—')+'</span></div><div class="purchaseOrderProducts">'+products+'</div><div class="purchaseOrderTotal">Total: ₱'+Number(o.total||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div></div>';
+  }).join('');
+ }catch(e){console.error('Purchase history error:',e);body.innerHTML='<div class="empty mini">Unable to load purchase history: '+esc(e.message||'Unknown error')+'</div>'}
 };
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closePurchaseHistory()});
 

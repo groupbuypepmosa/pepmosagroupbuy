@@ -45,6 +45,160 @@ body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 10%,rgba
 </style>
 <style id="pepmosa-login-polish">
 .loginPasswordWrap{position:relative}.loginPasswordWrap input{padding-right:76px!important}.passwordToggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:#fff1f7;color:#b72d7b;border-radius:9px;padding:7px 9px;font-size:9px;font-weight:950;letter-spacing:.05em;cursor:pointer}.passwordToggle:hover{background:#ffe4f1}.loginBusy{opacity:.7!important;cursor:wait!important}.loginHint{margin-top:9px;font-size:10px;line-height:1.45;color:#8a7580;text-align:center}
+</style><style id="pepmosa-logged-home-design">
+/* LOGGED-IN CUSTOMER HOME — design only */
+.accountCard:has(#accountArea:not(.hidden)){
+  max-width:1120px!important;
+  width:100%;
+  padding:18px!important;
+  background:rgba(255,255,255,.78)!important;
+  border:1px solid rgba(229,190,214,.75)!important;
+  border-radius:32px!important;
+  box-shadow:0 28px 80px rgba(126,55,103,.13)!important;
+}
+.accountCard:has(#accountArea:not(.hidden)) .logo,
+.accountCard:has(#accountArea:not(.hidden))>.title,
+.accountCard:has(#accountArea:not(.hidden))>.sub{
+  display:none!important;
+}
+.accountCard:has(#accountArea:not(.hidden)) #accountArea{display:block!important}
+.accountWelcome{
+  position:relative!important;
+  overflow:hidden!important;
+  padding:30px 32px!important;
+  margin:0 0 16px!important;
+  border-radius:28px!important;
+  background:
+    radial-gradient(circle at 91% 18%,rgba(224,71,153,.18),transparent 25%),
+    radial-gradient(circle at 7% 100%,rgba(176,91,207,.12),transparent 30%),
+    linear-gradient(135deg,#fff9fc 0%,#fff0f7 57%,#f7efff 100%)!important;
+  border:1px solid #efd5e4!important;
+  box-shadow:0 16px 38px rgba(133,61,108,.09)!important;
+}
+.accountWelcome:before{
+  content:"♡";position:absolute;right:28px;top:-18px;
+  font-family:Georgia,serif;font-size:145px;line-height:1;
+  color:rgba(207,49,133,.075);pointer-events:none;
+}
+.accountWelcome:after{
+  content:"✦";position:absolute;right:150px;bottom:20px;
+  font-size:28px;color:rgba(190,64,153,.14);pointer-events:none;
+}
+.welcomeEyebrow{
+  position:relative;z-index:1;
+  color:#c52f80!important;font-size:10px!important;
+  font-weight:950!important;letter-spacing:.18em!important;
+}
+.accountWelcome h1{
+  position:relative;z-index:1;
+  margin:8px 0 7px!important;
+  font-size:clamp(34px,5vw,54px)!important;
+  line-height:1!important;letter-spacing:-2px!important;
+  color:#382631!important;
+}
+.accountWelcome h1 span{color:#d12d84!important}
+.accountWelcome>p{
+  position:relative;z-index:1;
+  margin:0!important;color:#806b77!important;
+  font-size:13px!important;line-height:1.5!important;
+}
+.welcomeMeta{
+  position:relative;z-index:1;
+  display:flex!important;align-items:center!important;
+  flex-wrap:wrap!important;gap:8px!important;margin-top:17px!important;
+}
+.welcomeMeta #accountEmail{
+  padding:7px 11px;border-radius:999px;
+  background:rgba(255,255,255,.75);border:1px solid #efd9e5;
+  color:#7d6873;font-size:10px;font-weight:800;
+}
+.accountQuickGrid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:12px!important;margin:0 0 18px!important;
+}
+.accountQuick{
+  position:relative!important;overflow:hidden!important;
+  min-height:108px!important;
+  padding:17px 18px!important;
+  border:1px solid #efd8e6!important;
+  border-radius:21px!important;
+  background:linear-gradient(145deg,#fff,#fff7fb)!important;
+  color:#4b3541!important;
+  text-align:left!important;
+  cursor:pointer!important;
+  box-shadow:0 9px 24px rgba(132,61,106,.06)!important;
+  transition:.18s ease!important;
+}
+.accountQuick:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(132,61,106,.10)!important;border-color:#e6b8d2!important}
+.accountQuick.active{
+  background:linear-gradient(135deg,#fff0f7,#f8efff)!important;
+  border-color:#e4aaca!important;
+}
+.accountQuick span{
+  display:block!important;font-size:25px!important;margin-bottom:10px!important;
+}
+.accountQuick b{
+  display:block!important;font-size:11px!important;
+  letter-spacing:.08em!important;color:#4a3541!important;
+}
+.accountQuick small{
+  display:block!important;margin-top:4px!important;
+  font-size:10px!important;color:#967e89!important;
+}
+.accountSection{
+  padding:22px!important;
+  border:1px solid #efdce7!important;
+  border-radius:24px!important;
+  background:rgba(255,255,255,.91)!important;
+  box-shadow:0 10px 28px rgba(130,60,105,.05)!important;
+}
+.accountSection.active{display:block!important}
+.sectionTop{
+  display:flex!important;align-items:end!important;
+  justify-content:space-between!important;gap:15px!important;
+  margin-bottom:15px!important;
+}
+.sectionEyebrow{
+  color:#c13b83!important;font-size:9px!important;
+  font-weight:950!important;letter-spacing:.16em!important;
+}
+.sectionTop h2{
+  margin:5px 0 0!important;font-size:27px!important;
+  line-height:1!important;color:#382631!important;
+}
+.sectionAction{
+  padding:9px 12px!important;border-radius:999px!important;
+  background:#fff0f7!important;border:1px solid #edc7da!important;
+  color:#b72d78!important;font-size:9px!important;font-weight:950!important;
+}
+.accountList{display:grid!important;gap:11px!important}
+.orderCard,.cartAccountCard,.profileBox{
+  border-color:#efdce7!important;
+  box-shadow:none!important;
+}
+#logout{
+  max-width:190px!important;display:block!important;margin:18px auto 2px!important;
+}
+.accountCard:has(#accountArea:not(.hidden)) .links{display:none!important}
+
+@media(max-width:760px){
+ .accountCard:has(#accountArea:not(.hidden)){
+   width:100%;padding:10px!important;border-radius:25px!important;
+ }
+ .accountWelcome{padding:25px 21px!important;border-radius:23px!important}
+ .accountWelcome h1{font-size:34px!important;letter-spacing:-1.5px!important}
+ .accountWelcome:before{right:4px;top:-12px;font-size:105px}
+ .accountQuickGrid{grid-template-columns:1fr!important;gap:9px!important}
+ .accountQuick{min-height:76px!important;padding:13px 15px!important}
+ .accountQuick span{display:inline-block!important;margin:0 8px 0 0!important;font-size:21px!important;vertical-align:middle}
+ .accountQuick b{display:inline-block!important;font-size:10px!important}
+ .accountQuick small{margin-left:31px!important}
+ .accountSection{padding:17px 14px!important;border-radius:20px!important}
+ .sectionTop{align-items:flex-start!important}
+ .sectionTop h2{font-size:23px!important}
+ .sectionAction{font-size:8px!important;padding:8px 10px!important}
+}
 </style></head>
 <body>
 <div class="accountWrap"><div class="accountCard">

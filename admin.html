@@ -542,7 +542,9 @@ async function loadEverything(){
   try{
     await loadGroupBuys();
     if(typeof renderActiveGroupBuySelector==="function")renderActiveGroupBuySelector();
-    await Promise.all([loadCategories(),loadProducts(),loadFees(),loadOrders(),loadOrdersCenter()]);\n    await loadStockProducts();\n    await loadStockInventory();
+    await Promise.all([loadCategories(),loadProducts(),loadFees(),loadOrders(),loadOrdersCenter()]);
+    await loadStockProducts();
+    await loadStockInventory();
     // Populate the GB category picker immediately on admin load.
     // Without this, the form can remain stuck on "Loading categories..." until
     // the user manually creates/edits a GB.

@@ -44,7 +44,7 @@ document.getElementById('backToAdminBtn')?.addEventListener('click',async functi
       }
     }
   }catch(e){console.warn('Admin return backup failed',e)}
-  location.href='admin.html?return=finance';
+  window['history']['go'](-1);
 });
 (async()=>{
 try{initSupabase();await requireAdmin();}catch(e){document.body.innerHTML='<main style="padding:30px;font-family:Arial"><h2>Admin access required</h2><p>Please log in as PEPMOSA admin.</p></main>';return;}

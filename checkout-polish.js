@@ -246,7 +246,14 @@
       const {data,error}=await s.from('orders').select('shipping_method,shipping_fee,payment_status').eq('gb_number',gbNumber).eq('email',email).gt('shipping_fee',0).not('payment_status','in','("REJECTED","CANCELLED","CANCELED")').order('created_at',{ascending:false}).limit(1).maybeSingle();
       if(error||!data)return {paid:false,index:0};
       const method=String(data.shipping_method||'').toLowerCase();
-      const index=method.includes('visayas')?1:method.includes('mindanao')?2:method.includes('lalamove')?3:0;
+      const fee=Number(data.shipping_fee||0);
+      const index=method.includes('visayas')?1
+        :method.includes('mindanao')?2
+        :method.includes('lalamove')?3
+        :fee===150?1
+        :fee===180?2
+        :fee===100?0
+        :0;
       return {paid:true,index};
     }catch(e){console.warn('PEPMOSA paid shipping lookup',e);return {paid:false,index:0};}
   }
@@ -281,6 +288,7 @@
           <div class="pepFinalCard">
             <div class="pepFinalTitle"><span>SHIPPING METHOD</span><span class="optional">REQUIRED</span></div>
             <select id="pepShippingMethod" class="pepShippingSelect"${checkoutShippingPaid?" disabled":""}>
+              ${checkoutShippingPaid ? "" : '<option value="" disabled selected>Select shipping method</option>'}
               <option value="0">J&amp;T Express — Luzon • ₱100</option>
               <option value="1">J&amp;T Express — Visayas • ₱150</option>
               <option value="2">J&amp;T Express — Mindanao • ₱180</option>
@@ -314,7 +322,7 @@
     if(checkoutShippingPaid&&$('pepShippingMethod'))$('pepShippingMethod').value=String(checkoutPaidShippingIndex);$('pepShippingMethod')?.addEventListener('change',updateTotals);$('pepPlaceOrder').onclick=submitOrder;$('pepCancelOrder').onclick=closeCheckout;updateTotals();
   }
   function updateTotals(){
-    const {subtotal}=totals();const i=Number($('pepShippingMethod')?.value||0),fee=checkoutShippingPaid?0:([100,150,180,0][i]??100);
+    const {subtotal}=totals();const raw=$('pepShippingMethod')?.value??'';const i=raw===''?null:Number(raw);const fee=checkoutShippingPaid?0:(i===null?0:([100,150,180,0][i]??0));
     if($('pepShippingFee'))$('pepShippingFee').textContent=checkoutShippingPaid?'PAID':peso(fee);
     if($('pepGrandTotal'))$('pepGrandTotal').textContent=fee?peso(subtotal+fee):peso(subtotal);
   }
@@ -366,17 +374,18 @@
       const contact=(checkoutCustomer?.contact||'').trim();
       const address=(checkoutCustomer?.address||'').trim();
       const file=$('pepOrderProof')?.files?.[0]||null;
-      const shipIndex=Number($('pepShippingMethod')?.value||0);
+      const rawShipIndex=$('pepShippingMethod')?.value??'';
+      const shipIndex=rawShipIndex===''?null:Number(rawShipIndex);
       const shipNames=['J&T Express - Luzon','J&T Express - Visayas','J&T Express - Mindanao','Lalamove'];
       const shipFees=[100,150,180,0];
-      const shippingMethod=checkoutShippingPaid?(shipNames[checkoutPaidShippingIndex]||'J&T Express - Luzon'):(shipNames[shipIndex]||'');
-      const shippingFee=checkoutShippingPaid?0:(shipFees[shipIndex]||0);
+      const shippingMethod=checkoutShippingPaid?(shipNames[checkoutPaidShippingIndex]||''):(shipIndex===null?'':(shipNames[shipIndex]||''));
+      const shippingFee=checkoutShippingPaid?0:(shipIndex===null?0:(shipFees[shipIndex]??0));
       const total=subtotal+shippingFee;
       const missing=[];
       if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))missing.push('Account Email');
       if(!name)missing.push('Full Name');
       if(!contact)missing.push('Contact Number');
-      if(!shippingMethod)missing.push('Shipping Method');
+      if(!shippingMethod)missing.push('Shipping Method — please select J&T Express (Luzon/Visayas/Mindanao) or Lalamove');
       if(!address)missing.push('Delivery Address');
       if(!file)missing.push('Payment Proof');
       if(missing.length){

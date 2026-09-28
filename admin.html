@@ -496,7 +496,7 @@ async function verifyAdmin(user){
   }
   enterAdmin(user);
 }
-async function logout(){await sb.auth.signOut();$("adminApp").style.display="none";$("loginScreen").style.display="flex";$("loginPassword").value="";showLoginMessage("You have been logged out.","success")}
+async function logout(){await sb.auth.signOut();try{localStorage.removeItem("pepmosa_admin_session_backup");sessionStorage.removeItem("pepmosa_admin_session_backup");}catch(e){}$("adminApp").style.display="none";$("loginScreen").style.display="flex";$("loginPassword").value="";showLoginMessage("You have been logged out.","success")}
 async function checkExistingSession(){
   const loginScreen=$("loginScreen"),adminApp=$("adminApp");
   if(loginScreen)loginScreen.style.display="none";
@@ -528,7 +528,7 @@ async function checkExistingSession(){
       let user=data?.session?.user;
       if(!user){
         try{
-          const backup=JSON.parse(sessionStorage.getItem("pepmosa_admin_session_backup")||"null");
+          const backup=JSON.parse(localStorage.getItem("pepmosa_admin_session_backup")||sessionStorage.getItem("pepmosa_admin_session_backup")||"null");
           if(backup?.access_token&&backup?.refresh_token){
             const restored=await sb.auth.setSession({
               access_token:backup.access_token,
@@ -540,7 +540,7 @@ async function checkExistingSession(){
       }
       if(user){
         await verifyAdmin(user);
-        try{localStorage.removeItem("pepmosa_admin_return");localStorage.removeItem("pepmosa_admin_session_backup");sessionStorage.removeItem("pepmosa_admin_session_backup");}catch(e){}
+        try{localStorage.removeItem("pepmosa_admin_return");}catch(e){}
         return;
       }
     }

@@ -93,7 +93,7 @@ var peso = function(value) {
     }catch(e){console.error('PEPMOSA idle logout',e);}
     reset();
   }
-  function wireIdle(){
+  function wireIdle(){if(/^\/admin(?:\.html)?\/?$/i.test(window.location.pathname)){return;} 
     if(wired)return;
     wired=true;
     activityEvents.forEach(ev=>window.addEventListener(ev,reset,{passive:true}));

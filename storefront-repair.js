@@ -15,6 +15,10 @@
     #productGrid .pepStoreBody{padding:13px 14px!important}
     #productGrid .pepStoreBody h3{font-size:19px!important;margin:0 0 6px!important}
     #productGrid .pepStoreBottom{margin-top:10px!important;padding-top:10px!important}
+    #productGrid .pepSoldForGb{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;margin:9px 0 4px!important;padding:7px 10px!important;border:1px solid #f0c9dc!important;border-radius:12px!important;background:linear-gradient(90deg,#fff4f9,#fffafb)!important;box-sizing:border-box!important}
+    #productGrid .pepSoldForGb span{font-size:9px!important;font-weight:900!important;letter-spacing:.06em!important;color:#a45a79!important}
+    #productGrid .pepSoldForGb b{font-size:16px!important;line-height:1!important;color:#c72d7e!important}
+
     #productGrid .pepSelectVariant{position:relative;z-index:2!important}
     @media(max-width:620px){#productGrid{gap:14px!important}#productGrid .pepStoreCard .productImg{height:205px!important;padding:7px!important}#productGrid .pepStoreBody>.muted{display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important;font-size:13px!important}}
 
@@ -103,6 +107,8 @@
 `;
   if(!document.getElementById('pepPinkStudioRuntime')){const st=document.createElement('style');st.id='pepPinkStudioRuntime';st.textContent=__pepPinkStudioCSS;document.head.appendChild(st);}
 
+  let soldByProduct=new Map();
+
   function renderProducts(){
   const grid=$('productGrid');
   if(!grid)return;
@@ -128,6 +134,7 @@
       <div class="pepStoreBody">
         <h3>${esc(p.product_name)}</h3>
         <div class="muted">${esc(p.description||'')}</div>
+        <div class="pepSoldForGb"><span>♡ SOLD FOR THIS GB</span><b>${Number(soldByProduct.get(String(p.product_id))||0).toLocaleString('en-PH')}</b></div>
         <div class="pepStoreBottom">
           <div class="pepStarting"><small>${gb?.status==='KIT_COMPLETION'?'KIT COMPLETION':'STARTING AT'}</small><b>${peso(lowest)}</b><span>${gb?.status==='KIT_COMPLETION'?'Select an mg to see its exact remaining vial count':variants.length+' variant'+(variants.length===1?'':'s')+' available'}</span></div>
           <button class="pepFeeBtn pepSelectVariant" type="button" data-product-id="${esc(p.product_id)}">CHOOSE VARIANT</button>
@@ -295,6 +302,32 @@
       const vr=await s.from('product_variants').select('variant_id,product_id,strength,price,active').in('product_id',ids);
       if(vr.error)throw vr.error;
       allVariants=vr.data||[];
+    }
+    // Sold count is calculated once for the active GB and cached for the storefront renderer.
+    // Customer orders and admin/manual orders are both included; rejected/cancelled customer
+    // orders are excluded. This does not modify cart, checkout, inventory, or ordering logic.
+    soldByProduct=new Map();
+    const soldOrders=await s.from('orders').select('order_id,payment_status').eq('gb_number',gb.gb_number);
+    if(soldOrders.error)throw soldOrders.error;
+    const validSoldOrders=(soldOrders.data||[]).filter(o=>!['REJECTED','CANCELLED','CANCELED','REFUNDED','DELETED'].includes(String(o.payment_status||'').toUpperCase()));
+    const soldOrderIds=validSoldOrders.map(o=>o.order_id).filter(Boolean);
+    if(soldOrderIds.length){
+      const soldItems=await s.from('order_items').select('variant_id,qty').in('order_id',soldOrderIds);
+      if(soldItems.error)throw soldItems.error;
+      const variantToProduct=new Map((allVariants||[]).map(v=>[String(v.variant_id),String(v.product_id)]));
+      for(const item of (soldItems.data||[])){
+        const pid=variantToProduct.get(String(item.variant_id||''));
+        if(!pid)continue;
+        soldByProduct.set(pid,(soldByProduct.get(pid)||0)+Math.max(0,Number(item.qty||0)));
+      }
+    }
+    const adminSold=await s.from('admin_orders').select('variant_id,qty').eq('gb_number',gb.gb_number);
+    if(adminSold.error)throw adminSold.error;
+    const variantToProduct=new Map((allVariants||[]).map(v=>[String(v.variant_id),String(v.product_id)]));
+    for(const item of (adminSold.data||[])){
+      const pid=variantToProduct.get(String(item.variant_id||''));
+      if(!pid)continue;
+      soldByProduct.set(pid,(soldByProduct.get(pid)||0)+Math.max(0,Number(item.qty||0)));
     }
     products=baseProducts.map(p=>({...p,product_variants:allVariants.filter(v=>String(v.product_id)===String(p.product_id)&&v.active!==false)}));const ms=await s.from('gb_minimum_quantities').select('gb_number,product_id,variant_id,minimum_qty').eq('gb_number',gb.gb_number);if(ms.error)throw ms.error;minimums=ms.data||[];// Category-level minimums are optional. This project currently stores the
      // active per-variant minimums in gb_minimum_quantities. Do not query the

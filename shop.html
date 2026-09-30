@@ -821,39 +821,6 @@ header{
 @media(max-width:620px){.pepProductPicker{align-items:flex-end;padding:8px}.pepPickerBox{padding:22px 18px 20px;border-radius:26px 26px 18px 18px;max-height:94vh}.pepPickerHead{grid-template-columns:95px 1fr;gap:13px}.pepPickerImage{height:95px}.pepPickerHead h2{font-size:23px}.pepQuantityRow{align-items:flex-start;flex-direction:column}.pepStepper{width:100%;grid-template-columns:1fr 72px 1fr}.pepStepper input{width:72px}.pepStoreCard .productImg{height:155px!important}}
 </style>
 
-<style id="pep-sold-for-gb-style">
-.pepSoldForGbWide{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-  width:100%!important;
-  box-sizing:border-box!important;
-  margin:10px 0 2px!important;
-  padding:9px 12px!important;
-  border:1px solid #efb7d1!important;
-  border-radius:13px!important;
-  background:linear-gradient(90deg,#fff0f7,#fff8fb)!important;
-}
-.pepSoldForGbWide span{
-  font-size:10px!important;
-  font-weight:900!important;
-  letter-spacing:.06em!important;
-  color:#a54d76!important;
-}
-.pepSoldForGbWide strong{
-  font-size:20px!important;
-  line-height:1!important;
-  color:#c52e7d!important;
-}
-.pepSoldForGb{
-  display:none!important;
-}
-@media(max-width:620px){
-  .pepSoldForGbWide{margin:9px 0 1px!important;padding:8px 10px!important}
-  .pepSoldForGbWide span{font-size:9px!important}
-  .pepSoldForGbWide strong{font-size:18px!important}
-}
-</style>
 <style id="pep-mobile-product-polish">
 @media(max-width:620px){
   #productGrid{gap:14px!important}
@@ -1850,35 +1817,6 @@ async function load(){
       ...p,
       product_variants:variantData.filter(v=>String(v.product_id)===String(p.product_id))
     }));
-
-    // Read-only sales counter for THIS exact Group Buy only.
-    // It does not create or enforce any inventory/MOQ limit.
-    try{
-      const soldByProduct={};
-      const soldQuery=await sb
-        .from("order_items")
-        .select("product_id,qty,orders!inner(gb_number,payment_status)")
-        .eq("orders.gb_number",gb.gb_number);
-
-      if(soldQuery.error) throw soldQuery.error;
-
-      for(const item of (soldQuery.data||[])){
-        const status=String(item.orders?.payment_status||"").toUpperCase().replace(/[- ]/g,"_");
-        if(["CANCELLED","CANCELED","REFUNDED","DELETED"].includes(status)) continue;
-        const pid=String(item.product_id||"");
-        if(!pid) continue;
-        soldByProduct[pid]=(soldByProduct[pid]||0)+Math.max(0,Number(item.qty)||0);
-      }
-
-      products=products.map(p=>({
-        ...p,
-        sold_for_gb:Number(soldByProduct[String(p.product_id)]||0)
-      }));
-    }catch(soldError){
-      console.warn("PEPMOSA sold-for-this-GB counter unavailable",soldError);
-      products=products.map(p=>({...p,sold_for_gb:0}));
-    }
-
     window.__pepBaseProducts = products;
 
     if(gb.status==="CLOSED" && !categoryNames.length){
@@ -2054,20 +1992,10 @@ function renderProducts(){
                   ${esc(p.description || "")}
                 </p>
 
-                <div class="pepSoldForGbWide" aria-label="Sold for this Group Buy">
-                  <span>♡ SOLD FOR THIS GB</span>
-                  <strong>${Number(p.sold_for_gb||0).toLocaleString("en-PH")}</strong>
-                </div>
-
                 <div class="pepStoreBottom">
                   <div class="pepStarting">
                     <small>Starting at</small>
                     <b>${peso(lowest)}</b>
-                  </div>
-
-                  <div class="pepSoldForGb" aria-label="Sold for this Group Buy">
-                    <small>SOLD FOR THIS GB</small>
-                    <b>${Number(p.sold_for_gb||0).toLocaleString("en-PH")}</b>
                   </div>
 
                   <button
@@ -3245,10 +3173,7 @@ load();
       }
     }
 
-    // Preserve the sold-for-this-GB value calculated by the base loader.
-    const soldSource=Array.isArray(window.__pepBaseProducts)?window.__pepBaseProducts:[];
-    const soldMap=new Map(soldSource.map(p=>[String(p.product_id),Number(p.sold_for_gb)||0]));
-    const list=liveProducts.map(p=>({...p,sold_for_gb:soldMap.get(String(p.product_id)) ?? Number(p.sold_for_gb)||0}));
+    const list=liveProducts;
     const filtered=list.filter(p=>{
       const hay=(String(p.product_name||'')+' '+String(p.description||'')).toLowerCase();
       return !q || hay.includes(q);
@@ -3271,7 +3196,6 @@ load();
         '<div class="pepStoreBody">'+
           '<h3>'+esc2(p.product_name)+'</h3>'+
           '<p class="muted">'+esc2(p.description||'')+'</p>'+
-          '<div class="pepSoldForGbWide" aria-label="Sold for this Group Buy"><span>♡ SOLD FOR THIS GB</span><strong>'+Number(p.sold_for_gb||0).toLocaleString('en-PH')+'</strong></div>'+
           '<div class="pepStoreBottom">'+
             '<div class="pepStarting"><small>Starting at</small><b>'+peso2(lowest)+'</b></div>'+
             '<button class="btn primary pepSelectVariant" type="button" data-product-id="'+esc2(p.product_id)+'">SELECT VARIANT</button>'+

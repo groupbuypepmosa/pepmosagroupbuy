@@ -98,39 +98,40 @@
   .pepSideRail b{font-size:5px!important}
 }
 </style>
-<body><div class="top"><a class="back" href="./?home=20260924fix">← <span>Back to Shop</span></a></div><main class="page"><div class="brand"><img src="https://raw.githubusercontent.com/groupbuypepmosa/pepmosagroupbuy/main/pepmosa-logo.png" alt="PEPMOSA"><b>PEPMOSA</b><span>GROUP BUY</span></div><section class="hero"><div class="eyebrow">PEPMOSA REFERENCE LIBRARY</div><h1>Protocols <em>✧</em></h1><p>Easy-to-read peptide reference cards with the exact peptide name, reconstitution math, cycle information, storage and important notes.</p></section><section class="library"><div class="libraryHead"><b>Peptide Protocols</b><span>Reference cards for the protocols currently uploaded to PEPMOSA.</span></div><section id="documents"><div class="empty">Loading protocols…</div></section></section><div class="footer">♡ PEPMOSA GROUP BUY ♡</div></main>
+<body><div class="top"><a class="back" href="./?home=20260924fix">← <span>Back to Shop</span></a></div><main class="page"><div class="brand"><img src="https://raw.githubusercontent.com/groupbuypepmosa/pepmosagroupbuy/main/pepmosa-logo.png" alt="PEPMOSA"><b>PEPMOSA</b><span>GROUP BUY</span></div><section class="hero"><div class="eyebrow">PEPMOSA REFERENCE LIBRARY</div><h1>Protocols <em>✧</em></h1><p>Easy-to-read peptide reference cards with the exact peptide name, reconstitution math, cycle information, storage and important notes.</p></section><section class="library"><div class="libraryHead"><b>Peptide Protocols</b><span>Reference cards for the products currently available in PEPMOSA.</span></div><section id="documents"><div class="empty">Loading protocols…</div></section></section><div class="footer">♡ PEPMOSA GROUP BUY ♡</div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260903-library-live"></script><script src="supabase.js?v=20260903-library-live"></script>
 <script>
 (function(){
- const TYPE="PROTOCOL";
  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
  const clean=v=>String(v??'').trim();
- function strengthFrom(d){const s=clean(d.title)+" "+clean(d.product_name)+" "+clean(d.file_name);const m=s.match(/\b(\d+(?:\.\d+)?)\s*(mg|mcg|iu)\b/i);return m?m[1]+" "+m[2].toUpperCase():""; }
- function card(d){
-   const name=clean(d.product_name)||clean(d.title)||"PEPTIDE";
-   const strength=strengthFrom(d);
+ function card(p){
+   const name=clean(p.product_name)||"PEPTIDE";
+   const desc=clean(p.description);
    return '<article class="protocolCard">'+
     '<div class="pepName">'+esc(name)+'</div>'+
-    (strength?'<div class="pepStrength">'+esc(strength)+' VIAL</div>':'')+
-    '<div class="section"><b>WHAT IS IT?</b><p>Research/reference information for <strong>'+esc(name)+'</strong>. Product-specific use should be determined from an appropriate professional protocol.</p></div>'+
-    '<div class="section"><b>RECONSTITUTION</b><p>Use the diluent volume specified for the specific product and protocol. Do not assume the same volume for every peptide or vial.</p><div class="formula">Concentration = total peptide amount ÷ diluent volume</div></div>'+
-    '<div class="section"><b>CONCENTRATION &amp; CALCULATION</b><p>Always calculate the final concentration from the actual vial strength and the actual diluent volume used. Check the units (mg, mcg, IU or mL) before measuring.</p></div>'+
-    '<div class="section"><b>CYCLE / DURATION</b><p>Cycle length and frequency vary by peptide and research protocol. Follow the applicable protocol rather than using a generic cycle.</p></div>'+
-    '<div class="section"><b>STORAGE</b><p>Follow the product-specific storage and handling instructions. Protect the prepared solution from inappropriate heat, light and contamination.</p></div>'+
-    '<div class="noticeBox">⚠️ Reference information only. This card does not replace instructions from a qualified healthcare professional or the product manufacturer.</div>'+
+    '<div class="pepStrength">PEPMOSA PRODUCT PROTOCOL</div>'+
+    '<div class="section"><b>WHAT IS IT?</b><p>'+esc(desc||("Reference information for "+name+"."))+'</p></div>'+
+    '<div class="section"><b>RECONSTITUTION</b><p>Check the exact vial strength and the product-specific diluent instructions before preparing. Do not assume one diluent volume works for every product.</p><div class="formula">Concentration = total amount in vial ÷ final volume</div></div>'+
+    '<div class="section"><b>CONCENTRATION &amp; CALCULATION</b><p>Use the actual vial strength and actual final volume. Keep units consistent and verify the calculation before measuring any volume.</p></div>'+
+    '<div class="section"><b>CYCLE / DURATION</b><p>There is no single cycle that applies to every product. Follow the applicable product protocol and qualified professional guidance.</p></div>'+
+    '<div class="section"><b>STORAGE &amp; HANDLING</b><p>Follow the product-specific storage instructions. Keep prepared material protected from inappropriate heat, light and contamination.</p></div>'+
+    '<div class="noticeBox">⚠️ Reference information only. This card is not a personalized medical instruction or a substitute for professional guidance.</div>'+
    '</article>';
  }
  async function boot(){
   const box=document.getElementById("documents");
   try{
    const client=initSupabase();
-   const {data,error}=await client.from("library_documents").select("id,document_type,title,product_name,file_path,file_name,mime_type,created_at").eq("document_type",TYPE).order("created_at",{ascending:false});
+   const {data,error}=await client.from("products").select("product_id,product_name,description,active").eq("active",true).order("product_name");
    if(error)throw error;
-   if(!data?.length){box.innerHTML='<div class="empty">No protocols uploaded yet.</div>';return;}
+   if(!data?.length){box.innerHTML='<div class="empty">No active products found.</div>';return;}
    box.innerHTML=data.map(card).join("");
-  }catch(e){console.error(e);box.innerHTML='<div class="notice error"><b>Protocols could not load.</b><br>'+esc(e?.message||"Unknown error")+'</div>';}
+  }catch(e){
+   console.error("PROTOCOL PRODUCT LOAD ERROR",e);
+   box.innerHTML='<div class="notice error"><b>Protocols could not load.</b><br>'+esc(e?.message||"Unknown error")+'</div>';
+  }
  }
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
-</script>
+</script></script>
 <nav class="pepSideRail" aria-label="PEPMOSA shortcuts"><a href="./?home=20260924fix" title="Home"><span>⌂</span><b>HOME</b></a><a href="shop.html" title="Products"><span>🛍</span><b>PRODUCTS</b></a><a href="calculator.html" title="Calculator"><span>⌗</span><b>CALCULATOR</b></a><a href="protocols.html" title="Protocols"><span>☷</span><b>PROTOCOLS</b></a><a href="track.html?v=20260913-global" title="Track"><span>⌁</span><b>TRACK</b></a><a href="coa.html" title="COA"><span>✓</span><b>COA</b></a><a href="buyers-proof.html" title="Buyers' Proof"><span>♥</span><b>PROOF</b></a><a href="https://chat.whatsapp.com/B5YNWxs2c7t0l08JzNgkek" target="_blank" rel="noopener noreferrer" title="Community"><span>👥</span><b>COMMUNITY</b></a></nav></body></html>

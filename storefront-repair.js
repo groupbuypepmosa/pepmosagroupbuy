@@ -112,9 +112,7 @@
      short window, use the base loader's already-fetched products instead of
      treating the search as an empty catalog. */
   const source=products.length ? products : (Array.isArray(window.__pepBaseProducts)?window.__pepBaseProducts:[]);
-  const soldSource=Array.isArray(window.__pepBaseProducts)?window.__pepBaseProducts:[];
-  const soldMap=new Map(soldSource.map(p=>[String(p.product_id),Number(p.sold_for_gb)||0]));
-  const list=source.map(p=>({...p,sold_for_gb:soldMap.get(String(p.product_id)) ?? Number(p.sold_for_gb)||0})).filter(p=>`${p.product_name} ${p.category} ${(p.product_variants||[]).map(v=>v.strength).join(' ')}`.toLowerCase().includes(q));
+  const list=source.filter(p=>`${p.product_name} ${p.category} ${(p.product_variants||[]).map(v=>v.strength).join(' ')}`.toLowerCase().includes(q));
 
   if(!list.length){
     grid.innerHTML='<div class="card"><b>No products available yet.</b><br><span class="muted">No active products are available for this Group Buy.</span></div>';
@@ -130,7 +128,6 @@
       <div class="pepStoreBody">
         <h3>${esc(p.product_name)}</h3>
         <div class="muted">${esc(p.description||'')}</div>
-        <div class="pepSoldForGbWide" aria-label="Sold for this Group Buy"><span>♡ SOLD FOR THIS GB</span><strong>${Number(p.sold_for_gb||0).toLocaleString('en-PH')}</strong></div>
         <div class="pepStoreBottom">
           <div class="pepStarting"><small>${gb?.status==='KIT_COMPLETION'?'KIT COMPLETION':'STARTING AT'}</small><b>${peso(lowest)}</b><span>${gb?.status==='KIT_COMPLETION'?'Select an mg to see its exact remaining vial count':variants.length+' variant'+(variants.length===1?'':'s')+' available'}</span></div>
           <button class="pepFeeBtn pepSelectVariant" type="button" data-product-id="${esc(p.product_id)}">CHOOSE VARIANT</button>

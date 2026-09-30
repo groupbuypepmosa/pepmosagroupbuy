@@ -303,31 +303,37 @@
       if(vr.error)throw vr.error;
       allVariants=vr.data||[];
     }
-    // Sold count is calculated once for the active GB and cached for the storefront renderer.
-    // Customer orders and admin/manual orders are both included; rejected/cancelled customer
-    // orders are excluded. This does not modify cart, checkout, inventory, or ordering logic.
+    // Sold count is optional and isolated from the main catalog load.
+    // If order history is unavailable, the product catalog still renders normally.
     soldByProduct=new Map();
-    const soldOrders=await s.from('orders').select('order_id,payment_status').eq('gb_number',gb.gb_number);
-    if(soldOrders.error)throw soldOrders.error;
-    const validSoldOrders=(soldOrders.data||[]).filter(o=>!['REJECTED','CANCELLED','CANCELED','REFUNDED','DELETED'].includes(String(o.payment_status||'').toUpperCase()));
-    const soldOrderIds=validSoldOrders.map(o=>o.order_id).filter(Boolean);
-    if(soldOrderIds.length){
-      const soldItems=await s.from('order_items').select('variant_id,qty').in('order_id',soldOrderIds);
-      if(soldItems.error)throw soldItems.error;
-      const variantToProduct=new Map((allVariants||[]).map(v=>[String(v.variant_id),String(v.product_id)]));
-      for(const item of (soldItems.data||[])){
-        const pid=variantToProduct.get(String(item.variant_id||''));
-        if(!pid)continue;
-        soldByProduct.set(pid,(soldByProduct.get(pid)||0)+Math.max(0,Number(item.qty||0)));
+    try{
+      const soldOrders=await s.from('orders').select('order_id,payment_status').eq('gb_number',gb.gb_number);
+      if(!soldOrders.error){
+        const validSoldOrders=(soldOrders.data||[]).filter(o=>!['REJECTED','CANCELLED','CANCELED','REFUNDED','DELETED'].includes(String(o.payment_status||'').toUpperCase()));
+        const soldOrderIds=validSoldOrders.map(o=>o.order_id).filter(Boolean);
+        const variantToProduct=new Map((allVariants||[]).map(v=>[String(v.variant_id),String(v.product_id)]));
+        if(soldOrderIds.length){
+          const soldItems=await s.from('order_items').select('variant_id,qty').in('order_id',soldOrderIds);
+          if(!soldItems.error){
+            for(const item of (soldItems.data||[])){
+              const pid=variantToProduct.get(String(item.variant_id||''));
+              if(!pid)continue;
+              soldByProduct.set(pid,(soldByProduct.get(pid)||0)+Math.max(0,Number(item.qty||0)));
+            }
+          }
+        }
+        const adminSold=await s.from('admin_orders').select('variant_id,qty').eq('gb_number',gb.gb_number);
+        if(!adminSold.error){
+          for(const item of (adminSold.data||[])){
+            const pid=variantToProduct.get(String(item.variant_id||''));
+            if(!pid)continue;
+            soldByProduct.set(pid,(soldByProduct.get(pid)||0)+Math.max(0,Number(item.qty||0)));
+          }
+        }
       }
-    }
-    const adminSold=await s.from('admin_orders').select('variant_id,qty').eq('gb_number',gb.gb_number);
-    if(adminSold.error)throw adminSold.error;
-    const variantToProduct=new Map((allVariants||[]).map(v=>[String(v.variant_id),String(v.product_id)]));
-    for(const item of (adminSold.data||[])){
-      const pid=variantToProduct.get(String(item.variant_id||''));
-      if(!pid)continue;
-      soldByProduct.set(pid,(soldByProduct.get(pid)||0)+Math.max(0,Number(item.qty||0)));
+    }catch(e){
+      console.warn('PEPMOSA SOLD COUNT unavailable; storefront will continue.',e);
+      soldByProduct=new Map();
     }
     products=baseProducts.map(p=>({...p,product_variants:allVariants.filter(v=>String(v.product_id)===String(p.product_id)&&v.active!==false)}));const ms=await s.from('gb_minimum_quantities').select('gb_number,product_id,variant_id,minimum_qty').eq('gb_number',gb.gb_number);if(ms.error)throw ms.error;minimums=ms.data||[];// Category-level minimums are optional. This project currently stores the
      // active per-variant minimums in gb_minimum_quantities. Do not query the

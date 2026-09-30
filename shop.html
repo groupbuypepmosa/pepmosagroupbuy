@@ -821,6 +821,12 @@ header{
 @media(max-width:620px){.pepProductPicker{align-items:flex-end;padding:8px}.pepPickerBox{padding:22px 18px 20px;border-radius:26px 26px 18px 18px;max-height:94vh}.pepPickerHead{grid-template-columns:95px 1fr;gap:13px}.pepPickerImage{height:95px}.pepPickerHead h2{font-size:23px}.pepQuantityRow{align-items:flex-start;flex-direction:column}.pepStepper{width:100%;grid-template-columns:1fr 72px 1fr}.pepStepper input{width:72px}.pepStoreCard .productImg{height:155px!important}}
 </style>
 
+<style id="pep-sold-for-gb-style">
+.pepSoldForGb{min-width:92px;padding:7px 10px;border:1px solid rgba(213,43,135,.16);border-radius:12px;background:linear-gradient(135deg,#fff5fa,#fff);text-align:center}
+.pepSoldForGb small{display:block;font-size:8px;line-height:1.1;letter-spacing:.06em;font-weight:900;color:#a15b7d}
+.pepSoldForGb b{display:block;margin-top:3px;font-size:17px;line-height:1;color:#c52e7d}
+@media(max-width:620px){.pepSoldForGb{min-width:82px;padding:6px 8px}.pepSoldForGb small{font-size:7px}.pepSoldForGb b{font-size:15px}}
+</style>
 <style id="pep-mobile-product-polish">
 @media(max-width:620px){
   #productGrid{gap:14px!important}
@@ -1817,6 +1823,35 @@ async function load(){
       ...p,
       product_variants:variantData.filter(v=>String(v.product_id)===String(p.product_id))
     }));
+
+    // Read-only sales counter for THIS exact Group Buy only.
+    // It does not create or enforce any inventory/MOQ limit.
+    try{
+      const soldByProduct={};
+      const soldQuery=await sb
+        .from("order_items")
+        .select("product_id,qty,orders!inner(gb_number,payment_status)")
+        .eq("orders.gb_number",gb.gb_number);
+
+      if(soldQuery.error) throw soldQuery.error;
+
+      for(const item of (soldQuery.data||[])){
+        const status=String(item.orders?.payment_status||"").toUpperCase().replace(/[- ]/g,"_");
+        if(["CANCELLED","CANCELED","REFUNDED","DELETED"].includes(status)) continue;
+        const pid=String(item.product_id||"");
+        if(!pid) continue;
+        soldByProduct[pid]=(soldByProduct[pid]||0)+Math.max(0,Number(item.qty)||0);
+      }
+
+      products=products.map(p=>({
+        ...p,
+        sold_for_gb:Number(soldByProduct[String(p.product_id)]||0)
+      }));
+    }catch(soldError){
+      console.warn("PEPMOSA sold-for-this-GB counter unavailable",soldError);
+      products=products.map(p=>({...p,sold_for_gb:0}));
+    }
+
     window.__pepBaseProducts = products;
 
     if(gb.status==="CLOSED" && !categoryNames.length){
@@ -1996,6 +2031,11 @@ function renderProducts(){
                   <div class="pepStarting">
                     <small>Starting at</small>
                     <b>${peso(lowest)}</b>
+                  </div>
+
+                  <div class="pepSoldForGb" aria-label="Sold for this Group Buy">
+                    <small>SOLD FOR THIS GB</small>
+                    <b>${Number(p.sold_for_gb||0).toLocaleString("en-PH")}</b>
                   </div>
 
                   <button

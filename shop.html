@@ -822,10 +822,37 @@ header{
 </style>
 
 <style id="pep-sold-for-gb-style">
-.pepSoldForGb{min-width:92px;padding:7px 10px;border:1px solid rgba(213,43,135,.16);border-radius:12px;background:linear-gradient(135deg,#fff5fa,#fff);text-align:center}
-.pepSoldForGb small{display:block;font-size:8px;line-height:1.1;letter-spacing:.06em;font-weight:900;color:#a15b7d}
-.pepSoldForGb b{display:block;margin-top:3px;font-size:17px;line-height:1;color:#c52e7d}
-@media(max-width:620px){.pepSoldForGb{min-width:82px;padding:6px 8px}.pepSoldForGb small{font-size:7px}.pepSoldForGb b{font-size:15px}}
+.pepSoldForGbWide{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  margin:10px 0 2px!important;
+  padding:9px 12px!important;
+  border:1px solid #efb7d1!important;
+  border-radius:13px!important;
+  background:linear-gradient(90deg,#fff0f7,#fff8fb)!important;
+}
+.pepSoldForGbWide span{
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:.06em!important;
+  color:#a54d76!important;
+}
+.pepSoldForGbWide strong{
+  font-size:20px!important;
+  line-height:1!important;
+  color:#c52e7d!important;
+}
+.pepSoldForGb{
+  display:none!important;
+}
+@media(max-width:620px){
+  .pepSoldForGbWide{margin:9px 0 1px!important;padding:8px 10px!important}
+  .pepSoldForGbWide span{font-size:9px!important}
+  .pepSoldForGbWide strong{font-size:18px!important}
+}
 </style>
 <style id="pep-mobile-product-polish">
 @media(max-width:620px){
@@ -2026,6 +2053,11 @@ function renderProducts(){
                 <p class="muted">
                   ${esc(p.description || "")}
                 </p>
+
+                <div class="pepSoldForGbWide" aria-label="Sold for this Group Buy">
+                  <span>♡ SOLD FOR THIS GB</span>
+                  <strong>${Number(p.sold_for_gb||0).toLocaleString("en-PH")}</strong>
+                </div>
 
                 <div class="pepStoreBottom">
                   <div class="pepStarting">

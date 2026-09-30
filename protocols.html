@@ -104,32 +104,31 @@
 (function(){
  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
  const clean=v=>String(v??'').trim();
+ const protocolNames=new Set(["5-AMINO-1MQ","AOD-9604","ARA290","BPC + TB","BPC-157","CAGRILINTIDE","DSIP","EPITHALON","GHK-CU","GHK-CU + KPV","KISSPEPTIN","KPV","MOTS-C","NAD+","PT-141","RETATRUTIDE","SELANK","SEMAX","SS-31","SURVODUTIDE","TESAMORELIN","THYMOSIN ALPHA 1","TIRZEPATIDE"]);
  function card(p){
-   const name=clean(p.product_name)||"PEPTIDE";
-   const desc=clean(p.description);
-   return '<article class="protocolCard">'+
-    '<div class="pepName">'+esc(name)+'</div>'+
-    '<div class="pepStrength">PEPMOSA PRODUCT PROTOCOL</div>'+
-    '<div class="section"><b>WHAT IS IT?</b><p>'+esc(desc||("Reference information for "+name+"."))+'</p></div>'+
-    '<div class="section"><b>RECONSTITUTION</b><p>Check the exact vial strength and the product-specific diluent instructions before preparing. Do not assume one diluent volume works for every product.</p><div class="formula">Concentration = total amount in vial ÷ final volume</div></div>'+
-    '<div class="section"><b>CONCENTRATION &amp; CALCULATION</b><p>Use the actual vial strength and actual final volume. Keep units consistent and verify the calculation before measuring any volume.</p></div>'+
-    '<div class="section"><b>CYCLE / DURATION</b><p>There is no single cycle that applies to every product. Follow the applicable product protocol and qualified professional guidance.</p></div>'+
-    '<div class="section"><b>STORAGE &amp; HANDLING</b><p>Follow the product-specific storage instructions. Keep prepared material protected from inappropriate heat, light and contamination.</p></div>'+
-    '<div class="noticeBox">⚠️ Reference information only. This card is not a personalized medical instruction or a substitute for professional guidance.</div>'+
-   '</article>';
+  const name=clean(p.product_name)||"PEPTIDE";
+  const strengths=(p.strengths||"").split(",").map(x=>clean(x)).filter(Boolean);
+  const matched=protocolNames.has(name);
+  return '<article class="protocolCard">'+
+   '<div class="pepName">'+esc(name)+'</div>'+
+   '<div class="pepStrength">'+esc(strengths.join(" • ")||"PRODUCT")+'</div>'+
+   '<div class="section"><b>PROTOCOL</b><p>'+(matched?'A matching research-protocol entry is available for this peptide. The protocol depends on the exact vial strength shown above.':'No matching entry was found for this product in the reference protocol directory.')+'</p></div>'+
+   '<div class="section"><b>RECONSTITUTION</b><p>Use only the reconstitution method specified for the exact product and vial strength. Different strengths of the same peptide can require different concentration calculations.</p><div class="formula">Concentration = total peptide amount ÷ final volume</div></div>'+
+   '<div class="section"><b>CYCLE / DURATION</b><p>Cycle length and frequency are protocol-specific. Do not apply a schedule from another vial strength or another peptide.</p></div>'+
+   '<div class="section"><b>STORAGE &amp; HANDLING</b><p>Follow the applicable product handling instructions and maintain appropriate storage conditions after preparation.</p></div>'+
+   '<div class="noticeBox">⚠️ Research/reference information only. Exact dosing and administration should be confirmed with a qualified healthcare professional.</div>'+
+  '</article>';
  }
  async function boot(){
   const box=document.getElementById("documents");
   try{
    const client=initSupabase();
-   const {data,error}=await client.from("products").select("product_id,product_name,description,active").eq("active",true).order("product_name");
+   const {data,error}=await client.from("products").select("product_id,product_name,description,active,product_variants(strength,active)").eq("active",true).order("product_name");
    if(error)throw error;
-   if(!data?.length){box.innerHTML='<div class="empty">No active products found.</div>';return;}
-   box.innerHTML=data.map(card).join("");
-  }catch(e){
-   console.error("PROTOCOL PRODUCT LOAD ERROR",e);
-   box.innerHTML='<div class="notice error"><b>Protocols could not load.</b><br>'+esc(e?.message||"Unknown error")+'</div>';
-  }
+   const rows=(data||[]).map(p=>({...p,strengths:(p.product_variants||[]).filter(v=>v.active!==false).map(v=>v.strength)}));
+   if(!rows.length){box.innerHTML='<div class="empty">No active products found.</div>';return;}
+   box.innerHTML=rows.map(card).join("");
+  }catch(e){console.error(e);box.innerHTML='<div class="notice error"><b>Protocols could not load.</b><br>'+esc(e?.message||"Unknown error")+'</div>';}
  }
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();

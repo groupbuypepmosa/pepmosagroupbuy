@@ -3245,7 +3245,10 @@ load();
       }
     }
 
-    const list=liveProducts;
+    // Preserve the sold-for-this-GB value calculated by the base loader.
+    const soldSource=Array.isArray(window.__pepBaseProducts)?window.__pepBaseProducts:[];
+    const soldMap=new Map(soldSource.map(p=>[String(p.product_id),Number(p.sold_for_gb)||0]));
+    const list=liveProducts.map(p=>({...p,sold_for_gb:soldMap.get(String(p.product_id)) ?? Number(p.sold_for_gb)||0}));
     const filtered=list.filter(p=>{
       const hay=(String(p.product_name||'')+' '+String(p.description||'')).toLowerCase();
       return !q || hay.includes(q);
@@ -3268,6 +3271,7 @@ load();
         '<div class="pepStoreBody">'+
           '<h3>'+esc2(p.product_name)+'</h3>'+
           '<p class="muted">'+esc2(p.description||'')+'</p>'+
+          '<div class="pepSoldForGbWide" aria-label="Sold for this Group Buy"><span>♡ SOLD FOR THIS GB</span><strong>'+Number(p.sold_for_gb||0).toLocaleString('en-PH')+'</strong></div>'+
           '<div class="pepStoreBottom">'+
             '<div class="pepStarting"><small>Starting at</small><b>'+peso2(lowest)+'</b></div>'+
             '<button class="btn primary pepSelectVariant" type="button" data-product-id="'+esc2(p.product_id)+'">SELECT VARIANT</button>'+

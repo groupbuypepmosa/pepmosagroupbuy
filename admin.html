@@ -221,6 +221,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 .protocolEmpty{padding:28px;text-align:center;border:1px dashed #e2bdd1;border-radius:16px;background:#fffafd;color:#806c77}
 .protocolNotice{border:1px solid #efc6d9;border-radius:15px;padding:13px 15px;background:#fff6fa;color:#765060;font-size:12px;line-height:1.5;margin-bottom:14px}
 @media(max-width:850px){.protocolEditor{grid-template-columns:1fr}}
+
+.dosingRows{display:grid;gap:10px;margin-bottom:10px}.dosingRow{display:grid;grid-template-columns:1.05fr 1fr 1fr 1fr auto;gap:8px;align-items:end;padding:12px;border:1px solid #ead9e5;border-radius:14px;background:#fffafd}.dosingRow label{font-size:9px;letter-spacing:.08em;font-weight:900;color:#a05e7d;text-transform:uppercase}.dosingRow input{width:100%;margin-top:5px}.dosingRemove{min-height:42px;padding:0 12px}@media(max-width:700px){.dosingRow{grid-template-columns:1fr 1fr}.dosingRemove{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -349,7 +351,12 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
           <div class="field full"><label>DESCRIPTION</label><textarea id="protocolDescription" rows="5" placeholder="Description / research reference"></textarea></div>
           <div class="field full"><label>RECONSTITUTION</label><textarea id="protocolReconstitution" rows="5" placeholder="Reconstitution reference"></textarea></div>
           <div class="field full"><label>CYCLE</label><textarea id="protocolCycle" rows="4" placeholder="Cycle / schedule reference"></textarea></div>
-          <div class="field full"><label>DOSING GUIDE</label><textarea id="protocolDosing" rows="6" placeholder="Dosing guide / reference"></textarea></div>
+          <div class="field full">
+  <label>DOSING GUIDE</label>
+  <div class="small" style="margin:0 0 10px">Add one row per phase. Each row has Phase, Weeks, Dose, and Units.</div>
+  <div id="dosingRows" class="dosingRows"></div>
+  <button class="btn secondary" type="button" onclick="addDosingRow()">＋ ADD PHASE</button>
+</div>
           <div class="field full"><label>SUPPLIES NEEDED</label><textarea id="protocolSupplies" rows="4" placeholder="List supplies needed"></textarea></div>
           <div class="field full"><label><input id="protocolActive" type="checkbox" checked> ACTIVE / VISIBLE IN LIBRARY</label></div>
         </div>
@@ -394,8 +401,32 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 /* ===== PROTOCOL LIBRARY CRUD ===== */
 function resetProtocolForm(){
-  ["protocolId","protocolName","protocolDescription","protocolReconstitution","protocolCycle","protocolDosing","protocolSupplies"].forEach(id=>{if($(id))$(id).value=""});
+  ["protocolId","protocolName","protocolDescription","protocolReconstitution","protocolCycle","protocolSupplies"].forEach(id=>{if($(id))$(id).value=""});
   if($("protocolActive"))$("protocolActive").checked=true;
+  if($("dosingRows"))$("dosingRows").innerHTML="";
+  addDosingRow();
+}
+function addDosingRow(row={}){
+  const host=$("dosingRows");if(!host)return;
+  const el=document.createElement("div");el.className="dosingRow";
+  el.innerHTML='<div><label>PHASE</label><input class="dosePhase" placeholder="Phase 1" value="'+esc(row.phase||"")+'"></div>'+
+    '<div><label>WEEKS</label><input class="doseWeeks" placeholder="Weeks 1–4" value="'+esc(row.weeks||"")+'"></div>'+
+    '<div><label>DOSE</label><input class="doseAmount" placeholder="Dose" value="'+esc(row.dose||"")+'"></div>'+
+    '<div><label>UNITS</label><input class="doseUnits" placeholder="Units" value="'+esc(row.units||"")+'"></div>'+
+    '<button class="btn danger dosingRemove" type="button" onclick="this.closest(\'.dosingRow\').remove()">REMOVE</button>';
+  host.appendChild(el);
+}
+function getDosingRows(){
+  return [...document.querySelectorAll("#dosingRows .dosingRow")].map(r=>({
+    phase:r.querySelector(".dosePhase")?.value.trim()||"",
+    weeks:r.querySelector(".doseWeeks")?.value.trim()||"",
+    dose:r.querySelector(".doseAmount")?.value.trim()||"",
+    units:r.querySelector(".doseUnits")?.value.trim()||""
+  })).filter(r=>r.phase||r.weeks||r.dose||r.units);
+}
+function renderDosingSchedule(rows){
+  const data=Array.isArray(rows)?rows:[];
+  return data.length?'<div class="dosingTable">'+data.map(r=>'<div class="dosingRow"><div><b>PHASE</b><div>'+esc(r.phase||"—")+'</div></div><div><b>WEEKS</b><div>'+esc(r.weeks||"—")+'</div></div><div><b>DOSE</b><div>'+esc(r.dose||"—")+'</div></div><div><b>UNITS</b><div>'+esc(r.units||"—")+'</div></div></div>').join(""):'<div class="small">No dosing phases entered.</div>';
 }
 function protocolFieldHtml(label,value){
   return '<div class="protocolField"><b>'+esc(label)+'</b><div>'+esc(value||"—")+'</div></div>';
@@ -410,7 +441,7 @@ async function loadProtocols(){
     host.innerHTML=data.map(p=>
       '<div class="protocolItem"><div class="protocolItemHead"><div><div class="protocolName">'+esc(p.name_of_peptide)+'</div><div class="small">'+(p.active?"ACTIVE":"INACTIVE")+' · '+(p.created_at?new Date(p.created_at).toLocaleDateString("en-PH"):"")+'</div></div>'+
       '<div class="protocolActions"><button class="btn secondary" type="button" onclick="editProtocol(\''+esc(p.protocol_id)+'\')">EDIT</button><button class="btn danger" type="button" onclick="deleteProtocol(\''+esc(p.protocol_id)+'\')">DELETE</button></div></div>'+
-      protocolFieldHtml("DESCRIPTION",p.description)+protocolFieldHtml("RECONSTITUTION",p.reconstitution)+protocolFieldHtml("CYCLE",p.cycle)+protocolFieldHtml("DOSING GUIDE",p.dosing_guide)+protocolFieldHtml("SUPPLIES NEEDED",p.supplies_needed)+
+      protocolFieldHtml("DESCRIPTION",p.description)+protocolFieldHtml("RECONSTITUTION",p.reconstitution)+protocolFieldHtml("CYCLE",p.cycle)+'<div class="protocolField"><b>DOSING GUIDE</b>'+renderDosingSchedule(p.dosing_schedule)+'</div>'+protocolFieldHtml("SUPPLIES NEEDED",p.supplies_needed)+
       '</div>'
     ).join("");
   }catch(e){console.error("PROTOCOL LOAD ERROR",e);host.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load protocols.")+'</div>'}
@@ -424,8 +455,10 @@ async function editProtocol(id){
     $("protocolDescription").value=data.description||"";
     $("protocolReconstitution").value=data.reconstitution||"";
     $("protocolCycle").value=data.cycle||"";
-    $("protocolDosing").value=data.dosing_guide||"";
     $("protocolSupplies").value=data.supplies_needed||"";
+    $("dosingRows").innerHTML="";
+    (Array.isArray(data.dosing_schedule)?data.dosing_schedule:[]).forEach(addDosingRow);
+    if(!(data.dosing_schedule||[]).length)addDosingRow();
     $("protocolActive").checked=data.active!==false;
     document.querySelector('[data-panel="protocolsAdminPanel"]')?.click();
     window.scrollTo({top:0,behavior:"smooth"});
@@ -434,7 +467,7 @@ async function editProtocol(id){
 async function saveProtocol(){
   const name=$("protocolName")?.value.trim();
   if(!name)return showMessage("Name of peptide is required.","error");
-  const payload={name_of_peptide:name,description:$("protocolDescription").value.trim()||null,reconstitution:$("protocolReconstitution").value.trim()||null,cycle:$("protocolCycle").value.trim()||null,dosing_guide:$("protocolDosing").value.trim()||null,supplies_needed:$("protocolSupplies").value.trim()||null,active:$("protocolActive").checked,updated_at:new Date().toISOString()};
+  const payload={name_of_peptide:name,description:$("protocolDescription").value.trim()||null,reconstitution:$("protocolReconstitution").value.trim()||null,cycle:$("protocolCycle").value.trim()||null,dosing_guide:null,dosing_schedule:getDosingRows(),supplies_needed:$("protocolSupplies").value.trim()||null,active:$("protocolActive").checked,updated_at:new Date().toISOString()};
   try{
     const id=$("protocolId").value.trim();
     const result=id?await sb.from("protocol_library").update(payload).eq("protocol_id",id):await sb.from("protocol_library").insert(payload);

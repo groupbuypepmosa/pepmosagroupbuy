@@ -347,7 +347,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
       <div class="protocolFormCard">
         <input id="protocolId" type="hidden">
         <div class="grid">
-          <div class="field full"><label>NAME OF PEPTIDE *</label><input id="protocolName" placeholder="Example: Product / Compound Name"></div>
+          <div class="field"><label>NAME OF PEPTIDE *</label><input id="protocolName" placeholder="Example: 5-AMINO-1MQ"></div><div class="field"><label>STRENGTH</label><input id="protocolStrength" placeholder="Example: 10 mg"></div>
           <div class="field full"><label>DESCRIPTION</label><textarea id="protocolDescription" rows="5" placeholder="Description / research reference"></textarea></div>
           <div class="field full"><label>RECONSTITUTION</label><textarea id="protocolReconstitution" rows="5" placeholder="Reconstitution reference"></textarea></div>
           <div class="field full"><label>CYCLE</label><textarea id="protocolCycle" rows="4" placeholder="Cycle / schedule reference"></textarea></div>
@@ -401,7 +401,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
 /* ===== PROTOCOL LIBRARY CRUD ===== */
 function resetProtocolForm(){
-  ["protocolId","protocolName","protocolDescription","protocolReconstitution","protocolCycle","protocolSupplies"].forEach(id=>{if($(id))$(id).value=""});
+  ["protocolId","protocolName","protocolStrength","protocolDescription","protocolReconstitution","protocolCycle","protocolSupplies"].forEach(id=>{if($(id))$(id).value=""});
   if($("protocolActive"))$("protocolActive").checked=true;
   if($("dosingRows"))$("dosingRows").innerHTML="";
   addDosingRow();
@@ -463,6 +463,7 @@ async function editProtocol(id){
     if(error)throw error;if(!data)return showMessage("Protocol not found.","error");
     $("protocolId").value=data.protocol_id||"";
     $("protocolName").value=data.name_of_peptide||"";
+    $("protocolStrength").value=data.strength||"";
     $("protocolDescription").value=data.description||"";
     $("protocolReconstitution").value=data.reconstitution||"";
     $("protocolCycle").value=data.cycle||"";
@@ -478,7 +479,8 @@ async function editProtocol(id){
 async function saveProtocol(){
   const name=$("protocolName")?.value.trim();
   if(!name)return showMessage("Name of peptide is required.","error");
-  const payload={name_of_peptide:name,description:$("protocolDescription").value.trim()||null,reconstitution:$("protocolReconstitution").value.trim()||null,cycle:$("protocolCycle").value.trim()||null,dosing_guide:null,dosing_schedule:getDosingRows(),supplies_needed:$("protocolSupplies").value.trim()||null,active:$("protocolActive").checked,updated_at:new Date().toISOString()};
+  const strength=$("protocolStrength")?.value.trim()||null;
+  const payload={name_of_peptide:name,strength:strength,description:$("protocolDescription").value.trim()||null,reconstitution:$("protocolReconstitution").value.trim()||null,cycle:$("protocolCycle").value.trim()||null,dosing_guide:null,dosing_schedule:getDosingRows(),supplies_needed:$("protocolSupplies").value.trim()||null,active:$("protocolActive").checked,updated_at:new Date().toISOString()};
   try{
     const id=$("protocolId").value.trim();
     const result=id?await sb.from("protocol_library").update(payload).eq("protocol_id",id):await sb.from("protocol_library").insert(payload);

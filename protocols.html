@@ -1,51 +1,73 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA • Protocols</title><style>
-:root{--p:#e91e83;--ink:#4a263d;--muted:#806b78;--line:#f0d5e4}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(circle at 10% 0%,#fff 0 18%,transparent 40%),linear-gradient(135deg,#fffafd,#fff1f8 52%,#f8f1ff)}
-.top{max-width:1200px;margin:auto;padding:22px 24px}.back{color:#b52c70;font-weight:900;text-decoration:none}
-.page{max-width:1160px;margin:auto;padding:0 24px 70px}.brand{text-align:center;margin:5px 0 20px}.brand b{display:block;font-family:Georgia,serif;color:var(--p);letter-spacing:.16em;font-size:30px}.brand span{font-size:10px;letter-spacing:.3em;font-weight:900;color:#a35a80}
-.hero{text-align:center;background:linear-gradient(135deg,#fff,#fff0f8);border:1px solid var(--line);border-radius:24px;padding:28px 20px;margin-bottom:24px;box-shadow:0 12px 35px #c77da516}.hero h1{margin:0 0 8px;font-size:32px;color:#65264a}.hero p{margin:0;color:var(--muted)}
-.notice{margin-top:18px;padding:14px 16px;background:#fff8fc;border:1px solid #efbfd7;border-left:5px solid var(--p);border-radius:12px;color:#6b3a56;line-height:1.55;font-size:13px}
-.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 16px}.count{font-size:11px;font-weight:900;color:#a35a80;letter-spacing:.08em;text-transform:uppercase}
-.grid{display:grid;grid-template-columns:1fr;gap:22px;max-width:1050px;margin:0 auto}.card{background:#fff;border:1px solid #dbe8f1;border-radius:4px;padding:0;box-shadow:0 8px 28px #507b9212;overflow:hidden}.head{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:18px 26px;background:linear-gradient(100deg,#eef8ff,#f8fbff);border-bottom:1px solid #dceaf3}.name{font-size:23px;font-weight:950;color:#214d70}.strength{font-weight:800;color:#557b98;font-size:.78em;margin-left:5px}.badge{padding:5px 9px;border-radius:4px;background:#eaf7ef;color:#25834c;font-size:9px;font-weight:950;white-space:nowrap}.body{padding:28px 30px 32px}.field{margin-top:18px}.field b{display:block;font-size:10px;letter-spacing:.03em;color:#28577b;margin-bottom:8px}.field div{white-space:pre-wrap;line-height:1.65;font-size:14px;color:#284c68}.doseTable{border:1px solid #d7e7f2;border-radius:8px;overflow:hidden}.doseHeader,.doseRow{display:grid;grid-template-columns:1fr 1.7fr 1.7fr;gap:0;font-size:13px}.doseHeader{background:#e8f4fd;color:#214f72;font-weight:900}.doseHeader span,.doseRow span{padding:13px 14px;min-width:0}.doseRow{background:#fff;border-top:1px solid #dbe8f1}.doseRow:nth-child(odd){background:#f6fbff}.doseRow span+span{border-left:0}.doseRow strong{display:none}.empty{text-align:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:42px 24px;box-shadow:0 10px 28px #8f54700d;color:var(--muted)}.empty .icon{font-size:42px;margin-bottom:10px}.empty h2{margin:0 0 8px;color:#642c4d;font-size:22px}.empty p{margin:0;line-height:1.6}
-@media(max-width:800px){.grid{grid-template-columns:1fr}.body{padding:22px 18px 26px}.doseHeader,.doseRow{grid-template-columns:1.15fr 1fr 1.25fr;font-size:11px}.doseHeader span,.doseRow span{padding:11px 9px}}
-@media(max-width:700px){.page{padding:0 12px 50px}.hero h1{font-size:26px}.top{padding:18px 14px}.name{font-size:19px}}
-</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script></head><body>
-<div class="top"><a class="back" href="index.html">← PEPMOSA</a></div><main class="page">
-<div class="brand"><b>PEPMOSA</b><span>PROTOCOLS</span></div>
-<section class="hero"><h1>Peptide Protocols &amp; Dosing References</h1><p>Research / educational reference library managed by PEPMOSA.</p><div class="notice"><b>RESEARCH / EDUCATIONAL USE ONLY.</b><br>These entries are reference materials and are not a substitute for professional medical advice, diagnosis, or treatment.</div></section>
-<div class="toolbar"><div class="count" id="protocolCount">Loading protocols…</div></div>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA • Peptide Protocols</title>
+<style>
+:root{--pink:#d92d7b;--pink2:#f8d9e9;--pink3:#fff4fa;--ink:#172033;--blue:#244d6d;--muted:#6e7180;--line:#efd7e4;--green:#29a866;--gold:#b88318}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(180deg,#fff 0,#fff8fc 35%,#fff0f8 100%);min-height:100vh}
+.top{max-width:1240px;margin:auto;padding:20px 24px}.back{display:inline-flex;align-items:center;gap:7px;color:#9d3567;font-weight:900;text-decoration:none;font-size:13px}
+.page{max-width:1240px;margin:auto;padding:0 24px 70px}
+.hero{position:relative;overflow:hidden;text-align:center;border:1px solid #f0d2e2;border-radius:28px;background:radial-gradient(circle at 8% 20%,#ffdce9 0 4%,transparent 17%),radial-gradient(circle at 96% 8%,#f7d7e8 0 7%,transparent 20%),linear-gradient(135deg,#fff,#fff0f7);padding:38px 24px 30px;margin-bottom:18px;box-shadow:0 18px 50px #c76b9918}
+.hero:before{content:"";position:absolute;width:220px;height:220px;left:-80px;top:-90px;border:2px solid #f4c5da;border-radius:50%;box-shadow:70px 45px 0 -25px #fff0f7,125px 100px 0 -55px #f6c9df;opacity:.8}
+.hero:after{content:"🧬";position:absolute;right:28px;top:14px;font-size:90px;opacity:.11;transform:rotate(18deg)}
+.brand{position:relative;z-index:1}.brand b{display:block;font-family:Georgia,"Times New Roman",serif;font-size:46px;line-height:1;color:#172033;letter-spacing:-.03em}.brand b span{color:var(--pink)}.brand small{display:block;margin-top:12px;font-size:10px;letter-spacing:.34em;font-weight:950;color:#7f5269}
+.notice{position:relative;z-index:1;max-width:760px;margin:24px auto 0;padding:13px 18px;background:#fff8fc;border:1px solid #f1c9dc;border-radius:15px;color:#8e285d;line-height:1.45;font-size:12px;box-shadow:0 8px 22px #b75c8710}.notice b{font-size:12px}
+.toolbar{display:flex;align-items:center;gap:12px;margin:0 0 18px;padding:14px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 28px #9f567012}
+.search{flex:1;position:relative}.search span{position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:20px;color:#b23b70}.search input{width:100%;height:48px;border:1px solid #ecc9db;border-radius:999px;padding:0 18px 0 48px;outline:none;color:var(--ink);font-size:14px;background:#fffafd}.search input:focus{border-color:#e28ab2;box-shadow:0 0 0 4px #e91e8310}.count{white-space:nowrap;font-size:10px;font-weight:950;letter-spacing:.08em;color:#a23d6d;text-transform:uppercase;padding:0 8px}
+.grid{display:grid;grid-template-columns:1fr;gap:22px;max-width:1180px;margin:0 auto}.card{background:#fff;border:1px solid #efd6e2;border-radius:24px;overflow:hidden;box-shadow:0 18px 45px #9c527313}.head{display:flex;justify-content:space-between;gap:15px;align-items:center;padding:22px 30px 18px;background:linear-gradient(100deg,#fff,#fff4fa);border-bottom:1px solid #f1dce6}.titleWrap{min-width:0}.name{font-size:30px;font-weight:950;line-height:1.15;color:#171d2d;letter-spacing:-.02em}.strength{font-size:.72em;color:#5f7184;font-weight:850;margin-left:6px}.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}.tag{padding:6px 11px;border-radius:999px;background:#fde4f0;color:#bf286d;font-size:9px;font-weight:950;letter-spacing:.04em}.tag.blue{background:#e8edff;color:#365bc1}.badge{padding:7px 11px;border-radius:999px;background:#dcf8e9;color:#18834c;font-size:9px;font-weight:950;white-space:nowrap}
+.body{padding:24px 28px 30px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px}.mainCol{min-width:0}.side{display:flex;flex-direction:column;gap:14px}.section{border-radius:17px;border:1px solid #f0dbe5;background:#fff;padding:18px 20px;margin-bottom:15px}.section.soft{background:linear-gradient(135deg,#fff5fa,#fff)}.section.blue{background:linear-gradient(135deg,#f5faff,#fff)}.section.gold{background:#fffaf0;border-color:#f1dfad}.sectionHead{display:flex;align-items:center;gap:10px;margin-bottom:9px}.icon{width:34px;height:34px;border-radius:12px;background:#fde1ee;display:grid;place-items:center;font-size:17px;flex:0 0 auto}.sectionHead h3{margin:0;font-size:16px;color:#1b2536}.section p,.sectionText{margin:0;white-space:pre-wrap;line-height:1.65;font-size:13px;color:#344b60}.sideCard{border:1px solid #efd7e3;border-radius:17px;background:#fff;padding:17px 18px}.sideTitle{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:950;color:#1b2536;margin-bottom:12px}.kv{display:grid;gap:10px}.kv div{padding-bottom:9px;border-bottom:1px dashed #efdce5}.kv div:last-child{border-bottom:0;padding-bottom:0}.kv b{display:block;font-size:9px;color:#9c6680;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}.kv span{font-size:12px;color:#435363}.noteList{margin:0;padding-left:18px;color:#67583f;font-size:12px;line-height:1.6}
+.doseIntro{font-size:12px;color:#6f7180;margin:-2px 0 11px}.doseTable{border:1px solid #eccfdf;border-radius:13px;overflow:hidden;background:#fff}.doseHeader,.doseRow{display:grid;grid-template-columns:1.1fr 1.45fr 1.45fr;gap:0}.doseHeader{background:linear-gradient(90deg,#fde0ef,#fcebf4);color:#ad2865;font-size:11px;font-weight:950}.doseHeader span,.doseRow span{padding:13px 14px;min-width:0}.doseRow{font-size:12px;color:#435363;border-top:1px solid #f0dfe7}.doseRow:nth-child(odd){background:#fff8fc}.doseRow span{line-height:1.45}.empty{text-align:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:44px 24px;box-shadow:0 10px 28px #8f54700d;color:var(--muted)}.empty .icon{font-size:42px;margin-bottom:10px}.empty h2{margin:0 0 8px;color:#642c4d;font-size:22px}.empty p{margin:0;line-height:1.6}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.sideCard{height:100%}}
+@media(max-width:700px){.top{padding:15px 14px}.page{padding:0 12px 48px}.hero{padding:30px 15px 24px;border-radius:22px}.brand b{font-size:34px}.hero:after{font-size:60px;right:5px}.toolbar{padding:10px;display:block}.count{padding:10px 5px 2px;display:block}.name{font-size:23px}.head{padding:19px 18px}.body{padding:17px 14px 22px}.side{grid-template-columns:1fr}.section{padding:16px}.doseHeader,.doseRow{grid-template-columns:1.15fr 1fr 1.25fr;font-size:10px}.doseHeader span,.doseRow span{padding:10px 8px}.badge{align-self:flex-start}.head{align-items:flex-start}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script></head><body>
+<div class="top"><a class="back" href="index.html">← PEPMOSA</a></div>
+<main class="page">
+<section class="hero">
+  <div class="brand"><b>Peptide <span>Protocols</span></b><small>RESEARCH / EDUCATIONAL REFERENCE LIBRARY · MANAGED BY PEPMOSA</small></div>
+  <div class="notice"><b>📖 RESEARCH / EDUCATIONAL USE ONLY.</b><br>These protocols are reference materials and are not a substitute for professional medical advice, diagnosis, or treatment.</div>
+</section>
+<div class="toolbar"><div class="search"><span>⌕</span><input id="protocolSearch" type="search" placeholder="Search peptide protocols..."></div><div class="count" id="protocolCount">Loading protocols…</div></div>
 <div id="protocolGrid" class="grid"></div>
 </main>
 <script>
 (function(){
-
+ let allRows=[];
  function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+ function doseMarkup(ds){
+   if(!ds.length)return '<div class="sectionText">No structured dosing phases entered.</div>';
+   return '<div class="doseTable"><div class="doseHeader"><span>Phase</span><span>Daily Dose (mg)</span><span>Units / Volume</span></div>'+
+     ds.map(r=>{const ph=r.phase||((r.period_type||"days")==="days"?"Days "+(r.period||"—"):"Weeks "+(r.period||"—"));return '<div class="doseRow"><span>'+esc(ph)+'</span><span>'+esc(r.dose||"—")+'</span><span>'+esc(r.units||"—")+'</span></div>'}).join("")+
+     '</div>';
+ }
  function render(rows){
    const grid=document.getElementById("protocolGrid"),count=document.getElementById("protocolCount");
    count.textContent=rows.length+" PROTOCOL"+(rows.length===1?"":"S")+" AVAILABLE";
-   if(!rows.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="icon">📚</div><h2>No protocol references available</h2><p>Add a protocol from Admin → PROTOCOLS and it will appear here automatically.</p></div>';return;}
+   if(!rows.length){grid.innerHTML='<div class="empty"><div class="icon">📚</div><h2>No protocol references found</h2><p>Try another search or add a protocol from Admin → PROTOCOLS.</p></div>';return;}
    grid.innerHTML=rows.map(p=>{
      const ds=Array.isArray(p.dosing_schedule)?p.dosing_schedule:[];
-     const dose=ds.length?'<div class="doseTable"><div class="doseHeader"><span>Phase</span><span>Daily Dose (mg)</span><span>Units (per injection)</span></div>'+ds.map(r=>{const ph=r.phase||((r.period_type||"days")==="days" ? "Days "+(r.period||"—") : "Weeks "+(r.period||"—"));return '<div class="doseRow"><span>'+esc(ph)+'</span><span>'+esc(r.dose||"—")+'</span><span>'+esc(r.units||"—")+'</span></div>';}).join("")+'</div>':'<div class="field"><div>No structured dosing phases entered.</div></div>';
-     return '<article class="card"><div class="head"><div class="name">'+esc(p.name_of_peptide)+(p.strength?' <span class="strength">'+esc(p.strength)+'</span>':'')+'</div><span class="badge">'+(p.active?"ACTIVE":"INACTIVE")+'</span></div><div class="body">'+
-       (p.description?'<div class="field"><b>DESCRIPTION</b><div>'+esc(p.description)+'</div></div>':'')+
-       (p.reconstitution?'<div class="field"><b>RECONSTITUTION</b><div>'+esc(p.reconstitution)+'</div></div>':'')+
-       (p.cycle?'<div class="field"><b>CYCLE</b><div>'+esc(p.cycle)+'</div></div>':'')+
-       '<div class="field"><b>DOSING GUIDE</b>'+dose+'</div>'+
-       (p.supplies_needed?'<div class="field"><b>SUPPLIES NEEDED</b><div>'+esc(p.supplies_needed)+'</div></div>':'')+
-       '</div></article>';
+     return '<article class="card">'+
+       '<div class="head"><div class="titleWrap"><div class="name">'+esc(p.name_of_peptide)+(p.strength?' <span class="strength">'+esc(p.strength)+'</span>':'')+'</div><div class="tags"><span class="tag">RESEARCH REFERENCE</span><span class="tag blue">PROTOCOL</span></div></div><span class="badge">'+(p.active?"ACTIVE":"INACTIVE")+'</span></div>'+
+       '<div class="body"><div class="layout"><div class="mainCol">'+
+       (p.description?'<section class="section soft"><div class="sectionHead"><span class="icon">▤</span><h3>Description</h3></div><div class="sectionText">'+esc(p.description)+'</div></section>':'')+
+       (p.reconstitution?'<section class="section blue"><div class="sectionHead"><span class="icon">🧪</span><h3>Reconstitution</h3></div><div class="sectionText">'+esc(p.reconstitution)+'</div></section>':'')+
+       '<section class="section"><div class="sectionHead"><span class="icon">▦</span><h3>Dosing Guide</h3></div><div class="doseIntro">Reference schedule entered in the PEPMOSA Protocol Library.</div>'+doseMarkup(ds)+'</section>'+
+       (p.cycle?'<section class="section"><div class="sectionHead"><span class="icon">◷</span><h3>Cycle / Schedule</h3></div><div class="sectionText">'+esc(p.cycle)+'</div></section>':'')+
+       '</div><aside class="side">'+
+       '<div class="sideCard"><div class="sideTitle"><span class="icon">✦</span>Key Information</div><div class="kv"><div><b>Peptide Name</b><span>'+esc(p.name_of_peptide)+'</span></div>'+(p.strength?'<div><b>Strength</b><span>'+esc(p.strength)+'</span></div>':'')+'<div><b>Status</b><span>'+esc(p.active?"Active":"Inactive")+'</span></div></div></div>'+
+       (p.supplies_needed?'<div class="sideCard"><div class="sideTitle"><span class="icon">🧰</span>Supplies Needed</div><div class="sectionText">'+esc(p.supplies_needed)+'</div></div>':'')+
+       '<div class="sideCard" style="background:#fffaf0;border-color:#f1dfad"><div class="sideTitle" style="color:#80621c"><span class="icon" style="background:#fff0c9">⚠</span>Important Notes</div><ul class="noteList"><li>Research / educational reference only.</li><li>Not a substitute for professional medical advice.</li><li>Use the information according to its documented source and intended context.</li></ul></div>'+
+       '</aside></div></div></article>';
    }).join("");
  }
+ function filter(){const q=document.getElementById("protocolSearch").value.trim().toLowerCase();render(allRows.filter(p=>(p.name_of_peptide+" "+(p.strength||"")+" "+(p.description||"")).toLowerCase().includes(q)));}
+ document.getElementById("protocolSearch").addEventListener("input",filter);
  async function load(){
    try{
      const client=window.sb||initSupabase();
      const {data,error}=await client.from("protocol_library").select("protocol_id,name_of_peptide,strength,description,reconstitution,cycle,dosing_schedule,supplies_needed,active,created_at").eq("active",true).order("created_at",{ascending:false});
      if(error)throw error;
-     render(data||[]);
+     allRows=data||[];render(allRows);
    }catch(e){
-     console.error(e);
-     document.getElementById("protocolCount").textContent="";
-     document.getElementById("protocolGrid").innerHTML='<div class="empty" style="grid-column:1/-1"><div class="icon">♡</div><h2>Protocol library unavailable</h2><p>Please try again in a moment.</p></div>';
+     console.error(e);document.getElementById("protocolCount").textContent="";
+     document.getElementById("protocolGrid").innerHTML='<div class="empty"><div class="icon">♡</div><h2>Protocol library unavailable</h2><p>Please try again in a moment.</p></div>';
    }
  }
  load();

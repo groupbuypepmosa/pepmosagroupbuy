@@ -408,13 +408,22 @@ function resetProtocolForm(){
 }
 function addDosingRow(row={}){
   const host=$("dosingRows");if(!host)return;
-  const el=document.createElement("div");el.className="dosingRow";
-  el.innerHTML='<div><label>PHASE</label><input class="dosePhase" placeholder="Phase 1" value="'+esc(row.phase||"")+'"></div>'+
-    '<div><label>PERIOD TYPE</label><select class="dosePeriodType"><option value="weeks" '+((row.period_type||"weeks")==="weeks"?"selected":"")+'>WEEKS</option><option value="days" '+((row.period_type||"weeks")==="days"?"selected":"")+'>DAYS</option></select></div>'+
-    '<div><label>NUMBER</label><input class="dosePeriod" placeholder="1–4" value="'+esc(row.period||row.weeks||"")+'"></div>'+
-    '<div><label>DOSE</label><input class="doseAmount" placeholder="Dose" value="'+esc(row.dose||"")+'"></div>'+
-    '<div><label>UNITS</label><input class="doseUnits" placeholder="Units" value="'+esc(row.units||"")+'"></div>'+
-    '<button class="btn danger dosingRemove" type="button" onclick="this.closest(\\'.dosingRow\\').remove()">REMOVE</button>';
+  const el=document.createElement("div");
+  el.className="dosingRow";
+  el.innerHTML='<div><label>PHASE</label><input class="dosePhase" placeholder="Phase 1"></div>'+
+    '<div><label>PERIOD TYPE</label><select class="dosePeriodType"><option value="weeks">WEEKS</option><option value="days">DAYS</option></select></div>'+
+    '<div><label>NUMBER</label><input class="dosePeriod" placeholder="1–4"></div>'+
+    '<div><label>DOSE</label><input class="doseAmount" placeholder="Dose"></div>'+
+    '<div><label>UNITS</label><input class="doseUnits" placeholder="Units"></div>';
+  el.querySelector(".dosePhase").value=row.phase||"";
+  el.querySelector(".dosePeriodType").value=row.period_type||"weeks";
+  el.querySelector(".dosePeriod").value=row.period||row.weeks||"";
+  el.querySelector(".doseAmount").value=row.dose||"";
+  el.querySelector(".doseUnits").value=row.units||"";
+  const remove=document.createElement("button");
+  remove.type="button";remove.className="btn danger dosingRemove";remove.textContent="REMOVE";
+  remove.addEventListener("click",()=>el.remove());
+  el.appendChild(remove);
   host.appendChild(el);
 }
 function getDosingRows(){

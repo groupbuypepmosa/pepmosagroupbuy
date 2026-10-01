@@ -1,266 +1,313 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA • Protocols</title><style>
-:root{--ink:#30252d;--muted:#786b74;--pink:#d91f7b;--pink2:#b82f9b;--line:#efd4e2;--soft:#fff8fc}
-*{box-sizing:border-box}body{margin:0;color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 12% 8%,#fff 0 12%,transparent 35%),linear-gradient(135deg,#fffafd,#fff0f7 55%,#faf4ff);min-height:100vh}a{text-decoration:none;color:inherit}.top{max-width:1280px;margin:auto;padding:22px 34px 0}.back{display:inline-flex;gap:8px;align-items:center;color:#a22d65;font-weight:800;font-size:14px}.page{max-width:1120px;margin:auto;padding:20px 28px 70px}.brand{text-align:center;margin:8px 0}.brand img{width:58px;height:58px;object-fit:contain;display:block;margin:0 auto 4px}.brand b{display:block;font-family:Georgia,serif;letter-spacing:.12em;font-size:25px}.brand span{display:block;font-size:10px;letter-spacing:.28em;font-weight:800;color:#a64a73}.hero{text-align:center;margin:8px auto 28px}.eyebrow{color:#b22e73;font-size:10px;font-weight:950;letter-spacing:.24em;margin-bottom:8px}.hero h1{font-family:Georgia,serif;font-size:clamp(44px,7vw,76px);line-height:.95;margin:0;color:#2e242d;letter-spacing:-3px}.hero h1 em{font-style:normal;color:var(--pink)}.hero p{max-width:700px;margin:15px auto 0;color:#6f6670;line-height:1.6}.library{background:rgba(255,255,255,.76);border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 18px 50px rgba(170,69,122,.08)}.libraryHead{padding:8px 8px 18px;border-bottom:1px solid #f1dfe7;margin-bottom:16px}.libraryHead b{display:block;font-size:18px}.libraryHead span{font-size:12px;color:var(--muted)}#documents{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:18px}.protocolCard{position:relative;border:1px solid #edcddd;border-radius:22px;padding:16px;background:linear-gradient(145deg,#fff,#fff7fb 70%,#fdf4ff);box-shadow:0 12px 30px rgba(170,69,122,.08);overflow:hidden}.protocolCard:after{content:"✦";position:absolute;right:16px;top:12px;color:#df5a9c;font-size:22px}.pepName{font-family:Georgia,serif;font-size:25px;font-weight:900;line-height:1.05;color:#2e242d;padding-right:30px;margin-bottom:4px}.pepStrength{font-size:11px;color:#b22e73;font-weight:900;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}.section{border:1px solid #f1dce6;background:rgba(255,255,255,.8);border-radius:14px;padding:11px 12px;margin-top:9px}.section b{display:block;font-size:10px;letter-spacing:.12em;color:#b22e73;margin-bottom:5px}.section p{margin:0;font-size:12px;line-height:1.48;color:#5e535b}.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#fff1f7;border-radius:9px;padding:7px 9px;margin-top:7px;font-size:11px;color:#7d2855}.noticeBox{font-size:10px;line-height:1.4;color:#735d68;margin-top:11px;padding:9px 10px;border-radius:11px;background:#fff1f6;border:1px dashed #e8bdd1}.empty,.notice{padding:30px 18px;text-align:center;color:#806f7b;border:1px dashed #ecc9da;border-radius:18px;background:#fff9fc}.notice.error{color:#a22d65;background:#fff4f8}.footer{text-align:center;margin-top:18px;color:#cf4d8c;font-family:Georgia,serif;font-size:18px}@media(max-width:680px){.top{padding:16px 18px 0}.page{padding:14px 14px 80px}.library{padding:12px;border-radius:22px}#documents{grid-template-columns:1fr;gap:13px}.protocolCard{padding:14px}.pepName{font-size:23px}}
-</style><style id="pep-global-rail-fix">
-.pepSideRail{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:9999;display:flex;flex-direction:column;gap:3px;padding:7px;border:1px solid rgba(221,158,190,.32);border-radius:20px;background:rgba(255,250,253,.88);backdrop-filter:blur(16px);box-shadow:0 16px 40px rgba(100,48,83,.13)}
-.pepSideRail a{width:58px;min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:#725866;border-radius:13px;transition:.18s ease}
-.pepSideRail a:hover{color:#c52f80;background:#fff0f7;transform:translateX(-2px)}
-.pepSideRail span{font-size:17px;line-height:1}.pepSideRail b{font-size:6.5px;letter-spacing:.04em;font-weight:950;white-space:nowrap}
-@media(max-width:900px){.pepSideRail{right:8px}}
-@media(max-width:760px){
-  html,body{overflow-x:hidden!important}
-  .pepSideRail{left:50%;right:auto;top:auto;bottom:9px;transform:translateX(-50%);width:calc(100vw - 16px);max-width:560px;box-sizing:border-box;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:2px;padding:5px;border-radius:16px}
-  .pepSideRail a{width:auto;min-width:0;min-height:45px;border-radius:11px}
-  .pepSideRail span{font-size:14px}.pepSideRail b{font-size:5px;letter-spacing:0}
-}
-@media(max-width:430px){
-  .pepSideRail a{min-height:43px}.pepSideRail span{font-size:13px}.pepSideRail b{font-size:4.6px}
-}
-</style>
-<style id="pep-rail-same-everywhere">
-/* SAME SHORTCUT RAIL ON DESKTOP + MOBILE */
-.pepSideRail{
-  position:fixed!important;
-  right:14px!important;
-  left:auto!important;
-  top:50%!important;
-  bottom:auto!important;
-  transform:translateY(-50%)!important;
-  width:auto!important;
-  max-width:none!important;
-  display:flex!important;
-  flex-direction:column!important;
-  gap:3px!important;
-  padding:7px!important;
-  box-sizing:border-box!important;
-  border-radius:20px!important;
-  z-index:9999!important;
-}
-.pepSideRail a{
-  width:58px!important;
-  min-width:58px!important;
-  max-width:58px!important;
-  min-height:48px!important;
-  flex:none!important;
-  border-radius:13px!important;
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:2px!important;
-}
-.pepSideRail span{font-size:17px!important;line-height:1!important}
-.pepSideRail b{font-size:6.5px!important;letter-spacing:.04em!important;white-space:nowrap!important}
-@media(max-width:430px){
-  .pepSideRail{right:7px!important;padding:5px!important;border-radius:18px!important}
-  .pepSideRail a{width:52px!important;min-width:52px!important;max-width:52px!important;min-height:45px!important;border-radius:11px!important}
-  .pepSideRail span{font-size:15px!important}
-  .pepSideRail b{font-size:5.5px!important}
-}
-</style>
-<style id="pep-mobile-bottom-rail">
-/* Mobile: move the same shortcut rail to the bottom so it never blocks the page */
-@media(max-width:760px){
-  .pepSideRail{
-    left:50%!important;
-    right:auto!important;
-    top:auto!important;
-    bottom:8px!important;
-    transform:translateX(-50%)!important;
-    width:calc(100vw - 16px)!important;
-    max-width:620px!important;
-    display:flex!important;
-    flex-direction:row!important;
-    justify-content:space-between!important;
-    overflow-x:auto!important;
-    gap:2px!important;
-    padding:5px!important;
-    border-radius:18px!important;
-    box-sizing:border-box!important;
-    -webkit-overflow-scrolling:touch;
-  }
-  .pepSideRail a{
-    width:auto!important;
-    min-width:56px!important;
-    max-width:none!important;
-    min-height:45px!important;
-    flex:1 0 56px!important;
-    border-radius:12px!important;
-  }
-  .pepSideRail span{font-size:15px!important}
-  .pepSideRail b{font-size:5.5px!important}
-  body{padding-bottom:68px!important}
-}
-@media(max-width:390px){
-  .pepSideRail{bottom:6px!important;width:calc(100vw - 12px)!important}
-  .pepSideRail a{min-width:52px!important;flex-basis:52px!important;min-height:43px!important}
-  .pepSideRail span{font-size:14px!important}
-  .pepSideRail b{font-size:5px!important}
-}
-</style>
-<body><div class="top"><a class="back" href="./?home=20260924fix">← <span>Back to Shop</span></a></div><main class="page"><div class="brand"><img src="https://raw.githubusercontent.com/groupbuypepmosa/pepmosagroupbuy/main/pepmosa-logo.png" alt="PEPMOSA"><b>PEPMOSA</b><span>GROUP BUY</span></div><section class="hero"><div class="eyebrow">PEPMOSA REFERENCE LIBRARY</div><h1>Protocols <em>✧</em></h1><p>Easy-to-read peptide reference cards with the exact peptide name, reconstitution math, cycle information, storage and important notes.</p></section><section class="library"><div class="libraryHead"><b>Peptide Protocols</b><span>Reference cards for the products currently available in PEPMOSA.</span></div><section id="documents">
-<article class="pdExact">
-  <div class="pdHero"><span class="pdBadge">01</span><h2>🧪 5-AMINO-1MQ Quick Reference (10 mg Vial)</h2></div>
-  <div class="pdQuickExact">
-    <div class="pdFactsExact">
-      <div><span>💊</span><small>Vial contents</small><b>10 mg 5-AMINO-1MQ</b></div>
-      <div><span>💧</span><small>Final volume</small><b>2 mL</b></div>
-      <div><span>🧮</span><small>Concentration</small><b>5 mg/mL</b></div>
-      <div><span>💉</span><small>One U-100 unit</small><b>50 mcg in 0.01 mL</b></div>
-    </div>
-    <div class="pdVialExact"><div>PEPMOSA</div><strong>5-AMINO-1MQ</strong><em>10MG</em><small>RESEARCH USE</small></div>
-  </div>
-  <div class="pdResearchExact"><b>Research context:</b> This PEPMOSA reference card is organized using the same practical format as the PeptideDosages example. It is research/reference information, not individualized medical advice.</div>
-
-  <div class="pdSave"><span>♡</span><div><b>Keep this chart close</b><small>PEPMOSA reference chart for reconstitution and research information.</small></div></div>
-
-  <div class="pdHero pdHero2"><span class="pdBadge">02</span><h2>📊 5-AMINO-1MQ 10 mg Dosage Chart</h2></div>
-  <div class="pdBodyExact">
-    <h3>Dosing &amp; Reconstitution Guide</h3>
-    <p>Subcutaneous research-reference information, once or twice daily.</p>
-    <h3>Subcutaneous Protocol (2 mL = 5 mg/mL)</h3>
-    <table class="pdDoseTable"><thead><tr><th>Phase</th><th>Daily Dose (mg)</th><th>Units per injection (mL)</th></tr></thead>
-    <tbody><tr><td>Days 1–2 (Tolerance)</td><td>2.5 mg (2500 mcg)</td><td>50 units (0.50 mL)</td></tr><tr><td>Days 3+ (Standard)</td><td>5 mg (5000 mcg)</td><td>100 units (1.00 mL)</td></tr><tr><td>Alternative BID</td><td>2.5 mg twice daily</td><td>50 units (0.50 mL) × 2</td></tr></tbody></table>
-    <p class="pdFine"><b>Frequency:</b> The example reference schedule describes once- or twice-daily subcutaneous use. Treat the schedule as research/reference information rather than a personal treatment recommendation.</p>
-
-    <div class="pdSection">
-      <h3>Reconstitution</h3>
-      <div class="pdSteps"><div><b>1</b><span>Confirm the exact vial strength.</span></div><div><b>2</b><span>Use the specified final volume for that strength.</span></div><div><b>3</b><span>Calculate concentration before converting volume to syringe units.</span></div></div>
-      <div class="pdFormula">10 mg ÷ 2 mL = 5 mg/mL</div>
-    </div>
-
-    <div class="pdTwo"><section><h3>Vial Duration</h3><p>Duration depends on the amount used per administration. Calculate the total vial amount against the selected research-reference amount.</p></section><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle, alcohol prep, vial label and sharps-disposal container.</p></section></div>
-    <div class="pdTwo"><section><h3>Storage</h3><p>Follow the exact product/lot documentation and validated stability instructions for the specific formulation.</p></section><section><h3>Important Notes</h3><p>Do not transfer this calculation to a different vial strength. Changing the final volume changes the concentration.</p></section></div>
-
-    <h3>How This Works</h3><p>5-AMINO-1MQ is described in research literature as an NNMT-related compound. Evidence, mechanisms and human applicability should be interpreted cautiously.</p>
-    <h3>Potential Benefits &amp; Side Effects</h3><p>Potential effects and adverse effects are not established to the same degree as approved medicines. Research and community reports should not be treated as confirmed clinical outcomes.</p>
-    <h3>Protocol Overview</h3><p>This guide follows the same easy-reference sequence as the example: quick reference → dosage chart → reconstitution → duration → supplies → storage → notes → research context.</p>
-    <div class="pdWarn">⚠️ Research/reference only. Not individualized treatment instructions.</div>
-  </div>
-</article>
-</section><div class="footer">♡ PEPMOSA GROUP BUY ♡</div></main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260903-library-live"></script><script src="supabase.js?v=20260903-library-live"></script>
-<script>
-(function(){
- const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
- const clean=v=>String(v??'').trim();
-
- const protocolData={
-  "5-AMINO-1MQ":{
-   "50mg":{recon:"4 mL bacteriostatic water → 12.5 mg/mL",cycle:"Days 1–2: 2.5 mg daily; Day 3+: 5 mg daily. The page also describes a BID alternative.",note:"PeptideDosages labels this as a research/educational calculation and notes that published dosage research is preclinical."},
-  },
-  "AOD-9604":{
-   "5mg":{recon:"3 mL bacteriostatic water → 1.67 mg/mL",cycle:"Weeks 1–4: 300 mcg daily; Weeks 5–12: 500 mcg daily.",note:"PeptideDosages describes this as community-reported use, not an FDA-approved or clinically validated subcutaneous regimen."},
-  },
-  "BPC-157":{
-   "5mg":{recon:"3 mL bacteriostatic water → 1.67 mg/mL",cycle:"Weeks 1–2: 200 mcg daily; Weeks 3–4: 400 mcg daily; Weeks 5–8+: 600 mcg daily.",note:"The page says the schedule is extrapolated from preclinical models and is not clinically validated in humans."},
-   "10mg":{recon:"3 mL bacteriostatic water → 3.33 mg/mL",cycle:"Weeks 1–2: 200 mcg daily; Weeks 3–4: 400 mcg daily; Weeks 5–8+: 600 mcg daily.",note:"Community-reported calculation only; human evidence does not validate this schedule."},
-  },
-  "GHK-CU":{
-   "100mg":{recon:"3 mL bacteriostatic water → 33.33 mg/mL",cycle:"PeptideDosages presents example amounts of 1.0, 1.5 and 2.0 mg, with a 5-days/week pattern; it also shows an alternative 2 mg three-times-weekly pattern.",note:"These are presented as research/community reference examples, not a clinically validated regimen."},
-  },
-  "KPV":{
-   "10mg":{recon:"3 mL bacteriostatic water → 3.33 mg/mL",cycle:"Week 1: 200 mcg daily; Week 2: 300 mcg daily; Week 3: 400 mcg daily; Weeks 4–8: 500 mcg daily.",note:"PeptideDosages presents this as an educational research protocol."},
-  },
-  "MOTS-C":{
-   "40mg":{recon:"3 mL bacteriostatic water → 13.33 mg/mL",cycle:"Weeks 1–2: 200 mcg daily; Weeks 3–4: 400 mcg; Weeks 5–6: 600 mcg; Weeks 7–8: 800 mcg; Weeks 9–10+: 1,000 mcg daily.",note:"The displayed rows are community-reported calculations and are not a validated human injection schedule."},
-   "10mg":{recon:"3 mL bacteriostatic water → 3.33 mg/mL",cycle:"PeptideDosages lists a daily research-reference range of about 200–1,000 mcg with gradual titration.",note:"Community-reported calculation only; not a validated human regimen."},
-  },
-  "NAD+": {
-   "500mg":{recon:"3 mL bacteriostatic water → 166.67 mg/mL",cycle:"The page gives calculation examples of 50, 75 and 100 mg; it does not present them as an established clinical schedule.",note:"Research/reference calculations only."},
-   "1000mg":{recon:"3 mL bacteriostatic water → 333.3 mg/mL",cycle:"PeptideDosages lists calculation examples/ranges rather than a single established clinical schedule.",note:"Research/reference calculations only."},
-  },
-  "PT-141":{
-   "10mg":{recon:"3 mL bacteriostatic water → 3.33 mg/mL",cycle:"PeptideDosages presents an educational daily range of 500 mcg–1.5 mg.",note:"Research/educational reference only."},
-  },
-  "RETATRUTIDE":{
-   "10mg":{recon:"3 mL final volume → 10 mg/mL on the strength-specific reference page",cycle:"PeptideDosages describes once-weekly research schedules with gradual escalation.",note:"Retatrutide is investigational; the site separates trial schedules from vial arithmetic."},
-   "20mg":{recon:"3 mL final volume → 10 mg/mL on the strength-specific reference page",cycle:"Once-weekly research schedules with gradual escalation are described.",note:"Research/trial reference only."},
-   "30mg":{recon:"3 mL bacteriostatic water → 10 mg/mL",cycle:"The page converts phase 2/3 once-weekly trial schedules to the 30 mg vial; its phase-2 lower-start arm is 2 mg for Weeks 1–4, 4 mg for Weeks 5–8, 8 mg for Weeks 9–12, then 12 mg from Week 13+.",note:"These are trial schedules, not an individualized recommendation. Retatrutide remains investigational."},
-  },
-  "SELANK":{
-   "10mg":{recon:"PeptideDosages presents measured intranasal calculations using either 5 mL or 10 mL final volume.",cycle:"The 10 mg page focuses on intranasal research calculations rather than a universal injection cycle.",note:"Human research cited there primarily used intranasal preparations."},
-  },
-  "SS-31":{
-   "50mg":{recon:"3 mL final volume → about 16.67 mg/mL",cycle:"The page provides strength-specific calculation examples rather than a universal clinical dose.",note:"Human studies used protocol-specific formulations/routes; the 50 mg vial chart is not a universal clinical regimen."},
-  },
-  "SURVODUTIDE":{
-   "10mg":{recon:"2 mL bacteriostatic water → 5 mg/mL",cycle:"Weeks 1–2: 0.6 mg weekly; Weeks 3–4: 1.2 mg; Weeks 5–6: 1.8 mg; Weeks 7–8: 2.4 mg; Weeks 9–10: 3.6 mg; Weeks 11–12: 4.8 mg; Week 13+: 6 mg weekly.",note:"PeptideDosages describes this as a research/educational schedule based on clinical-trial dosing."},
-  },
-  "TESAMORELIN":{
-   "5mg":{recon:"2.5 mL bacteriostatic water → 2 mg/mL",cycle:"Weeks 1–26: 2 mg once daily in the phase-3 research schedule described on the page.",note:"This is a research schedule and is distinct from separately labeled finished products."},
-   "10mg":{recon:"Use the strength-specific PeptideDosages calculation for the 10 mg vial.",cycle:"PeptideDosages lists a 1–2 mg daily research range for the 10 mg vial.",note:"Research/reference only."},
-  },
-  "THYMOSIN ALPHA 1":{
-   "5mg":{recon:"PeptideDosages lists a 5 mg strength-specific reconstitution calculation.",cycle:"The dosage chart lists a 300–500 mcg daily research-reference range.",note:"Research/reference only."},
-   "10mg":{recon:"PeptideDosages lists a 10 mg strength-specific reconstitution calculation.",cycle:"The dosage chart lists a 300–500 mcg daily research-reference range.",note:"Research/reference only."},
-  },
-  "TIRZEPATIDE":{
-   "30mg":{recon:"3 mL final volume → 10 mg/mL for the 30 mg vial calculation",cycle:"Once weekly with gradual escalation; the page describes 2.5 mg weekly for the first 4 weeks, then 5 mg weekly, with later 2.5 mg increases only after at least 4 weeks at the current dose.",note:"This page separates vial arithmetic from population-level prescribing information; it is not individualized medical advice."},
-  },
- };
-
- function strengthKey(v){
-  const s=String(v??"").trim().toLowerCase().replace(/\\s+/g,"");
-  return s.replace(/\.0+(?=mg|ml)/g,"");
- }
- function getProtocol(name,strength){
-  const p=protocolData[name];
-  if(!p)return null;
-  return p[strengthKey(strength)]||null;
- }
- function card(p){
-  const name=clean(p.product_name)||"PEPTIDE";
-  const strengths=Array.isArray(p.strengths)?p.strengths.map(x=>clean(x)).filter(Boolean):String(p.strengths||"").split(",").map(x=>clean(x)).filter(Boolean);
-  const cards=strengths.length?strengths.map(str=>{
-    const d=getProtocol(name,str);
-    return '<article class="protocolCard">'+
-      '<div class="pepName">'+esc(name)+'</div>'+
-      '<div class="pepStrength">'+esc(str)+'</div>'+
-      '<div class="section"><b>WHAT IS IT?</b><p>Research/reference information for <strong>'+esc(name)+'</strong> at the exact strength shown above.</p></div>'+
-      '<div class="section"><b>RECONSTITUTION</b><p>'+(d?esc(d.recon):'No matching strength-specific PeptideDosages entry was found for this exact product/strength. Do not copy a different strength.')</p></div>'+
-      '<div class="section"><b>CYCLE / PROTOCOL</b><p>'+(d?esc(d.cycle):'No verified matching protocol was found in the reference directory for this exact strength.')</p></div>'+
-      '<div class="section"><b>STORAGE &amp; HANDLING</b><p>Follow the exact product/lot documentation. PeptideDosages commonly lists refrigerated handling after reconstitution, but stability and discard time are formulation-specific.</p></div>'+
-      '<div class="noticeBox">⚠️ '+esc(d?.note||'Research/reference only. Do not substitute another vial strength or product protocol.')+'</div>'+
-    '</article>';
-  }).join(""):'<article class="protocolCard"><div class="pepName">'+esc(name)+'</div><div class="noticeBox">No active strength is listed for this product.</div></article>';
-  return cards;
- }
- function boot(){
-  const box=document.getElementById("documents");
-  try{
-    const protocolProducts=Object.keys(protocolData).map(name=>({
-      product_name:name,
-      strengths:Object.keys(protocolData[name])
-    }));
-    box.innerHTML=protocolProducts.map(card).join("");
-  }catch(e){
-    console.error("PEPMOSA protocols",e);
-    box.innerHTML='<div class="notice error"><b>Protocols could not load.</b><br>'+esc(e?.message||"Unknown error")+'</div>';
-  }
- }
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
-})();
-</script></script>
-<nav class="pepSideRail" aria-label="PEPMOSA shortcuts"><a href="./?home=20260924fix" title="Home"><span>⌂</span><b>HOME</b></a><a href="shop.html" title="Products"><span>🛍</span><b>PRODUCTS</b></a><a href="calculator.html" title="Calculator"><span>⌗</span><b>CALCULATOR</b></a><a href="protocols.html" title="Protocols"><span>☷</span><b>PROTOCOLS</b></a><a href="track.html?v=20260913-global" title="Track"><span>⌁</span><b>TRACK</b></a><a href="coa.html" title="COA"><span>✓</span><b>COA</b></a><a href="buyers-proof.html" title="Buyers' Proof"><span>♥</span><b>PROOF</b></a><a href="https://chat.whatsapp.com/B5YNWxs2c7t0l08JzNgkek" target="_blank" rel="noopener noreferrer" title="Community"><span>👥</span><b>COMMUNITY</b></a></nav></body></html<style id="pd-clean-layout">
-.pdPage{background:#fff;border:1px solid #d4e4ef;border-radius:18px;overflow:hidden;margin-bottom:30px;box-shadow:0 8px 25px rgba(39,88,119,.07)}
-.pdTitle{display:flex;align-items:center;background:linear-gradient(90deg,#f4fbff,#e6f4fc);border-bottom:1px solid #d8e7ef;min-height:58px}
-.pdTitle>span{align-self:stretch;display:flex;align-items:center;padding:0 12px;background:#f35449;color:#fff;font-weight:900;font-size:12px}.pdTitle h2{margin:0;padding:14px 18px;font-size:22px;color:#17496b;font-weight:800}
-.pdQuick{display:grid;grid-template-columns:1fr 210px;gap:30px;padding:28px}
-.pdFacts>div{display:grid;grid-template-columns:150px 1fr;padding:17px 0;border-bottom:1px solid #e0eaf0;align-items:center}.pdFacts span{font-size:13px;color:#607b90}.pdFacts b{font-size:18px;color:#17496b}
-.pdVial{width:125px;height:165px;margin:auto;border-radius:12px 12px 22px 22px;border:3px solid #bcc7cd;background:linear-gradient(#f1f4f5 0 43%,#ccebdd 43% 72%,#e8a16b 72%);box-shadow:0 12px 22px rgba(55,87,105,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1a6e84;text-align:center}.pdVial strong{font-size:12px;color:#193f52;margin:8px 6px 2px}.pdVial em{font-style:normal;font-weight:900;font-size:20px;color:#0084a2}.pdVial small{font-size:7px;color:#445b67;margin-top:7px}
-.pdContext{margin:0 28px 28px;padding:14px 18px;border:1px solid #b8dff6;border-left:4px solid #289dde;border-radius:8px;background:#f4fbff;color:#42627a;font-size:13px;line-height:1.5}
-.pdSecond{border-top:1px solid #d8e7ef}.pdContent{padding:24px 28px 30px}.pdContent h3{font-size:19px;color:#17496b;margin:6px 0 10px}.pdContent p,.pdContent li{color:#4c6678;line-height:1.65;font-size:14px}.pdContent ol{padding-left:22px}.pdBlue{padding:13px 15px;border-radius:8px;background:#edf8ff;border:1px solid #c9e7f7;color:#28536f;margin:15px 0 22px}.pdGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}.pdGrid section{border:1px solid #dbe8ef;border-radius:10px;padding:16px;background:#fbfdff}.pdDisclaimer{margin-top:25px;padding:13px 15px;border-radius:9px;background:#fff5f5;border:1px solid #f0cccc;color:#855454;font-size:12px}
-@media(max-width:700px){.pdQuick{grid-template-columns:1fr;padding:18px}.pdVial{display:none}.pdFacts>div{grid-template-columns:120px 1fr}.pdTitle h2{font-size:17px;padding:12px}.pdContent{padding:18px}.pdContext{margin:0 18px 18px}.pdGrid{grid-template-columns:1fr}.pdFacts b{font-size:15px}}
-</style><style id="pd-exact-reference-layout">
-.pdExact{background:#fff;border:1px solid #cfe0eb;border-radius:16px;overflow:hidden;box-shadow:0 8px 28px rgba(32,83,115,.07);margin-bottom:30px}
-.pdHero{height:72px;background:linear-gradient(100deg,#f2f9fd 0%,#edf8fd 72%,#e3f2fa 100%);border-bottom:1px solid #d5e5ef;display:flex;align-items:center;position:relative}
-.pdHero h2{font-size:25px;color:#173f5b;margin:0;padding:0 22px;font-weight:800}.pdBadge{align-self:stretch;background:#f35a4e;color:#fff;font-size:12px;font-weight:900;display:flex;align-items:flex-start;padding:9px 11px;border-radius:0 0 10px 0}
-.pdQuickExact{display:grid;grid-template-columns:minmax(0,1fr) 245px;gap:26px;padding:28px}
-.pdFactsExact>div{display:grid;grid-template-columns:35px 135px 1fr;align-items:center;min-height:74px;border-bottom:1px solid #e0e9ef}.pdFactsExact span{font-size:22px}.pdFactsExact small{color:#617b8f}.pdFactsExact b{font-size:18px;color:#194867}
-.pdVialExact{width:132px;height:176px;margin:8px auto 0;border:3px solid #b8c3c9;border-radius:12px 12px 22px 22px;background:linear-gradient(#eef2f4 0 42%,#cce9dc 42% 70%,#df9966 70%);box-shadow:0 14px 25px rgba(43,79,97,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#16849d}.pdVialExact strong{font-size:12px;color:#163e51;margin-top:9px}.pdVialExact em{font-style:normal;font-weight:900;font-size:21px;color:#0084a4}.pdVialExact small{font-size:7px;color:#465b66;margin-top:8px}
-.pdResearchExact{margin:0 28px 26px;padding:14px 18px;background:#f3fbff;border:1px solid #b8dcf2;border-left:4px solid #2b9fdf;border-radius:8px;color:#36566c;line-height:1.5}
-.pdSave{margin:0 28px 16px;border:1px solid #d6e7f0;border-radius:14px;background:linear-gradient(90deg,#f9fdff,#fff);padding:14px 17px;display:flex;align-items:center;gap:12px}.pdSave>span{font-size:26px;color:#ef6259}.pdSave b{display:block;color:#31566d}.pdSave small{display:block;color:#6c8291;font-size:11px;margin-top:2px}
-.pdHero2{border-top:1px solid #d5e5ef}.pdBodyExact{padding:28px}.pdBodyExact h3{font-size:20px;color:#17486a;margin:2px 0 12px}.pdBodyExact p{color:#496577;line-height:1.65;margin:0 0 22px}.pdDoseTable{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid #cfe1ec;border-radius:8px;margin:14px 0 22px}.pdDoseTable th{background:#e7f5fc;color:#194b69;text-align:left;padding:14px}.pdDoseTable td{padding:14px;border-top:1px solid #d8e6ee;color:#4a6475}.pdDoseTable tr:nth-child(even) td{background:#f7fbfd}.pdFine{font-size:13px}.pdSection{margin:24px 0}.pdSteps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.pdSteps>div{border:1px solid #d7e6ee;border-radius:9px;padding:15px;background:#fbfdff;display:flex;gap:10px}.pdSteps b{width:25px;height:25px;border-radius:50%;background:#eaf6fd;color:#2188bd;display:grid;place-items:center}.pdFormula{margin-top:13px;background:#f1f8fc;border:1px solid #d5e8f2;border-radius:8px;padding:12px 15px;font-family:ui-monospace,monospace;color:#24536d}.pdTwo{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}.pdTwo section{border:1px solid #d9e7ee;border-radius:10px;padding:17px;background:#fcfeff}.pdWarn{margin-top:25px;padding:13px 15px;background:#fff5f5;border:1px solid #efcccc;border-radius:9px;color:#855555;font-size:12px}
-@media(max-width:700px){.pdQuickExact{grid-template-columns:1fr;padding:18px}.pdVialExact{display:none}.pdFactsExact>div{grid-template-columns:32px 105px 1fr}.pdFactsExact b{font-size:14px}.pdHero h2{font-size:17px}.pdResearchExact,.pdSave{margin-left:18px;margin-right:18px}.pdBodyExact{padding:18px}.pdSteps,.pdTwo{grid-template-columns:1fr}.pdDoseTable{font-size:12px}.pdDoseTable th,.pdDoseTable td{padding:10px 8px}}
-</style>>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA • Protocols</title>
+<style>
+:root{--ink:#183e59;--muted:#60788a;--line:#d4e5ee;--blue:#eaf7fd;--red:#f35b4f;--pink:#d91f7b}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:#f4f9fc}a{text-decoration:none;color:inherit}
+.top{max-width:1180px;margin:auto;padding:22px 24px 0}.back{color:#a52e69;font-weight:800}.page{max-width:1120px;margin:auto;padding:18px 24px 70px}.brand{text-align:center;margin:4px 0 24px}.brand b{display:block;font-family:Georgia,serif;letter-spacing:.16em;font-size:27px;color:#a52e69}.brand span{font-size:10px;letter-spacing:.3em;font-weight:800;color:#8d6a7c}
+.intro{text-align:center;margin:0 auto 26px}.intro h1{font-size:30px;margin:0 0 7px}.intro p{color:var(--muted);margin:0}
+.protocol{background:#fff;border:1px solid var(--line);border-radius:15px;overflow:hidden;margin:0 0 28px;box-shadow:0 8px 25px rgba(38,83,110,.07)}
+.sectionHead{height:72px;background:linear-gradient(100deg,#f5fbfe,#e8f5fb);border-bottom:1px solid var(--line);display:flex;align-items:center}.sectionHead>span{align-self:stretch;background:var(--red);color:white;font-weight:900;font-size:12px;padding:10px 12px;display:flex;align-items:flex-start;border-radius:0 0 10px 0}.sectionHead h2{font-size:23px;margin:0;padding:0 20px;font-weight:850}
+.quick{display:grid;grid-template-columns:1fr 230px;gap:25px;padding:25px 28px 20px}.facts>div{min-height:66px;display:grid;grid-template-columns:34px 145px 1fr;align-items:center;border-bottom:1px solid #e1ebf0}.facts i{font-style:normal;font-size:20px}.facts small{color:#668092}.facts b{font-size:16px}.vial{width:125px;height:170px;margin:auto;border:3px solid #b9c4ca;border-radius:11px 11px 22px 22px;background:linear-gradient(#f1f3f4 0 38%,#cce9df 38% 70%,#e2a171 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 12px 22px #9fb0b91f}.vial strong{font-size:9px;color:#1685a0}.vial b{font-size:11px;margin-top:8px}.vial em{font-style:normal;font-weight:900;font-size:18px;color:#0085a7}.vial small{font-size:7px;margin-top:8px}
+.context{margin:0 28px 22px;padding:14px 17px;background:#f3fbff;border:1px solid #bcdff1;border-left:4px solid #2e9fdc;border-radius:8px;line-height:1.5;color:#466678}.keep{margin:0 28px 16px;padding:13px 16px;border:1px solid #d6e7ef;border-radius:13px;display:flex;gap:12px;align-items:center}.keep span{font-size:25px;color:#ef6259}.keep b{display:block}.keep small{color:#6b8190}
+.body{padding:27px 28px}.body h3{font-size:19px;margin:2px 0 10px}.body p{color:#4d6879;line-height:1.65;margin:0 0 22px}.formula{padding:13px 15px;background:#f0f8fc;border:1px solid #d6e8f1;border-radius:8px;font-family:ui-monospace,monospace;margin:-5px 0 24px}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:8px 0 24px}.twocol section{border:1px solid var(--line);border-radius:10px;padding:17px;background:#fcfeff}.twocol h3{margin-top:0}.warning{padding:13px 15px;background:#fff6f5;border:1px solid #efceca;border-radius:9px;color:#855858;font-size:12px}
+@media(max-width:700px){.page{padding:12px}.quick{grid-template-columns:1fr;padding:18px}.vial{display:none}.facts>div{grid-template-columns:30px 105px 1fr}.facts b{font-size:13px}.sectionHead h2{font-size:16px}.context,.keep{margin-left:18px;margin-right:18px}.body{padding:18px}.twocol{grid-template-columns:1fr}}
+</style></head><body><div class="top"><a class="back" href="index.html">← PEPMOSA</a></div><main class="page"><div class="brand"><b>PEPMOSA</b><span>PROTOCOLS</span></div><div class="intro"><h1>Peptide Protocols</h1><p>Research and reference guides for products currently listed by PEPMOSA.</p></div><article class="protocol">
+<div class="sectionHead"><span>01</span><h2>🧪 5-AMINO-1MQ Quick Reference (10mg / 50mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>5-AMINO-1MQ</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>10mg / 50mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>5-AMINO-1MQ</b><em>10mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>01</span><h2>📊 5-AMINO-1MQ Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>02</span><h2>🧪 AOD-9604 Quick Reference (5mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>AOD-9604</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>5mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>AOD-9604</b><em>5mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>02</span><h2>📊 AOD-9604 Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>03</span><h2>🧪 BPC-157 Quick Reference (5mg / 10mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>BPC-157</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>5mg / 10mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>BPC-157</b><em>5mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>03</span><h2>📊 BPC-157 Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>04</span><h2>🧪 GHK-CU Quick Reference (50mg / 100mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>GHK-CU</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>50mg / 100mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>GHK-CU</b><em>50mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>04</span><h2>📊 GHK-CU Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>05</span><h2>🧪 KPV Quick Reference (10mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>KPV</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>10mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>KPV</b><em>10mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>05</span><h2>📊 KPV Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>06</span><h2>🧪 MOTS-C Quick Reference (10mg / 40mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>MOTS-C</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>10mg / 40mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>MOTS-C</b><em>10mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>06</span><h2>📊 MOTS-C Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>07</span><h2>🧪 NAD+ Quick Reference (500mg / 1000mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>NAD+</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>500mg / 1000mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>NAD+</b><em>500mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>07</span><h2>📊 NAD+ Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>08</span><h2>🧪 PT-141 Quick Reference (10mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>PT-141</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>10mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>PT-141</b><em>10mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>08</span><h2>📊 PT-141 Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>09</span><h2>🧪 RETATRUTIDE Quick Reference (10mg / 20mg / 30mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>RETATRUTIDE</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>10mg / 20mg / 30mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>RETATRUTIDE</b><em>10mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>09</span><h2>📊 RETATRUTIDE Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>10</span><h2>🧪 SELANK Quick Reference (10mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>SELANK</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>10mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>SELANK</b><em>10mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>10</span><h2>📊 SELANK Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>11</span><h2>🧪 SS-31 Quick Reference (50mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>SS-31</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>50mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>SS-31</b><em>50mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>11</span><h2>📊 SS-31 Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>12</span><h2>🧪 SURVODUTIDE Quick Reference (10mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>SURVODUTIDE</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>10mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>SURVODUTIDE</b><em>10mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>12</span><h2>📊 SURVODUTIDE Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>13</span><h2>🧪 TESAMORELIN Quick Reference (5mg / 10mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>TESAMORELIN</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>5mg / 10mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>TESAMORELIN</b><em>5mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>13</span><h2>📊 TESAMORELIN Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>14</span><h2>🧪 THYMOSIN ALPHA 1 Quick Reference (5mg / 10mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>THYMOSIN ALPHA 1</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>5mg / 10mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>THYMOSIN ALPHA 1</b><em>5mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>14</span><h2>📊 THYMOSIN ALPHA 1 Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article><article class="protocol">
+<div class="sectionHead"><span>15</span><h2>🧪 TIRZEPATIDE Quick Reference (15mg / 30mg)</h2></div>
+<div class="quick"><div class="facts">
+<div><i>💊</i><small>Peptide</small><b>TIRZEPATIDE</b></div>
+<div><i>🧪</i><small>Available strengths</small><b>15mg / 30mg</b></div>
+<div><i>📐</i><small>Reconstitution</small><b>Concentration depends on vial strength and final volume</b></div>
+<div><i>💉</i><small>Syringe conversion</small><b>Calculate concentration first, then convert volume to U-100 units</b></div>
+</div><div class="vial"><strong>PEPMOSA</strong><b>TIRZEPATIDE</b><em>15mg</em><small>RESEARCH USE</small></div></div>
+<div class="context"><b>Research context:</b> This reference is organized from the protocol format used by PeptideDosages. It is for research/reference purposes and is not individualized medical advice.</div>
+<div class="keep"><span>♡</span><div><b>Keep this chart close</b><small>Quick reference for product handling and protocol information.</small></div></div>
+<div class="sectionHead"><span>15</span><h2>📊 TIRZEPATIDE Dosage &amp; Reconstitution Guide</h2></div>
+<div class="body"><h3>Protocol Overview</h3><p>This page uses the same easy-to-follow organization as the reference site: quick reference, dosage/protocol information, reconstitution, vial duration, supplies, storage, important notes, and research context.</p>
+<h3>Reconstitution</h3><p>Use the exact vial strength and validated final volume for the specific product. The concentration is calculated as <b>total peptide amount ÷ final volume</b>. Do not transfer a calculation from one strength to another.</p>
+<div class="formula">Concentration (mg/mL) = vial amount (mg) ÷ final volume (mL)</div>
+<h3>Vial Duration</h3><p>Vial duration varies with the amount used per administration and the product-specific research protocol. Calculate from the total amount in the vial rather than assuming the duration is the same across strengths.</p>
+<div class="twocol"><section><h3>Supplies Needed</h3><p>Appropriate sterile diluent, sterile syringe/needle when applicable, alcohol prep, vial label, and an appropriate sharps-disposal container.</p></section><section><h3>Storage</h3><p>Follow the product/lot documentation for storage before and after reconstitution. Do not assume one storage period applies to every peptide or formulation.</p></section></div>
+<h3>Important Notes</h3><p>Research-peptide protocols can differ by source, formulation, strength, and route. Confirm the exact product identity and concentration before using any calculation.</p>
+<h3>How This Works</h3><p>For educational purposes, this section summarizes the compound's research context without treating experimental findings as established clinical outcomes.</p>
+<h3>Potential Benefits &amp; Side Effects</h3><p>Reported effects and adverse effects vary by compound and evidence quality. Experimental or community-reported effects should not be treated as confirmed clinical benefits.</p>
+<div class="warning">⚠️ Research/reference information only. Not a personalized treatment plan or medical prescription.</div>
+</div></article></main></body></html>

@@ -104,20 +104,87 @@
 (function(){
  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
  const clean=v=>String(v??'').trim();
- const protocolNames=new Set(["5-AMINO-1MQ","AOD-9604","ARA290","BPC + TB","BPC-157","CAGRILINTIDE","DSIP","EPITHALON","GHK-CU","GHK-CU + KPV","KISSPEPTIN","KPV","MOTS-C","NAD+","PT-141","RETATRUTIDE","SELANK","SEMAX","SS-31","SURVODUTIDE","TESAMORELIN","THYMOSIN ALPHA 1","TIRZEPATIDE"]);
+
+ const protocolData={
+  "5-AMINO-1MQ":{
+   "50mg":{recon:"4 mL bacteriostatic water → 12.5 mg/mL",cycle:"Days 1–2: 2.5 mg daily; Day 3+: 5 mg daily. The page also describes a BID alternative.",note:"PeptideDosages labels this as a research/educational calculation and notes that published dosage research is preclinical."},
+  },
+  "AOD-9604":{
+   "5mg":{recon:"3 mL bacteriostatic water → 1.67 mg/mL",cycle:"Weeks 1–4: 300 mcg daily; Weeks 5–12: 500 mcg daily.",note:"PeptideDosages describes this as community-reported use, not an FDA-approved or clinically validated subcutaneous regimen."},
+  },
+  "BPC-157":{
+   "5mg":{recon:"3 mL bacteriostatic water → 1.67 mg/mL",cycle:"Weeks 1–2: 200 mcg daily; Weeks 3–4: 400 mcg daily; Weeks 5–8+: 600 mcg daily.",note:"The page says the schedule is extrapolated from preclinical models and is not clinically validated in humans."},
+   "10mg":{recon:"3 mL bacteriostatic water → 3.33 mg/mL",cycle:"Weeks 1–2: 200 mcg daily; Weeks 3–4: 400 mcg daily; Weeks 5–8+: 600 mcg daily.",note:"Community-reported calculation only; human evidence does not validate this schedule."},
+  },
+  "GHK-CU":{
+   "100mg":{recon:"3 mL bacteriostatic water → 33.33 mg/mL",cycle:"PeptideDosages presents example amounts of 1.0, 1.5 and 2.0 mg, with a 5-days/week pattern; it also shows an alternative 2 mg three-times-weekly pattern.",note:"These are presented as research/community reference examples, not a clinically validated regimen."},
+  },
+  "KPV":{
+   "10mg":{recon:"3 mL bacteriostatic water → 3.33 mg/mL",cycle:"Week 1: 200 mcg daily; Week 2: 300 mcg daily; Week 3: 400 mcg daily; Weeks 4–8: 500 mcg daily.",note:"PeptideDosages presents this as an educational research protocol."},
+  },
+  "MOTS-C":{
+   "40mg":{recon:"3 mL bacteriostatic water → 13.33 mg/mL",cycle:"Weeks 1–2: 200 mcg daily; Weeks 3–4: 400 mcg; Weeks 5–6: 600 mcg; Weeks 7–8: 800 mcg; Weeks 9–10+: 1,000 mcg daily.",note:"The displayed rows are community-reported calculations and are not a validated human injection schedule."},
+   "10mg":{recon:"3 mL bacteriostatic water → 3.33 mg/mL",cycle:"PeptideDosages lists a daily research-reference range of about 200–1,000 mcg with gradual titration.",note:"Community-reported calculation only; not a validated human regimen."},
+  },
+  "NAD+": {
+   "500mg":{recon:"3 mL bacteriostatic water → 166.67 mg/mL",cycle:"The page gives calculation examples of 50, 75 and 100 mg; it does not present them as an established clinical schedule.",note:"Research/reference calculations only."},
+   "1000mg":{recon:"3 mL bacteriostatic water → 333.3 mg/mL",cycle:"PeptideDosages lists calculation examples/ranges rather than a single established clinical schedule.",note:"Research/reference calculations only."},
+  },
+  "PT-141":{
+   "10mg":{recon:"3 mL bacteriostatic water → 3.33 mg/mL",cycle:"PeptideDosages presents an educational daily range of 500 mcg–1.5 mg.",note:"Research/educational reference only."},
+  },
+  "RETATRUTIDE":{
+   "10mg":{recon:"3 mL final volume → 10 mg/mL on the strength-specific reference page",cycle:"PeptideDosages describes once-weekly research schedules with gradual escalation.",note:"Retatrutide is investigational; the site separates trial schedules from vial arithmetic."},
+   "20mg":{recon:"3 mL final volume → 10 mg/mL on the strength-specific reference page",cycle:"Once-weekly research schedules with gradual escalation are described.",note:"Research/trial reference only."},
+   "30mg":{recon:"3 mL bacteriostatic water → 10 mg/mL",cycle:"The page converts phase 2/3 once-weekly trial schedules to the 30 mg vial; its phase-2 lower-start arm is 2 mg for Weeks 1–4, 4 mg for Weeks 5–8, 8 mg for Weeks 9–12, then 12 mg from Week 13+.",note:"These are trial schedules, not an individualized recommendation. Retatrutide remains investigational."},
+  },
+  "SELANK":{
+   "10mg":{recon:"PeptideDosages presents measured intranasal calculations using either 5 mL or 10 mL final volume.",cycle:"The 10 mg page focuses on intranasal research calculations rather than a universal injection cycle.",note:"Human research cited there primarily used intranasal preparations."},
+  },
+  "SS-31":{
+   "50mg":{recon:"3 mL final volume → about 16.67 mg/mL",cycle:"The page provides strength-specific calculation examples rather than a universal clinical dose.",note:"Human studies used protocol-specific formulations/routes; the 50 mg vial chart is not a universal clinical regimen."},
+  },
+  "SURVODUTIDE":{
+   "10mg":{recon:"2 mL bacteriostatic water → 5 mg/mL",cycle:"Weeks 1–2: 0.6 mg weekly; Weeks 3–4: 1.2 mg; Weeks 5–6: 1.8 mg; Weeks 7–8: 2.4 mg; Weeks 9–10: 3.6 mg; Weeks 11–12: 4.8 mg; Week 13+: 6 mg weekly.",note:"PeptideDosages describes this as a research/educational schedule based on clinical-trial dosing."},
+  },
+  "TESAMORELIN":{
+   "5mg":{recon:"2.5 mL bacteriostatic water → 2 mg/mL",cycle:"Weeks 1–26: 2 mg once daily in the phase-3 research schedule described on the page.",note:"This is a research schedule and is distinct from separately labeled finished products."},
+   "10mg":{recon:"Use the strength-specific PeptideDosages calculation for the 10 mg vial.",cycle:"PeptideDosages lists a 1–2 mg daily research range for the 10 mg vial.",note:"Research/reference only."},
+  },
+  "THYMOSIN ALPHA 1":{
+   "5mg":{recon:"PeptideDosages lists a 5 mg strength-specific reconstitution calculation.",cycle:"The dosage chart lists a 300–500 mcg daily research-reference range.",note:"Research/reference only."},
+   "10mg":{recon:"PeptideDosages lists a 10 mg strength-specific reconstitution calculation.",cycle:"The dosage chart lists a 300–500 mcg daily research-reference range.",note:"Research/reference only."},
+  },
+  "TIRZEPATIDE":{
+   "30mg":{recon:"3 mL final volume → 10 mg/mL for the 30 mg vial calculation",cycle:"Once weekly with gradual escalation; the page describes 2.5 mg weekly for the first 4 weeks, then 5 mg weekly, with later 2.5 mg increases only after at least 4 weeks at the current dose.",note:"This page separates vial arithmetic from population-level prescribing information; it is not individualized medical advice."},
+  },
+ };
+
+ function strengthKey(v){
+  const s=String(v??"").trim().toLowerCase().replace(/\\s+/g,"");
+  return s.replace(/\.0+(?=mg|ml)/g,"");
+ }
+ function getProtocol(name,strength){
+  const p=protocolData[name];
+  if(!p)return null;
+  return p[strengthKey(strength)]||null;
+ }
  function card(p){
   const name=clean(p.product_name)||"PEPTIDE";
   const strengths=Array.isArray(p.strengths)?p.strengths.map(x=>clean(x)).filter(Boolean):String(p.strengths||"").split(",").map(x=>clean(x)).filter(Boolean);
-  const matched=protocolNames.has(name);
-  return '<article class="protocolCard">'+
-   '<div class="pepName">'+esc(name)+'</div>'+
-   '<div class="pepStrength">'+esc(strengths.join(" • ")||"PRODUCT")+'</div>'+
-   '<div class="section"><b>PROTOCOL</b><p>'+(matched?'A matching research-protocol entry is available for this peptide. The protocol depends on the exact vial strength shown above.':'No matching entry was found for this product in the reference protocol directory.')+'</p></div>'+
-   '<div class="section"><b>RECONSTITUTION</b><p>Use only the reconstitution method specified for the exact product and vial strength. Different strengths of the same peptide can require different concentration calculations.</p><div class="formula">Concentration = total peptide amount ÷ final volume</div></div>'+
-   '<div class="section"><b>CYCLE / DURATION</b><p>Cycle length and frequency are protocol-specific. Do not apply a schedule from another vial strength or another peptide.</p></div>'+
-   '<div class="section"><b>STORAGE &amp; HANDLING</b><p>Follow the applicable product handling instructions and maintain appropriate storage conditions after preparation.</p></div>'+
-   '<div class="noticeBox">⚠️ Research/reference information only. Exact dosing and administration should be confirmed with a qualified healthcare professional.</div>'+
-  '</article>';
+  const cards=strengths.length?strengths.map(str=>{
+    const d=getProtocol(name,str);
+    return '<article class="protocolCard">'+
+      '<div class="pepName">'+esc(name)+'</div>'+
+      '<div class="pepStrength">'+esc(str)+'</div>'+
+      '<div class="section"><b>WHAT IS IT?</b><p>Research/reference information for <strong>'+esc(name)+'</strong> at the exact strength shown above.</p></div>'+
+      '<div class="section"><b>RECONSTITUTION</b><p>'+(d?esc(d.recon):'No matching strength-specific PeptideDosages entry was found for this exact product/strength. Do not copy a different strength.')</p></div>'+
+      '<div class="section"><b>CYCLE / PROTOCOL</b><p>'+(d?esc(d.cycle):'No verified matching protocol was found in the reference directory for this exact strength.')</p></div>'+
+      '<div class="section"><b>STORAGE &amp; HANDLING</b><p>Follow the exact product/lot documentation. PeptideDosages commonly lists refrigerated handling after reconstitution, but stability and discard time are formulation-specific.</p></div>'+
+      '<div class="noticeBox">⚠️ '+esc(d?.note||'Research/reference only. Do not substitute another vial strength or product protocol.')+'</div>'+
+    '</article>';
+  }).join(""):'<article class="protocolCard"><div class="pepName">'+esc(name)+'</div><div class="noticeBox">No active strength is listed for this product.</div></article>';
+  return cards;
  }
  async function boot(){
   const box=document.getElementById("documents");

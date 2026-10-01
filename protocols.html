@@ -1,75 +1,208 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA • Peptide Protocols</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d92d7b">
+<title>PEPMOSA • Protocol Library</title>
 <style>
-:root{--pink:#d92d7b;--pink2:#f8d9e9;--pink3:#fff4fa;--ink:#172033;--blue:#244d6d;--muted:#6e7180;--line:#efd7e4;--green:#29a866;--gold:#b88318}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(180deg,#fff 0,#fff8fc 35%,#fff0f8 100%);min-height:100vh}
-.top{max-width:1240px;margin:auto;padding:20px 24px}.back{display:inline-flex;align-items:center;gap:7px;color:#9d3567;font-weight:900;text-decoration:none;font-size:13px}
-.page{max-width:1240px;margin:auto;padding:0 24px 70px}
-.hero{position:relative;overflow:hidden;text-align:center;border:1px solid #f0d2e2;border-radius:28px;background:radial-gradient(circle at 8% 20%,#ffdce9 0 4%,transparent 17%),radial-gradient(circle at 96% 8%,#f7d7e8 0 7%,transparent 20%),linear-gradient(135deg,#fff,#fff0f7);padding:38px 24px 30px;margin-bottom:18px;box-shadow:0 18px 50px #c76b9918}
-.hero:before{content:"";position:absolute;width:220px;height:220px;left:-80px;top:-90px;border:2px solid #f4c5da;border-radius:50%;box-shadow:70px 45px 0 -25px #fff0f7,125px 100px 0 -55px #f6c9df;opacity:.8}
-.hero:after{content:"🧬";position:absolute;right:28px;top:14px;font-size:90px;opacity:.11;transform:rotate(18deg)}
-.brand{position:relative;z-index:1}.brand b{display:block;font-family:Georgia,"Times New Roman",serif;font-size:46px;line-height:1;color:#172033;letter-spacing:-.03em}.brand b span{color:var(--pink)}.brand small{display:block;margin-top:12px;font-size:10px;letter-spacing:.34em;font-weight:950;color:#7f5269}
-.notice{position:relative;z-index:1;max-width:760px;margin:24px auto 0;padding:13px 18px;background:#fff8fc;border:1px solid #f1c9dc;border-radius:15px;color:#8e285d;line-height:1.45;font-size:12px;box-shadow:0 8px 22px #b75c8710}.notice b{font-size:12px}
-.toolbar{display:flex;align-items:center;gap:12px;margin:0 0 18px;padding:14px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 28px #9f567012}
-.search{flex:1;position:relative}.search span{position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:20px;color:#b23b70}.search input{width:100%;height:48px;border:1px solid #ecc9db;border-radius:999px;padding:0 18px 0 48px;outline:none;color:var(--ink);font-size:14px;background:#fffafd}.search input:focus{border-color:#e28ab2;box-shadow:0 0 0 4px #e91e8310}.count{white-space:nowrap;font-size:10px;font-weight:950;letter-spacing:.08em;color:#a23d6d;text-transform:uppercase;padding:0 8px}
-.grid{display:grid;grid-template-columns:1fr;gap:22px;max-width:1180px;margin:0 auto}.card{background:#fff;border:1px solid #efd6e2;border-radius:24px;overflow:hidden;box-shadow:0 18px 45px #9c527313}.head{display:flex;justify-content:space-between;gap:15px;align-items:center;padding:22px 30px 18px;background:linear-gradient(100deg,#fff,#fff4fa);border-bottom:1px solid #f1dce6}.titleWrap{min-width:0}.name{font-size:30px;font-weight:950;line-height:1.15;color:#171d2d;letter-spacing:-.02em}.strength{font-size:.72em;color:#5f7184;font-weight:850;margin-left:6px}.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}.tag{padding:6px 11px;border-radius:999px;background:#fde4f0;color:#bf286d;font-size:9px;font-weight:950;letter-spacing:.04em}.tag.blue{background:#e8edff;color:#365bc1}.badge{padding:7px 11px;border-radius:999px;background:#dcf8e9;color:#18834c;font-size:9px;font-weight:950;white-space:nowrap}
-.body{padding:24px 28px 30px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px}.mainCol{min-width:0}.side{display:flex;flex-direction:column;gap:14px}.section{border-radius:17px;border:1px solid #f0dbe5;background:#fff;padding:18px 20px;margin-bottom:15px}.section.soft{background:linear-gradient(135deg,#fff5fa,#fff)}.section.blue{background:linear-gradient(135deg,#f5faff,#fff)}.section.gold{background:#fffaf0;border-color:#f1dfad}.sectionHead{display:flex;align-items:center;gap:10px;margin-bottom:9px}.icon{width:34px;height:34px;border-radius:12px;background:#fde1ee;display:grid;place-items:center;font-size:17px;flex:0 0 auto}.sectionHead h3{margin:0;font-size:16px;color:#1b2536}.section p,.sectionText{margin:0;white-space:pre-wrap;line-height:1.65;font-size:13px;color:#344b60}.sideCard{border:1px solid #efd7e3;border-radius:17px;background:#fff;padding:17px 18px}.sideTitle{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:950;color:#1b2536;margin-bottom:12px}.kv{display:grid;gap:10px}.kv div{padding-bottom:9px;border-bottom:1px dashed #efdce5}.kv div:last-child{border-bottom:0;padding-bottom:0}.kv b{display:block;font-size:9px;color:#9c6680;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}.kv span{font-size:12px;color:#435363}.noteList{margin:0;padding-left:18px;color:#67583f;font-size:12px;line-height:1.6}
-.doseIntro{font-size:12px;color:#6f7180;margin:-2px 0 11px}.doseTable{border:1px solid #eccfdf;border-radius:13px;overflow:hidden;background:#fff}.doseHeader,.doseRow{display:grid;grid-template-columns:1.1fr 1.45fr 1.45fr;gap:0}.doseHeader{background:linear-gradient(90deg,#fde0ef,#fcebf4);color:#ad2865;font-size:11px;font-weight:950}.doseHeader span,.doseRow span{padding:13px 14px;min-width:0}.doseRow{font-size:12px;color:#435363;border-top:1px solid #f0dfe7}.doseRow:nth-child(odd){background:#fff8fc}.doseRow span{line-height:1.45}.empty{text-align:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:44px 24px;box-shadow:0 10px 28px #8f54700d;color:var(--muted)}.empty .icon{font-size:42px;margin-bottom:10px}.empty h2{margin:0 0 8px;color:#642c4d;font-size:22px}.empty p{margin:0;line-height:1.6}
-@media(max-width:900px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.sideCard{height:100%}}
-@media(max-width:700px){.top{padding:15px 14px}.page{padding:0 12px 48px}.hero{padding:30px 15px 24px;border-radius:22px}.brand b{font-size:34px}.hero:after{font-size:60px;right:5px}.toolbar{padding:10px;display:block}.count{padding:10px 5px 2px;display:block}.name{font-size:23px}.head{padding:19px 18px}.body{padding:17px 14px 22px}.side{grid-template-columns:1fr}.section{padding:16px}.doseHeader,.doseRow{grid-template-columns:1.15fr 1fr 1.25fr;font-size:10px}.doseHeader span,.doseRow span{padding:10px 8px}.badge{align-self:flex-start}.head{align-items:flex-start}}
+:root{
+  --pink:#d92d7b;--pink2:#f16aa8;--rose:#fff0f7;--rose2:#fff8fc;
+  --ink:#251b25;--muted:#82717c;--line:#efd9e5;--white:#fff;
+  --shadow:0 20px 55px rgba(111,42,79,.10);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+ margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+ color:var(--ink);
+ background:
+  radial-gradient(circle at 0 0,rgba(255,128,190,.15),transparent 27%),
+  radial-gradient(circle at 100% 7%,rgba(197,142,255,.13),transparent 28%),
+  linear-gradient(180deg,#fffafd 0%,#fff7fb 55%,#fdf4fa 100%);
+ min-height:100vh;
+}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;background-image:radial-gradient(#fff 1.2px,transparent 1.2px);background-size:30px 30px;z-index:-1}
+a{color:inherit}
+.top{max-width:1260px;margin:auto;padding:18px 22px}
+.back{
+ display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+ color:#a62d67;font-size:11px;font-weight:950;letter-spacing:.08em;
+ padding:10px 14px;border:1px solid #f0cddd;border-radius:999px;background:#fff;
+ box-shadow:0 7px 20px rgba(150,58,102,.07)
+}
+.page{max-width:1260px;margin:auto;padding:0 22px 75px}
+.hero{
+ position:relative;overflow:hidden;border:1px solid #efd1df;border-radius:30px;
+ padding:38px 34px 30px;background:
+ radial-gradient(circle at 8% 10%,rgba(255,112,179,.22),transparent 22%),
+ radial-gradient(circle at 93% 4%,rgba(210,156,255,.20),transparent 25%),
+ linear-gradient(135deg,#fff 0%,#fff5fa 58%,#faf1ff 100%);
+ box-shadow:var(--shadow);margin-bottom:18px
+}
+.hero:after{content:"✦";position:absolute;right:35px;top:18px;color:#d92d7b;font-size:85px;opacity:.08;transform:rotate(12deg)}
+.eyebrow{font-size:9px;letter-spacing:.28em;font-weight:950;color:#bc3d78}
+.hero h1{margin:8px 0 7px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(40px,6vw,66px);line-height:.98;letter-spacing:-.04em}
+.hero h1 span{color:var(--pink)}
+.hero p{max-width:690px;margin:0;color:#766570;font-size:13px;line-height:1.65}
+.heroNotice{
+ margin-top:22px;display:flex;gap:12px;align-items:flex-start;max-width:800px;
+ padding:13px 15px;border-radius:16px;background:rgba(255,255,255,.75);
+ border:1px solid #f0cadb;color:#713651;font-size:10px;line-height:1.55
+}
+.heroNotice b{display:block;font-size:10px;margin-bottom:2px;color:#a92868}
+.noticeIcon{width:32px;height:32px;flex:0 0 32px;border-radius:11px;background:#fde1ee;display:grid;place-items:center}
+.toolbar{
+ position:sticky;top:10px;z-index:20;display:flex;gap:10px;align-items:center;
+ padding:10px;border:1px solid #ecd9e4;border-radius:20px;background:rgba(255,255,255,.88);
+ backdrop-filter:blur(18px);box-shadow:0 12px 30px rgba(95,43,72,.08);margin-bottom:18px
+}
+.search{position:relative;flex:1}
+.searchIcon{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:18px;color:#c02f75}
+.search input{
+ width:100%;height:48px;border:1px solid #eccddd;border-radius:15px;background:#fffafa;
+ padding:0 16px 0 45px;outline:none;font-size:13px;color:var(--ink)
+}
+.search input:focus{border-color:#dd79a7;box-shadow:0 0 0 4px rgba(217,45,123,.08)}
+.count{white-space:nowrap;padding:0 12px;color:#a83a6d;font-size:9px;font-weight:950;letter-spacing:.1em}
+.grid{display:grid;gap:20px}
+.card{
+ overflow:hidden;background:rgba(255,255,255,.96);border:1px solid #ecd7e2;border-radius:25px;
+ box-shadow:var(--shadow)
+}
+.cardHead{
+ display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+ padding:22px 24px 19px;background:linear-gradient(105deg,#fff,#fff4f9 65%,#faf4ff);
+ border-bottom:1px solid #f1dfe8
+}
+.titleRow{display:flex;gap:13px;min-width:0}
+.peptideIcon{
+ width:45px;height:45px;flex:0 0 45px;border-radius:15px;
+ display:grid;place-items:center;font-size:21px;color:#b92368;
+ background:linear-gradient(145deg,#ffe3f0,#f9e8ff);border:1px solid #f0cfe0
+}
+.name{font-size:25px;line-height:1.1;font-weight:950;letter-spacing:-.025em;word-break:break-word}
+.strength{color:#9b6680;font-size:13px;font-weight:800;margin-left:5px}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pill{padding:6px 9px;border-radius:999px;background:#fde4f0;color:#b42668;font-size:8px;font-weight:950;letter-spacing:.06em}
+.pill.soft{background:#f2ecff;color:#7451a2}
+.active{padding:7px 10px;border-radius:999px;background:#e6f8ed;color:#208652;font-size:8px;font-weight:950;white-space:nowrap}
+.body{padding:21px 23px 24px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:17px}
+.section{
+ border:1px solid #efdee7;border-radius:17px;background:#fff;padding:17px 18px;margin-bottom:13px
+}
+.section.soft{background:linear-gradient(135deg,#fff5fa,#fff)}
+.section.blue{background:linear-gradient(135deg,#f7f8ff,#fff)}
+.section.gold{background:#fffaf0;border-color:#f1dfae}
+.sectionHead{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.icon{width:31px;height:31px;border-radius:10px;display:grid;place-items:center;background:#fde3ef;font-size:15px;flex:0 0 auto}
+.section h3{margin:0;font-size:14px;font-weight:950}
+.sectionText{font-size:12px;line-height:1.7;color:#48535f;white-space:pre-wrap}
+.side{display:flex;flex-direction:column;gap:13px}
+.sideCard{border:1px solid #edd9e4;border-radius:17px;padding:16px;background:#fff}
+.sideTitle{font-size:13px;font-weight:950;margin-bottom:11px;display:flex;align-items:center;gap:8px}
+.kv{display:grid;gap:9px}.kv div{padding-bottom:8px;border-bottom:1px dashed #eadbe3}.kv div:last-child{border-bottom:0;padding-bottom:0}
+.kv b{display:block;font-size:8px;color:#a06d84;letter-spacing:.1em;margin-bottom:3px}.kv span{font-size:11px;color:#4d5863}
+.doseIntro{font-size:10px;color:#8b7b84;margin:-1px 0 10px}
+.doseTable{overflow:hidden;border:1px solid #edcfde;border-radius:13px}
+.doseHeader,.doseRow{display:grid;grid-template-columns:1.05fr 1.3fr 1.45fr}
+.doseHeader{background:linear-gradient(90deg,#fbddeb,#fdf0f7);color:#a82a65;font-size:9px;font-weight:950;text-transform:uppercase;letter-spacing:.04em}
+.doseHeader span,.doseRow span{padding:11px 12px;min-width:0}
+.doseRow{border-top:1px solid #f1e1e8;font-size:11px;color:#4c5964}
+.doseRow:nth-child(odd){background:#fff9fc}.doseRow span{line-height:1.45}
+.noteList{margin:0;padding-left:17px;color:#685d47;font-size:10px;line-height:1.65}
+.empty{text-align:center;padding:50px 25px;border:1px dashed #e4cbd8;border-radius:22px;background:#fff;color:#82727c}
+.emptyIcon{font-size:38px;margin-bottom:8px}.empty h2{margin:0 0 7px;font-size:20px;color:#6b3151}.empty p{margin:0;font-size:12px;line-height:1.6}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){
+ .top{padding:14px 12px}.page{padding:0 12px 60px}
+ .hero{padding:28px 19px 22px;border-radius:23px}.hero h1{font-size:38px}.hero:after{font-size:58px;right:8px}
+ .heroNotice{font-size:9px}.toolbar{top:7px;display:block;padding:9px}.count{padding:9px 4px 1px}
+ .card{border-radius:21px}.cardHead{padding:17px 16px}.name{font-size:21px}.strength{font-size:11px}
+ .peptideIcon{width:39px;height:39px;flex-basis:39px;border-radius:13px;font-size:18px}
+ .body{padding:15px 13px 19px}.section{padding:15px;margin-bottom:11px}
+ .side{grid-template-columns:1fr}.doseHeader,.doseRow{grid-template-columns:1fr 1fr 1.15fr}
+ .doseHeader span,.doseRow span{padding:9px 7px;font-size:9px}.active{font-size:7px}
+}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script></head><body>
-<div class="top"><a class="back" href="index.html">← PEPMOSA</a></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script><script src="supabase.js"></script>
+</head>
+<body>
+<div class="top"><a class="back" href="index.html">← BACK TO PEPMOSA</a></div>
 <main class="page">
 <section class="hero">
-  <div class="brand"><b>Peptide <span>Protocols</span></b><small>RESEARCH / EDUCATIONAL REFERENCE LIBRARY · MANAGED BY PEPMOSA</small></div>
-  <div class="notice"><b>📖 RESEARCH / EDUCATIONAL USE ONLY.</b><br>These protocols are reference materials and are not a substitute for professional medical advice, diagnosis, or treatment.</div>
+ <div class="eyebrow">PEPMOSA REFERENCE LIBRARY</div>
+ <h1>Peptide <span>Protocols</span></h1>
+ <p>Browse the current protocol references maintained in the PEPMOSA library. Use search to quickly find a peptide, strength, or reference topic.</p>
+ <div class="heroNotice">
+  <div class="noticeIcon">📖</div>
+  <div><b>RESEARCH / EDUCATIONAL USE ONLY</b>These materials are provided as reference information only and are not a substitute for professional medical advice, diagnosis, or treatment.</div>
+ </div>
 </section>
-<div class="toolbar"><div class="search"><span>⌕</span><input id="protocolSearch" type="search" placeholder="Search peptide protocols..."></div><div class="count" id="protocolCount">Loading protocols…</div></div>
+
+<div class="toolbar">
+ <div class="search"><span class="searchIcon">⌕</span><input id="protocolSearch" type="search" placeholder="Search peptide, strength, or protocol..." autocomplete="off"></div>
+ <div class="count" id="protocolCount">LOADING…</div>
+</div>
+
 <div id="protocolGrid" class="grid"></div>
 </main>
+
 <script>
 (function(){
  let allRows=[];
- function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+ const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
  function doseMarkup(ds){
-   if(!ds.length)return '<div class="sectionText">No structured dosing phases entered.</div>';
-   return '<div class="doseTable"><div class="doseHeader"><span>Phase</span><span>Daily Dose (mg)</span><span>Units / Volume</span></div>'+
-     ds.map(r=>{const ph=r.phase||((r.period_type||"days")==="days"?"Days "+(r.period||"—"):"Weeks "+(r.period||"—"));return '<div class="doseRow"><span>'+esc(ph)+'</span><span>'+esc(r.dose||"—")+'</span><span>'+esc(r.units||"—")+'</span></div>'}).join("")+
-     '</div>';
+  if(!ds.length)return '<div class="sectionText">No structured dosing phases entered.</div>';
+  return '<div class="doseTable"><div class="doseHeader"><span>Phase</span><span>Daily Dose (mg)</span><span>Units / Volume</span></div>'+
+   ds.map(r=>{
+    const ph=r.phase||((r.period_type||"days")==="days"?"Days "+(r.period||"—"):"Weeks "+(r.period||"—"));
+    return '<div class="doseRow"><span>'+esc(ph)+'</span><span>'+esc(r.dose||"—")+'</span><span>'+esc(r.units||"—")+'</span></div>';
+   }).join("")+'</div>';
  }
  function render(rows){
-   const grid=document.getElementById("protocolGrid"),count=document.getElementById("protocolCount");
-   count.textContent=rows.length+" PROTOCOL"+(rows.length===1?"":"S")+" AVAILABLE";
-   if(!rows.length){grid.innerHTML='<div class="empty"><div class="icon">📚</div><h2>No protocol references found</h2><p>Try another search or add a protocol from Admin → PROTOCOLS.</p></div>';return;}
-   grid.innerHTML=rows.map(p=>{
-     const ds=Array.isArray(p.dosing_schedule)?p.dosing_schedule:[];
-     return '<article class="card">'+
-       '<div class="head"><div class="titleWrap"><div class="name">'+esc(p.name_of_peptide)+(p.strength?' <span class="strength">'+esc(p.strength)+'</span>':'')+'</div><div class="tags"><span class="tag">RESEARCH REFERENCE</span><span class="tag blue">PROTOCOL</span></div></div><span class="badge">'+(p.active?"ACTIVE":"INACTIVE")+'</span></div>'+
-       '<div class="body"><div class="layout"><div class="mainCol">'+
-       (p.description?'<section class="section soft"><div class="sectionHead"><span class="icon">▤</span><h3>Description</h3></div><div class="sectionText">'+esc(p.description)+'</div></section>':'')+
-       (p.reconstitution?'<section class="section blue"><div class="sectionHead"><span class="icon">🧪</span><h3>Reconstitution</h3></div><div class="sectionText">'+esc(p.reconstitution)+'</div></section>':'')+
-       '<section class="section"><div class="sectionHead"><span class="icon">▦</span><h3>Dosing Guide</h3></div><div class="doseIntro">Reference schedule entered in the PEPMOSA Protocol Library.</div>'+doseMarkup(ds)+'</section>'+
-       (p.cycle?'<section class="section"><div class="sectionHead"><span class="icon">◷</span><h3>Cycle / Schedule</h3></div><div class="sectionText">'+esc(p.cycle)+'</div></section>':'')+
-       '</div><aside class="side">'+
-       '<div class="sideCard"><div class="sideTitle"><span class="icon">✦</span>Key Information</div><div class="kv"><div><b>Peptide Name</b><span>'+esc(p.name_of_peptide)+'</span></div>'+(p.strength?'<div><b>Strength</b><span>'+esc(p.strength)+'</span></div>':'')+'<div><b>Status</b><span>'+esc(p.active?"Active":"Inactive")+'</span></div></div></div>'+
-       (p.important_notes?'<div class="sideCard" style="background:#fffaf0;border-color:#f1dfad"><div class="sideTitle" style="color:#80621c"><span class="icon" style="background:#fff0c9">⚠</span>Important Notes</div><div class="sectionText" style="color:#67583f">'+esc(p.important_notes)+'</div></div>':'')+
-       '<div class="sideCard" style="background:#fffaf0;border-color:#f1dfad"><div class="sideTitle" style="color:#80621c"><span class="icon" style="background:#fff0c9">⚠</span>Reference Notice</div><ul class="noteList"><li>Research / educational reference only.</li><li>Not a substitute for professional medical advice.</li></ul></div>'+
-       '</aside></div></div></article>';
-   }).join("");
+  const grid=document.getElementById("protocolGrid"),count=document.getElementById("protocolCount");
+  count.textContent=rows.length+" PROTOCOL"+(rows.length===1?"":"S");
+  if(!rows.length){
+   grid.innerHTML='<div class="empty"><div class="emptyIcon">♡</div><h2>No protocol references found</h2><p>Try another search or add a protocol from Admin → Protocols.</p></div>';return;
+  }
+  grid.innerHTML=rows.map(p=>{
+   const ds=Array.isArray(p.dosing_schedule)?p.dosing_schedule:[];
+   return '<article class="card">'+
+    '<div class="cardHead"><div class="titleRow"><div class="peptideIcon">🧬</div><div><div class="name">'+esc(p.name_of_peptide)+(p.strength?' <span class="strength">'+esc(p.strength)+'</span>':'')+'</div><div class="meta"><span class="pill">RESEARCH REFERENCE</span><span class="pill soft">PROTOCOL</span></div></div></div><span class="active">'+(p.active?"ACTIVE":"INACTIVE")+'</span></div>'+
+    '<div class="body"><div class="layout"><div>'+
+    (p.description?'<section class="section soft"><div class="sectionHead"><span class="icon">✦</span><h3>About This Peptide</h3></div><div class="sectionText">'+esc(p.description)+'</div></section>':'')+
+    (p.reconstitution?'<section class="section blue"><div class="sectionHead"><span class="icon">🧪</span><h3>Reconstitution</h3></div><div class="sectionText">'+esc(p.reconstitution)+'</div></section>':'')+
+    '<section class="section"><div class="sectionHead"><span class="icon">▦</span><h3>Dosing Reference</h3></div><div class="doseIntro">Schedule information entered in the PEPMOSA Protocol Library.</div>'+doseMarkup(ds)+'</section>'+
+    (p.cycle?'<section class="section"><div class="sectionHead"><span class="icon">◷</span><h3>Cycle / Schedule</h3></div><div class="sectionText">'+esc(p.cycle)+'</div></section>':'')+
+    '</div><aside class="side">'+
+    '<div class="sideCard"><div class="sideTitle"><span class="icon">♡</span>Quick Details</div><div class="kv"><div><b>PEPTIDE</b><span>'+esc(p.name_of_peptide)+'</span></div>'+(p.strength?'<div><b>STRENGTH</b><span>'+esc(p.strength)+'</span></div>':'')+'<div><b>LIBRARY STATUS</b><span>'+esc(p.active?"Active":"Inactive")+'</span></div></div></div>'+
+    (p.important_notes?'<div class="sideCard" style="background:#fffaf0;border-color:#f1dfad"><div class="sideTitle" style="color:#80621c"><span class="icon" style="background:#fff0c9">⚠</span>Important Notes</div><div class="sectionText" style="color:#67583f">'+esc(p.important_notes)+'</div></div>':'')+
+    '<div class="sideCard" style="background:#fffaf0;border-color:#f1dfad"><div class="sideTitle" style="color:#80621c"><span class="icon" style="background:#fff0c9">ⓘ</span>Reference Notice</div><ul class="noteList"><li>Research / educational reference only.</li><li>Not a substitute for professional medical advice.</li><li>Follow applicable professional and regulatory guidance.</li></ul></div>'+
+    '</aside></div></div></article>';
+  }).join("");
  }
- function filter(){const q=document.getElementById("protocolSearch").value.trim().toLowerCase();render(allRows.filter(p=>(p.name_of_peptide+" "+(p.strength||"")+" "+(p.description||"")).toLowerCase().includes(q)));}
+ function filter(){
+  const q=document.getElementById("protocolSearch").value.trim().toLowerCase();
+  render(allRows.filter(p=>(p.name_of_peptide+" "+(p.strength||"")+" "+(p.description||"")+" "+(p.important_notes||"")).toLowerCase().includes(q)));
+ }
  document.getElementById("protocolSearch").addEventListener("input",filter);
  async function load(){
-   try{
-     const client=window.sb||initSupabase();
-     const {data,error}=await client.from("protocol_library").select("protocol_id,name_of_peptide,strength,description,reconstitution,cycle,dosing_schedule,important_notes,active,created_at").eq("active",true).order("created_at",{ascending:false});
-     if(error)throw error;
-     allRows=data||[];render(allRows);
-   }catch(e){
-     console.error(e);document.getElementById("protocolCount").textContent="";
-     document.getElementById("protocolGrid").innerHTML='<div class="empty"><div class="icon">♡</div><h2>Protocol library unavailable</h2><p>Please try again in a moment.</p></div>';
-   }
+  try{
+   const client=window.sb||initSupabase();
+   const {data,error}=await client.from("protocol_library").select("protocol_id,name_of_peptide,strength,description,reconstitution,cycle,dosing_schedule,important_notes,active,created_at").eq("active",true).order("created_at",{ascending:false});
+   if(error)throw error;
+   allRows=data||[];render(allRows);
+  }catch(e){
+   console.error(e);
+   document.getElementById("protocolCount").textContent="";
+   document.getElementById("protocolGrid").innerHTML='<div class="empty"><div class="emptyIcon">♡</div><h2>Protocol library unavailable</h2><p>Please try again in a moment.</p></div>';
+  }
  }
  load();
 })();
-</script></body></html>
+</script>
+</body>
+</html>

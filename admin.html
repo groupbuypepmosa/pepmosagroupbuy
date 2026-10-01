@@ -410,14 +410,10 @@ function addDosingRow(row={}){
   const host=$("dosingRows");if(!host)return;
   const el=document.createElement("div");
   el.className="dosingRow";
-  el.innerHTML='<div><label>PHASE</label><input class="dosePhase" placeholder="Phase 1"></div>'+
-    '<div><label>PERIOD TYPE</label><select class="dosePeriodType"><option value="weeks">WEEKS</option><option value="days">DAYS</option></select></div>'+
-    '<div><label>NUMBER</label><input class="dosePeriod" placeholder="1–4"></div>'+
-    '<div><label>DOSE</label><input class="doseAmount" placeholder="Dose"></div>'+
-    '<div><label>UNITS</label><input class="doseUnits" placeholder="Units"></div>';
+  el.innerHTML='<div><label>PHASE / PERIOD LABEL</label><input class="dosePhase" placeholder="Days 1–2 (Tolerance)"></div>'+
+    '<div><label>DAILY DOSE</label><input class="doseAmount" placeholder="e.g. 2.5 mg"></div>'+
+    '<div><label>UNITS / VOLUME</label><input class="doseUnits" placeholder="e.g. 50 units (0.50 mL)"></div>';
   el.querySelector(".dosePhase").value=row.phase||"";
-  el.querySelector(".dosePeriodType").value=row.period_type||"weeks";
-  el.querySelector(".dosePeriod").value=row.period||row.weeks||"";
   el.querySelector(".doseAmount").value=row.dose||"";
   el.querySelector(".doseUnits").value=row.units||"";
   const remove=document.createElement("button");
@@ -437,7 +433,7 @@ function getDosingRows(){
 }
 function renderDosingSchedule(rows){
   const data=Array.isArray(rows)?rows:[];
-  return data.length?'<div class="dosingTable">'+data.map(r=>'<div class="dosingRow"><div><b>PHASE</b><div>'+esc(r.phase||"—")+'</div></div><div><b>PERIOD</b><div>'+esc(r.period||r.weeks||"—")+'</div></div><div><b>TYPE</b><div>'+esc((r.period_type||"weeks").toUpperCase())+'</div></div><div><b>DOSE</b><div>'+esc(r.dose||"—")+'</div></div><div><b>UNITS</b><div>'+esc(r.units||"—")+'</div></div></div>').join(""):'<div class="small">No dosing phases entered.</div>';
+  return data.length?'<div class="dosingTable">'+data.map(r=>'<div class="dosingRow"></div><div><b>PERIOD</b><div>'+esc(r.period||r.weeks||"—")+'</div></div><div><b>TYPE</b><div>'+esc((r.period_type||"weeks").toUpperCase())+'</div></div><div><b>DOSE</b><div>'+esc(r.dose||"—")+'</div></div><div><b>UNITS</b><div>'+esc(r.units||"—")+'</div></div></div>').join(""):'<div class="small">No dosing phases entered.</div>';
 }
 function protocolFieldHtml(label,value){
   return '<div class="protocolField"><b>'+esc(label)+'</b><div>'+esc(value||"—")+'</div></div>';

@@ -209,6 +209,18 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 
 
 .btn.warning{background:#fff3cd;color:#7a5a00;border-color:#efd98a}.btn.warning:hover{filter:brightness(.98)}
+
+/* ===== PROTOCOL LIBRARY ===== */
+.protocolEditor{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.72fr);gap:18px}
+.protocolFormCard{background:linear-gradient(145deg,#fff,#fff7fb);border:1px solid #efd1df;border-radius:22px;padding:20px}
+.protocolList{display:grid;gap:12px}.protocolItem{border:1px solid #ead9e5;border-radius:18px;padding:17px;background:#fff}
+.protocolItemHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.protocolName{font-size:18px;font-weight:950;color:#3b2934}
+.protocolActions{display:flex;gap:7px;flex-wrap:wrap}.protocolField{margin-top:12px;padding-top:12px;border-top:1px dashed #ead9e5}
+.protocolField b{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#a05e7d;margin-bottom:5px}
+.protocolField div{white-space:pre-wrap;color:#5d4b55;font-size:13px;line-height:1.55}
+.protocolEmpty{padding:28px;text-align:center;border:1px dashed #e2bdd1;border-radius:16px;background:#fffafd;color:#806c77}
+.protocolNotice{border:1px solid #efc6d9;border-radius:15px;padding:13px 15px;background:#fff6fa;color:#765060;font-size:12px;line-height:1.5;margin-bottom:14px}
+@media(max-width:850px){.protocolEditor{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -223,7 +235,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
       <a class="btn primary" href="admin-orders.html" style="margin-left:auto;text-decoration:none;display:inline-flex;align-items:center">📦 ADMIN ORDERS</a>
     </div>
   </div>
-  <div class="tabs"><button class="tab active" data-panel="gbPanel" onclick="openTab(this)">GROUP BUY</button><button class="tab" data-panel="historyPanel" onclick="openTab(this)">HISTORY</button><button class="tab" data-panel="categoriesPanel" onclick="openTab(this)">CATEGORIES</button><button class="tab" data-panel="productsPanel" onclick="openTab(this)">PRODUCTS</button><button class="tab" data-panel="stockPanel" onclick="openTab(this)">📦 STOCKS</button><button class="tab" data-panel="openForAllPanel" onclick="openTab(this)">OPEN FOR ALL</button><button class="tab" data-panel="feesPanel" onclick="openTab(this)">PAYMENTS</button><button class="tab" data-panel="ordersPanel" onclick="openTab(this)">ORDERS</button><button class="tab" data-panel="trackingPanel" onclick="openTab(this)">TRACKING</button><button class="tab" data-panel="waybillPanel" onclick="openTab(this)">WAYBILL</button><button class="tab" data-panel="vialTrackerPanel" onclick="openTab(this)">VIAL TRACKER</button><button class="tab" data-panel="documentsPanel" onclick="openTab(this)">COA & PROTOCOLS</button><button class="tab" data-panel="siteNoticePanel" onclick="openTab(this)">SITE NOTICE ♥</button><a class="tab" href="buyers-proof-admin-v6.html" style="text-decoration:none;display:inline-flex;align-items:center">♥ BUYERS' PROOF</a><a class="tab financeTab" href="finance.html" style="text-decoration:none;display:inline-flex;align-items:center">💰 FINANCE</a><a class="tab" href="manufacturer-orders.html" style="text-decoration:none;display:inline-flex;align-items:center">🏭 MANUFACTURER ORDERS</a><a class="tab customerAccountsTab" href="admin-accounts.html" style="text-decoration:none;display:inline-flex;align-items:center">👤 CUSTOMER ACCOUNT APPROVALS</a></div>
+  <div class="tabs"><button class="tab active" data-panel="gbPanel" onclick="openTab(this)">GROUP BUY</button><button class="tab" data-panel="historyPanel" onclick="openTab(this)">HISTORY</button><button class="tab" data-panel="categoriesPanel" onclick="openTab(this)">CATEGORIES</button><button class="tab" data-panel="productsPanel" onclick="openTab(this)">PRODUCTS</button><button class="tab" data-panel="stockPanel" onclick="openTab(this)">📦 STOCKS</button><button class="tab" data-panel="openForAllPanel" onclick="openTab(this)">OPEN FOR ALL</button><button class="tab" data-panel="feesPanel" onclick="openTab(this)">PAYMENTS</button><button class="tab" data-panel="ordersPanel" onclick="openTab(this)">ORDERS</button><button class="tab" data-panel="trackingPanel" onclick="openTab(this)">TRACKING</button><button class="tab" data-panel="waybillPanel" onclick="openTab(this)">WAYBILL</button><button class="tab" data-panel="vialTrackerPanel" onclick="openTab(this)">VIAL TRACKER</button><button class="tab" data-panel="documentsPanel" onclick="openTab(this)">COA & PROTOCOLS</button><button class="tab" data-panel="protocolsAdminPanel" onclick="openTab(this);loadProtocols()">📚 PROTOCOLS</button><button class="tab" data-panel="siteNoticePanel" onclick="openTab(this)">SITE NOTICE ♥</button><a class="tab" href="buyers-proof-admin-v6.html" style="text-decoration:none;display:inline-flex;align-items:center">♥ BUYERS' PROOF</a><a class="tab financeTab" href="finance.html" style="text-decoration:none;display:inline-flex;align-items:center">💰 FINANCE</a><a class="tab" href="manufacturer-orders.html" style="text-decoration:none;display:inline-flex;align-items:center">🏭 MANUFACTURER ORDERS</a><a class="tab customerAccountsTab" href="admin-accounts.html" style="text-decoration:none;display:inline-flex;align-items:center">👤 CUSTOMER ACCOUNT APPROVALS</a></div>
 <section id="gbPanel" class="panel active"><div class="card"><h2>Create / Edit Group Buy</h2><input id="editingGBId" type="hidden"><div class="grid"><div class="field"><label>GB Number *</label><input id="gbNumber" placeholder="GB-001"></div><div class="field"><label>Customer-Facing Name</label><input id="gbName" placeholder="September Group Buy"></div><div class="field"><label>Admin Fee</label><input id="gbAdminFee" type="number" min="0" step="0.01" value="0"></div><div class="field"><label>Status *</label><select id="gbStatus"><option value="OPEN">OPEN</option><option value="CLOSED">CLOSED</option><option value="KIT_COMPLETION">KIT COMPLETION</option></select></div><div class="field"><label>ORDER DEADLINE</label><input id="gbDeadline" type="datetime-local"><div class="small">Customers can order until this date/time. Leave blank if there is no deadline.</div></div></div><div class="card" style="margin-top:18px;border-color:#efc5db;background:linear-gradient(135deg,#fffafd,#fff1f8)"><h3 style="margin-bottom:6px">GB SCHEDULE</h3><p class="muted" style="margin-top:0">Set the customer-facing timeline for this Group Buy. These dates appear on the Home page.</p><div class="grid"><div class="field"><label>GB OPENS</label><input id="gbScheduleOpen" type="datetime-local"></div><div class="field"><label>ADMIN FEE PAYMENT</label><input id="gbScheduleFee" type="datetime-local"></div><div class="field"><label>ORDER PLACEMENT</label><input id="gbScheduleOrder" type="datetime-local"></div><div class="field"><label>FINAL PAYMENT</label><input id="gbScheduleFinal" type="datetime-local"></div><div class="field"><label>ORDER PLACED</label><input id="gbSchedulePlaced" type="datetime-local"></div><div class="field"><label>DELIVERY ETA</label><input id="gbScheduleDelivery" type="text" placeholder="2–3 weeks"></div></div></div>
 <div class="field full" style="margin-top:14px"><label>Categories for this Group Buy</label><div id="gbCategoryPicker" class="checkList"><div class="small">Loading categories...</div></div><div class="small" style="margin-top:8px">Choose the categories that should appear in this Group Buy.</div></div>
 <hr><h3>Admin Fee QR</h3><div class="fileBox"><input id="adminQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('adminQrFile','adminQrPreview')"><br><br><img id="adminQrPreview" class="qrPreview" style="display:none"></div><br><h3>Final Payment QR</h3><div class="fileBox"><input id="finalQrFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile('finalQrFile','finalQrPreview')"><br><br><img id="finalQrPreview" class="qrPreview" style="display:none"></div><div class="actions"><button class="btn primary" onclick="saveGroupBuy()">SAVE GROUP BUY</button><button class="btn secondary" onclick="clearGBForm()">NEW</button></div></div><div class="card"><h2>Group Buys</h2><div id="gbList">Loading...</div></div></section>
@@ -322,6 +334,43 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
   </div>
 </section>
 <section id="vialTrackerPanel" class="panel"><div class="card"><div class="itemHead"><div><h2>Vial / Order Tracker</h2><p class="muted">Consolidated by product + variant. 10 vials = 1 kit, with remaining vials needed to complete the next kit.</p></div><button class="btn primary" type="button" onclick="printTotalVials()">🖨 PRINT TOTAL VIALS</button></div><div class="grid"><div class="field"><label>Group Buy</label><select id="vialTrackerGB" onchange="loadVialTracker()"><option value="">All Group Buys</option></select></div><div class="field"><label>Search Product / Variant</label><input id="vialTrackerSearch" placeholder="Search..." oninput="renderVialTracker()"></div></div><div id="vialTrackerResults" style="margin-top:18px">Select a Group Buy or use All Group Buys.</div><div id="cancelledKitsResults" style="margin-top:24px"></div></div></section>
+<section id="protocolsAdminPanel" class="panel">
+  <div class="card">
+    <div class="itemHead">
+      <div><div class="eyebrow">PEPMOSA ADMIN</div><h2 style="margin:4px 0">📚 Protocols</h2><p class="muted" style="margin:0">Create and manage your protocol reference entries in one place.</p></div>
+      <button class="btn secondary" type="button" onclick="resetProtocolForm()">NEW / RESET</button>
+    </div>
+    <div class="protocolNotice"><b>Protocol Library:</b> Fill in the reference fields below. Dosing Guide is a free-text reference field and is not pre-filled by the system.</div>
+    <div class="protocolEditor">
+      <div class="protocolFormCard">
+        <input id="protocolId" type="hidden">
+        <div class="grid">
+          <div class="field full"><label>NAME OF PEPTIDE *</label><input id="protocolName" placeholder="Example: Product / Compound Name"></div>
+          <div class="field full"><label>DESCRIPTION</label><textarea id="protocolDescription" rows="5" placeholder="Description / research reference"></textarea></div>
+          <div class="field full"><label>RECONSTITUTION</label><textarea id="protocolReconstitution" rows="5" placeholder="Reconstitution reference"></textarea></div>
+          <div class="field full"><label>CYCLE</label><textarea id="protocolCycle" rows="4" placeholder="Cycle / schedule reference"></textarea></div>
+          <div class="field full"><label>DOSING GUIDE</label><textarea id="protocolDosing" rows="6" placeholder="Dosing guide / reference"></textarea></div>
+          <div class="field full"><label>SUPPLIES NEEDED</label><textarea id="protocolSupplies" rows="4" placeholder="List supplies needed"></textarea></div>
+          <div class="field full"><label><input id="protocolActive" type="checkbox" checked> ACTIVE / VISIBLE IN LIBRARY</label></div>
+        </div>
+        <div class="actions"><button class="btn primary" type="button" onclick="saveProtocol()">SAVE PROTOCOL</button><button class="btn secondary" type="button" onclick="resetProtocolForm()">CLEAR</button></div>
+      </div>
+      <div class="card" style="margin:0">
+        <div class="itemHead"><div><h3 style="margin:0">Quick Info</h3><div class="small">Each saved protocol keeps the six fields separately for easy editing.</div></div></div>
+        <div class="protocolField"><b>01 · Name</b><div>Protocol / peptide name</div></div>
+        <div class="protocolField"><b>02 · Description</b><div>General description or reference notes</div></div>
+        <div class="protocolField"><b>03 · Reconstitution</b><div>Reconstitution reference</div></div>
+        <div class="protocolField"><b>04 · Cycle</b><div>Cycle / schedule reference</div></div>
+        <div class="protocolField"><b>05 · Dosing Guide</b><div>Dosing reference field</div></div>
+        <div class="protocolField"><b>06 · Supplies Needed</b><div>Required supplies list</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="itemHead"><div><h2 style="margin:0">Saved Protocols</h2><div class="small">Edit or delete any protocol entry.</div></div><button class="btn secondary" type="button" onclick="loadProtocols()">↻ REFRESH</button></div>
+    <div id="protocolAdminList" class="protocolList" style="margin-top:14px">Loading protocols…</div>
+  </div>
+</section>
 <section id="documentsPanel" class="panel"><div class="card"><h2>COA & Protocol Library</h2><p class="muted">Upload files directly from your device. No URL required.</p><div class="grid"><div class="field"><label>Document Type *</label><select id="docType"><option value="COA">COA</option><option value="PROTOCOL">PROTOCOL</option></select></div><div class="field"><label>Title *</label><input id="docTitle"></div><div class="field full"><label>Product / Reference</label><input id="docProduct"></div><div class="field full"><label>Upload File *</label><input id="docFile" type="file" accept=".pdf,image/png,image/jpeg,image/webp"></div></div><div class="actions"><button class="btn primary" type="button" onclick="uploadLibraryDocument()">UPLOAD DOCUMENT</button></div></div><div class="card"><h2>Uploaded Documents</h2><div id="documentAdminList">Loading...</div></div></section>
 <div id="productEditModal" class="editModal" onclick="if(event.target===this)closeProductEdit()"><div class="editModalCard"><div class="itemHead"><div><div class="eyebrow">PEPMOSA ADMIN</div><h2>Edit Product</h2><div class="small">Update product details and prices.</div></div><button class="btn secondary" type="button" onclick="closeProductEdit()">CLOSE</button></div><div class="grid" style="margin-top:18px"><div class="field"><label>Product Name *</label><input id="editProductName"></div><div class="field"><label>Category *</label><select id="editProductCategory"></select></div><div class="field"><label>Replace Product Image</label><input id="editProductImageFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewFile(\'editProductImageFile\',\'editProductImagePreview\')"><img id="editProductImagePreview" class="qrPreview" style="display:none;max-width:160px;max-height:160px"></div><div class="field full"><label>Description</label><textarea id="editProductDescription"></textarea></div></div><div style="margin-top:18px"><h3 style="margin-bottom:6px">Variants & Prices</h3><div class="small">You can update prices directly here.</div><div id="editProductVariants"></div></div><div class="actions"><button class="btn primary" type="button" onclick="saveProductEdit()">SAVE CHANGES</button><button class="btn secondary" type="button" onclick="closeProductEdit()">CANCEL</button></div></div></div>
 <section id="siteNoticePanel" class="panel">
@@ -342,7 +391,64 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
   </div>
   <div class="card" style="margin-top:18px"><div class="itemHead"><div><h2 style="margin:0">Notice History</h2><div class="small">Activate, edit, or remove announcements anytime.</div></div><button class="btn secondary" onclick="loadSiteNotices()">REFRESH</button></div><div id="siteNoticeList" class="noticeList" style="margin-top:14px">Loading notices…</div></div>
 </section></main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260911-supabase-fix"></script><script src="supabase.js?v=20260911-supabase-fix"></script><script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+/* ===== PROTOCOL LIBRARY CRUD ===== */
+function resetProtocolForm(){
+  ["protocolId","protocolName","protocolDescription","protocolReconstitution","protocolCycle","protocolDosing","protocolSupplies"].forEach(id=>{if($(id))$(id).value=""});
+  if($("protocolActive"))$("protocolActive").checked=true;
+}
+function protocolFieldHtml(label,value){
+  return '<div class="protocolField"><b>'+esc(label)+'</b><div>'+esc(value||"—")+'</div></div>';
+}
+async function loadProtocols(){
+  const host=$("protocolAdminList"); if(!host)return;
+  host.innerHTML='<div class="small">Loading protocols…</div>';
+  try{
+    const {data,error}=await sb.from("protocol_library").select("*").order("created_at",{ascending:false});
+    if(error)throw error;
+    if(!data?.length){host.innerHTML='<div class="protocolEmpty">No protocols yet. Click <b>NEW / RESET</b> and add your first protocol.</div>';return;}
+    host.innerHTML=data.map(p=>
+      '<div class="protocolItem"><div class="protocolItemHead"><div><div class="protocolName">'+esc(p.name_of_peptide)+'</div><div class="small">'+(p.active?"ACTIVE":"INACTIVE")+' · '+(p.created_at?new Date(p.created_at).toLocaleDateString("en-PH"):"")+'</div></div>'+
+      '<div class="protocolActions"><button class="btn secondary" type="button" onclick="editProtocol(\''+esc(p.protocol_id)+'\')">EDIT</button><button class="btn danger" type="button" onclick="deleteProtocol(\''+esc(p.protocol_id)+'\')">DELETE</button></div></div>'+
+      protocolFieldHtml("DESCRIPTION",p.description)+protocolFieldHtml("RECONSTITUTION",p.reconstitution)+protocolFieldHtml("CYCLE",p.cycle)+protocolFieldHtml("DOSING GUIDE",p.dosing_guide)+protocolFieldHtml("SUPPLIES NEEDED",p.supplies_needed)+
+      '</div>'
+    ).join("");
+  }catch(e){console.error("PROTOCOL LOAD ERROR",e);host.innerHTML='<div class="notice error">'+esc(e.message||"Unable to load protocols.")+'</div>'}
+}
+async function editProtocol(id){
+  try{
+    const {data,error}=await sb.from("protocol_library").select("*").eq("protocol_id",id).maybeSingle();
+    if(error)throw error;if(!data)return showMessage("Protocol not found.","error");
+    $("protocolId").value=data.protocol_id||"";
+    $("protocolName").value=data.name_of_peptide||"";
+    $("protocolDescription").value=data.description||"";
+    $("protocolReconstitution").value=data.reconstitution||"";
+    $("protocolCycle").value=data.cycle||"";
+    $("protocolDosing").value=data.dosing_guide||"";
+    $("protocolSupplies").value=data.supplies_needed||"";
+    $("protocolActive").checked=data.active!==false;
+    document.querySelector('[data-panel="protocolsAdminPanel"]')?.click();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }catch(e){showMessage(e.message||"Unable to open protocol.","error")}
+}
+async function saveProtocol(){
+  const name=$("protocolName")?.value.trim();
+  if(!name)return showMessage("Name of peptide is required.","error");
+  const payload={name_of_peptide:name,description:$("protocolDescription").value.trim()||null,reconstitution:$("protocolReconstitution").value.trim()||null,cycle:$("protocolCycle").value.trim()||null,dosing_guide:$("protocolDosing").value.trim()||null,supplies_needed:$("protocolSupplies").value.trim()||null,active:$("protocolActive").checked,updated_at:new Date().toISOString()};
+  try{
+    const id=$("protocolId").value.trim();
+    const result=id?await sb.from("protocol_library").update(payload).eq("protocol_id",id):await sb.from("protocol_library").insert(payload);
+    if(result.error)throw result.error;
+    showMessage(id?"Protocol updated successfully.":"Protocol saved successfully.","success");
+    resetProtocolForm();await loadProtocols();
+  }catch(e){console.error("PROTOCOL SAVE ERROR",e);showMessage(e.message||"Unable to save protocol.","error")}
+}
+async function deleteProtocol(id){
+  if(!confirm("Delete this protocol? This cannot be undone."))return;
+  try{const {error}=await sb.from("protocol_library").delete().eq("protocol_id",id);if(error)throw error;showMessage("Protocol deleted.","success");await loadProtocols()}
+  catch(e){console.error("PROTOCOL DELETE ERROR",e);showMessage(e.message||"Unable to delete protocol.","error")}
+}
+</script><script src="config.js?v=20260911-supabase-fix"></script><script src="supabase.js?v=20260911-supabase-fix"></script><script>
 if(typeof initSupabase==="function"){initSupabase();}else{document.addEventListener("DOMContentLoaded",()=>{if(typeof initSupabase==="function")initSupabase();});}
 var categories=[],groupBuys=[],products=[],fees=[],ordersCache=[],orderItemsCache=[],customersCache=[],currentShipment=null,vialTrackerRows=[],waybillRows=[],selectedWaybillBuyer=null,libraryDocuments=[];
 const TRACKING_STATUSES=["ORDER RECEIVED","PAYMENT CONFIRMED","ORDER PROCESSING","IN TRANSIT TO THE PHILIPPINES","ARRIVED IN THE PHILIPPINES","RECEIVED AT WAREHOUSE","PACKING & LABELLING","HANDED OVER TO LOCAL COURIER","DELIVERED"];

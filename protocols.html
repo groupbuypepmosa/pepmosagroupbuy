@@ -123,9 +123,19 @@
   const box=document.getElementById("documents");
   try{
    const client=initSupabase();
-   const {data,error}=await client.from("products").select("product_id,product_name,description,active,product_variants(strength,active)").eq("active",true).order("product_name");
+   const {data,error}=await client.from("products").select("product_id,product_name,description,active").eq("active",true).order("product_name");
    if(error)throw error;
-   const rows=(data||[]).map(p=>({...p,strengths:(p.product_variants||[]).filter(v=>v.active!==false).map(v=>v.strength)}));
+   const products=data||[];
+   const ids=products.map(p=>p.product_id).filter(Boolean);
+   let variants=[];
+   if(ids.length){
+    const vr=await client.from("product_variants").select("product_id,strength,active").in("product_id",ids).eq("active",true);
+    if(vr.error)throw vr.error;
+    variants=vr.data||[];
+   }
+   const byId={};
+   variants.forEach(v=>{(byId[v.product_id]||(byId[v.product_id]=[])).push(v.strength)});
+   const rows=products.map(p=>({...p,strengths:byId[p.product_id]||[]}));
    if(!rows.length){box.innerHTML='<div class="empty">No active products found.</div>';return;}
    box.innerHTML=rows.map(card).join("");
   }catch(e){console.error(e);box.innerHTML='<div class="notice error"><b>Protocols could not load.</b><br>'+esc(e?.message||"Unknown error")+'</div>';}

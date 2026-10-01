@@ -353,7 +353,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
           <div class="field full"><label>CYCLE</label><textarea id="protocolCycle" rows="4" placeholder="Cycle / schedule reference"></textarea></div>
           <div class="field full">
   <label>DOSING GUIDE</label>
-  <div class="small" style="margin:0 0 10px">Add one row per phase. Each row has Phase, Weeks, Dose, and Units.</div>
+  <div class="small" style="margin:0 0 10px">Add one row per phase. Use the exact phase label, daily dose, and units / volume you want displayed on the public Protocols page.</div>
   <div id="dosingRows" class="dosingRows"></div>
   <button class="btn secondary" type="button" onclick="addDosingRow()">＋ ADD PHASE</button>
 </div>
@@ -433,7 +433,11 @@ function getDosingRows(){
 }
 function renderDosingSchedule(rows){
   const data=Array.isArray(rows)?rows:[];
-  return data.length?'<div class="dosingTable">'+data.map(r=>'<div class="dosingRow"></div><div><b>PERIOD</b><div>'+esc(r.period||r.weeks||"—")+'</div></div><div><b>TYPE</b><div>'+esc((r.period_type||"weeks").toUpperCase())+'</div></div><div><b>DOSE</b><div>'+esc(r.dose||"—")+'</div></div><div><b>UNITS</b><div>'+esc(r.units||"—")+'</div></div></div>').join(""):'<div class="small">No dosing phases entered.</div>';
+  return data.length
+    ? '<div class="dosingTable"><div class="dosingRow dosingHead"><div><b>PHASE</b></div><div><b>DAILY DOSE</b></div><div><b>UNITS / VOLUME</b></div></div>'+
+      data.map(r=>'<div class="dosingRow"><div>'+esc(r.phase||"—")+'</div><div>'+esc(r.dose||"—")+'</div><div>'+esc(r.units||"—")+'</div></div>').join("")+
+      '</div>'
+    : '<div class="small">No dosing phases entered.</div>';
 }
 function protocolFieldHtml(label,value){
   return '<div class="protocolField"><b>'+esc(label)+'</b><div>'+esc(value||"—")+'</div></div>';

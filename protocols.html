@@ -186,25 +186,18 @@
   }).join(""):'<article class="protocolCard"><div class="pepName">'+esc(name)+'</div><div class="noticeBox">No active strength is listed for this product.</div></article>';
   return cards;
  }
- async function boot(){
+ function boot(){
   const box=document.getElementById("documents");
   try{
-   /*
-    * Keep this page independent from the product_variants relationship.
-    * Protocol cards are keyed to the exact PEPMOSA product/strength entries
-    * represented in protocolData, so a catalog-schema change cannot leave
-    * the page stuck on "Loading protocols…".
-    */
-   const protocolProducts=Object.keys(protocolData).map(name=>({
-     product_name:name,
-     strengths:Object.keys(protocolData[name])
-   }));
-   if(!protocolProducts.length){
-     box.innerHTML='<div class="empty">No protocols available.</div>';
-     return;
-   }
-   box.innerHTML=protocolProducts.map(card).join("");
-  }catch(e){console.error(e);box.innerHTML='<div class="notice error"><b>Protocols could not load.</b><br>'+esc(e?.message||"Unknown error")+'</div>';}
+    const protocolProducts=Object.keys(protocolData).map(name=>({
+      product_name:name,
+      strengths:Object.keys(protocolData[name])
+    }));
+    box.innerHTML=protocolProducts.map(card).join("");
+  }catch(e){
+    console.error("PEPMOSA protocols",e);
+    box.innerHTML='<div class="notice error"><b>Protocols could not load.</b><br>'+esc(e?.message||"Unknown error")+'</div>';
+  }
  }
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();

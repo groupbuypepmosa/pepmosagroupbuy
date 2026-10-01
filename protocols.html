@@ -52,8 +52,8 @@
        (p.cycle?'<section class="section"><div class="sectionHead"><span class="icon">◷</span><h3>Cycle / Schedule</h3></div><div class="sectionText">'+esc(p.cycle)+'</div></section>':'')+
        '</div><aside class="side">'+
        '<div class="sideCard"><div class="sideTitle"><span class="icon">✦</span>Key Information</div><div class="kv"><div><b>Peptide Name</b><span>'+esc(p.name_of_peptide)+'</span></div>'+(p.strength?'<div><b>Strength</b><span>'+esc(p.strength)+'</span></div>':'')+'<div><b>Status</b><span>'+esc(p.active?"Active":"Inactive")+'</span></div></div></div>'+
-       (p.supplies_needed?'<div class="sideCard"><div class="sideTitle"><span class="icon">🧰</span>Supplies Needed</div><div class="sectionText">'+esc(p.supplies_needed)+'</div></div>':'')+
-       '<div class="sideCard" style="background:#fffaf0;border-color:#f1dfad"><div class="sideTitle" style="color:#80621c"><span class="icon" style="background:#fff0c9">⚠</span>Important Notes</div><ul class="noteList"><li>Research / educational reference only.</li><li>Not a substitute for professional medical advice.</li><li>Use the information according to its documented source and intended context.</li></ul></div>'+
+       (p.important_notes?'<div class="sideCard" style="background:#fffaf0;border-color:#f1dfad"><div class="sideTitle" style="color:#80621c"><span class="icon" style="background:#fff0c9">⚠</span>Important Notes</div><div class="sectionText" style="color:#67583f">'+esc(p.important_notes)+'</div></div>':'')+
+       '<div class="sideCard" style="background:#fffaf0;border-color:#f1dfad"><div class="sideTitle" style="color:#80621c"><span class="icon" style="background:#fff0c9">⚠</span>Reference Notice</div><ul class="noteList"><li>Research / educational reference only.</li><li>Not a substitute for professional medical advice.</li></ul></div>'+
        '</aside></div></div></article>';
    }).join("");
  }
@@ -62,7 +62,7 @@
  async function load(){
    try{
      const client=window.sb||initSupabase();
-     const {data,error}=await client.from("protocol_library").select("protocol_id,name_of_peptide,strength,description,reconstitution,cycle,dosing_schedule,supplies_needed,active,created_at").eq("active",true).order("created_at",{ascending:false});
+     const {data,error}=await client.from("protocol_library").select("protocol_id,name_of_peptide,strength,description,reconstitution,cycle,dosing_schedule,important_notes,active,created_at").eq("active",true).order("created_at",{ascending:false});
      if(error)throw error;
      allRows=data||[];render(allRows);
    }catch(e){

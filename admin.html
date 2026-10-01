@@ -357,7 +357,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
   <div id="dosingRows" class="dosingRows"></div>
   <button class="btn secondary" type="button" onclick="addDosingRow()">＋ ADD PHASE</button>
 </div>
-          <div class="field full"><label>SUPPLIES NEEDED</label><textarea id="protocolSupplies" rows="4" placeholder="List supplies needed"></textarea></div>
+          <div class="field full"><label>IMPORTANT NOTES</label><textarea id="protocolImportantNotes" rows="4" placeholder="Notes to display on the public Protocols page"></textarea></div>
           <div class="field full"><label><input id="protocolActive" type="checkbox" checked> ACTIVE / VISIBLE IN LIBRARY</label></div>
         </div>
         <div class="actions"><button class="btn primary" type="button" onclick="saveProtocol()">SAVE PROTOCOL</button><button class="btn secondary" type="button" onclick="resetProtocolForm()">CLEAR</button></div>
@@ -369,7 +369,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
         <div class="protocolField"><b>03 · Reconstitution</b><div>Reconstitution reference</div></div>
         <div class="protocolField"><b>04 · Cycle</b><div>Cycle / schedule reference</div></div>
         <div class="protocolField"><b>05 · Dosing Guide</b><div>Dosing reference field</div></div>
-        <div class="protocolField"><b>06 · Supplies Needed</b><div>Required supplies list</div></div>
+        <div class="protocolField"><b>06 · Important Notes</b><div>Reference notes displayed on the public Protocols page</div></div>
       </div>
     </div>
   </div>
@@ -401,7 +401,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
 /* ===== PROTOCOL LIBRARY CRUD ===== */
 function resetProtocolForm(){
-  ["protocolId","protocolName","protocolStrength","protocolDescription","protocolReconstitution","protocolCycle","protocolSupplies"].forEach(id=>{if($(id))$(id).value=""});
+  ["protocolId","protocolName","protocolStrength","protocolDescription","protocolReconstitution","protocolCycle","protocolImportantNotes"].forEach(id=>{if($(id))$(id).value=""});
   if($("protocolActive"))$("protocolActive").checked=true;
   if($("dosingRows"))$("dosingRows").innerHTML="";
   addDosingRow();
@@ -467,7 +467,7 @@ async function editProtocol(id){
     $("protocolDescription").value=data.description||"";
     $("protocolReconstitution").value=data.reconstitution||"";
     $("protocolCycle").value=data.cycle||"";
-    $("protocolSupplies").value=data.supplies_needed||"";
+    $("protocolImportantNotes").value=data.important_notes||"";
     $("dosingRows").innerHTML="";
     (Array.isArray(data.dosing_schedule)?data.dosing_schedule:[]).forEach(addDosingRow);
     if(!(data.dosing_schedule||[]).length)addDosingRow();
@@ -480,7 +480,7 @@ async function saveProtocol(){
   const name=$("protocolName")?.value.trim();
   if(!name)return showMessage("Name of peptide is required.","error");
   const strength=$("protocolStrength")?.value.trim()||null;
-  const payload={name_of_peptide:name,strength:strength,description:$("protocolDescription").value.trim()||null,reconstitution:$("protocolReconstitution").value.trim()||null,cycle:$("protocolCycle").value.trim()||null,dosing_guide:null,dosing_schedule:getDosingRows(),supplies_needed:$("protocolSupplies").value.trim()||null,active:$("protocolActive").checked,updated_at:new Date().toISOString()};
+  const payload={name_of_peptide:name,strength:strength,description:$("protocolDescription").value.trim()||null,reconstitution:$("protocolReconstitution").value.trim()||null,cycle:$("protocolCycle").value.trim()||null,dosing_guide:null,dosing_schedule:getDosingRows(),supplies_needed:null,important_notes:$("protocolImportantNotes").value.trim()||null,active:$("protocolActive").checked,updated_at:new Date().toISOString()};
   try{
     const id=$("protocolId").value.trim();
     const result=id?await sb.from("protocol_library").update(payload).eq("protocol_id",id):await sb.from("protocol_library").insert(payload);

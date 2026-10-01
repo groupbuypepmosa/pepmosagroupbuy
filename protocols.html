@@ -107,7 +107,7 @@
  const protocolNames=new Set(["5-AMINO-1MQ","AOD-9604","ARA290","BPC + TB","BPC-157","CAGRILINTIDE","DSIP","EPITHALON","GHK-CU","GHK-CU + KPV","KISSPEPTIN","KPV","MOTS-C","NAD+","PT-141","RETATRUTIDE","SELANK","SEMAX","SS-31","SURVODUTIDE","TESAMORELIN","THYMOSIN ALPHA 1","TIRZEPATIDE"]);
  function card(p){
   const name=clean(p.product_name)||"PEPTIDE";
-  const strengths=(p.strengths||"").split(",").map(x=>clean(x)).filter(Boolean);
+  const strengths=Array.isArray(p.strengths)?p.strengths.map(x=>clean(x)).filter(Boolean):String(p.strengths||"").split(",").map(x=>clean(x)).filter(Boolean);
   const matched=protocolNames.has(name);
   return '<article class="protocolCard">'+
    '<div class="pepName">'+esc(name)+'</div>'+

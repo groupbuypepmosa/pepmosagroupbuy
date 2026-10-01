@@ -9,7 +9,7 @@
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 12px 35px #8f54700d}.head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.name{font-size:21px;font-weight:950;color:#642c4d}.badge{padding:5px 9px;border-radius:999px;background:#ffe5f1;color:#b1266b;font-size:9px;font-weight:950;white-space:nowrap}.field{margin-top:14px}.field b{display:block;font-size:9px;letter-spacing:.1em;color:#a05b7f;margin-bottom:5px}.field div{white-space:pre-wrap;line-height:1.55;font-size:13px;color:#57424e}.doseTable{display:grid;gap:7px}.doseRow{display:grid;grid-template-columns:1.05fr .8fr .7fr .8fr .8fr;gap:7px;padding:10px;border:1px solid #f0dfe7;border-radius:11px;background:#fffafd;font-size:11px}.doseRow span{min-width:0}.doseRow strong{display:block;font-size:8px;color:#a05b7f;letter-spacing:.05em;margin-bottom:3px}.empty{text-align:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:42px 24px;box-shadow:0 10px 28px #8f54700d;color:var(--muted)}.empty .icon{font-size:42px;margin-bottom:10px}.empty h2{margin:0 0 8px;color:#642c4d;font-size:22px}.empty p{margin:0;line-height:1.6}
 @media(max-width:800px){.grid{grid-template-columns:1fr}.doseRow{grid-template-columns:1fr 1fr}.doseRow span:last-child{grid-column:1/-1}}
 @media(max-width:700px){.page{padding:0 12px 50px}.hero h1{font-size:26px}.top{padding:18px 14px}.name{font-size:19px}}
-</style></head><body>
+</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script></head><body>
 <div class="top"><a class="back" href="index.html">← PEPMOSA</a></div><main class="page">
 <div class="brand"><b>PEPMOSA</b><span>PROTOCOLS</span></div>
 <section class="hero"><h1>Peptide Protocols &amp; Dosing References</h1><p>Research / educational reference library managed by PEPMOSA.</p><div class="notice"><b>RESEARCH / EDUCATIONAL USE ONLY.</b><br>These entries are reference materials and are not a substitute for professional medical advice, diagnosis, or treatment.</div></section>
@@ -18,8 +18,7 @@
 </main>
 <script>
 (function(){
- const SUPABASE_URL="https://pnetzdggtlbuhuxdzzak.supabase.co";
- const SUPABASE_KEY=""+(window.PEPMOSA_SUPABASE_ANON_KEY||"");
+
  function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
  function render(rows){
    const grid=document.getElementById("protocolGrid"),count=document.getElementById("protocolCount");
@@ -39,9 +38,10 @@
  }
  async function load(){
    try{
-     const res=await fetch(SUPABASE_URL+"/rest/v1/protocol_library?select=protocol_id,name_of_peptide,description,reconstitution,cycle,dosing_schedule,supplies_needed,active&active=eq.true&order=created_at.desc",{headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY}});
-     if(!res.ok)throw new Error("Unable to load protocol library.");
-     render(await res.json());
+     const client=window.sb||initSupabase();
+     const {data,error}=await client.from("protocol_library").select("protocol_id,name_of_peptide,description,reconstitution,cycle,dosing_schedule,supplies_needed,active,created_at").eq("active",true).order("created_at",{ascending:false});
+     if(error)throw error;
+     render(data||[]);
    }catch(e){
      console.error(e);
      document.getElementById("protocolCount").textContent="";

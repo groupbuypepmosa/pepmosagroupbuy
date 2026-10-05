@@ -120,7 +120,13 @@
   async function copyVialShortage(){
     const rows=(window.vialTrackerRows||[]).filter(r=>Number(r.inCurrent||0)>0).sort((a,b)=>((a.product_name||"")+" "+(a.strength||"")).localeCompare((b.product_name||"")+" "+(b.strength||"")));
     if(!rows.length){alert('No loose vials.');return}
-    const text=rows.map(r=>(r.product_name||"Unnamed Product")+" "+(r.strength||r.variant_id||"")+" — "+Number(r.remainingToComplete||0)+" VIALS NEEDED").join("\n");
+    const text=rows.map(r=>{
+      const name=String(r.product_name||"Unnamed Product").trim();
+      const strength=String(r.strength||r.variant_id||"").trim();
+      const full=(strength && !name.toLowerCase().includes(strength.toLowerCase())) ? name+" "+strength : name;
+      const n=Number(r.remainingToComplete||0);
+      return full+" — "+n+" VIAL"+(n===1?"":"S")+" NEEDED";
+    }).join("\n");
     try{
       await navigator.clipboard.writeText(text);
       const btn=document.querySelector('#pepVialPrintBtn');

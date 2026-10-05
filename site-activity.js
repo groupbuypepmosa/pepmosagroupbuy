@@ -108,7 +108,7 @@
       '<div class="shotHeader"><div><div class="shotEyebrow">PEPMOSA • VIAL TRACKER</div><div class="shotTitle">VIAL SHORTAGE</div><div class="shotSub">Screenshot-ready • 10 vials = 1 kit</div></div><button type="button" class="shotPrint" id="pepVialPrintBtn">PRINT / SAVE</button></div>'+
       '<div class="shotRows">'+incomplete.map(r=>{
         const qty=Number(r.qty||0),inCurrent=Number(r.inCurrent||0),need=Number(r.remainingToComplete||0);
-        return '<div class="shotRow"><div class="shotProduct"><b>'+esc(r.product_name||"Unnamed Product")+'</b><span>'+esc(r.strength||r.variant_id||"")+'</span></div><div class="shotStat"><small>ORDERED</small><b>'+qty+'</b></div><div class="shotNeed"><small>NEEDED</small><b>'+need+'</b><span>to complete kit</span></div></div>';
+        return '<div class="shotRow"><div class="shotProduct"><b>'+esc(r.product_name||"Unnamed Product")+'</b><span>'+esc(r.strength||r.variant_id||"")+'</span></div><div class="shotNeed"><small>NEEDED</small><b>'+need+'</b></div></div>';
       }).join("")+'</div>'+
       '<div class="shotFooter"><b>'+incomplete.length+' PRODUCT/S NEEDING VIALS</b><span>Send this screenshot to the supplier</span></div></div>';
     const btn=document.querySelector('#pepVialPrintBtn');

@@ -108,14 +108,26 @@
     }
     content.innerHTML=
       '<div class="pepVialShot">'+
-      '<div class="shotHeader"><div><div class="shotEyebrow">PEPMOSA • VIAL TRACKER</div><div class="shotTitle">VIAL SHORTAGE</div><div class="shotSub">Screenshot-ready • 10 vials = 1 kit</div></div><button type="button" class="shotPrint" id="pepVialPrintBtn">PRINT / SAVE</button></div>'+
+      '<div class="shotHeader"><div><div class="shotEyebrow">PEPMOSA • VIAL TRACKER</div><div class="shotTitle">VIAL SHORTAGE</div><div class="shotSub">Screenshot-ready • 10 vials = 1 kit</div></div><button type="button" class="shotPrint" id="pepVialPrintBtn">COPY</button></div>'+
       '<div class="shotRows">'+incomplete.map(r=>{
         const qty=Number(r.qty||0),inCurrent=Number(r.inCurrent||0),need=Number(r.remainingToComplete||0);
         return '<div class="shotRow"><div class="shotProduct"><b>'+esc(r.product_name||"Unnamed Product")+'</b><span>'+esc(r.strength||r.variant_id||"")+'</span></div><div class="shotNeedInline">- '+need+' needed</div></div>';
       }).join("")+'</div>'+
       '<div class="shotFooter"><b>'+incomplete.length+' PRODUCT/S NEEDING VIALS</b><span>Send this screenshot to the supplier</span></div></div>';
     const btn=document.querySelector('#pepVialPrintBtn');
-    if(btn)btn.onclick=printVialShortage;
+    if(btn)btn.onclick=copyVialShortage;
+  }
+  async function copyVialShortage(){
+    const rows=(window.vialTrackerRows||[]).filter(r=>Number(r.inCurrent||0)>0).sort((a,b)=>((a.product_name||"")+" "+(a.strength||"")).localeCompare((b.product_name||"")+" "+(b.strength||"")));
+    if(!rows.length){alert('No loose vials.');return}
+    const text=rows.map(r=>(r.product_name||"Unnamed Product")+" "+(r.strength||r.variant_id||"")+" — "+Number(r.remainingToComplete||0)+" VIALS NEEDED").join("\n");
+    try{
+      await navigator.clipboard.writeText(text);
+      const btn=document.querySelector('#pepVialPrintBtn');
+      if(btn){const old=btn.textContent;btn.textContent='COPIED ✓';setTimeout(()=>btn.textContent=old,1400)}
+    }catch(e){
+      const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();alert('Loose vials copied.');
+    }
   }
   function printVialShortage(){
     const rows=(window.vialTrackerRows||[]).filter(r=>Number(r.inCurrent||0)>0).sort((a,b)=>((a.product_name||"")+" "+(a.strength||"")).localeCompare((b.product_name||"")+" "+(b.strength||"")));

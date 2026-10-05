@@ -125,7 +125,7 @@
       const strength=String(r.strength||r.variant_id||"").trim();
       const full=(strength && !name.toLowerCase().includes(strength.toLowerCase())) ? name+" "+strength : name;
       const n=Number(r.remainingToComplete||0);
-      return full+" — "+n+" VIAL"+(n===1?"":"S")+" NEEDED";
+      return full+" — "+n+" VIAL"+(n===1?"":"S");
     }).join("\n");
     try{
       await navigator.clipboard.writeText(text);

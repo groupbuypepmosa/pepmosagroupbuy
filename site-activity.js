@@ -99,11 +99,14 @@
       panel.id='pepVialScreenshotPanel';
       box.parentNode.insertBefore(panel,box);
     }
+    panel.innerHTML='<button type="button" id="pepLooseToggle" style="padding:9px 14px;border:1px solid #e7b3cf;border-radius:10px;background:#fff7fb;color:#bd236f;font-weight:900;cursor:pointer;margin-bottom:10px">VIEW LOOSE VIALS</button><div id="pepLooseContent" hidden></div>';
+    const content=panel.querySelector('#pepLooseContent');
+    panel.querySelector('#pepLooseToggle').onclick=function(){content.hidden=!content.hidden;this.textContent=content.hidden?'VIEW LOOSE VIALS':'HIDE LOOSE VIALS'};
     if(!incomplete.length){
-      panel.innerHTML='<div class="pepVialShot emptyShot"><div class="shotTitle">✓ NO NEEDED — ALL CURRENT KITS COMPLETE</div></div>';
+      content.innerHTML='<div class="pepVialShot emptyShot"><div class="shotTitle">✓ NO NEEDED — ALL CURRENT KITS COMPLETE</div></div>';
       return;
     }
-    panel.innerHTML=
+    content.innerHTML=
       '<div class="pepVialShot">'+
       '<div class="shotHeader"><div><div class="shotEyebrow">PEPMOSA • VIAL TRACKER</div><div class="shotTitle">VIAL SHORTAGE</div><div class="shotSub">Screenshot-ready • 10 vials = 1 kit</div></div><button type="button" class="shotPrint" id="pepVialPrintBtn">PRINT / SAVE</button></div>'+
       '<div class="shotRows">'+incomplete.map(r=>{

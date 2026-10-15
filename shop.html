@@ -1273,7 +1273,23 @@ header{position:sticky!important;top:0;z-index:100!important;min-height:70px!imp
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
 
-</head>
+<style id="pepmosa-catalog-upgrade">
+/* PEPMOSA catalog refinement */
+.pepCatalogIntro{display:flex;justify-content:space-between;align-items:end;gap:14px;margin:0 2px 14px}
+.pepSortWrap{display:flex;align-items:center;gap:9px;white-space:nowrap;color:#9a7489;font-size:9px;font-weight:950;letter-spacing:.12em}
+.pepSortWrap select{min-height:45px;max-width:190px;padding:0 34px 0 13px;border:1px solid #ead0df;border-radius:14px;background:#fffafd;color:#5a354b;font:inherit;font-size:11px;letter-spacing:0;cursor:pointer;outline:none}
+.pepSortWrap select:focus{border-color:#d95799;box-shadow:0 0 0 4px #df5d9b19}
+#productGrid .pepStoreCard{overflow:hidden;position:relative}
+#productGrid .productImg{display:flex;align-items:center;justify-content:center;overflow:hidden}
+#productGrid .productImg img{width:100%;height:100%;object-fit:contain;padding:16px;box-sizing:border-box;transition:transform .3s ease}
+#productGrid .pepStoreCard:hover .productImg img{transform:scale(1.035)}
+#productGrid .pepStoreBody{display:flex;flex-direction:column;height:calc(100% - 220px);box-sizing:border-box}
+#productGrid .pepStoreBody .pepStoreBottom{margin-top:auto}
+#productGrid .pepSelectVariant{transition:transform .18s ease,filter .18s ease,box-shadow .18s ease}
+#productGrid .pepSelectVariant:focus-visible{outline:3px solid #f0a5ca;outline-offset:3px}
+@media(max-width:900px){.pepSortWrap{justify-content:space-between}.pepSortWrap select{flex:1;max-width:none}}
+@media(max-width:620px){.pepSortWrap{width:100%;box-sizing:border-box}.pepSortWrap select{min-height:43px}.pepCatalogIntro{align-items:stretch;flex-direction:column}}
+</style>\n</head>
 
 
 <body>
@@ -1362,6 +1378,7 @@ header{position:sticky!important;top:0;z-index:100!important;min-height:70px!imp
       <input id="search" class="search" placeholder="Search products…" oninput="window.renderProducts();pepSyncSearchClear()">
       <button id="pepSearchClear" class="pepSearchClear" type="button" onclick="document.getElementById('search').value='';window.renderProducts();pepSyncSearchClear()" aria-label="Clear search">×</button>
     </div>
+    <label class="pepSortWrap"><span>SORT BY</span><select id="pepProductSort" aria-label="Sort products"><option value="featured">Featured</option><option value="name">Name A–Z</option><option value="price-low">Price: Low to high</option><option value="price-high">Price: High to low</option></select></label>
   </div>
   <div id="productGrid" class="grid"><div class="card">Loading…</div></div>
 </section>
@@ -3265,6 +3282,7 @@ load();
       (typeof products!=='undefined' && Array.isArray(products) && products.length ? products : []);
     const input=document.getElementById('search');
     const q=String(input?.value||'').toLowerCase().trim();
+    const sortMode=String(document.getElementById('pepProductSort')?.value||'featured');
 
     /* If the repair loader has not finished yet, NEVER replace the already
        visible product cards with "No products found". Filter those existing
@@ -3285,6 +3303,14 @@ load();
       const hay=(String(p.product_name||'')+' '+String(p.description||'')).toLowerCase();
       return !q || hay.includes(q);
     });
+    const priceOf=p=>{
+      const prices=(Array.isArray(p.product_variants)?p.product_variants:[])
+        .filter(v=>v.active!==false).map(v=>Number(v.price)||0).filter(v=>v>0);
+      return prices.length?Math.min(...prices):Number.POSITIVE_INFINITY;
+    };
+    if(sortMode==='name') filtered.sort((a,b)=>String(a.product_name||'').localeCompare(String(b.product_name||'')));
+    if(sortMode==='price-low') filtered.sort((a,b)=>priceOf(a)-priceOf(b));
+    if(sortMode==='price-high') filtered.sort((a,b)=>priceOf(b)-priceOf(a));
 
     if(!filtered.length){
       grid.innerHTML='<div class="card"><div style="text-align:center;padding:35px"><div style="font-size:36px;margin-bottom:10px">🛍️</div><b>'+(q?'No products found':'No products available yet.')+'</b><p class="muted">'+(q?'Try another product name or clear your search.':'No products are available right now.')+'</p></div></div>';
@@ -3334,6 +3360,11 @@ load();
   }
 
   function bind(){
+    const sort=document.getElementById('pepProductSort');
+    if(sort && !sort.dataset.pepFinalBound){
+      sort.dataset.pepFinalBound='1';
+      sort.addEventListener('change',renderIndexProducts);
+    }
     const input=document.getElementById('search');
     if(input && !input.dataset.pepFinalBound){
       input.dataset.pepFinalBound='1';

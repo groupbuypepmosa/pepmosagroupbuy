@@ -3294,6 +3294,11 @@ load();
       (Array.isArray(window.__pepBaseProducts)&&window.__pepBaseProducts.length ? window.__pepBaseProducts : null) ||
       (typeof products!=='undefined' && Array.isArray(products) && products.length ? products : []);
     const input=document.getElementById('search');
+    if(input && !input.dataset.pepQueryInitialized){
+      const urlQuery=new URLSearchParams(window.location.search).get('q');
+      if(urlQuery && !input.value) input.value=urlQuery;
+      input.dataset.pepQueryInitialized='1';
+    }
     const q=String(input?.value||'').toLowerCase().trim();
     const sortMode=String(document.getElementById('pepProductSort')?.value||'featured');
 

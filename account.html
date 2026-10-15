@@ -397,6 +397,17 @@ body:has(#accountArea:not(.hidden)){
 @media(prefers-reduced-motion:reduce){.accountWrap:has(#accountArea:not(.hidden)) *{transition:none!important}}
 </style>
 
+<style id="pep-wine-rose-account-final">
+:root{--pep-wine:#54263f;--pep-wine-deep:#351b2c;--pep-rose:#c45b83;--pep-line:#ead0dc}
+body{background:radial-gradient(circle at 10% 10%,rgba(233,165,191,.18),transparent 28%),radial-gradient(circle at 90% 10%,rgba(196,91,131,.11),transparent 30%),linear-gradient(140deg,#fffafd,#fff3f7 48%,#f7edf4)!important;color:#351b2c!important}
+.accountCard,.accountWrap .card,.accountPanel{border-color:#ead0dc!important}
+.accountWrap h1,.accountWrap h2,.accountWrap h3{color:#54263f!important}
+.accountWrap .btn:not(.secondary),.accountWrap button:not(.secondary):not(.tab){background:linear-gradient(120deg,#54263f,#8d4262 58%,#c45b83)!important;box-shadow:0 9px 22px rgba(84,38,63,.16)!important}
+.accountWrap .btn.secondary,.accountWrap button.secondary,.accountWrap .tab{color:#75405a!important;border-color:#e4bdce!important;background:#fffafd!important}
+.accountWrap input,.accountWrap select,.accountWrap textarea{border-color:#e4bdce!important}
+.accountWrap input:focus,.accountWrap select:focus,.accountWrap textarea:focus{border-color:#c45b83!important;box-shadow:0 0 0 3px rgba(196,91,131,.13)!important}
+.accountWrap .notice{border-color:#ead0dc!important}
+</style>
 </head>
 <body>
 <div class="accountWrap"><div class="accountCard">

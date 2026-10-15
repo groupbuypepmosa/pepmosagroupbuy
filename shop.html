@@ -1368,14 +1368,27 @@ header{position:sticky!important;top:0;z-index:100!important;min-height:70px!imp
   <a href="buyers-proof.html" title="Buyers' Proof"><span>♥</span><b>PROOF</b></a>
 </nav>
 <main class="wrap">
+<style id="pep-shop-hero-refresh">
+.pepShopHero{min-height:310px!important;margin:18px 0 24px!important;padding:24px 30px!important;grid-template-columns:minmax(250px,38%) minmax(0,62%)!important;gap:12px!important;border-radius:28px!important;background:radial-gradient(circle at 10% 20%,rgba(255,186,220,.25),transparent 32%),linear-gradient(125deg,#fff 0%,#fff6fb 62%,#f8f0ff 100%)!important;border:1px solid #f0d2e2!important;box-shadow:0 18px 48px rgba(130,60,105,.08)!important}
+.pepShopHero .heroLogo{min-height:245px!important;padding:0 10px!important}
+.pepShopHero .heroLogo img{width:min(100%,250px)!important;max-height:245px!important;filter:drop-shadow(0 12px 18px rgba(120,50,100,.12))!important}
+.pepShopHero .gbPanel{padding:18px 20px!important}
+.pepShopEyebrow{display:inline-flex;align-items:center;gap:7px;margin-bottom:9px;color:#b34c82;font-size:10px;font-weight:950;letter-spacing:.16em;text-transform:uppercase}
+.pepShopEyebrow span{color:#e13a9b;font-size:14px}
+.pepShopHero .gbPanel h1{font-size:clamp(36px,4.2vw,54px)!important;line-height:1.02!important;letter-spacing:-1.8px!important;margin:0 0 12px!important}
+.pepShopHero .gbPanel .muted{max-width:500px;font-size:13px!important;line-height:1.7!important}
+.pepShopHero #gbStatus{margin-top:18px!important;border-radius:20px!important}
+@media(max-width:900px){.pepShopHero{grid-template-columns:minmax(0,1fr)!important;padding:20px!important;gap:0!important}.pepShopHero .heroLogo{min-height:150px!important;height:150px!important}.pepShopHero .heroLogo img{max-height:150px!important;width:auto!important;max-width:170px!important}.pepShopHero .gbPanel{padding:12px 8px 8px!important}.pepShopHero .gbPanel h1{font-size:clamp(34px,8vw,46px)!important}}
+@media(max-width:560px){.pepShopHero{padding:15px!important;margin:12px 0 18px!important;border-radius:22px!important}.pepShopHero .heroLogo{min-height:125px!important;height:125px!important}.pepShopHero .heroLogo img{max-height:125px!important;max-width:140px!important}.pepShopHero .gbPanel{padding:10px 4px 4px!important}.pepShopHero .gbPanel h1{font-size:34px!important;letter-spacing:-1.2px!important}.pepShopHero .gbPanel .muted{font-size:12px!important}}
+</style>
 <section class="hero pepShopHero">
   <div class="heroLogo">
     <img src="pepmosa-no-name.png" alt="PEPMOSA">
   </div>
-  <div class="gbPanel">
-    <div class="eyebrow">PEPMOSA SHOP</div>
+  <div class="gbPanel pepShopIntro">
+    <div class="pepShopEyebrow"><span>✦</span> YOUR COLLECTION</div>
     <h1>SHOP <span>PEPMOSA</span></h1>
-    <p class="muted">Choose your product and variant. Availability follows the categories opened for the current Group Buy.</p>
+    <p class="muted">Browse products, compare variants, and find what you need for the current Group Buy.</p>
     <div id="gbStatus" class="notice">Loading current Group Buy…</div>
   </div>
 </section>

@@ -76,6 +76,33 @@
     .pepInfoActions{display:flex;justify-content:center;margin-top:23px}
     .pepInfoActions .pepFeeBtn{min-width:150px;min-height:48px;border-radius:15px}
     @media(max-width:560px){.pepInfoBox{padding:28px 20px 23px;border-radius:25px}.pepInfoBox h2{font-size:27px}.pepInfoText{font-size:12px}}
+
+    /* PEPMOSA POPUP REFINEMENT — compact, readable, mobile-safe */
+    .pepFeeModal,#pepInfoModal,#pepSiteNoticeModal{padding:18px!important;box-sizing:border-box}
+    .pepInfoBox{width:min(470px,100%)!important;padding:30px 28px 26px!important;border-radius:28px!important;border:1px solid rgba(239,206,224,.95)!important;box-shadow:0 24px 75px rgba(55,18,43,.24)!important}
+    .pepInfoIcon{width:62px!important;height:62px!important;margin-bottom:12px!important;font-size:31px!important}
+    .pepInfoBox h2{font-size:clamp(24px,4vw,29px)!important;letter-spacing:-.5px!important;margin:8px 0 10px!important}
+    .pepInfoText{font-size:13px!important;line-height:1.65!important;max-width:390px!important}
+    .pepInfoActions{margin-top:21px!important}
+    .pepInfoActions .pepFeeBtn{min-width:150px!important;min-height:47px!important;border-radius:14px!important}
+    .pepFeeBox{width:min(620px,100%)!important;max-height:min(88dvh,850px)!important;border-width:1px!important;border-radius:26px!important;box-shadow:0 25px 80px rgba(55,12,47,.30)!important}
+    .pepFeeHead{padding:23px 25px 21px!important}
+    .pepFeeBox h2{font-size:clamp(25px,4vw,31px)!important}
+    .pepFeeBody{padding:20px 25px 25px!important}
+    .pepSiteNoticeCard{width:min(500px,100%)!important;max-height:85dvh!important;padding:26px!important;border-radius:25px!important;box-shadow:0 24px 75px rgba(80,30,70,.24)!important}
+    .pepSiteNoticeCard h2{font-size:clamp(24px,4vw,29px)!important}
+    .pepFeeBtn{min-height:46px;border-radius:14px!important}
+    @media(max-width:560px){
+      .pepFeeModal,#pepInfoModal,#pepSiteNoticeModal{padding:12px!important}
+      .pepInfoBox{padding:25px 18px 21px!important;border-radius:23px!important}
+      .pepInfoIcon{width:54px!important;height:54px!important;font-size:27px!important}
+      .pepInfoBox h2{font-size:25px!important}
+      .pepInfoText{font-size:12px!important}
+      .pepFeeBox{max-height:90dvh!important;border-radius:22px!important}
+      .pepFeeHead{padding:20px 18px 18px!important}
+      .pepFeeBody{grid-template-columns:minmax(0,1fr)!important;padding:16px 18px 20px!important}
+      .pepSiteNoticeCard{padding:22px 18px!important;border-radius:22px!important}
+    }
   `;document.head.appendChild(s)}
   function makeModal(id,html,cls='pepFeeModal'){if($(id))return;const d=document.createElement('div');d.id=id;d.className=cls;d.innerHTML=html;d.addEventListener('click',e=>{if(e.target===d)d.classList.remove('open')});document.body.appendChild(d)}
   function ensureUI(){styles();const status=$('gbStatus');if(status&&!$('pepKitCompletionCard')){const k=document.createElement('section');k.id='pepKitCompletionCard';k.className='pepKitCompletionCard';k.style.cssText='display:none';k.innerHTML='<div class="pepKitGlow"></div><div class="pepKitTop"><div class="pepKitBadge">✦ KIT COMPLETION</div><div class="pepKitIcon">◈</div></div><h3>Complete the remaining vials</h3><p class="pepKitLead">Each <b>mg / variant is tracked separately.</b></p><div class="pepKitRules"><div><span>1</span><p>Every strength has its own separate 10-vial kit and live remaining count.</p></div><div><span>2</span><p>Only variants with remaining vials are shown.</p></div><div><span>3</span><p>You may order from <b>1 vial up to the exact live remaining quantity.</b></p></div><div class="pepKitFooter">⚡ Once a remaining vial is secured, it automatically becomes unavailable to the next buyer.</div>';const grid=$('productGrid');if(grid&&grid.parentNode)grid.parentNode.insertBefore(k,grid);else status.parentNode.insertBefore(k,status.nextSibling)}if(status&&!$('pepFeeCard')){const c=document.createElement('div');c.id='pepFeeCard';c.className='notice';c.style.marginTop='14px';c.innerHTML='<div style="font-weight:900">GROUP BUY ACCESS</div><div id="pepFeeState" class="pepFeeMuted" style="margin:5px 0 10px">Loading…</div><div class="pepFeeActions"><button id="pepFeeAction" class="pepFeeBtn">PAY ADMIN FEE</button><button id="pepVerifyExisting" class="pepFeeBtn secondary">VERIFY EMAIL</button></div>';status.parentNode.insertBefore(c,status.nextSibling);$('pepFeeAction').onclick=feeAction;$('pepVerifyExisting').onclick=openVerify}

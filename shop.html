@@ -1289,7 +1289,17 @@ header{position:sticky!important;top:0;z-index:100!important;min-height:70px!imp
 #productGrid .pepSelectVariant:focus-visible{outline:3px solid #f0a5ca;outline-offset:3px}
 @media(max-width:900px){.pepSortWrap{justify-content:space-between}.pepSortWrap select{flex:1;max-width:none}}
 @media(max-width:620px){.pepSortWrap{width:100%;box-sizing:border-box}.pepSortWrap select{min-height:43px}.pepCatalogIntro{align-items:stretch;flex-direction:column}}
-</style>\n</head>
+</style>\n<style id="pepmosa-sort-visibility-fix">
+/* Keep search and sorting controls visible and usable at every width */
+#products .sectionHead{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(220px,360px)!important;align-items:end!important}
+#products .sectionHead>div:first-child{grid-column:1;grid-row:1}
+#products .pepSearchWrap{grid-column:2;grid-row:1;width:100%!important;min-width:0!important}
+#products .pepSortWrap{grid-column:1/-1;grid-row:2;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:12px!important;margin-top:4px!important;padding:10px 12px!important;border:1px solid #efd6e3!important;border-radius:15px!important;background:rgba(255,255,255,.78)!important;box-sizing:border-box!important}
+#products .pepSortWrap span{font-size:9px!important;font-weight:900!important;letter-spacing:.14em!important;color:#a35a7d!important}
+#products .pepSortWrap select{display:block!important;visibility:visible!important;opacity:1!important;min-width:180px!important;min-height:42px!important;border:1px solid #e8c7d9!important;border-radius:11px!important;background:#fff!important;color:#56364a!important;padding:0 12px!important;font-size:12px!important}
+@media(max-width:620px){#products .sectionHead{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}#products .sectionHead>div:first-child,#products .pepSearchWrap,#products .pepSortWrap{grid-column:1;grid-row:auto}#products .pepSortWrap{justify-content:space-between!important;margin-top:0!important}#products .pepSortWrap select{flex:1;min-width:0!important;max-width:70%!important}}
+</style>
+</head>
 
 
 <body>
@@ -1378,7 +1388,7 @@ header{position:sticky!important;top:0;z-index:100!important;min-height:70px!imp
       <input id="search" class="search" placeholder="Search products…" oninput="window.renderProducts();pepSyncSearchClear()">
       <button id="pepSearchClear" class="pepSearchClear" type="button" onclick="document.getElementById('search').value='';window.renderProducts();pepSyncSearchClear()" aria-label="Clear search">×</button>
     </div>
-    <label class="pepSortWrap"><span>SORT BY</span><select id="pepProductSort" aria-label="Sort products"><option value="featured">Featured</option><option value="name">Name A–Z</option><option value="price-low">Price: Low to high</option><option value="price-high">Price: High to low</option></select></label>
+    <label class="pepSortWrap"><span>SORT BY</span><select id="pepProductSort" aria-label="Sort products" onchange="window.renderProducts()"><option value="featured">Featured</option><option value="name">Name A–Z</option><option value="price-low">Price: Low to high</option><option value="price-high">Price: High to low</option></select></label>
   </div>
   <div id="productGrid" class="grid"><div class="card">Loading…</div></div>
 </section>

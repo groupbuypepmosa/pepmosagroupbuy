@@ -2185,6 +2185,26 @@ main.wrap>.hero .pepHomeShopNow{border-radius:999px!important;background:linear-
     <div class="pepHeroDecor pepDecorA">♡</div><div class="pepHeroDecor pepDecorB">✦</div>
   </section>
 
+  <section class="pepHomeSearch" aria-label="Search PEPMOSA products">
+    <div class="pepHomeSearchLabel"><span>✦</span> FIND YOUR PRODUCT</div>
+    <form class="pepHomeSearchForm" action="shop.html" method="get">
+      <span aria-hidden="true">⌕</span>
+      <input type="search" name="q" placeholder="Search products by name…" aria-label="Search products by name">
+      <button type="submit">SEARCH PRODUCTS <b>→</b></button>
+    </form>
+  </section>
+  <style id="pep-home-search-style">
+    .pepHomeSearch{max-width:1120px;margin:0 auto 20px;padding:20px 22px;border:1px solid #efd0e1;border-radius:22px;background:linear-gradient(115deg,#fff,#fff3f9 65%,#f8f1ff);box-shadow:0 12px 30px rgba(143,61,106,.08);box-sizing:border-box}
+    .pepHomeSearchLabel{font-size:10px;letter-spacing:.16em;font-weight:950;color:#a84d7a;margin-bottom:11px}
+    .pepHomeSearchLabel span{color:#d52b87;margin-right:7px}
+    .pepHomeSearchForm{display:flex;align-items:center;gap:10px;min-width:0}
+    .pepHomeSearchForm>span{font-size:27px;line-height:1;color:#c43c83;padding-left:4px}
+    .pepHomeSearchForm input{flex:1;min-width:0;height:50px;border:1px solid #e7c5d7;border-radius:13px;background:#fff;padding:0 14px;font-size:15px;color:#43293a;box-sizing:border-box;outline:none}
+    .pepHomeSearchForm input:focus{border-color:#d95799;box-shadow:0 0 0 4px #df5d9b19}
+    .pepHomeSearchForm button{height:50px;padding:0 18px;border:0;border-radius:13px;background:linear-gradient(135deg,#df4a98,#b83e9b);color:white;font-size:11px;font-weight:900;letter-spacing:.04em;cursor:pointer;white-space:nowrap}
+    .pepHomeSearchForm button b{font-size:16px;margin-left:8px}
+    @media(max-width:620px){.pepHomeSearch{padding:15px 13px;border-radius:18px;margin:0 0 16px}.pepHomeSearchForm{display:grid;grid-template-columns:25px minmax(0,1fr);gap:8px}.pepHomeSearchForm>span{grid-column:1;grid-row:1}.pepHomeSearchForm input{grid-column:2;grid-row:1;width:100%;height:48px}.pepHomeSearchForm button{grid-column:1/-1;width:100%;height:46px}}
+  </style>
   <section class="pepHomeWelcomeStrip">
     <div><span class="pepStripIcon">✦</span><div><b>Everything in one place</b><small>Products, account, order updates, and community links.</small></div></div>
     <a href="shop.html">EXPLORE PEPMOSA <span>→</span></a>

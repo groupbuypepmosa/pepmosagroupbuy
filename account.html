@@ -288,6 +288,115 @@ body:has(#authArea:not(.hidden)){background:radial-gradient(ellipse at 12% 15%,r
 @media(prefers-reduced-motion:reduce){.accountWrap:has(#authArea:not(.hidden)) *{animation:none!important;transition:none!important}}
 </style>
 
+
+<style id="pepmosa-logged-in-home-redesign">
+/* Signed-in view: personalized customer home, not a generic account form */
+body:has(#accountArea:not(.hidden)){
+ background:radial-gradient(ellipse at 5% 0%,rgba(245,190,210,.25),transparent 30%),linear-gradient(145deg,#fff9fc,#f9f1f5 58%,#f5edf2)!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)){width:min(1240px,96%)!important;margin:22px auto 58px!important}
+.accountWrap:has(#accountArea:not(.hidden)) .accountCard{
+ max-width:none!important;width:100%!important;box-sizing:border-box!important;padding:clamp(14px,2.4vw,28px)!important;
+ border-radius:30px!important;border:1px solid #ead5df!important;background:rgba(255,255,255,.82)!important;
+ box-shadow:0 25px 75px rgba(91,39,61,.09)!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) #accountArea{display:block!important}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome{
+ display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:12px 22px!important;
+ align-items:center!important;min-height:190px!important;box-sizing:border-box!important;
+ padding:clamp(24px,4vw,42px)!important;margin:0 0 17px!important;border:1px solid #e8c8d6!important;
+ border-radius:27px!important;overflow:hidden!important;
+ background:radial-gradient(circle at 87% 18%,rgba(255,255,255,.75),transparent 20%),linear-gradient(115deg,#6f2e45 0%,#8e3c59 48%,#c56a8a 100%)!important;
+ box-shadow:0 15px 35px rgba(111,46,69,.17)!important;color:white!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome:before{
+ content:"PEPMOSA";position:absolute;right:-8px;bottom:-25px;font-family:Georgia,serif;
+ font-size:clamp(58px,10vw,132px);font-weight:700;letter-spacing:-.07em;color:rgba(255,255,255,.08);
+ pointer-events:none;white-space:nowrap
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome:after{
+ content:"♡";position:absolute;right:7%;top:-28px;font:150px Georgia;color:rgba(255,255,255,.12);pointer-events:none
+}
+.accountWrap:has(#accountArea:not(.hidden)) .welcomeEyebrow{color:#f8dce7!important;letter-spacing:.2em!important;font-size:9px!important}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome h1{
+ margin:10px 0!important;font-family:Georgia,"Times New Roman",serif!important;font-size:clamp(34px,5vw,58px)!important;
+ line-height:1!important;letter-spacing:-1.7px!important;color:#fff!important;font-weight:500!important
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome h1 span{color:#ffe1ed!important}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome>p{color:rgba(255,255,255,.82)!important;font-size:12px!important;line-height:1.7!important;max-width:520px}
+.accountWrap:has(#accountArea:not(.hidden)) .welcomeMeta{grid-column:1/-1;margin-top:5px!important;gap:7px!important}
+.accountWrap:has(#accountArea:not(.hidden)) .welcomeMeta #accountEmail{background:rgba(255,255,255,.12)!important;color:#fff!important;border:1px solid rgba(255,255,255,.25)!important}
+.accountWrap:has(#accountArea:not(.hidden)) #accountStatus .status{border:1px solid rgba(255,255,255,.25)!important}
+.accountWrap:has(#accountArea:not(.hidden)) #accountMessage{border-radius:14px!important;margin:0 0 15px!important}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuickGrid{
+ grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;margin:0 0 20px!important
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuick{
+ display:grid!important;grid-template-columns:52px minmax(0,1fr)!important;grid-template-rows:auto auto!important;
+ column-gap:13px!important;align-items:center!important;min-height:98px!important;padding:18px!important;
+ border-radius:20px!important;border:1px solid #ecd6e0!important;background:linear-gradient(145deg,#fff,#fff8fb)!important;
+ box-shadow:0 7px 20px rgba(99,42,65,.045)!important;transition:transform .18s,border-color .18s,box-shadow .18s!important
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuick:hover{transform:translateY(-2px)!important;border-color:#d9a5bb!important;box-shadow:0 13px 25px rgba(99,42,65,.09)!important}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuick.active{background:linear-gradient(135deg,#f9e7ee,#fff7fb)!important;border-color:#d7a0b5!important;box-shadow:inset 0 0 0 1px #efd4df!important}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuick>span{
+ grid-row:1/3!important;width:52px!important;height:52px!important;display:grid!important;place-items:center!important;
+ margin:0!important;border-radius:16px!important;background:linear-gradient(145deg,#f3c5d5,#d995ae)!important;
+ color:#78334c!important;font-size:23px!important
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuick b{align-self:end!important;font-size:10px!important;letter-spacing:.09em!important;color:#633448!important}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuick small{align-self:start!important;margin-top:5px!important;color:#997a89!important;font-size:10px!important}
+.accountWrap:has(#accountArea:not(.hidden)) .accountSection{
+ padding:clamp(17px,2.6vw,29px)!important;border:1px solid #ead6df!important;border-radius:23px!important;
+ background:rgba(255,255,255,.94)!important;box-shadow:0 8px 25px rgba(99,42,65,.035)!important
+}
+.accountWrap:has(#accountArea:not(.hidden)) .sectionTop{align-items:center!important;margin:0 0 17px!important}
+.accountWrap:has(#accountArea:not(.hidden)) .sectionEyebrow{color:#b35b7a!important;letter-spacing:.17em!important}
+.accountWrap:has(#accountArea:not(.hidden)) .sectionTop h2{font-family:Georgia,serif!important;font-size:clamp(24px,3vw,32px)!important;font-weight:500!important;letter-spacing:-.5px!important;color:#6f2e45!important}
+.accountWrap:has(#accountArea:not(.hidden)) .sectionAction{padding:10px 13px!important;border-radius:999px!important;background:#fff1f6!important;border:1px solid #efd3df!important;color:#8d3b57!important;font-size:9px!important;letter-spacing:.06em!important}
+.accountWrap:has(#accountArea:not(.hidden)) .accountList{gap:11px!important}
+.accountWrap:has(#accountArea:not(.hidden)) .orderCard{border-radius:17px!important;border-color:#efdee5!important;box-shadow:none!important;padding:18px!important;transition:border-color .18s,box-shadow .18s}
+.accountWrap:has(#accountArea:not(.hidden)) .orderCard:hover{border-color:#d9a7bc!important;box-shadow:0 7px 20px rgba(99,42,65,.05)!important}
+.accountWrap:has(#accountArea:not(.hidden)) .orderId{color:#71354b!important;font-size:13px!important}
+.accountWrap:has(#accountArea:not(.hidden)) .orderTotal b{color:#9c405f!important}
+.accountWrap:has(#accountArea:not(.hidden)) .accountLoading,.accountWrap:has(#accountArea:not(.hidden)) .accountEmpty{
+ border-radius:17px!important;background:#fff9fc!important;border-color:#e9cbd8!important;padding:35px 18px!important;line-height:1.7
+}
+.accountWrap:has(#accountArea:not(.hidden)) .profileBox{border-color:#ecd7e0!important;border-radius:18px!important;background:#fff!important}
+.accountWrap:has(#accountArea:not(.hidden)) .profileRow{padding:16px!important;border-color:#f2e5eb!important}
+.accountWrap:has(#accountArea:not(.hidden)) .profileRow span{color:#a17e8e!important;letter-spacing:.12em!important}
+.accountWrap:has(#accountArea:not(.hidden)) .profileRow b{color:#603649!important}
+.accountWrap:has(#accountArea:not(.hidden)) #logout{
+ display:block!important;max-width:180px!important;margin:18px auto 0!important;
+ background:#fff!important;color:#8a3c57!important;border:1px solid #e8c9d6!important;box-shadow:none!important
+}
+.accountWrap:has(#accountArea:not(.hidden)) #logout:hover{background:#fff2f6!important}
+.accountWrap:has(#accountArea:not(.hidden)) .links{margin-top:17px!important;padding-top:15px;border-top:1px solid #f0dfe7}
+.accountWrap:has(#accountArea:not(.hidden)) .links a{color:#8b3a56!important;font-size:10px!important}
+@media(max-width:700px){
+ .accountWrap:has(#accountArea:not(.hidden)){width:calc(100% - 16px)!important;margin:8px auto 28px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountCard{padding:9px!important;border-radius:23px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountWelcome{grid-template-columns:1fr!important;min-height:0!important;padding:25px 20px!important;border-radius:21px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountWelcome h1{font-size:37px!important;letter-spacing:-1.3px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountWelcome:before{font-size:66px;right:-4px;bottom:-7px}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountWelcome:after{font-size:90px;right:0;top:-20px}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountQuickGrid{grid-template-columns:1fr!important;gap:8px!important;margin-bottom:13px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountQuick{grid-template-columns:43px minmax(0,1fr)!important;min-height:70px!important;padding:12px 14px!important;border-radius:16px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountQuick>span{width:43px!important;height:43px!important;border-radius:13px!important;font-size:20px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountQuick b{font-size:10px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountQuick small{font-size:10px!important;margin-top:3px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountSection{padding:16px 12px!important;border-radius:18px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .sectionTop{align-items:flex-start!important;gap:8px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .sectionTop h2{font-size:25px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .sectionAction{font-size:8px!important;padding:8px 9px!important;white-space:nowrap}
+ .accountWrap:has(#accountArea:not(.hidden)) .orderCard{padding:14px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .orderTop{display:block!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .orderBadge{margin-top:8px}
+ .accountWrap:has(#accountArea:not(.hidden)) .orderBottom{gap:12px;align-items:flex-start!important}
+}
+@media(prefers-reduced-motion:reduce){.accountWrap:has(#accountArea:not(.hidden)) *{transition:none!important}}
+</style>
+
 </head>
 <body>
 <div class="accountWrap"><div class="accountCard">

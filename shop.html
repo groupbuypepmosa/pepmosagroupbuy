@@ -1289,15 +1289,18 @@ header{position:sticky!important;top:0;z-index:100!important;min-height:70px!imp
 #productGrid .pepSelectVariant:focus-visible{outline:3px solid #f0a5ca;outline-offset:3px}
 @media(max-width:900px){.pepSortWrap{justify-content:space-between}.pepSortWrap select{flex:1;max-width:none}}
 @media(max-width:620px){.pepSortWrap{width:100%;box-sizing:border-box}.pepSortWrap select{min-height:43px}.pepCatalogIntro{align-items:stretch;flex-direction:column}}
-</style>\n<style id="pepmosa-sort-visibility-fix">
-/* Keep search and sorting controls visible and usable at every width */
-#products .sectionHead{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(220px,360px)!important;align-items:end!important}
-#products .sectionHead>div:first-child{grid-column:1;grid-row:1}
-#products .pepSearchWrap{grid-column:2;grid-row:1;width:100%!important;min-width:0!important}
-#products .pepSortWrap{grid-column:1/-1;grid-row:2;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:12px!important;margin-top:4px!important;padding:10px 12px!important;border:1px solid #efd6e3!important;border-radius:15px!important;background:rgba(255,255,255,.78)!important;box-sizing:border-box!important}
-#products .pepSortWrap span{font-size:9px!important;font-weight:900!important;letter-spacing:.14em!important;color:#a35a7d!important}
-#products .pepSortWrap select{display:block!important;visibility:visible!important;opacity:1!important;min-width:180px!important;min-height:42px!important;border:1px solid #e8c7d9!important;border-radius:11px!important;background:#fff!important;color:#56364a!important;padding:0 12px!important;font-size:12px!important}
-@media(max-width:620px){#products .sectionHead{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}#products .sectionHead>div:first-child,#products .pepSearchWrap,#products .pepSortWrap{grid-column:1;grid-row:auto}#products .pepSortWrap{justify-content:space-between!important;margin-top:0!important}#products .pepSortWrap select{flex:1;min-width:0!important;max-width:70%!important}}
+</style>\n<style id="pepmosa-search-visibility-fix">
+/* Make the product search unmistakable and full-width, not hidden beside the title. */
+#products .sectionHead{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:13px!important;align-items:stretch!important;margin:28px 0 20px!important}
+#products .sectionHead>div:first-child{grid-column:1!important;grid-row:1!important}
+#products .pepSearchWrap{grid-column:1!important;grid-row:2!important;display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;min-width:0!important;max-width:none!important;position:relative!important;z-index:5!important}
+#products #search{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;max-width:none!important;min-width:0!important;min-height:56px!important;box-sizing:border-box!important;padding:0 48px 0 48px!important;border:2px solid #e7b8d1!important;border-radius:17px!important;background:#fff!important;color:#43293a!important;font-size:16px!important;box-shadow:0 8px 24px rgba(170,62,122,.10)!important}
+#products #search::placeholder{color:#9b7b8c!important;opacity:1!important}
+#products .pepSearchIcon{left:16px!important;z-index:6!important;font-size:25px!important;color:#c43c83!important}
+#products .pepSearchClear{z-index:7!important}
+#products .pepSortWrap{grid-column:1!important;grid-row:3!important;display:flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;width:100%!important;box-sizing:border-box!important;margin:0!important;padding:10px 12px!important;border:1px solid #efd6e3!important;border-radius:15px!important;background:rgba(255,255,255,.85)!important}
+#products .pepSortWrap span{font-size:10px!important;font-weight:900!important;letter-spacing:.14em!important;color:#a35a7d!important}
+#products .pepSortWrap select{display:block!important;visibility:visible!important;opacity:1!important;flex:0 1 260px!important;min-width:0!important;min-height:43px!important;border:1px solid #e8c7d9!important;border-radius:11px!important;background:#fff!important;color:#56364a!important;padding:0 12px!important;font-size:13px!important}
 </style>
 </head>
 

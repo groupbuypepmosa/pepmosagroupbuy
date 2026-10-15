@@ -1380,16 +1380,27 @@ header{position:sticky!important;top:0;z-index:100!important;min-height:70px!imp
   </div>
 </section>
 
+
+<style id="pep-search-above-products-style">
+.pepSearchAboveProducts{display:block!important;visibility:visible!important;opacity:1!important;position:relative;z-index:5;width:min(100%,900px);margin:24px auto 22px;padding:20px 22px;box-sizing:border-box;border:1px solid #efc9dd;border-radius:22px;background:linear-gradient(120deg,#fff 0%,#fff3f9 68%,#f8f0ff 100%);box-shadow:0 12px 30px rgba(143,61,106,.09)}
+.pepSearchAboveLabel{font-size:11px;font-weight:900;letter-spacing:.16em;color:#a84d7a;margin:0 0 10px 2px}
+.pepSearchAboveProducts .pepSearchWrap{display:flex!important;visibility:visible!important;opacity:1!important;width:100%;max-width:none;min-width:0;box-sizing:border-box}
+.pepSearchAboveProducts #search{display:block!important;visibility:visible!important;opacity:1!important;flex:1;min-width:0;width:100%;height:52px;box-sizing:border-box;font-size:16px}
+@media(max-width:620px){.pepSearchAboveProducts{margin:18px 0;padding:15px 13px;border-radius:17px}.pepSearchAboveProducts #search{height:48px}}
+</style>
 <section id="products">
-  <div class="sectionHead">
-    <div>
-      <div class="eyebrow">AVAILABLE NOW</div>
-      <h2>PRODUCTS</h2>
-    </div>
+  <div class="pepSearchAboveProducts">
+    <div class="pepSearchAboveLabel">FIND YOUR PRODUCT</div>
     <div class="pepSearchWrap">
       <span class="pepSearchIcon">⌕</span>
       <input id="search" class="search" placeholder="Search products…" oninput="window.renderProducts();pepSyncSearchClear()">
       <button id="pepSearchClear" class="pepSearchClear" type="button" onclick="document.getElementById('search').value='';window.renderProducts();pepSyncSearchClear()" aria-label="Clear search">×</button>
+    </div>
+  </div>
+  <div class="sectionHead">
+    <div>
+      <div class="eyebrow">AVAILABLE NOW</div>
+      <h2>PRODUCTS</h2>
     </div>
     <label class="pepSortWrap"><span>SORT BY</span><select id="pepProductSort" aria-label="Sort products" onchange="window.renderProducts()"><option value="featured">Featured</option><option value="name">Name A–Z</option><option value="price-low">Price: Low to high</option><option value="price-high">Price: High to low</option></select></label>
   </div>

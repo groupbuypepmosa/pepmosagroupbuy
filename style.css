@@ -140,3 +140,72 @@ body:after{
 }
 
 /* deploy refresh: restore stable main revision */
+
+
+/* =========================================================
+   PEPMOSA WINE & ROSE — brand theme
+   Visual layer only; preserves existing flows and behavior.
+   ========================================================= */
+:root{
+  --pep-wine:#54263f;
+  --pep-wine-deep:#351b2c;
+  --pep-rose:#c45b83;
+  --pep-rose-light:#e9a5bf;
+  --pep-blush:#fff3f7;
+  --pep-ivory:#fffafd;
+  --pep-line:#ead0dc;
+  --pep-muted:#806a77;
+  --pep-shadow:0 18px 48px rgba(84,38,63,.10);
+}
+body{
+  background:
+    radial-gradient(circle at 8% 8%,rgba(233,165,191,.20),transparent 27%),
+    radial-gradient(circle at 94% 18%,rgba(196,91,131,.10),transparent 25%),
+    linear-gradient(140deg,#fffafd 0%,#fff3f7 55%,#f8eef4 100%)!important;
+  color:var(--pep-wine-deep)!important;
+}
+body:before{
+  opacity:.22!important;
+  background-image:radial-gradient(rgba(255,255,255,.95) 1.4px,transparent 1.4px)!important;
+}
+header,.siteHeader,.navBar{
+  background:rgba(255,250,253,.94)!important;
+  border-color:var(--pep-line)!important;
+  box-shadow:0 8px 28px rgba(84,38,63,.045)!important;
+}
+a{color:var(--pep-rose)}
+button,.btn,.button{
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease!important;
+}
+button:not(.secondary):not(.tab):not(.navLink),.btn:not(.secondary),.button:not(.secondary){
+  background:linear-gradient(120deg,#b94c78 0%,#d4779b 100%)!important;
+  border-color:transparent!important;
+  box-shadow:0 9px 22px rgba(148,54,95,.17)!important;
+}
+button:not(:disabled):hover,.btn:not(:disabled):hover,.button:not(:disabled):hover{
+  transform:translateY(-1px);
+}
+input,select,textarea{
+  border-color:#e6c8d6!important;
+  border-radius:13px!important;
+  background-color:rgba(255,255,255,.92)!important;
+  color:var(--pep-wine-deep)!important;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none!important;
+  border-color:var(--pep-rose)!important;
+  box-shadow:0 0 0 3px rgba(196,91,131,.13)!important;
+}
+.card,.panel,.notice,.accountCard,.accountPanel,.productCard,.product-card{
+  border-color:var(--pep-line)!important;
+}
+.notice{
+  border-radius:16px!important;
+}
+.badge,.pill,.statusBadge{
+  letter-spacing:.035em;
+}
+::selection{background:#f1c2d3;color:#351b2c}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}

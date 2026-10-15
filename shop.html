@@ -1352,7 +1352,13 @@ body{background:radial-gradient(circle at 8% 8%,rgba(233,165,191,.19),transparen
 .pepInfoKicker{color:#a84b72!important}
 @media(max-width:560px){.pepSearchAboveProducts{background:linear-gradient(120deg,#fff,#fff3f7)!important}}
 </style>
-</head>
+<style id="pep-bigger-shop-logo">
+.pepShopHero{grid-template-columns:minmax(260px,36%) minmax(0,64%)!important}
+.pepShopHero .heroLogo{min-height:255px!important}
+.pepShopHero .heroLogo img{width:min(100%,290px)!important;max-height:270px!important}
+@media(max-width:900px){.pepShopHero{grid-template-columns:minmax(0,1fr)!important}.pepShopHero .heroLogo{min-height:190px!important;height:190px!important}.pepShopHero .heroLogo img{max-height:185px!important;max-width:210px!important}}
+@media(max-width:560px){.pepShopHero .heroLogo{min-height:160px!important;height:160px!important}.pepShopHero .heroLogo img{max-height:155px!important;max-width:175px!important}}
+</style></head>
 
 
 <body>

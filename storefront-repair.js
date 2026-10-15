@@ -134,7 +134,6 @@
       <div class="pepStoreBody">
         <h3>${esc(p.product_name)}</h3>
         <div class="muted">${esc(p.description||'')}</div>
-        <div class="pepSoldForGb"><span>♡ SOLD FOR THIS GB</span><b>${Number(soldByProduct.get(String(p.product_id))||0).toLocaleString('en-PH')}</b></div>
         <div class="pepStoreBottom">
           <div class="pepStarting"><small>${gb?.status==='KIT_COMPLETION'?'KIT COMPLETION':'STARTING AT'}</small><b>${peso(lowest)}</b><span>${gb?.status==='KIT_COMPLETION'?'Select an mg to see its exact remaining vial count':variants.length+' variant'+(variants.length===1?'':'s')+' available'}</span></div>
           <button class="pepFeeBtn pepSelectVariant" type="button" data-product-id="${esc(p.product_id)}">CHOOSE VARIANT</button>

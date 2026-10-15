@@ -1,32 +1,96 @@
-/* PEPMOSA luxury pink/wine homepage refresh */
-:root{--pep-wine:#87334f;--pep-rose:#c84e76;--pep-blush:#fff1f6;--pep-ink:#482737}
-body{background:radial-gradient(circle at 8% 12%,rgba(255,120,174,.22),transparent 28%),radial-gradient(circle at 88% 18%,rgba(202,124,167,.18),transparent 30%),linear-gradient(135deg,#fff8fb 0%,#fff0f6 55%,#f9edf4 100%)!important;color:var(--pep-ink)}
-body:before{background-size:44px 44px;opacity:.3}
-.pepAnnouncement{background:linear-gradient(100deg,#733047,#a54160 55%,#c05a75)!important;color:#fff!important;letter-spacing:.06em}
-header{background:linear-gradient(105deg,#773149,#9b405d 55%,#b95470)!important;border:0!important;box-shadow:0 10px 30px rgba(103,35,63,.18)!important}
-header .brand,header .brand span,header .nav a{color:#fff!important}
-header .pepAuthLogin{color:#963c5a!important;background:#fff6fa!important;border-color:#f4c7d8!important}
-header .pepAuthSignup{color:#fff!important;background:linear-gradient(135deg,#e67b9c,#c63f6d)!important;border-color:#ef9bb6!important}
-header .cart{background:#fff2f7!important;color:#913652!important;border:1px solid #f4c7d8!important;border-radius:999px!important}
-main.wrap{max-width:1440px!important;padding-top:26px!important}
-main.wrap>.hero{grid-template-columns:minmax(0,1.02fr) minmax(390px,.98fr)!important;gap:12px!important;min-height:600px!important;padding:38px!important;border-radius:34px!important;border:1px solid rgba(198,78,118,.22)!important;background:radial-gradient(circle at 10% 8%,rgba(255,190,211,.62),transparent 36%),linear-gradient(135deg,rgba(255,255,255,.97),rgba(255,239,246,.96) 60%,rgba(250,233,243,.97))!important;box-shadow:0 28px 85px rgba(126,45,80,.14),inset 0 1px 0 #fff!important;overflow:hidden!important}
-main.wrap>.hero:before{width:480px!important;height:480px!important;left:-190px!important;top:-230px!important;background:rgba(231,99,149,.13)!important}
-main.wrap>.hero .heroLogo{min-height:440px!important;padding:14px!important}
-main.wrap>.hero .heroLogo img{max-width:680px!important;max-height:460px!important;filter:drop-shadow(0 20px 24px rgba(119,47,76,.15))!important}
-main.wrap>.hero .gbPanel{align-self:center!important;padding:34px 32px!important;border:1px solid rgba(255,255,255,.95)!important;border-radius:30px!important;background:rgba(255,255,255,.72)!important;backdrop-filter:blur(18px)!important;box-shadow:0 18px 54px rgba(120,48,79,.12),inset 0 1px 0 #fff!important;text-align:left!important}
-main.wrap>.hero .gbPanel>.eyebrow{color:#bd4a72!important;letter-spacing:.22em!important;font-size:10px!important;font-weight:900!important}
-main.wrap>.hero .gbPanel h1{font-family:Georgia,'Times New Roman',serif!important;font-size:clamp(40px,4.3vw,62px)!important;line-height:.99!important;letter-spacing:-1.8px!important;color:#733047!important;margin:13px 0 16px!important}
-main.wrap>.hero .gbPanel h1 span{color:#c43e6b!important}
-main.wrap>.hero .gbPanel>.muted{color:#795765!important;font-size:14px!important;line-height:1.8!important}
-main.wrap>.hero #gbStatus{margin-top:18px!important;border-radius:20px!important}
-main.wrap>.hero .pepHomeAuthCTA{margin-top:18px!important;padding:22px!important;border-radius:22px!important;border:1px solid #f0c8d8!important;background:linear-gradient(135deg,#fff9fc,#fff0f6)!important;box-shadow:0 10px 28px rgba(166,65,104,.08)!important}
-main.wrap>.hero .pepHomeAuthTitle{color:#963653!important;letter-spacing:.14em!important}
-main.wrap>.hero .pepHomeAuthSub{color:#896775!important;line-height:1.6!important}
-main.wrap>.hero .pepHomeLoginBtn,main.wrap>.hero .pepHomeSignupBtn{border-radius:999px!important;min-height:48px!important}
-main.wrap>.hero .pepHomeLoginBtn{background:#fff!important;color:#a33c60!important;border:1px solid #e8b4c8!important}
-main.wrap>.hero .pepHomeSignupBtn{background:linear-gradient(110deg,#8b344f,#d64d78)!important;color:#fff!important;box-shadow:0 10px 24px rgba(162,54,91,.2)!important}
-main.wrap>.hero .pepHomeShopNow{border-radius:999px!important;background:linear-gradient(110deg,#7e304b,#c74370)!important;box-shadow:0 12px 28px rgba(156,49,87,.2)!important}
-.pepHomeUpdate,.pepWhyP,.pepLatestProof,.pepHomeTrustLite,.pepHomeCommunityCTA{border-radius:26px!important;border-color:#f0d0de!important;box-shadow:0 14px 38px rgba(117,47,78,.07)!important}
-.pepWhyHead h2,.pepLatestProofTop h2,.pepHomeCommunityCTA h2{font-family:Georgia,'Times New Roman',serif!important;color:#7e304b!important}
-@media(max-width:900px){main.wrap>.hero{grid-template-columns:1fr!important;min-height:0!important;padding:22px!important;gap:0!important}main.wrap>.hero .heroLogo{min-height:260px!important}main.wrap>.hero .heroLogo img{max-height:280px!important}main.wrap>.hero .gbPanel{padding:25px 20px!important;text-align:center!important}main.wrap>.hero .gbPanel h1{font-size:clamp(38px,9vw,54px)!important}}
-@media(max-width:560px){main.wrap{padding:14px 12px 100px!important}main.wrap>.hero{padding:13px!important;border-radius:25px!important}main.wrap>.hero .heroLogo{min-height:225px!important;height:225px!important}main.wrap>.hero .gbPanel{padding:21px 15px!important;border-radius:22px!important}main.wrap>.hero .pepHomeAuthCTA{padding:17px!important}main.wrap>.hero .pepHomeAuthBtns{gap:9px!important}main.wrap>.hero .pepHomeAuthBtns a{flex:1!important;min-width:0!important;font-size:10px!important}}
+/* Complete PEPMOSA homepage redesign — blush, rose and wine */
+:root{--wine:#743047;--wine2:#8c3854;--rose:#c84e76;--pink:#f8dce7;--ink:#482737;--muted:#8b6b79;--line:#f0d5e0}
+html{scroll-behavior:smooth}
+body{margin:0!important;color:var(--ink)!important;background:radial-gradient(ellipse at 8% 10%,rgba(255,172,202,.28),transparent 30%),radial-gradient(ellipse at 92% 26%,rgba(221,174,203,.24),transparent 28%),linear-gradient(140deg,#fff9fc,#fff0f6 55%,#f8edf4)!important}
+body:before{background-image:radial-gradient(rgba(178,82,121,.12) 1px,transparent 1px)!important;background-size:30px 30px!important;opacity:.24!important;z-index:0!important}
+.pepAnnouncement{position:relative!important;z-index:30!important;background:linear-gradient(100deg,#603047,#8e3a56,#b95273)!important;color:#fff!important;letter-spacing:.1em!important;font-size:10px!important}
+header{position:relative!important;z-index:30!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:16px!important;padding:16px clamp(18px,4vw,58px)!important;background:rgba(255,250,252,.88)!important;border-bottom:1px solid rgba(210,147,173,.26)!important;box-shadow:0 8px 32px rgba(104,45,69,.07)!important;backdrop-filter:blur(18px)!important}
+header .brand,header .brand span{color:var(--wine)!important;font-weight:950!important;letter-spacing:.1em!important}
+header .brand img{width:44px!important;height:40px!important;object-fit:contain!important}
+header .nav{margin-left:auto!important}
+header .pepAuthLinks{gap:8px!important}
+header .pepAuthLinks>a{border-radius:999px!important;min-height:40px!important;padding:0 17px!important;font-size:9px!important;letter-spacing:.1em!important}
+header .pepAuthLogin{background:#fff!important;color:var(--wine)!important;border:1px solid #e8b9ca!important}
+header .pepAuthSignup{background:linear-gradient(110deg,#8b344f,#cb4a73)!important;color:#fff!important;border:1px solid #cb4a73!important}
+header .cart{border-radius:999px!important;background:#fff!important;color:var(--wine)!important;border:1px solid #edcad8!important;padding:11px 16px!important}
+main.wrap.pepHomeRedesigned{position:relative!important;z-index:1!important;max-width:1320px!important;width:calc(100% - 48px)!important;margin:0 auto!important;padding:32px 0 26px!important}
+.pepWelcomeHero{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1.03fr) minmax(390px,.97fr);gap:clamp(20px,4vw,56px);align-items:stretch;overflow:hidden;padding:clamp(24px,4vw,54px);border:1px solid rgba(209,132,163,.28);border-radius:36px;background:linear-gradient(125deg,rgba(255,255,255,.94),rgba(255,239,246,.96) 54%,rgba(248,230,240,.96));box-shadow:0 28px 80px rgba(112,43,72,.12),inset 0 1px 0 #fff}
+.pepWelcomeVisual{position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:510px;padding:30px 16px;text-align:center;overflow:hidden;border-radius:28px;background:radial-gradient(ellipse at 50% 45%,rgba(255,255,255,.97),rgba(255,240,247,.6) 55%,transparent 78%)}
+.pepWelcomeVisual:after{content:"";position:absolute;inset:12%;border:1px solid rgba(202,100,142,.18);border-radius:48% 52% 45% 55%;transform:rotate(-14deg);z-index:-1}
+.pepLuxuryOrb{position:absolute;border-radius:50%;filter:blur(2px);z-index:-1;animation:pepFloat 9s ease-in-out infinite}
+.pepOrbOne{width:270px;height:270px;top:4%;left:-8%;background:radial-gradient(circle,rgba(244,169,196,.32),transparent 70%)}
+.pepOrbTwo{width:320px;height:320px;right:-12%;bottom:0;background:radial-gradient(circle,rgba(207,142,181,.25),transparent 70%);animation-delay:-4s}
+@keyframes pepFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-13px)}}
+.pepWelcomeBrand{display:flex;align-items:center;gap:10px;color:var(--wine);font-family:Georgia,serif;font-size:clamp(25px,3vw,39px);font-weight:700;letter-spacing:.15em}
+.pepCrown{color:#bd7894;font-size:38px}
+.pepWelcomeLogo{display:block;width:min(100%,510px);height:260px;object-fit:contain;filter:drop-shadow(0 18px 24px rgba(108,47,72,.14));mix-blend-mode:multiply}
+.pepWelcomeTagline{color:#b44b71;font-size:9px;font-weight:950;letter-spacing:.32em;margin-top:7px}
+.pepWelcomeCopy{max-width:400px;color:#896b78;font-family:Georgia,serif;font-size:16px;line-height:1.8}
+.pepWelcomePills{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:14px}
+.pepWelcomePills span{padding:9px 11px;border:1px solid #efd4df;border-radius:999px;background:rgba(255,255,255,.7);color:#9c5a74;font-size:8px;font-weight:900;letter-spacing:.08em}
+.pepWelcomeAccess{position:relative;display:flex;flex-direction:column;justify-content:center;padding:clamp(10px,2vw,28px) 0}
+.pepAccessKicker{display:flex;align-items:center;gap:9px;color:#b24c72;font-size:9px;font-weight:950;letter-spacing:.17em;line-height:1.6}
+.pepLiveDot{width:7px;height:7px;border-radius:50%;background:#ce4f7b;box-shadow:0 0 0 5px #f8dfe8}
+.pepWelcomeAccess h1{margin:18px 0 13px;color:var(--wine);font-family:Georgia,'Times New Roman',serif;font-size:clamp(40px,4.5vw,65px);font-weight:500;letter-spacing:-2px;line-height:.99}
+.pepWelcomeAccess h1 em,.pepSectionHeading h2 em{color:#c44c75;font-weight:500}
+.pepAccessIntro{max-width:420px;color:#876b78;font-size:13px;line-height:1.8;margin:0 0 22px}
+.pepAccessCard{padding:clamp(18px,2.4vw,29px);border:1px solid rgba(255,255,255,.96);border-radius:26px;background:rgba(255,255,255,.78);box-shadow:0 18px 48px rgba(126,48,79,.12),inset 0 1px 0 #fff;backdrop-filter:blur(16px)}
+.pepAccessCardTop{display:flex;align-items:center;gap:13px;margin-bottom:22px}
+.pepMiniCrown{display:grid;place-items:center;width:47px;height:47px;border-radius:16px;background:#fff0f6;border:1px solid #f1d2df;color:#b74b73;font-size:26px}
+.pepAccessCardTop b{display:block;color:#673047;font-family:Georgia,serif;font-size:20px;font-weight:600}
+.pepAccessCardTop small{display:block;margin-top:4px;color:#9b7b89;font-size:10px}
+.pepAccessPrimary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;padding:0 17px;border-radius:15px;background:linear-gradient(110deg,#733047,#a33f60 58%,#cb4a73);color:white;text-decoration:none;font-size:10px;font-weight:950;letter-spacing:.1em;box-shadow:0 11px 24px rgba(129,47,79,.2);transition:transform .2s,box-shadow .2s}
+.pepAccessPrimary:hover,.pepAccessSecondary:hover{transform:translateY(-2px)}
+.pepAccessPrimary span:first-child{font-size:20px}
+.pepAccessPrimary b{font-size:17px}
+.pepAccessSecondary{display:flex;align-items:center;justify-content:center;gap:10px;min-height:48px;margin-top:10px;border:1px solid #e9c0d0;border-radius:15px;background:#fff;color:#9a3e60;text-decoration:none;font-size:9px;font-weight:950;letter-spacing:.1em;transition:transform .2s}
+.pepAccessDivider{display:flex;align-items:center;gap:10px;margin:22px 0 13px;color:#b18b9b;font-size:8px;font-weight:900;letter-spacing:.16em}
+.pepAccessDivider span{height:1px;flex:1;background:#f0dce5}
+.pepAccessQuick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pepAccessQuick a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:75px;border:1px solid #f1dce5;border-radius:15px;background:#fffafd;color:#8c536b;text-decoration:none;transition:background .2s,transform .2s}
+.pepAccessQuick a:hover{background:#fff0f6;transform:translateY(-2px)}
+.pepAccessQuick span{font-size:20px}.pepAccessQuick b{font-size:8px;letter-spacing:.03em}
+.pepCurrentGB{margin-top:14px;padding:13px 16px;border:1px solid #f0d1df;border-radius:16px;background:rgba(255,255,255,.7);color:#80576a;font-size:11px}
+.pepHeroDecor{position:absolute;z-index:2;pointer-events:none;color:rgba(195,74,116,.25);font-size:38px}
+.pepDecorA{top:25px;right:33px}.pepDecorB{bottom:22px;left:48%;font-size:24px}
+.pepHomeWelcomeStrip{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:20px 0 26px;padding:18px 23px;border:1px solid #f0d7e1;border-radius:20px;background:rgba(255,255,255,.76);box-shadow:0 12px 32px rgba(112,43,72,.05)}
+.pepHomeWelcomeStrip>div{display:flex;align-items:center;gap:13px}.pepStripIcon{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:#fff0f6;color:#bd4c75;font-size:20px}
+.pepHomeWelcomeStrip b{display:block;color:#71364c;font-family:Georgia,serif;font-size:16px}.pepHomeWelcomeStrip small{display:block;margin-top:4px;color:#987b88;font-size:10px}
+.pepHomeWelcomeStrip>a{white-space:nowrap;color:#a33f62;text-decoration:none;font-size:9px;font-weight:950;letter-spacing:.1em}.pepHomeWelcomeStrip>a span{margin-left:9px}
+.pepHomeUpdate{display:flex!important;align-items:center!important;gap:18px!important;margin:0 0 54px!important;padding:24px 28px!important;border:1px solid #efd2df!important;border-radius:24px!important;background:linear-gradient(110deg,#fff,#fff4f8)!important;box-shadow:0 14px 36px rgba(112,43,72,.06)!important}
+.pepHomeUpdateIcon{display:grid;place-items:center;flex:0 0 52px;width:52px;height:52px;border-radius:18px;background:linear-gradient(135deg,#fce4ed,#fff);color:#b94972;font-size:23px}
+.pepHomeUpdateText{flex:1}.pepHomeUpdateText .eyebrow{color:#b34c72!important;font-size:8px!important;letter-spacing:.18em!important}.pepHomeUpdateText h2{margin:5px 0;color:#71364c!important;font-family:Georgia,serif!important;font-size:22px!important}.pepHomeUpdateText p{margin:0;color:#8e7180!important;font-size:11px!important;line-height:1.7!important}
+.pepHomeUpdate>a{color:#a43f62!important;text-decoration:none!important;white-space:nowrap;font-size:9px!important;font-weight:950!important;letter-spacing:.08em!important}
+.pepHomeSection{margin:0 0 58px}
+.pepSectionHeading{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;margin-bottom:23px}
+.pepSectionEyebrow{color:#b34c72;font-size:9px;font-weight:950;letter-spacing:.22em}
+.pepSectionHeading h2{margin:10px 0 0;color:#71364c;font-family:Georgia,serif;font-size:clamp(31px,3.4vw,46px);font-weight:500;line-height:1.08;letter-spacing:-1px}
+.pepSectionHeading>p{max-width:320px;margin:0 0 4px;color:#8d7180;font-size:12px;line-height:1.8}
+.pepHomeFeatureGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.pepFeatureCard{position:relative;display:flex;flex-direction:column;min-height:255px;padding:23px 20px;border:1px solid #efd5e0;border-radius:24px;background:rgba(255,255,255,.8);color:var(--ink);text-decoration:none;box-shadow:0 12px 34px rgba(112,43,72,.055);transition:transform .22s,box-shadow .22s,border-color .22s;overflow:hidden}
+.pepFeatureCard:hover{transform:translateY(-5px);border-color:#dfa9bf;box-shadow:0 20px 42px rgba(112,43,72,.12)}
+.pepFeatureShop{background:linear-gradient(150deg,#fff,#fff0f6)}
+.pepFeatureNo{color:#b38a9a;font-size:8px;font-weight:950;letter-spacing:.15em}
+.pepFeatureIcon{display:grid;place-items:center;width:51px;height:51px;margin:23px 0 17px;border-radius:17px;background:#fff0f6;border:1px solid #f0d3df;color:#b64a72;font-size:24px}
+.pepFeatureCard h3{margin:0;color:#71364c;font-family:Georgia,serif;font-size:20px;font-weight:600}
+.pepFeatureCard p{margin:9px 0 24px;color:#8c7180;font-size:10px;line-height:1.75}
+.pepFeatureCard>b{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:14px;border-top:1px solid #f1dce5;color:#a64265;font-size:8px;letter-spacing:.12em}
+.pepFeatureCard>b span{font-size:15px}
+.pepLatestProof{margin:0 0 54px!important;padding:clamp(22px,3.5vw,38px)!important;border:1px solid #efd4df!important;border-radius:30px!important;background:rgba(255,255,255,.82)!important;box-shadow:0 18px 46px rgba(112,43,72,.07)!important}
+.pepLatestProofTop{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:20px!important;margin-bottom:20px!important}
+.pepLatestProofTop h2{margin:8px 0!important;color:#71364c!important;font-family:Georgia,serif!important;font-size:clamp(24px,3vw,34px)!important;font-weight:500!important}
+.pepLatestProofTop p{color:#8d7180!important;font-size:11px!important}
+.pepViewAllProof{padding:12px 15px!important;border:1px solid #e8c1d1!important;border-radius:999px!important;color:#a34062!important;text-decoration:none!important;font-size:8px!important;font-weight:950!important;white-space:nowrap}
+.pepLatestProofCard{border-radius:19px!important;overflow:hidden!important}
+.pepHomeCommunityCTA{display:flex!important;align-items:center!important;gap:22px!important;margin:0 0 35px!important;padding:clamp(24px,4vw,42px)!important;border:1px solid #e6c4d2!important;border-radius:30px!important;background:linear-gradient(115deg,#fff8fb,#f8e8f0 55%,#f2e0ea)!important;box-shadow:0 18px 45px rgba(112,43,72,.07)!important}
+.pepCommunitySeal{display:grid;place-items:center;flex:0 0 64px;width:64px;height:64px;border:1px solid #e5b8cb;border-radius:22px;background:rgba(255,255,255,.75);color:#b64972;font-size:29px}
+.pepHomeCommunityCTA>div:nth-child(2){flex:1}.pepHomeCommunityCTA .eyebrow{color:#b34c72!important;font-size:8px!important;letter-spacing:.18em!important}.pepHomeCommunityCTA h2{margin:8px 0!important;color:#71364c!important;font-family:Georgia,serif!important;font-size:clamp(23px,3vw,35px)!important;font-weight:500!important}.pepHomeCommunityCTA p{margin:0!important;color:#8d7180!important;font-size:11px!important}
+.pepHomeCommunityCTA>a{padding:15px 18px!important;border-radius:999px!important;background:linear-gradient(110deg,#743047,#c34a72)!important;color:#fff!important;text-decoration:none!important;font-size:8px!important;font-weight:950!important;letter-spacing:.08em!important;white-space:nowrap!important}.pepHomeCommunityCTA>a span{margin-left:10px}
+.pepHomeFooter{padding:26px 0 10px;border-top:1px solid #ecd5df;text-align:center;color:#9b7b89}
+.pepFooterBrand{color:#743047;font-family:Georgia,serif;font-size:17px;font-weight:700;letter-spacing:.18em}.pepFooterBrand span{color:#bd7894;font-size:22px;margin-right:7px}
+.pepHomeFooter p{font-size:10px}.pepHomeFooter>div:last-child{font-size:8px;letter-spacing:.18em;margin-top:15px}
+.pepSideRail{border-color:#ecd0dc!important;background:rgba(255,250,253,.9)!important;box-shadow:0 15px 42px rgba(100,48,83,.12)!important}
+.pepSideRail a{color:#86566b!important}.pepSideRail a:hover{color:#c52f80!important;background:#fff0f7!important}
+@media(max-width:1000px){.pepWelcomeHero{grid-template-columns:1fr minmax(330px,.9fr);padding:24px;gap:22px}.pepWelcomeVisual{min-height:450px}.pepWelcomeLogo{height:220px}.pepHomeFeatureGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.pepFeatureCard{min-height:225px}}
+@media(max-width:760px){main.wrap.pepHomeRedesigned{width:calc(100% - 28px)!important;padding:16px 0 24px!important}.pepWelcomeHero{grid-template-columns:1fr;gap:0;padding:13px;border-radius:27px}.pepWelcomeVisual{min-height:310px;padding:19px 10px 10px}.pepWelcomeBrand{font-size:27px}.pepWelcomeLogo{height:165px;max-width:400px}.pepWelcomeCopy{font-size:13px;margin:9px 0}.pepWelcomePills{margin-top:5px}.pepWelcomePills span{font-size:7px;padding:8px}.pepWelcomeAccess{padding:24px 10px 13px}.pepWelcomeAccess h1{font-size:46px;margin:15px 0 11px}.pepAccessIntro{font-size:12px;margin-bottom:17px}.pepAccessCard{padding:19px;border-radius:22px}.pepHeroDecor{display:none}.pepHomeWelcomeStrip{align-items:flex-start;padding:16px;margin:14px 0 22px}.pepHomeWelcomeStrip small{line-height:1.5}.pepHomeWelcomeStrip>a{font-size:8px}.pepHomeUpdate{flex-wrap:wrap!important;padding:18px!important;gap:12px!important;margin-bottom:38px!important}.pepHomeUpdateText{min-width:calc(100% - 70px)}.pepHomeUpdate>a{margin-left:64px}.pepSectionHeading{display:block}.pepSectionHeading>p{margin-top:13px}.pepHomeFeatureGrid{gap:10px}.pepFeatureCard{padding:17px 15px;min-height:220px;border-radius:20px}.pepFeatureIcon{margin:17px 0 13px;width:43px;height:43px}.pepFeatureCard h3{font-size:17px}.pepFeatureCard p{font-size:9px}.pepLatestProof{padding:19px!important;margin-bottom:35px!important}.pepLatestProofTop{align-items:flex-start!important;flex-direction:column!important}.pepHomeCommunityCTA{flex-wrap:wrap!important;gap:15px!important;padding:23px!important}.pepHomeCommunityCTA>div:nth-child(2){flex:1 1 calc(100% - 80px)}.pepHomeCommunityCTA>a{margin-left:79px}.pepSideRail{left:50%!important;right:auto!important;top:auto!important;bottom:10px!important;transform:translateX(-50%)!important;width:min(calc(100vw - 20px),560px)!important;flex-direction:row!important;justify-content:space-around!important;padding:7px!important;gap:1px!important}.pepSideRail a{width:auto!important;flex:1!important;min-height:44px!important}.pepSideRail span{font-size:16px!important}.pepSideRail b{font-size:6px!important}}
+@media(max-width:430px){header{padding:12px 12px!important;gap:7px!important}header .brand img{width:33px!important}header .brand span{font-size:12px!important}header .pepAuthLinks>a{padding:0 9px!important;min-height:34px!important;font-size:7px!important}header .cart{padding:9px!important;font-size:8px!important}main.wrap.pepHomeRedesigned{width:calc(100% - 22px)!important}.pepWelcomeVisual{min-height:280px}.pepWelcomeLogo{height:145px}.pepWelcomePills{gap:5px}.pepWelcomePills span{font-size:6px;letter-spacing:.04em}.pepWelcomeAccess h1{font-size:39px}.pepAccessQuick b{font-size:7px}.pepHomeWelcomeStrip{flex-direction:column}.pepHomeWelcomeStrip>a{margin-left:55px}.pepHomeFeatureGrid{gap:8px}.pepFeatureCard{padding:14px 12px;min-height:220px}.pepFeatureCard h3{font-size:15px}.pepFeatureCard p{font-size:8px}.pepHomeCommunityCTA>a{margin-left:0}.pepSideRail a{flex:0 0 48px!important}}

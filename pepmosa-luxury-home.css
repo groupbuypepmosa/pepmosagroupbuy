@@ -115,3 +115,11 @@ header .pepAuthSignup{background:linear-gradient(110deg,#54263f,#8d4262,#c45b83)
 .pepFeatureCard>b,.pepHomeWelcomeStrip>a,.pepHomeUpdate>a{color:#a84b72!important}
 .pepFeatureCard:hover{border-color:#d5a0b7!important;box-shadow:0 20px 42px rgba(84,38,63,.12)!important}
 @media(prefers-reduced-motion:reduce){.pepLuxuryOrb{animation:none!important}}
+
+
+/* Bigger PEPMOSA brand mark */
+header .brand img{width:58px!important;height:54px!important;flex:0 0 58px!important}
+.pepWelcomeVisual{min-height:540px!important}
+.pepWelcomeLogo{width:min(100%,580px)!important;height:310px!important;max-width:580px!important;filter:drop-shadow(0 20px 28px rgba(84,38,63,.17))!important}
+@media(max-width:900px){.pepWelcomeVisual{min-height:400px!important}.pepWelcomeLogo{height:260px!important;max-width:460px!important}}
+@media(max-width:560px){header .brand img{width:44px!important;height:42px!important;flex-basis:44px!important}.pepWelcomeVisual{min-height:330px!important}.pepWelcomeLogo{height:220px!important;max-width:340px!important}}

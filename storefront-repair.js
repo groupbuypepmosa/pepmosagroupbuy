@@ -83,9 +83,17 @@
     #pepInfoModal .pepInfoBox:before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#29121e,#633047 48%,#b36b88 78%,#edc4d2)!important}
     #pepInfoModal .pepInfoBox.pepOrderingClosedDesign{padding:42px 30px 32px!important;overflow:hidden!important;border:2px solid #e7c08e!important;border-radius:29px!important;background:linear-gradient(145deg,#fffaf4 0%,#fff3ee 62%,#f7e3e7 100%)!important;box-shadow:0 30px 90px rgba(35,7,20,.4),inset 0 0 0 4px rgba(255,255,255,.8)!important}
     #pepInfoModal .pepRoseArtwork{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
-    #pepInfoModal .pepRoseTop,#pepInfoModal .pepRoseBottom{position:absolute;width:150px;height:145px;filter:drop-shadow(0 5px 7px rgba(90,12,40,.2))}
-    #pepInfoModal .pepRoseTop{top:-8px;left:-8px}
-    #pepInfoModal .pepRoseBottom{right:-8px;bottom:-10px}
+    #pepInfoModal .pepRoseTop,#pepInfoModal .pepRoseBottom{position:absolute;width:190px;height:180px;filter:drop-shadow(0 8px 10px rgba(90,12,40,.22))}
+    #pepInfoModal .pepRoseTop{top:-9px;left:-9px}
+    #pepInfoModal .pepRoseBottom{right:-9px;bottom:-10px}
+    #pepInfoModal .pepRoseTop g,#pepInfoModal .pepRoseBottom g{transform-box:fill-box;transform-origin:center}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign{width:min(610px,100%)!important;min-height:0!important;padding:43px 34px 32px!important}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign:before{height:0!important}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign .pepInfoIcon{margin-top:4px!important}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign h2{font-size:clamp(29px,4vw,37px)!important}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign .pepInfoText{font-size:16px!important;line-height:1.7!important;max-width:440px!important}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign .pepFeeBtn{width:min(100%,340px)!important;min-height:58px!important;font-size:19px!important}
+    @media(max-width:560px){#pepInfoModal .pepRoseTop,#pepInfoModal .pepRoseBottom{width:130px;height:125px}#pepInfoModal .pepInfoBox.pepOrderingClosedDesign{padding:37px 20px 27px!important}}
     #pepInfoModal .pepRosePetalOne,#pepInfoModal .pepRosePetalTwo{position:absolute;color:#d58a4b;font-size:22px;opacity:.7}
     #pepInfoModal .pepRosePetalOne{top:82px;left:31%}
     #pepInfoModal .pepRosePetalTwo{right:28%;bottom:15px;color:#d94870;font-size:18px}

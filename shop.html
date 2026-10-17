@@ -3627,5 +3627,30 @@ main.wrap{position:relative;z-index:3}
 })();
 </script>
 
+
+<!-- PEPMOSA FINAL ALERT ROUTER: loaded last so later scripts cannot replace the custom alert -->
+<style id="pepmosa-final-alert-style">
+#pepmosaGlobalPopup{z-index:2147483647!important}
+</style>
+<script id="pepmosa-final-alert-router">
+(function(){
+  const nativeAlert=window.alert.bind(window);
+  function show(message){
+    const msg=String(message==null?'':message);
+    if(typeof window.pepmosaPopup==='function'){
+      let title='PEPMOSA',icon='✦',body=msg;
+      if(/This Group Buy is closed\. Admin Fee payments are no longer accepted\.?/i.test(msg)){
+        title='Ordering Closed';icon='!';
+        body='This Group Buy is closed.\nAdmin Fee payments are no longer accepted.';
+      }else if(/ordering closed/i.test(msg)){
+        title='Ordering Closed';icon='!';
+      }
+      window.pepmosaPopup(body,title,icon);
+    }else nativeAlert(msg);
+  }
+  window.alert=show;
+})();
+</script>
+
 </body>
 </html>

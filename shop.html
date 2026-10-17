@@ -2906,13 +2906,8 @@ load();
 <link rel="stylesheet" href="checkout-design.css?v=20260927-design-only-v1">
 <script src="kit-completion-storefront.js?v=20260904-remove-duplicate-kit-hero-v2"></script>
 
-<!-- PEPMOSA custom popup system: design-only replacement for browser alerts -->
-<style id="pepmosa-popup-style">
-.pepmosa-popup-backdrop{position:fixed;inset:0;background:rgba(36,22,38,.48);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:999999;display:flex;align-items:center;justify-content:center;padding:22px;animation:pepmosaFade .18s ease}.pepmosa-popup{width:min(440px,100%);background:linear-gradient(145deg,#fff,#fff8fc);border:1px solid rgba(213,52,135,.22);border-radius:28px;box-shadow:0 24px 80px rgba(73,28,59,.28);overflow:hidden;animation:pepmosaPop .24s cubic-bezier(.2,.8,.2,1)}.pepmosa-popup-top{height:6px;background:linear-gradient(90deg,#e92c8a,#a44ec1)}.pepmosa-popup-body{padding:26px 28px 24px;text-align:center}.pepmosa-popup-icon{width:58px;height:58px;margin:0 auto 14px;border-radius:19px;display:grid;place-items:center;background:linear-gradient(135deg,#f9d8ea,#efd9fb);color:#c92f82;font-size:27px;font-weight:800}.pepmosa-popup-title{margin:0;color:#3d3942;font-size:21px;font-weight:800;letter-spacing:.02em}.pepmosa-popup-message{margin:10px auto 22px;color:#6f6972;line-height:1.6;font-size:15px;white-space:pre-wrap}.pepmosa-popup-button{border:0;border-radius:14px;padding:13px 34px;min-width:130px;background:linear-gradient(135deg,#df287f,#ad48bd);color:#fff;font-weight:800;letter-spacing:.04em;font-size:14px;box-shadow:0 10px 24px rgba(202,45,132,.25);cursor:pointer}.pepmosa-popup-button:hover{transform:translateY(-1px);filter:brightness(1.04)}@keyframes pepmosaFade{from{opacity:0}to{opacity:1}}@keyframes pepmosaPop{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}@media(max-width:480px){.pepmosa-popup-body{padding:23px 20px 20px}.pepmosa-popup{border-radius:24px}}
-</style>
-<script>
-(function(){function showPepmosaPopup(message){var old=document.getElementById('pepmosa-popup');if(old)old.remove();var wrap=document.createElement('div');wrap.className='pepmosa-popup-backdrop';wrap.id='pepmosa-popup';wrap.innerHTML='<div class="pepmosa-popup" role="dialog" aria-modal="true"><div class="pepmosa-popup-top"></div><div class="pepmosa-popup-body"><div class="pepmosa-popup-icon">✦</div><h3 class="pepmosa-popup-title">PEPMOSA</h3><div class="pepmosa-popup-message"></div><button class="pepmosa-popup-button" type="button">OKAY</button></div></div>';wrap.querySelector('.pepmosa-popup-message').textContent=String(message||'');function close(){wrap.remove();document.removeEventListener('keydown',key)}function key(e){if(e.key==='Escape'||e.key==='Enter')close()}wrap.querySelector('button').addEventListener('click',close);wrap.addEventListener('click',function(e){if(e.target===wrap)close()});document.addEventListener('keydown',key);document.body.appendChild(wrap);setTimeout(function(){var b=wrap.querySelector('button');if(b)b.focus()},0)}window.alert=showPepmosaPopup;window.pepmosaPopup=showPepmosaPopup})();
-</script>
+<!-- Legacy duplicate popup removed. The global popup below is the single alert UI. -->
+
 
 <!-- PEPMOSA FINAL GB STATUS SYNC: database is the single source of truth -->
 <script>
@@ -3225,26 +3220,27 @@ load();
 
 <!-- PEPMOSA GLOBAL POPUP POLISH -->
 <style id="pepmosa-global-popup-style">
-#pepmosaGlobalPopup{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(49,27,45,.65);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+/* PEPMOSA SHOP — SINGLE LUXE WINE & ROSE POPUP */
+#pepmosaGlobalPopup{position:fixed;inset:0;z-index:2147483647;display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;background:rgba(35,14,27,.76);backdrop-filter:blur(15px) saturate(112%);-webkit-backdrop-filter:blur(15px) saturate(112%)}
 #pepmosaGlobalPopup.show{display:flex}
-.pepGlobalPopupCard{position:relative;box-sizing:border-box;width:min(470px,100%);overflow:hidden;border:1px solid #f3c7df;border-radius:32px;background:radial-gradient(circle at 7% 8%,rgba(255,170,211,.30),transparent 34%),radial-gradient(circle at 94% 82%,rgba(238,175,227,.28),transparent 38%),linear-gradient(145deg,#fff,#fff8fc 58%,#ffedf7);box-shadow:0 32px 90px rgba(54,18,43,.34),inset 0 1px 0 #fff;animation:pepPopupIn .28s cubic-bezier(.2,.8,.2,1)}
-.pepGlobalPopupGlow{position:absolute;width:260px;height:260px;right:-85px;top:-125px;border-radius:50%;background:radial-gradient(circle,rgba(229,43,139,.14),transparent 72%);pointer-events:none}
-.pepGlobalPopupCard:before,.pepGlobalPopupCard:after{content:'♡';position:absolute;color:#f1a1c8;opacity:.25;font-size:86px;pointer-events:none}
-.pepGlobalPopupCard:before{top:-35px;left:13px;transform:rotate(-16deg)}
-.pepGlobalPopupCard:after{right:-12px;bottom:45px;transform:rotate(16deg)}
-.pepGlobalPopupBody{position:relative;padding:32px 30px 27px;text-align:center}
-.pepGlobalPopupEyebrow{color:#c72d80;font-size:10px;letter-spacing:.21em;font-weight:950;margin-bottom:13px}
-.pepGlobalPopupMark{position:relative;width:74px;height:74px;display:grid;place-items:center;margin:0 auto 16px;border-radius:24px;background:linear-gradient(135deg,#f349a0,#bb35a8);color:#fff;font-size:35px;font-weight:900;box-shadow:0 12px 28px rgba(205,43,139,.26)}
-.pepGlobalPopupMark:after{content:'✦';position:absolute;font-size:18px;color:#f2a3cb;right:-18px;top:-9px}
-.pepGlobalPopupTitle{margin:0 0 10px;color:#482d3c;font-size:29px;line-height:1.12;font-weight:950;letter-spacing:-.6px}
-.pepGlobalPopupText{margin:0 auto;color:#785e6d;line-height:1.7;font-size:14px;white-space:pre-line;max-width:370px}
-.pepGlobalPopupActions{display:flex;justify-content:center;margin-top:24px}
-.pepGlobalPopupBtn{width:min(240px,100%);border:0;border-radius:16px;padding:15px 24px;background:linear-gradient(135deg,#ee3195,#bb37ac);color:#fff;font-weight:950;letter-spacing:.06em;font-size:13px;cursor:pointer;box-shadow:0 12px 26px rgba(205,43,139,.25)}
-.pepGlobalPopupBtn:hover{filter:brightness(1.05);transform:translateY(-1px)}
-.pepGlobalPopupCard.is-payment-success .pepGlobalPopupTitle{color:#c3277a}
-.pepGlobalPopupCard.is-payment-success .pepGlobalPopupText{max-width:360px}
-@keyframes pepPopupIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
-@media(max-width:560px){#pepmosaGlobalPopup{padding:14px}.pepGlobalPopupCard{border-radius:27px}.pepGlobalPopupBody{padding:28px 20px 24px}.pepGlobalPopupTitle{font-size:26px}.pepGlobalPopupBtn{width:100%}}
+#pepmosaGlobalPopup .pepGlobalPopupCard{position:relative;isolation:isolate;box-sizing:border-box;width:min(480px,100%);max-height:calc(100dvh - 40px);overflow:auto;border:1px solid rgba(255,255,255,.92);border-radius:30px;background:linear-gradient(145deg,#fffdfd 0%,#fff9fc 53%,#f7eaf1 100%);box-shadow:0 36px 100px rgba(24,8,18,.42),0 8px 30px rgba(84,38,63,.16);animation:pepPopupLuxeIn .28s cubic-bezier(.2,.8,.2,1) both}
+#pepmosaGlobalPopup .pepGlobalPopupCard:before{content:"";position:absolute;z-index:2;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#321626 0%,#65304b 45%,#b66a88 78%,#edc3d2 100%)}
+#pepmosaGlobalPopup .pepGlobalPopupGlow{position:absolute;z-index:-1;width:270px;height:270px;right:-100px;top:-145px;border-radius:50%;background:radial-gradient(circle,rgba(196,91,131,.2),rgba(233,165,191,.07) 45%,transparent 72%);pointer-events:none}
+#pepmosaGlobalPopup .pepGlobalPopupCard:after{content:"♡";position:absolute;right:18px;bottom:35px;color:rgba(166,77,112,.07);font-family:Georgia,serif;font-size:100px;line-height:1;pointer-events:none}
+#pepmosaGlobalPopup .pepGlobalPopupBody{position:relative;z-index:1;padding:36px 36px 32px;text-align:center}
+#pepmosaGlobalPopup .pepGlobalPopupEyebrow{margin:0 0 20px;color:#a64d70;font-size:10px;line-height:1.4;letter-spacing:.24em;font-weight:900;text-transform:uppercase}
+#pepmosaGlobalPopup .pepGlobalPopupMark{position:relative;display:grid;place-items:center;width:72px;height:72px;margin:0 auto 20px;border:1px solid rgba(255,255,255,.45);border-radius:24px;background:linear-gradient(145deg,#321626 0%,#63304a 55%,#a95175 100%);color:#fffafd;font-size:34px;font-weight:700;box-shadow:0 14px 30px rgba(84,38,63,.25),inset 0 1px 0 rgba(255,255,255,.2)}
+#pepmosaGlobalPopup .pepGlobalPopupMark:after{content:"✦";position:absolute;right:-13px;top:-10px;color:#c98ba4;font-size:16px}
+#pepmosaGlobalPopup .pepGlobalPopupTitle{margin:0 0 12px;color:#492338;font-family:Georgia,"Times New Roman",serif;font-size:30px;line-height:1.12;font-weight:700;letter-spacing:-.6px}
+#pepmosaGlobalPopup .pepGlobalPopupText{max-width:365px;margin:0 auto;color:#806a77;font-size:14px;line-height:1.8;white-space:pre-line}
+#pepmosaGlobalPopup .pepGlobalPopupActions{display:flex;justify-content:center;margin-top:27px}
+#pepmosaGlobalPopup .pepGlobalPopupBtn{width:min(180px,100%);min-height:49px;border:1px solid rgba(255,255,255,.22);border-radius:15px;padding:14px 26px;background:linear-gradient(115deg,#54263f 0%,#783854 58%,#a94d73 100%);color:#fffafd;font-size:12px;font-weight:900;letter-spacing:.15em;cursor:pointer;box-shadow:0 12px 25px rgba(84,38,63,.24),inset 0 1px 0 rgba(255,255,255,.13);transition:transform .18s ease,filter .18s ease,box-shadow .18s ease}
+#pepmosaGlobalPopup .pepGlobalPopupBtn:hover{transform:translateY(-2px);filter:brightness(1.07);box-shadow:0 16px 30px rgba(84,38,63,.29)}
+#pepmosaGlobalPopup .pepGlobalPopupBtn:focus-visible{outline:3px solid rgba(196,91,131,.4);outline-offset:3px}
+#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success .pepGlobalPopupTitle{color:#54263f}
+@keyframes pepPopupLuxeIn{from{opacity:0;transform:translateY(12px) scale(.975)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:560px){#pepmosaGlobalPopup{padding:14px}#pepmosaGlobalPopup .pepGlobalPopupCard{width:100%;border-radius:25px;max-height:calc(100dvh - 28px)}#pepmosaGlobalPopup .pepGlobalPopupBody{padding:30px 22px 25px}#pepmosaGlobalPopup .pepGlobalPopupEyebrow{margin-bottom:17px}#pepmosaGlobalPopup .pepGlobalPopupMark{width:66px;height:66px;border-radius:22px;margin-bottom:18px}#pepmosaGlobalPopup .pepGlobalPopupTitle{font-size:27px}#pepmosaGlobalPopup .pepGlobalPopupActions{margin-top:23px}#pepmosaGlobalPopup .pepGlobalPopupBtn{width:100%}}
+@media(prefers-reduced-motion:reduce){#pepmosaGlobalPopup .pepGlobalPopupCard,#pepmosaGlobalPopup .pepGlobalPopupBtn{animation:none;transition:none}}
 </style>
 <script id="pepmosa-global-popup-script">
 (function(){
@@ -3295,9 +3291,7 @@ load();
 <!-- Kit Completion is owned by storefront-repair.js; redundant no-op observer removed. -->
 
 
-<style id="pepmosa-popup-unified-style">
-#pepmosaGlobalPopup{z-index:2147483647!important}
-</style>
+<!-- Popup z-index is defined in the canonical global popup stylesheet. -->
 <script id="pepmosa-popup-unified-script">
 (function(){
   const nativePrompt=window.prompt.bind(window);

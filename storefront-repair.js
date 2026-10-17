@@ -77,8 +77,18 @@
     .pepInfoActions .pepFeeBtn{min-width:150px;min-height:48px;border-radius:15px}
     @media(max-width:560px){.pepInfoBox{padding:28px 20px 23px;border-radius:25px}.pepInfoBox h2{font-size:27px}.pepInfoText{font-size:12px}}
 
-    /* PEPMOSA POPUP REFINEMENT — compact, readable, mobile-safe */
-    .pepFeeModal,#pepInfoModal,#pepSiteNoticeModal{padding:18px!important;box-sizing:border-box}
+    /* PEPMOSA WINE & ROSE — Ordering Closed popup, cache-busted storefront repair */
+    #pepInfoModal{z-index:2147483647!important;background:rgba(28,10,20,.78)!important;backdrop-filter:blur(16px) saturate(115%)!important;-webkit-backdrop-filter:blur(16px) saturate(115%)!important}
+    #pepInfoModal .pepInfoBox{position:relative!important;overflow:hidden!important;width:min(440px,100%)!important;padding:38px 30px 30px!important;border:1px solid rgba(255,255,255,.9)!important;border-radius:30px!important;background:linear-gradient(145deg,#fffdfd 0%,#fff8fb 54%,#f4e5ec 100%)!important;box-shadow:0 35px 100px rgba(14,3,9,.45),0 0 0 1px rgba(255,255,255,.18)!important}
+    #pepInfoModal .pepInfoBox:before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#29121e,#633047 48%,#b36b88 78%,#edc4d2)!important}
+    #pepInfoModal .pepInfoIcon{width:70px!important;height:70px!important;margin:0 auto 18px!important;border-radius:23px!important;background:linear-gradient(145deg,#2e1422 0%,#613047 58%,#a65375 100%)!important;color:#fff9fc!important;font-size:32px!important;box-shadow:0 14px 30px rgba(66,27,47,.27)!important}
+    #pepInfoModal .pepInfoKicker{color:#a64d70!important;letter-spacing:.24em!important}
+    #pepInfoModal .pepInfoBox h2{font-family:Georgia,"Times New Roman",serif!important;font-size:clamp(27px,4vw,32px)!important;color:#492338!important;letter-spacing:-.6px!important}
+    #pepInfoModal .pepInfoText{max-width:360px!important;color:#806a77!important;font-size:14px!important;line-height:1.8!important}
+    #pepInfoModal .pepInfoActions{margin-top:27px!important}
+    #pepInfoModal .pepInfoActions .pepFeeBtn{min-width:170px!important;min-height:50px!important;border:1px solid rgba(255,255,255,.2)!important;border-radius:15px!important;background:linear-gradient(115deg,#54263f 0%,#783854 58%,#a94d73 100%)!important;color:#fffafd!important;box-shadow:0 12px 25px rgba(84,38,63,.24)!important;font-size:12px!important;font-weight:900!important;letter-spacing:.15em!important}
+    .pepFeeModal,#pepSiteNoticeModal{padding:18px!important;box-sizing:border-box}
+    @media(max-width:560px){#pepInfoModal{padding:14px!important}#pepInfoModal .pepInfoBox{padding:32px 22px 25px!important;border-radius:25px!important}#pepInfoModal .pepInfoIcon{width:64px!important;height:64px!important;border-radius:21px!important}#pepInfoModal .pepInfoText{font-size:13px!important}}
     .pepInfoBox{width:min(470px,100%)!important;padding:30px 28px 26px!important;border-radius:28px!important;border:1px solid rgba(239,206,224,.95)!important;box-shadow:0 24px 75px rgba(55,18,43,.24)!important}
     .pepInfoIcon{width:62px!important;height:62px!important;margin-bottom:12px!important;font-size:31px!important}
     .pepInfoBox h2{font-size:clamp(24px,4vw,29px)!important;letter-spacing:-.5px!important;margin:8px 0 10px!important}

@@ -3708,6 +3708,18 @@ load();
 @keyframes pepPopupIn{to{transform:translateY(0) scale(1)}}
 @media(max-width:560px){#pepmosaGlobalPopup{align-items:center;padding:15px}.pepGlobalPopupCard{border-radius:25px!important}.pepGlobalPopupBody{padding:33px 23px 25px}.pepGlobalPopupTitle{font-size:28px!important}.pepGlobalPopupActions{display:block}.pepGlobalPopupBtn{width:100%;min-width:0!important}}
 @media(prefers-reduced-motion:reduce){.pepGlobalPopupCard,.pepGlobalPopupBtn{animation:none;transition:none}}
+
+/* FINAL OVERRIDE: style both legacy alert popup and global popup */
+#pepmosa-popup.pepmosa-popup-backdrop{background:rgba(35,14,28,.70)!important;backdrop-filter:blur(14px) saturate(115%)!important;-webkit-backdrop-filter:blur(14px) saturate(115%)!important;padding:18px!important}
+#pepmosa-popup .pepmosa-popup{position:relative;width:min(470px,100%)!important;border:1px solid rgba(255,255,255,.9)!important;border-radius:30px!important;background:radial-gradient(circle at 100% 0%,rgba(196,91,131,.15),transparent 34%),linear-gradient(145deg,#fffdfd 0%,#fff9fc 52%,#f8edf3 100%)!important;box-shadow:0 38px 110px rgba(26,9,20,.4),0 8px 30px rgba(84,38,63,.15)!important}
+#pepmosa-popup .pepmosa-popup-top{height:5px!important;background:linear-gradient(90deg,#351b2c,#783854 55%,#d9a0b6)!important}
+#pepmosa-popup .pepmosa-popup-body{padding:35px 34px 31px!important;text-align:center!important}
+#pepmosa-popup .pepmosa-popup-icon{width:72px!important;height:72px!important;margin:0 auto 20px!important;border-radius:24px!important;background:linear-gradient(145deg,#351b2c,#63304a 55%,#a64d70)!important;color:#fffafd!important;box-shadow:0 14px 30px rgba(84,38,63,.25),inset 0 1px 0 rgba(255,255,255,.22)!important;font-size:32px!important}
+#pepmosa-popup .pepmosa-popup-title{margin:0 0 10px!important;color:#54263f!important;font-family:Georgia,"Times New Roman",serif!important;font-size:12px!important;font-weight:900!important;letter-spacing:.24em!important;text-transform:uppercase!important}
+#pepmosa-popup .pepmosa-popup-message{margin:0 auto 25px!important;max-width:365px!important;color:#806a77!important;font-size:14px!important;line-height:1.75!important;white-space:pre-wrap}
+#pepmosa-popup .pepmosa-popup-button{min-width:175px!important;border:1px solid rgba(255,255,255,.2)!important;border-radius:15px!important;padding:15px 30px!important;background:linear-gradient(115deg,#54263f,#783854 58%,#a94d73)!important;color:#fffafd!important;font-size:12px!important;font-weight:900!important;letter-spacing:.16em!important;box-shadow:0 12px 25px rgba(84,38,63,.24)!important;transition:transform .2s ease,filter .2s ease!important}
+#pepmosa-popup .pepmosa-popup-button:hover{transform:translateY(-2px)!important;filter:brightness(1.08)}
+@media(max-width:560px){#pepmosa-popup.pepmosa-popup-backdrop{padding:14px!important}#pepmosa-popup .pepmosa-popup{border-radius:25px!important}#pepmosa-popup .pepmosa-popup-body{padding:30px 22px 25px!important}#pepmosa-popup .pepmosa-popup-button{width:100%!important}}
 </style>
 <script id="pepmosa-global-popup-script">
 (function(){

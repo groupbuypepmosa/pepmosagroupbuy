@@ -123,6 +123,17 @@
     @media(max-width:560px){
       .pepFeeModal,#pepInfoModal,#pepSiteNoticeModal{padding:12px!important}
       .pepInfoBox{padding:25px 18px 21px!important;border-radius:23px!important}
+    /* FINAL OVERRIDE — quiet luxury, no cartoon ornaments or pink gradients */
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign{width:min(500px,calc(100vw - 32px))!important;min-height:0!important;padding:40px 34px 32px!important;overflow:hidden!important;border:1px solid #d8b987!important;border-radius:24px!important;background:linear-gradient(145deg,#fffdf9 0%,#fff8f3 72%,#f7eceb 100%)!important;box-shadow:0 28px 80px rgba(35,12,24,.32),inset 0 0 0 4px rgba(255,255,255,.88)!important}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign:before{content:none!important;display:none!important}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign:after{content:none!important;display:none!important}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign .pepInfoIcon{width:60px!important;height:60px!important;margin:0 auto 20px!important;border:1px solid #d4b47b!important;outline:none!important;border-radius:50%!important;background:linear-gradient(145deg,#70233d,#3f1025)!important;color:#fffaf5!important;font-size:29px!important;box-shadow:0 7px 18px rgba(63,16,37,.18)!important}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign h2{margin:0 0 13px!important;color:#4b172d!important;font-family:Georgia,"Times New Roman",serif!important;font-size:clamp(27px,3.5vw,33px)!important;font-weight:600!important;letter-spacing:-.025em!important;line-height:1.15!important;text-transform:uppercase!important}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign .pepInfoText{max-width:385px!important;margin:0 auto!important;color:#66515a!important;font-size:14px!important;line-height:1.8!important}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign .pepInfoActions{margin-top:25px!important}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign .pepFeeBtn{width:min(100%,280px)!important;min-height:50px!important;border:1px solid #c5a16e!important;border-radius:999px!important;background:#51172e!important;background-image:linear-gradient(110deg,#471126,#6b1d38 52%,#471126)!important;color:#fffaf4!important;box-shadow:0 7px 18px rgba(71,17,38,.2)!important;font-family:Georgia,"Times New Roman",serif!important;font-size:16px!important;font-weight:600!important;letter-spacing:.06em!important}
+    #pepInfoModal .pepInfoBox.pepOrderingClosedDesign .pepInfoKicker{display:none!important}
+    @media(max-width:560px){#pepInfoModal .pepInfoBox.pepOrderingClosedDesign{width:calc(100vw - 28px)!important;padding:34px 22px 26px!important;border-radius:20px!important}#pepInfoModal .pepInfoBox.pepOrderingClosedDesign .pepInfoText{font-size:13px!important}}
       .pepInfoIcon{width:54px!important;height:54px!important;font-size:27px!important}
       .pepInfoBox h2{font-size:25px!important}
       .pepInfoText{font-size:12px!important}

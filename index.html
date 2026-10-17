@@ -3688,7 +3688,7 @@ load();
 
 <!-- PEPMOSA GLOBAL POPUP — LUXE WINE & ROSE -->
 <style id="pepmosa-global-popup-style">
-#pepmosaGlobalPopup{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(37,16,29,.70)!important;backdrop-filter:blur(14px) saturate(115%)!important;-webkit-backdrop-filter:blur(14px) saturate(115%)!important}
+#pepmosaGlobalPopup{position:fixed;inset:0;z-index:2147483647;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(37,16,29,.70)!important;backdrop-filter:blur(14px) saturate(115%)!important;-webkit-backdrop-filter:blur(14px) saturate(115%)!important}
 #pepmosaGlobalPopup.show{display:flex}
 .pepGlobalPopupCard{position:relative;width:min(490px,100%);overflow:hidden;border:1px solid rgba(255,255,255,.92)!important;border-radius:30px!important;background:linear-gradient(145deg,#fffdfd 0%,#fff9fc 48%,#f9edf3 100%)!important;box-shadow:0 38px 110px rgba(26,9,20,.40),0 8px 30px rgba(84,38,63,.15)!important;transform:translateY(14px) scale(.975);animation:pepPopupIn .34s cubic-bezier(.18,.82,.25,1) forwards}
 .pepGlobalPopupCard:before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#351b2c 0%,#6f334f 38%,#c45b83 72%,#edb8cb 100%);z-index:3}
@@ -3772,9 +3772,7 @@ load();
 <!-- Kit Completion is owned by storefront-repair.js; redundant no-op observer removed. -->
 
 
-<style id="pepmosa-popup-unified-style">
-#pepmosaGlobalPopup{z-index:2147483647!important}
-</style>
+<!-- Popup z-index is consolidated into pepmosa-global-popup-style. -->
 <script id="pepmosa-popup-unified-script">
 (function(){
   const nativePrompt=window.prompt.bind(window);

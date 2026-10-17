@@ -4121,3 +4121,32 @@ load();
 <style>#pepStaticOrderLine{}.pepStaticOrderLine{display:flex;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid #f0e0e8;border-radius:13px;background:#fff;margin-top:7px}.pepStaticOrderLine b{display:block;color:#392831;font-size:12px}.pepStaticOrderLine small{display:block;color:#927c87;font-size:9px;margin-top:3px}.pepStaticOrderLine>strong{white-space:nowrap;color:#3e2934;font-size:12px}.pepStaticQR img{width:145px;height:145px;object-fit:contain;border-radius:10px}</style>
 </body>
 </html>
+
+
+<!-- POPUP VISUAL OVERRIDE v3: cover every active PEPMOSA popup implementation -->
+<style id="pepmosa-popup-final-override">
+/* Global custom popup */
+#pepmosaGlobalPopup{background:rgba(35,14,28,.76)!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important}
+#pepmosaGlobalPopup .pepGlobalPopupCard{width:min(480px,calc(100vw - 32px))!important;border-radius:32px!important;border:1px solid #fff!important;background:linear-gradient(145deg,#fffdfd 0%,#fff8fb 52%,#f6e8ef 100%)!important;box-shadow:0 40px 120px rgba(32,9,23,.45)!important}
+#pepmosaGlobalPopup .pepGlobalPopupBody{padding:38px 38px 34px!important;text-align:center!important}
+#pepmosaGlobalPopup .pepGlobalPopupMark{width:76px!important;height:76px!important;border-radius:26px!important;background:linear-gradient(145deg,#321626,#603049 58%,#a95175)!important;box-shadow:0 16px 34px rgba(84,38,63,.28)!important}
+#pepmosaGlobalPopup .pepGlobalPopupTitle{font-family:Georgia,"Times New Roman",serif!important;font-size:31px!important;color:#492338!important;font-weight:700!important;letter-spacing:-.6px!important}
+#pepmosaGlobalPopup .pepGlobalPopupText{font-size:14px!important;line-height:1.8!important;color:#806a77!important}
+#pepmosaGlobalPopup .pepGlobalPopupBtn{min-width:175px!important;border-radius:15px!important;background:linear-gradient(115deg,#54263f,#783854 58%,#a94d73)!important;color:#fff!important;letter-spacing:.14em!important;box-shadow:0 12px 28px rgba(84,38,63,.25)!important}
+/* Legacy alert popup */
+#pepmosa-popup.pepmosa-popup-backdrop{background:rgba(35,14,28,.76)!important;backdrop-filter:blur(16px)!important}
+#pepmosa-popup .pepmosa-popup{width:min(480px,calc(100vw - 32px))!important;border-radius:32px!important;background:linear-gradient(145deg,#fffdfd,#fff8fb 52%,#f6e8ef)!important;box-shadow:0 40px 120px rgba(32,9,23,.45)!important}
+#pepmosa-popup .pepmosa-popup-top{height:5px!important;background:linear-gradient(90deg,#321626,#783854,#d9a0b6)!important}
+#pepmosa-popup .pepmosa-popup-body{padding:38px 38px 34px!important}
+#pepmosa-popup .pepmosa-popup-icon{width:76px!important;height:76px!important;border-radius:26px!important;background:linear-gradient(145deg,#321626,#603049 58%,#a95175)!important;color:#fff!important}
+#pepmosa-popup .pepmosa-popup-title{font-family:Georgia,"Times New Roman",serif!important;font-size:12px!important;letter-spacing:.22em!important;color:#a64d70!important}
+#pepmosa-popup .pepmosa-popup-message{font-family:Georgia,"Times New Roman",serif!important;font-size:30px!important;font-weight:700!important;line-height:1.2!important;color:#492338!important}
+#pepmosa-popup .pepmosa-popup-button{min-width:175px!important;border-radius:15px!important;background:linear-gradient(115deg,#54263f,#783854 58%,#a94d73)!important;letter-spacing:.14em!important;box-shadow:0 12px 28px rgba(84,38,63,.25)!important}
+/* SweetAlert or third-party dialog fallback, if that is the popup actually invoked */
+.swal2-container{backdrop-filter:blur(16px)!important;background:rgba(35,14,28,.58)!important}
+.swal2-popup{border-radius:30px!important;background:linear-gradient(145deg,#fffdfd,#fff8fb 52%,#f6e8ef)!important;box-shadow:0 40px 120px rgba(32,9,23,.45)!important}
+.swal2-title{font-family:Georgia,"Times New Roman",serif!important;color:#492338!important}
+.swal2-html-container{color:#806a77!important}
+.swal2-confirm{border-radius:15px!important;background:linear-gradient(115deg,#54263f,#783854 58%,#a94d73)!important;box-shadow:0 12px 28px rgba(84,38,63,.25)!important}
+@media(max-width:560px){#pepmosaGlobalPopup .pepGlobalPopupBody,#pepmosa-popup .pepmosa-popup-body{padding:30px 22px 26px!important}#pepmosaGlobalPopup .pepGlobalPopupBtn,#pepmosa-popup .pepmosa-popup-button{width:100%!important}}
+</style>

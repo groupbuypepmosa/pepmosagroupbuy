@@ -209,3 +209,115 @@ input:focus,select:focus,textarea:focus{
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
+
+
+/* =========================================================
+   PEPMOSA POPUP REDESIGN — WINE & ROSE (2026-10-17)
+   Explicitly overrides the older generic modal styling.
+   Keeps modal IDs, form controls, and JavaScript behavior intact.
+   ========================================================= */
+:root{
+  --pep-modal-wine:#54263f;
+  --pep-modal-wine-deep:#351b2c;
+  --pep-modal-rose:#c45b83;
+  --pep-modal-rose-soft:#f4dce6;
+  --pep-modal-ivory:#fffafd;
+  --pep-modal-line:#ead0dc;
+}
+.modal,
+[role="dialog"],
+.popup,
+.popover{
+  color:var(--pep-modal-wine-deep)!important;
+}
+.modal{
+  background:rgba(35,17,29,.66)!important;
+  -webkit-backdrop-filter:blur(12px) saturate(115%)!important;
+  backdrop-filter:blur(12px) saturate(115%)!important;
+  padding:18px!important;
+}
+.modalbox,
+[role="dialog"],
+.popup{
+  border:1px solid rgba(234,208,220,.95)!important;
+  border-radius:26px!important;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(196,91,131,.12),transparent 32%),
+    linear-gradient(145deg,#fffafd 0%,#fff 58%,#fff3f7 100%)!important;
+  color:var(--pep-modal-wine-deep)!important;
+  box-shadow:0 28px 90px rgba(35,17,29,.30),0 5px 20px rgba(84,38,63,.12)!important;
+  overflow:hidden;
+}
+.modalbox h1,.modalbox h2,.modalbox h3,
+[role="dialog"] h1,[role="dialog"] h2,[role="dialog"] h3,
+.popup h1,.popup h2,.popup h3{
+  color:var(--pep-modal-wine)!important;
+  letter-spacing:-.035em!important;
+  line-height:1.12!important;
+}
+.modalbox p,[role="dialog"] p,.popup p{
+  color:#806a77!important;
+  line-height:1.6!important;
+}
+.modalbox .sectionHead,
+[role="dialog"] .sectionHead,
+.popup .sectionHead{
+  background:linear-gradient(120deg,#54263f 0%,#793b5b 58%,#c45b83 100%)!important;
+  color:#fffafd!important;
+  border-bottom:1px solid rgba(255,255,255,.18)!important;
+}
+.modalbox .sectionHead h1,.modalbox .sectionHead h2,
+.modalbox .sectionHead h3,
+[role="dialog"] .sectionHead h1,[role="dialog"] .sectionHead h2,
+[role="dialog"] .sectionHead h3{
+  color:#fffafd!important;
+}
+.modalbox .close,.modalbox [aria-label="Close"],
+[role="dialog"] .close,[role="dialog"] [aria-label="Close"],
+.popup .close,.popup [aria-label="Close"]{
+  border-radius:50%!important;
+  color:var(--pep-modal-wine)!important;
+  background:#fff0f5!important;
+  border:1px solid #e8c3d2!important;
+}
+.modalbox button:not(.secondary):not(.tab),
+[role="dialog"] button:not(.secondary):not(.tab),
+.popup button:not(.secondary):not(.tab){
+  background:linear-gradient(125deg,#54263f 0%,#8f4266 60%,#c45b83 100%)!important;
+  color:#fffafd!important;
+  border:1px solid transparent!important;
+  border-radius:14px!important;
+  box-shadow:0 8px 20px rgba(84,38,63,.18)!important;
+  font-weight:800!important;
+}
+.modalbox button.secondary,
+[role="dialog"] button.secondary,
+.popup button.secondary,
+.modalbox .secondary,[role="dialog"] .secondary,.popup .secondary{
+  background:#fff1f6!important;
+  color:#54263f!important;
+  border:1px solid #ead0dc!important;
+  box-shadow:none!important;
+}
+.modalbox input,.modalbox select,.modalbox textarea,
+[role="dialog"] input,[role="dialog"] select,[role="dialog"] textarea,
+.popup input,.popup select,.popup textarea{
+  border:1px solid #e6c8d6!important;
+  border-radius:13px!important;
+  background:#fff!important;
+  color:#351b2c!important;
+  box-shadow:none!important;
+}
+.modalbox input:focus,.modalbox select:focus,.modalbox textarea:focus,
+[role="dialog"] input:focus,[role="dialog"] select:focus,[role="dialog"] textarea:focus,
+.popup input:focus,.popup select:focus,.popup textarea:focus{
+  border-color:#c45b83!important;
+  box-shadow:0 0 0 3px rgba(196,91,131,.15)!important;
+  outline:none!important;
+}
+#cartModal{background:rgba(35,17,29,.68)!important;backdrop-filter:blur(12px)!important}
+#cartModal .modalbox{border-radius:26px!important}
+@media(max-width:620px){
+  .modal{padding:10px!important}
+  .modalbox,[role="dialog"],.popup{border-radius:23px!important;max-width:100%!important}
+}

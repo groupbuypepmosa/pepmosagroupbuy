@@ -2366,7 +2366,7 @@ function openProductPicker(pid, productOverride){
                   <span>
                     <b>${esc(v.strength)}</b>
                     <small>
-                      Minimum ${Math.max(1, Number(v.minimum_qty || 1))} pc
+                      MINIMUM ORDER: ${Math.max(1, Number(v.minimum_qty || 1))} ${Math.max(1, Number(v.minimum_qty || 1)) === 1 ? "VIAL" : "VIALS"}
                     </small>
                   </span>
 
@@ -2389,7 +2389,7 @@ function openProductPicker(pid, productOverride){
               </div>
 
               <div class="muted">
-                Minimum ${minimum} pc
+                Minimum ${minimum} ${minimum === 1 ? "vial" : "vials"} per variant
               </div>
             </div>
 
@@ -3654,3 +3654,15 @@ main.wrap{position:relative;z-index:3}
 
 </body>
 </html>
+
+<style id="pep-picker-actual-popup-fix">
+#pepProductPicker .pepVariantChoice{background:#fff!important;background-image:none!important;color:#392630!important;border:1.5px solid #ead8e2!important;min-height:82px!important;padding:14px 20px 14px 58px!important;box-shadow:0 5px 15px rgba(104,48,78,.035)!important}
+#pepProductPicker .pepVariantChoice:before{content:""!important;display:block!important;position:absolute!important;left:20px!important;top:50%!important;transform:translateY(-50%)!important;width:22px!important;height:22px!important;border:2px solid #bd8aa4!important;border-radius:50%!important;background:#fff!important;box-shadow:none!important}
+#pepProductPicker .pepVariantChoice.selected{border:2px solid #c51e75!important;background:#fff0f7!important;background-image:none!important;padding-left:57px!important;box-shadow:0 0 0 3px rgba(197,30,117,.10)!important}
+#pepProductPicker .pepVariantChoice.selected:before{border:2px solid #c51e75!important;background:#c51e75!important;box-shadow:inset 0 0 0 4px #fff!important}
+#pepProductPicker .pepVariantChoice span b{color:#392630!important;font-size:20px!important}
+#pepProductPicker .pepVariantChoice small{display:inline-flex!important;align-items:center!important;min-height:25px!important;padding:5px 11px!important;border-radius:999px!important;background:#fbe1ed!important;color:#9e245e!important;font-size:10px!important;font-weight:900!important;letter-spacing:.04em!important}
+#pepProductPicker .pepVariantChoice.selected small{background:#c72a78!important;color:#fff!important}
+#pepProductPicker .pepVariantChoice strong{color:#392630!important;border-left:1px solid #e8c6d7!important;text-align:right!important;min-width:125px!important}
+@media(max-width:620px){#pepProductPicker .pepVariantChoice{min-height:74px!important;padding:12px 13px 12px 48px!important}#pepProductPicker .pepVariantChoice.selected{padding-left:47px!important}#pepProductPicker .pepVariantChoice:before{left:14px!important;width:19px!important;height:19px!important}#pepProductPicker .pepVariantChoice span b{font-size:17px!important}#pepProductPicker .pepVariantChoice small{font-size:9px!important;min-height:23px!important;padding:5px 8px!important}#pepProductPicker .pepVariantChoice strong{min-width:82px!important;padding-left:10px!important;font-size:14px!important}}
+</style>

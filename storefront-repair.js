@@ -192,6 +192,18 @@
       .pepFeeBody{grid-template-columns:minmax(0,1fr)!important;padding:16px 18px 20px!important}
       .pepSiteNoticeCard{padding:22px 18px!important;border-radius:22px!important}
     }
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign{position:relative!important;box-sizing:border-box!important;width:min(760px,calc(100vw - 32px))!important;max-width:760px!important;max-height:calc(100vh - 40px)!important;overflow:hidden!important;margin:auto!important;padding:28px 36px 28px!important;border-radius:34px!important;background:linear-gradient(180deg,#fffafd 0%,#fff8fc 72%,#fdeaf4 100%)!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign:before,#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign:after{content:none!important;display:none!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign>*{position:relative;z-index:1}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoIcon{width:112px!important;height:112px!important;margin:0 auto 8px!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoKicker{margin:0 0 6px!important;font-size:13px!important;letter-spacing:.36em!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign h2{margin:4px 0 12px!important;font-size:clamp(27px,3.4vw,38px)!important;line-height:1.12!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoText{max-width:600px!important;margin:0 auto!important;font-size:14px!important;line-height:1.5!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoText:before{margin:0 auto 10px!important;padding:10px 16px!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoActions{display:flex!important;justify-content:center!important;margin:18px auto 0!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoActions .pepFeeBtn{width:min(300px,100%)!important;min-height:54px!important;margin:0 auto!important}
+@media(max-width:600px){#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign{width:calc(100vw - 24px)!important;max-height:calc(100vh - 24px)!important;padding:22px 18px 22px!important;border-radius:26px!important}#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoIcon{width:88px!important;height:88px!important}#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign h2{font-size:26px!important}#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoText{font-size:13px!important}#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoActions .pepFeeBtn{min-height:48px!important}}
+
   `;document.head.appendChild(s)}
   function makeModal(id,html,cls='pepFeeModal'){if($(id))return;const d=document.createElement('div');d.id=id;d.className=cls;d.innerHTML=html;d.addEventListener('click',e=>{if(e.target===d)d.classList.remove('open')});document.body.appendChild(d)}
   function ensureUI(){styles();const status=$('gbStatus');if(status&&!$('pepKitCompletionCard')){const k=document.createElement('section');k.id='pepKitCompletionCard';k.className='pepKitCompletionCard';k.style.cssText='display:none';k.innerHTML='<div class="pepKitGlow"></div><div class="pepKitTop"><div class="pepKitBadge">✦ KIT COMPLETION</div><div class="pepKitIcon">◈</div></div><h3>Complete the remaining vials</h3><p class="pepKitLead">Each <b>mg / variant is tracked separately.</b></p><div class="pepKitRules"><div><span>1</span><p>Every strength has its own separate 10-vial kit and live remaining count.</p></div><div><span>2</span><p>Only variants with remaining vials are shown.</p></div><div><span>3</span><p>You may order from <b>1 vial up to the exact live remaining quantity.</b></p></div><div class="pepKitFooter">⚡ Once a remaining vial is secured, it automatically becomes unavailable to the next buyer.</div>';const grid=$('productGrid');if(grid&&grid.parentNode)grid.parentNode.insertBefore(k,grid);else status.parentNode.insertBefore(k,status.nextSibling)}if(status&&!$('pepFeeCard')){const c=document.createElement('div');c.id='pepFeeCard';c.className='notice';c.style.marginTop='14px';c.innerHTML='<div style="font-weight:900">GROUP BUY ACCESS</div><div id="pepFeeState" class="pepFeeMuted" style="margin:5px 0 10px">Loading…</div><div class="pepFeeActions"><button id="pepFeeAction" class="pepFeeBtn">PAY ADMIN FEE</button></div>';status.parentNode.insertBefore(c,status.nextSibling);$('pepFeeAction').onclick=feeAction}
@@ -482,16 +494,4 @@ function boot(){
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 
-<style id="pep-admin-fee-popup-alignment-fix">
-#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign{position:relative!important;box-sizing:border-box!important;width:min(760px,calc(100vw - 32px))!important;max-width:760px!important;max-height:calc(100vh - 40px)!important;overflow:hidden!important;margin:auto!important;padding:28px 36px 28px!important;border-radius:34px!important;background:linear-gradient(180deg,#fffafd 0%,#fff8fc 72%,#fdeaf4 100%)!important}
-#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign:before,#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign:after{content:none!important;display:none!important}
-#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign>*{position:relative;z-index:1}
-#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoIcon{width:112px!important;height:112px!important;margin:0 auto 8px!important}
-#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoKicker{margin:0 0 6px!important;font-size:13px!important;letter-spacing:.36em!important}
-#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign h2{margin:4px 0 12px!important;font-size:clamp(27px,3.4vw,38px)!important;line-height:1.12!important}
-#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoText{max-width:600px!important;margin:0 auto!important;font-size:14px!important;line-height:1.5!important}
-#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoText:before{margin:0 auto 10px!important;padding:10px 16px!important}
-#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoActions{display:flex!important;justify-content:center!important;margin:18px auto 0!important}
-#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoActions .pepFeeBtn{width:min(300px,100%)!important;min-height:54px!important;margin:0 auto!important}
-@media(max-width:600px){#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign{width:calc(100vw - 24px)!important;max-height:calc(100vh - 24px)!important;padding:22px 18px 22px!important;border-radius:26px!important}#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoIcon{width:88px!important;height:88px!important}#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign h2{font-size:26px!important}#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoText{font-size:13px!important}#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoActions .pepFeeBtn{min-height:48px!important}}
-</style>
+

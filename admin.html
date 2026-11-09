@@ -1816,7 +1816,7 @@ function renderTrackingDashboard(){
     const meta=s?'<div class="trackingMetaGrid"><div class="trackingMetaBox"><small>COURIER</small><b>'+esc(s.courier||"To be assigned")+'</b></div><div class="trackingMetaBox"><small>TRACKING NO.</small><b>'+esc(s.tracking_number||"To be assigned")+'</b></div><div class="trackingMetaBox"><small>WAYBILL</small><b>'+esc(s.waybill_number||"To be assigned")+'</b></div><div class="trackingMetaBox"><small>ORDERS</small><b>'+orders.length+' order'+(orders.length===1?'':'s')+'</b></div></div>':'<div class="trackingSetup"><b>No shipment has been created yet.</b><div class="small" style="margin-top:4px">Create one shipment for this client and all orders under this email will stay together.</div><button class="btn primary" type="button" data-email="'+esc(email)+'" onclick="createTrackingShipment(this.dataset.email)">CREATE CLIENT SHIPMENT</button></div>';
     const editor=s?'<details class="trackingEditor"><summary>EDIT THIS CLIENT’S TRACKING</summary><div class="grid" style="margin-top:14px">'+
       '<div class="field"><label>Status</label><select id="'+k+'-status">'+TRACKING_STATUSES.map(x=>'<option value="'+esc(x)+'" '+(x===status?'selected':'')+'>'+esc(x)+'</option>').join('')+'</select></div>'+
-      '<div class="field"><label>Courier</label><select id="'+k+'-courier"><option value="">—</option><option value="J&T" '+(s.courier==="J&T"?'selected':'')+'>J&T</option><option value="Lalamove" '+(s.courier==="Lalamove"?'selected':'')+'>Lalamove</option><option value="Other" '+(s.courier==="Other"?'selected':'')+'>Other</option></select></div>'+
+      '<div class="field"><label>Courier</label><select id="'+k+'-courier"><option value="">—</option><option value="J&T" '+(s.courier==="J&T"?'selected':'')+'>J&T</option><option value="Other" '+(s.courier==="Other"?'selected':'')+'>Other</option></select></div>'+
       '<div class="field"><label>Tracking Number</label><input id="'+k+'-tracking" value="'+esc(s.tracking_number||"")+'"></div>'+
       '<div class="field"><label>Waybill Number</label><input id="'+k+'-waybill" value="'+esc(s.waybill_number||"")+'"></div>'+
       '<div class="field full"><label>Notes</label><textarea id="'+k+'-notes">'+esc(s.notes||"")+'</textarea></div></div>'+
@@ -2041,7 +2041,7 @@ checkExistingSession();
     <div class="bulkTrackingPreview"><b id="bulkTrackingClientCount">Loading clients…</b><span>This bulk update changes the shipment status for all clients. Existing individual tracking and waybill numbers are preserved.</span></div>
     <div class="grid" style="margin-top:16px">
       <div class="field full"><label>NEW STATUS *</label><select id="bulkTrackingStatus"></select></div>
-      <div class="field"><label>COURIER (OPTIONAL)</label><select id="bulkTrackingCourier"><option value="">Keep current courier</option><option value="J&T">J&T</option><option value="Lalamove">Lalamove</option><option value="Other">Other</option></select></div>
+      <div class="field"><label>COURIER (OPTIONAL)</label><select id="bulkTrackingCourier"><option value="">Keep current courier</option><option value="J&T">J&T</option><option value="Other">Other</option></select></div>
       <div class="field"><label>NOTE (OPTIONAL)</label><input id="bulkTrackingNote" placeholder="Example: Shipment arrived at warehouse"></div>
     </div>
     <div class="notice warning" style="margin-top:16px"><b>IMPORTANT:</b> Tracking number and waybill number are not bulk-updated because those can be different for each client.</div>

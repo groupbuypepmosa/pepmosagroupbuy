@@ -2895,7 +2895,7 @@ function openProductPicker(pid, productOverride){
                   <span>
                     <b>${esc(v.strength)}</b>
                     <small>
-                      Minimum ${Math.max(1, Number(v.minimum_qty || 1))} pc
+                      Minimum ${Math.max(1, Number(v.minimum_qty || 1))} ${Number(v.minimum_qty || 1) === 1 ? "vial" : "vials"}
                     </small>
                   </span>
 
@@ -2918,7 +2918,7 @@ function openProductPicker(pid, productOverride){
               </div>
 
               <div class="muted">
-                Minimum ${minimum} pc
+                Minimum ${minimum} ${minimum === 1 ? "vial" : "vials"} per variant
               </div>
             </div>
 
@@ -4122,6 +4122,67 @@ load();
 })();
 </script>
 <style>#pepStaticOrderLine{}.pepStaticOrderLine{display:flex;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid #f0e0e8;border-radius:13px;background:#fff;margin-top:7px}.pepStaticOrderLine b{display:block;color:#392831;font-size:12px}.pepStaticOrderLine small{display:block;color:#927c87;font-size:9px;margin-top:3px}.pepStaticOrderLine>strong{white-space:nowrap;color:#3e2934;font-size:12px}.pepStaticQR img{width:145px;height:145px;object-fit:contain;border-radius:10px}</style>
+
+<style id="pep-picker-clarity-refresh">
+/* PEPMOSA product picker — unmistakable selected variant + readable MOQ */
+.pepProductPicker{padding:22px!important;background:rgba(48,25,40,.66)!important;backdrop-filter:blur(9px)!important}
+.pepPickerBox{width:min(760px,100%)!important;padding:30px!important;border:1px solid #f0cddd!important;border-radius:30px!important;background:linear-gradient(145deg,#fff 0%,#fffafd 62%,#fbf2ff 100%)!important;box-shadow:0 32px 100px rgba(55,18,43,.38)!important}
+.pepPickerClose{width:42px!important;height:42px!important;right:17px!important;top:16px!important;border:0!important;background:linear-gradient(135deg,#df4b91,#bd347d)!important;color:#fff!important;font-size:25px!important;line-height:1!important;box-shadow:0 8px 20px rgba(190,52,125,.22)!important}
+.pepPickerHead{grid-template-columns:145px minmax(0,1fr)!important;gap:22px!important;padding-right:42px!important}
+.pepPickerImage{height:145px!important;border-radius:22px!important;background:#fff0f7!important}
+.pepPickerHead h2{font-size:30px!important;line-height:1.08!important;letter-spacing:-.7px!important;color:#392630!important}
+.pepPickerHead .muted{font-size:13px!important;line-height:1.58!important;color:#806c78!important}
+.pepPickerLabel{margin:25px 0 12px!important;color:#bd397b!important;font-size:10px!important;letter-spacing:.14em!important;font-weight:1000!important}
+.pepVariantChoices{gap:11px!important}
+.pepVariantChoice{position:relative!important;min-height:82px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:18px!important;padding:14px 20px 14px 58px!important;border:1.5px solid #ead8e2!important;border-radius:19px!important;background:#fff!important;color:#392630!important;box-shadow:0 5px 15px rgba(104,48,78,.035)!important;transition:border-color .18s ease,background .18s ease,box-shadow .18s ease!important}
+.pepVariantChoice:hover{border-color:#e7a2c2!important;background:#fff9fc!important}
+.pepVariantChoice:before{content:""!important;position:absolute!important;left:20px!important;top:50%!important;transform:translateY(-50%)!important;width:22px!important;height:22px!important;border:2px solid #bd8aa4!important;border-radius:50%!important;background:#fff!important;box-shadow:inset 0 0 0 4px #fff!important}
+.pepVariantChoice.selected{border:2px solid #d21d79!important;background:linear-gradient(110deg,#ffe7f1 0%,#fff5fa 100%)!important;box-shadow:0 0 0 3px rgba(210,29,121,.10),0 9px 22px rgba(178,54,119,.08)!important;padding-left:57px!important}
+.pepVariantChoice.selected:before{border:2px solid #c51e75!important;background:#c51e75!important;box-shadow:inset 0 0 0 4px #fff!important}
+.pepVariantChoice span{display:flex!important;flex:1!important;min-width:0!important;flex-direction:column!important;align-items:flex-start!important;gap:7px!important;padding:0!important}
+.pepVariantChoice span b{font-size:20px!important;line-height:1.1!important;font-weight:950!important;color:#392630!important}
+.pepVariantChoice small{display:inline-flex!important;align-items:center!important;min-height:25px!important;padding:5px 11px!important;border-radius:999px!important;background:#c72a78!important;color:#fff!important;font-size:11px!important;line-height:1!important;font-weight:900!important;letter-spacing:.01em!important}
+.pepVariantChoice strong{flex:0 0 auto!important;min-width:125px!important;padding:9px 0 9px 22px!important;border-left:1px solid #e8c6d7!important;text-align:right!important;font-size:19px!important;font-weight:950!important;color:#392630!important;white-space:nowrap!important}
+.pepQuantityRow{margin-top:18px!important;padding:17px 19px!important;border:1px solid #efcfdf!important;border-radius:20px!important;background:linear-gradient(135deg,#fff 0%,#fffafd 100%)!important;align-items:center!important}
+.pepQuantityRow .pepPickerLabel.small{margin:0 0 8px!important;color:#bd397b!important}
+.pepQuantityRow .muted{display:inline-flex!important;align-items:center!important;min-height:27px!important;padding:5px 11px!important;border-radius:999px!important;background:#c72a78!important;color:#fff!important;font-size:11px!important;line-height:1.2!important;font-weight:900!important}
+.pepStepper{grid-template-columns:42px 72px 42px!important;gap:0!important}
+.pepStepper button{height:44px!important;border:0!important;background:linear-gradient(135deg,#d9448e,#b92d78)!important;color:#fff!important;font-size:23px!important;box-shadow:0 7px 16px rgba(190,45,120,.17)!important}
+.pepStepper button:first-child{border-radius:0!important}
+.pepStepper button:last-child{border-radius:0!important}
+.pepStepper input{height:44px!important;width:72px!important;border:1px solid #e9cbd9!important;border-radius:12px!important;background:#fff!important;color:#392630!important;font-size:16px!important}
+.pepPickerTotal{margin-top:17px!important;padding:17px 2px!important;border-top:1px solid #eedbe5!important;align-items:center!important;color:#493440!important;font-size:14px!important}
+.pepPickerTotal b{font-size:23px!important;font-weight:1000!important;color:#cf287c!important}
+.pepPickerAdd{min-height:54px!important;margin-top:8px!important;border-radius:15px!important;background:linear-gradient(100deg,#c52d79,#e06a9f)!important;color:#fff!important;font-size:14px!important;font-weight:1000!important;letter-spacing:.04em!important;box-shadow:0 10px 23px rgba(190,45,120,.20)!important}
+@media(max-width:620px){
+ .pepProductPicker{align-items:flex-end!important;padding:8px!important}
+ .pepPickerBox{padding:23px 17px 19px!important;border-radius:26px 26px 18px 18px!important;max-height:94vh!important}
+ .pepPickerHead{grid-template-columns:88px minmax(0,1fr)!important;gap:12px!important;padding-right:28px!important}
+ .pepPickerImage{height:88px!important;border-radius:16px!important}
+ .pepPickerHead h2{font-size:21px!important;margin:4px 0 6px!important}
+ .pepPickerHead .muted{font-size:10px!important;line-height:1.4!important}
+ .pepPickerLabel{margin:20px 0 10px!important}
+ .pepVariantChoice{min-height:74px!important;padding:12px 13px 12px 48px!important;gap:9px!important}
+ .pepVariantChoice.selected{padding-left:47px!important}
+ .pepVariantChoice:before{left:14px!important;width:19px!important;height:19px!important}
+ .pepVariantChoice span b{font-size:17px!important}
+ .pepVariantChoice small{font-size:9px!important;min-height:23px!important;padding:5px 8px!important}
+ .pepVariantChoice strong{min-width:94px!important;padding-left:10px!important;font-size:15px!important}
+ .pepQuantityRow{flex-direction:row!important;align-items:center!important;padding:13px!important;gap:8px!important}
+ .pepQuantityRow .muted{font-size:9px!important;padding:5px 8px!important}
+ .pepStepper{grid-template-columns:36px 54px 36px!important}
+ .pepStepper button,.pepStepper input{height:40px!important}
+ .pepStepper input{width:54px!important}
+ .pepPickerTotal b{font-size:21px!important}
+}
+@media(max-width:390px){
+ .pepVariantChoice strong{min-width:82px!important;font-size:14px!important}
+ .pepQuantityRow{align-items:flex-start!important;flex-direction:column!important}
+ .pepStepper{width:100%!important;grid-template-columns:1fr 62px 1fr!important}
+ .pepStepper input{width:62px!important}
+}
+</style>
+
 </body>
 </html>
 

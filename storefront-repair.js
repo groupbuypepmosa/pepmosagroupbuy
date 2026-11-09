@@ -481,3 +481,17 @@ function boot(){
 }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
+
+<style id="pep-admin-fee-popup-alignment-fix">
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign{position:relative!important;box-sizing:border-box!important;width:min(760px,calc(100vw - 32px))!important;max-width:760px!important;max-height:calc(100vh - 40px)!important;overflow:hidden!important;margin:auto!important;padding:28px 36px 28px!important;border-radius:34px!important;background:linear-gradient(180deg,#fffafd 0%,#fff8fc 72%,#fdeaf4 100%)!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign:before,#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign:after{content:none!important;display:none!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign>*{position:relative;z-index:1}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoIcon{width:112px!important;height:112px!important;margin:0 auto 8px!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoKicker{margin:0 0 6px!important;font-size:13px!important;letter-spacing:.36em!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign h2{margin:4px 0 12px!important;font-size:clamp(27px,3.4vw,38px)!important;line-height:1.12!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoText{max-width:600px!important;margin:0 auto!important;font-size:14px!important;line-height:1.5!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoText:before{margin:0 auto 10px!important;padding:10px 16px!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoActions{display:flex!important;justify-content:center!important;margin:18px auto 0!important}
+#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoActions .pepFeeBtn{width:min(300px,100%)!important;min-height:54px!important;margin:0 auto!important}
+@media(max-width:600px){#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign{width:calc(100vw - 24px)!important;max-height:calc(100vh - 24px)!important;padding:22px 18px 22px!important;border-radius:26px!important}#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoIcon{width:88px!important;height:88px!important}#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign h2{font-size:26px!important}#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoText{font-size:13px!important}#pepInfoModal .pepInfoBox.pepAdminFeeReceivedDesign .pepInfoActions .pepFeeBtn{min-height:48px!important}}
+</style>

@@ -3576,7 +3576,7 @@ load();
           const r=await window.sb.from('admin_fee_payments').insert({gb_number:gb.gb_number,email,amount:Number(gb.admin_fee||0),payment_reference:ref,status:'SUBMITTED'}).select('id').maybeSingle();
           if(r.error)throw r.error;
           wrap.remove();
-          if(window.pepmosaPopup)window.pepmosaPopup('Admin Fee payment submitted.\n\nPlease wait for PEPMOSA admin approval. Your cart is saved.');
+          if(window.pepmosaPopup)window.pepmosaPopup('Your admin fee payment proof has been received. Please wait for admin approval. We’ll notify you once your payment is verified.','Admin Fee Payment Received!','✓');
           resolve(false);
         }catch(e){msg.textContent=e?.message||'Unable to submit Admin Fee payment.';btn.disabled=false;btn.textContent='I PAID — SUBMIT'}
       };
@@ -3734,7 +3734,7 @@ load();
     if(root)return root;
     root=document.createElement('div');
     root.id='pepmosaGlobalPopup';
-    root.innerHTML='<div class="pepGlobalPopupCard" role="dialog" aria-modal="true"><div class="pepGlobalPopupGlow"></div><div class="pepGlobalPopupBody"><div class="pepGlobalPopupMark" id="pepGlobalPopupMark">✦</div><div class="pepGlobalPopupTitle" id="pepGlobalPopupTitle">PEPMOSA</div><p class="pepGlobalPopupText" id="pepGlobalPopupText"></p><div class="pepGlobalPopupActions"><button type="button" class="pepGlobalPopupBtn" id="pepGlobalPopupBtn">OKAY</button></div></div></div>';
+    root.innerHTML='<div class="pepGlobalPopupCard" role="dialog" aria-modal="true"><div class="pepGlobalPopupGlow"></div><div class="pepGlobalPopupBody"><div class="pepGlobalPopupMark" id="pepGlobalPopupMark">✦</div><div class="pepGlobalPopupTitle" id="pepGlobalPopupTitle">PEPMOSA</div><div class="pepGlobalPopupStatus" id="pepGlobalPopupStatus">SUBMITTED FOR REVIEW</div><p class="pepGlobalPopupText" id="pepGlobalPopupText"></p><div class="pepGlobalPopupActions"><button type="button" class="pepGlobalPopupBtn" id="pepGlobalPopupBtn">OKAY</button></div></div></div>';
     root.addEventListener('click',e=>{if(e.target===root)root.classList.remove('show')});
     document.body.appendChild(root);
     document.getElementById('pepGlobalPopupBtn').onclick=()=>root.classList.remove('show');
@@ -3743,8 +3743,11 @@ load();
   window.pepmosaPopup=function(message,title,icon){
     try{
       const root=ensure();
+      const success=title==='Admin Fee Payment Received!';
+      root.querySelector('.pepGlobalPopupCard').classList.toggle('is-payment-success',success);
       document.getElementById('pepGlobalPopupText').textContent=String(message||'');
       document.getElementById('pepGlobalPopupTitle').textContent=title||'PEPMOSA';
+      document.getElementById('pepGlobalPopupBtn').textContent=success?'GOT IT ♡':'OKAY';
       document.getElementById('pepGlobalPopupMark').textContent=icon||'✦';
       root.classList.add('show');
     }catch(e){nativeAlert(String(message||''))}
@@ -4205,4 +4208,21 @@ load();
 #pepProductPicker .pepVariantChoice.selected{padding-left:18px!important}
 #pepProductPicker .pepVariantChoice:before,#pepProductPicker .pepVariantChoice:after{content:none!important;display:none!important}
 #pepProductPicker .pepVariantChoice span{margin-left:0!important}
+</style>
+
+<style id="pep-admin-fee-success-redesign-index">
+#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success{width:min(520px,100%);border-radius:32px;background:radial-gradient(circle at 50% 0%,rgba(255,222,239,.92),transparent 38%),linear-gradient(145deg,#fff 0%,#fff9fc 54%,#ffedf6 100%);border:1px solid #f8d7e7;box-shadow:0 32px 90px rgba(100,29,67,.25),0 0 0 5px rgba(255,255,255,.16)}
+#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success:before{height:6px;background:linear-gradient(90deg,#ed2690,#c42d91 50%,#f2a2c8)}
+#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success:after{content:"♡";right:15px;bottom:8px;color:rgba(211,52,137,.08);font-size:130px}
+#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success .pepGlobalPopupBody{padding:38px 38px 34px}
+#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success .pepGlobalPopupEyebrow{color:#c12b79;letter-spacing:.25em;margin-bottom:18px}
+#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success .pepGlobalPopupMark{width:78px;height:78px;border-radius:50%;margin-bottom:20px;background:linear-gradient(145deg,#f52d99,#c51f78);font-size:38px;box-shadow:0 13px 28px rgba(210,40,129,.25),inset 0 2px 0 rgba(255,255,255,.28)}
+#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success .pepGlobalPopupMark:after{content:"✦";right:-9px;top:-7px;color:#e78ab8}
+#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success .pepGlobalPopupTitle{font-family:Georgia,"Times New Roman",serif;font-size:30px;color:#51243d;margin-bottom:14px}
+#pepmosaGlobalPopup .pepGlobalPopupStatus{display:none;width:max-content;max-width:100%;margin:0 auto 16px;padding:8px 14px;border-radius:999px;background:#ffe1ef;color:#b91f70;font-size:10px;font-weight:950;letter-spacing:.12em}
+#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success .pepGlobalPopupStatus{display:block}
+#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success .pepGlobalPopupText{max-width:380px;color:#755c6a;font-size:14px;line-height:1.75}
+#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success .pepGlobalPopupActions{margin-top:25px}
+#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success .pepGlobalPopupBtn{width:min(220px,100%);min-height:52px;border:0;border-radius:16px;background:linear-gradient(105deg,#ec2791,#c52d9a);color:white;font-size:13px;letter-spacing:.12em;box-shadow:0 12px 25px rgba(205,43,139,.24)}
+@media(max-width:560px){#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success .pepGlobalPopupBody{padding:32px 22px 27px}#pepmosaGlobalPopup .pepGlobalPopupCard.is-payment-success .pepGlobalPopupTitle{font-size:27px}}
 </style>

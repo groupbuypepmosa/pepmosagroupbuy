@@ -1692,7 +1692,6 @@ body{background:radial-gradient(circle at 8% 8%,rgba(233,165,191,.19),transparen
         <option value="0" data-fee="100">J&T Express — Luzon • ₱100</option>
         <option value="1" data-fee="150">J&T Express — Visayas • ₱150</option>
         <option value="2" data-fee="180">J&T Express — Mindanao • ₱180</option>
-        <option value="3" data-fee="0">Lalamove • App Rate</option>
        </select>
        <input id="shippingMethod" type="hidden">
       </div>
@@ -1735,7 +1734,7 @@ body{background:radial-gradient(circle at 8% 8%,rgba(233,165,191,.19),transparen
   var fee=Number(sel?.selectedOptions?.[0]?.dataset?.fee||100);
   var sm=document.getElementById('shippingMethod'); if(sm)sm.value=sel?.value||'J&T Express — Luzon';
   var ship=document.getElementById('pepShopShipping');if(ship)ship.textContent=fee?money(fee):'APP RATE';
-  var note=document.getElementById('pepShippingNote');if(note)note.textContent=fee?'Shipping fee: '+money(fee):'Shipping fee: Lalamove app rate';
+  var note=document.getElementById('pepShippingNote');if(note)note.textContent=fee?'Shipping fee: '+money(fee):'Shipping fee: '+money(fee);
   var total=document.getElementById('pepShopTotal');if(total)total.textContent=fee?money(subtotal+fee):money(subtotal);
   var st=document.getElementById('pepShopSubtotal');if(st)st.textContent=money(subtotal);
   var sr=document.getElementById('pepShopSubtotalRow');if(sr)sr.textContent=money(subtotal);

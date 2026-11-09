@@ -292,7 +292,6 @@
               <option value="0">J&amp;T Express — Luzon • ₱100</option>
               <option value="1">J&amp;T Express — Visayas • ₱150</option>
               <option value="2">J&amp;T Express — Mindanao • ₱180</option>
-              <option value="3">Lalamove — APP RATE</option>
             </select>
           </div>
           <div class="pepFinalCard">
@@ -385,7 +384,7 @@
       if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))missing.push('Account Email');
       if(!name)missing.push('Full Name');
       if(!contact)missing.push('Contact Number');
-      if(!shippingMethod)missing.push('Shipping Method — please select J&T Express (Luzon/Visayas/Mindanao) or Lalamove');
+      if(!shippingMethod)missing.push('Shipping Method — please select J&T Express (Luzon, Visayas, or Mindanao)');
       if(!address)missing.push('Delivery Address');
       if(!file)missing.push('Payment Proof');
       if(missing.length){

@@ -234,6 +234,23 @@
 .pepSuccessDone{position:relative!important;width:100%!important;min-height:56px!important;border:1px solid rgba(255,255,255,.65)!important;border-radius:19px!important;background:linear-gradient(100deg,#f82d92,#e13aaf 55%,#bf45c2)!important;color:#fff!important;font-size:14px!important;font-weight:950!important;letter-spacing:.5px!important;cursor:pointer!important;box-shadow:0 13px 28px rgba(205,44,139,.23),0 0 0 2px rgba(255,255,255,.16) inset!important;transition:transform .15s ease,box-shadow .15s ease!important}
 .pepSuccessDone:after{content:"→";font-size:22px!important;margin-left:13px!important;vertical-align:-2px!important}
 .pepSuccessDone:hover{transform:translateY(-1px)!important;box-shadow:0 16px 32px rgba(205,44,139,.28)!important}
+#pepInfoModal>.pepSuccessCard{max-height:92vh!important;overflow-y:auto!important;overscroll-behavior:contain!important}
+.pepSuccessSummary{position:relative;z-index:1;text-align:left;max-width:440px;margin:0 auto 18px;padding:15px;border:1px solid #f0d4e3;border-radius:18px;background:rgba(255,255,255,.88);box-shadow:0 7px 20px rgba(202,70,139,.05)}
+.pepSuccessSummaryHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;color:#a72b70;font-size:10px;font-weight:950;letter-spacing:.13em}
+.pepSuccessSummaryHead span{font-size:8px;letter-spacing:.04em;color:#9d8491;background:#fff0f7;padding:5px 8px;border-radius:999px}
+.pepSuccessItem{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid #f5e7ee;font-size:11px}
+.pepSuccessItem:first-of-type{border-top:0}
+.pepSuccessItemInfo{min-width:0;flex:1}
+.pepSuccessItemInfo b{display:block;color:#44313d;font-size:11px;overflow-wrap:anywhere}
+.pepSuccessItemInfo small{display:block;margin-top:3px;color:#927d88;font-size:9px;line-height:1.4}
+.pepSuccessItem strong{white-space:nowrap;color:#563447;font-size:11px}
+.pepSuccessTotals{border-top:1px solid #ecd8e3;margin-top:7px;padding-top:9px;display:grid;gap:7px}
+.pepSuccessTotalRow{display:flex;justify-content:space-between;gap:10px;color:#806b77;font-size:10px}
+.pepSuccessTotalRow b{color:#5a3b4c}
+.pepSuccessTotalRow.grand{padding-top:9px;border-top:1px dashed #e8c9da;color:#a51e68;font-size:13px;font-weight:950}
+.pepSuccessTotalRow.grand b{color:#bd216f;font-size:16px}
+@media(max-width:560px){#pepInfoModal>.pepSuccessCard{max-height:94vh!important;padding:24px 16px 19px!important}.pepSuccessSummary{padding:12px;margin-bottom:15px}.pepSuccessNote{margin-bottom:17px!important}.pepSuccessTitle{font-size:29px!important}}
+
 @media(max-width:560px){#pepInfoModal{padding:10px!important}#pepInfoModal>.pepSuccessCard{width:calc(100vw - 20px)!important;padding:27px 18px 22px!important;border-radius:25px!important}.pepSuccessIcon{width:82px!important;height:82px!important}.pepSuccessIcon span{font-size:47px!important}.pepSuccessTitle{font-size:31px!important}.pepSuccessTitle:before,.pepSuccessTitle:after{width:32px!important;margin-left:7px!important;margin-right:7px!important}.pepSuccessText{font-size:12px!important}.pepSuccessNote{padding:13px!important}.pepSuccessDone{min-height:52px!important}}
 `;
   document.head.appendChild(s);
@@ -447,6 +464,14 @@
       localStorage.setItem('pepmosa_customer_email',email);
       localStorage.setItem('pepmosa_customer_name',name);
       localStorage.setItem('pepmosa_phone',contact);
+      const successItemsHtml=items.map(i=>`
+        <div class="pepSuccessItem">
+          <div class="pepSuccessItemInfo">
+            <b>${esc(i.product_name||'Product')}</b>
+            <small>${esc(i.strength||'')} ${i.strength?' · ':''}Qty ${Number(i.qty||0)} × ${peso(i.unit_price)}</small>
+          </div>
+          <strong>${peso(i.line_total)}</strong>
+        </div>`).join('');
       clearPersistedCart();
       const cartModal=$('cartModal');
       if(cartModal)cartModal.classList.remove('show','open');
@@ -459,6 +484,15 @@
           <h2 class="pepSuccessTitle">Payment Submitted</h2>
           <div class="pepSuccessOrder">Order <b>${esc(oid)}</b></div>
           <p class="pepSuccessText">Your order has been submitted successfully. Your payment proof is now <b>pending admin review</b>.</p>
+          <section class="pepSuccessSummary" aria-label="Order summary">
+            <div class="pepSuccessSummaryHead">ORDER SUMMARY <span>${items.length} ${items.length===1?'ITEM':'ITEMS'}</span></div>
+            ${successItemsHtml}
+            <div class="pepSuccessTotals">
+              <div class="pepSuccessTotalRow"><span>Subtotal</span><b>${peso(subtotal)}</b></div>
+              <div class="pepSuccessTotalRow"><span>Shipping · ${esc(shippingMethod||'Not specified')}</span><b>${shippingFee?peso(shippingFee):'₱0.00'}</b></div>
+              <div class="pepSuccessTotalRow grand"><span>TOTAL PAID / SUBMITTED</span><b>${peso(total)}</b></div>
+            </div>
+          </section>
           <div class="pepSuccessNote"><span>✓</span><span>We’ll review your payment and update your order status once approved.</span></div>
           <button type="button" id="pepInfoOk" class="pepSuccessDone">DONE</button>
         </div>`;

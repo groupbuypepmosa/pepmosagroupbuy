@@ -1675,13 +1675,15 @@ async function loadWaybillCenter(){
       const shippingOrder=g.orders.slice().sort((x,y)=>new Date(y.created_at||0)-new Date(x.created_at||0))
         .find(x=>String(x.shipping_method||"").trim() || Number(x.shipping_fee||0)>0) || latest;
       const checkoutShippingMethod=String(shippingOrder.shipping_method||"").trim();
-      const checkoutShippingFee=Number(shippingOrder.shipping_fee||0);
+      // Normalize legacy shipping fees that may be stored as formatted currency text.
+      const shippingFeeRaw=shippingOrder.shipping_fee ?? shippingOrder.shipping_fee_paid ?? 0;
+      const checkoutShippingFee=Number(String(shippingFeeRaw).replace(/[^0-9.-]/g,""))||0;
       const derivedShippingMethod=checkoutShippingMethod ||
         (checkoutShippingFee===100 ? "J&T Express - Luzon" :
          checkoutShippingFee===150 ? "J&T Express - Visayas" :
-         checkoutShippingFee===180 ? "J&T Express - Mindanao" :
-         checkoutShippingFee===0 && String(shippingOrder.shipping_method||"").trim()==="" ? "" : "");
-      const shippingDisplay=derivedShippingMethod || "Shipping option not recorded";
+         checkoutShippingFee===180 ? "J&T Express - Mindanao" : "");
+      const shippingDisplay=derivedShippingMethod ||
+        (checkoutShippingFee>0 ? "Shipping paid • courier option not recorded" : "Shipping not recorded");
       const shipment=shipmentsByEmail.get(g.email)||{};
       const merged=new Map();
       for(const i of g.items){
@@ -1772,7 +1774,7 @@ function renderSelectedWaybill(){
         '<div class="waybillBlock"><div class="waybillLabel">FROM</div><b>PEPMOSA</b><div>PEPMOSA Group Buy<br>Philippines</div></div>'+
         '<div class="waybillBlock"><div class="waybillLabel">SHIP TO</div><b>'+esc(r.customer_name)+'</b><div>'+esc(r.contact||"Contact not set")+'<br>'+esc(r.address||"Address not set")+'</div></div>'+
       '</div><div class="waybillBarcodeWrap"><div class="waybillBarcode"><span>'+esc(barcode)+'</span></div></div>'+
-      '<div class="waybillBlock" style="margin-bottom:12px"><div class="waybillLabel">CONSOLIDATED SHIPPING DETAILS</div><div><b>Shipping Option:</b> '+esc(r.shipping_method||r.courier||"To be assigned")+' &nbsp; • &nbsp; <b>Waybill / Tracking:</b> '+esc(r.waybill_number||"To be assigned")+'<br><b>Orders:</b> '+esc(r.orders.map(o=>o.order_id).join(", "))+'<br><b>Payment:</b> '+esc(r.payment)+' &nbsp; • &nbsp; <b>Consolidated Total:</b> '+peso(r.total)+'</div></div>'+
+      '<div class="waybillBlock" style="margin-bottom:12px"><div class="waybillLabel">CONSOLIDATED SHIPPING DETAILS</div><div><b>Shipping Option:</b> '+esc(r.shipping_method||r.courier||"To be assigned")+'<br><b>Shipping Paid:</b> '+peso(r.shipping_fee_paid||0)+' &nbsp; • &nbsp; <b>Waybill / Tracking:</b> '+esc(r.waybill_number||"To be assigned")+'<br><b>Orders:</b> '+esc(r.orders.map(o=>o.order_id).join(", "))+'<br><b>Payment:</b> '+esc(r.payment)+' &nbsp; • &nbsp; <b>Consolidated Total:</b> '+peso(r.total)+'</div></div>'+
 
       '<table class="waybillTable"><thead><tr><th>Qty</th><th>Product</th><th>Variant</th><th>Price</th><th>Total</th></tr></thead><tbody>'+
         r.products.map(p=>{

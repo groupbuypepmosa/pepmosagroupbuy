@@ -150,8 +150,22 @@
     setTimeout(()=>w.print(),350);
   }
 
+  function removeShippingEditor(){
+    const panel=document.getElementById('waybillPanel')||document;
+    panel.querySelectorAll('button').forEach(button=>{
+      if(String(button.textContent||'').trim().toUpperCase()!=='SAVE SHIPPING') return;
+      let target=button.closest('.card');
+      if(!target){
+        target=button.parentElement;
+        for(let i=0;i<3&&target&&target.parentElement!==panel;i++) target=target.parentElement;
+      }
+      if(target && target!==panel) target.remove();
+    });
+  }
+
   function install(){
     css();
+    removeShippingEditor();
     if(typeof window.renderSelectedWaybill==='function'){
       window.renderSelectedWaybill=renderV2;
       window.printSelectedWaybill=printV2;

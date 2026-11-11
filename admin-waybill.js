@@ -68,7 +68,17 @@
     const waybillNo=r.waybill_number||('WB-PEPMOSA-'+slug);
     const shippingFee=Number(r.shipping||0);
     const paidShippingFee=Number(r.shipping_fee_paid||shippingFee||0);
-    const shippingLabel=(r.shipping_method||'Shipping option not recorded')+' • '+peso(paidShippingFee);
+    // Prefer the saved checkout option, then the shipment courier. Older records
+    // may have a fee but no method, so use the same legacy fee mapping as admin.html.
+    const savedMethod=String(r.shipping_method||'').trim();
+    const shipmentCourier=String(r.courier||'').trim();
+    const usableMethod=value=>value && !/not recorded|courier option not recorded|to be assigned|shipping details/i.test(value);
+    const inferredMethod=paidShippingFee===100 ? 'J&T Express - Luzon' :
+      paidShippingFee===150 ? 'J&T Express - Visayas' :
+      paidShippingFee===180 ? 'J&T Express - Mindanao' : '';
+    const shippingMethod=usableMethod(savedMethod) ? savedMethod :
+      (usableMethod(shipmentCourier) ? shipmentCourier : inferredMethod);
+    const shippingLabel=(shippingMethod||'Shipping details pending')+' • '+peso(paidShippingFee);
     const total=Number(r.total||0);
     const consolidatedTotal=total;
     const status=r.shipment_status||'PAYMENT CONFIRMED';

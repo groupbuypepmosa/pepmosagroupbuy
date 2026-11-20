@@ -740,6 +740,15 @@ body:has(#authArea:not(.hidden)) .accountWrap .links a{color:#a53d64!important}
  body:has(#authArea:not(.hidden)) .accountWrap .btn{min-height:48px!important}
 }
 </style>
+<style id="pepmosa-ph-address-style">
+.phAddressGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.phAddressGrid select,.phAddressGrid input{width:100%;min-width:0;box-sizing:border-box;padding:12px 13px;border:1px solid #e9c8d7;border-radius:11px;background:#fffafd;color:#713047;font:inherit;font-size:13px;outline:none}
+.phAddressGrid select:focus,.phAddressGrid input:focus{border-color:#c34c7c;box-shadow:0 0 0 3px rgba(195,76,124,.1)}
+.phAddressGrid select:disabled{opacity:.5;background:#f8edf2}
+.phAddressGrid input{grid-column:1/-1}
+.phAddressHint{display:block;margin-top:7px;color:#9a7183;font-size:11px;line-height:1.45}
+@media(max-width:560px){.phAddressGrid{grid-template-columns:1fr}.phAddressGrid input{grid-column:auto}}
+</style>
 </head>
 <body>
 <div class="accountWrap"><div class="accountCard">
@@ -765,7 +774,18 @@ body:has(#authArea:not(.hidden)) .accountWrap .links a{color:#a53d64!important}
 <section id="signupPanel" class="accountPanel">
 <form id="signupForm">
 <div class="field"><label>Full Name</label><input id="signupName" autocomplete="name" required></div>
-<div class="field"><label>Complete Address</label><textarea id="signupAddress" autocomplete="street-address" required style="width:100%;box-sizing:border-box;padding:13px;border:1px solid #e4d3df;border-radius:12px;min-height:82px;resize:vertical;outline:none"></textarea></div>
+<div class="field phAddressGroup" data-ph-address="signup">
+  <label>PHILIPPINE ADDRESS</label>
+  <div class="phAddressGrid">
+   <select id="signupRegion" required><option value="">Select Region</option></select>
+   <select id="signupProvince" disabled><option value="">Select Province</option></select>
+   <select id="signupCity" required disabled><option value="">Select City / Municipality</option></select>
+   <select id="signupBarangay" disabled><option value="">Select Barangay</option></select>
+   <input id="signupStreet" type="text" placeholder="House No. / Building / Street / Subdivision" autocomplete="street-address" required>
+  </div>
+  <small class="phAddressHint" id="signupAddressHint">Choose your region, province, city/municipality, and barangay.</small>
+  <textarea id="signupAddress" autocomplete="street-address" required hidden></textarea>
+ </div>
 <div class="field"><label>Contact Number</label><input id="signupContact" type="tel" autocomplete="tel" required></div>
 <div class="field"><label>WhatsApp Name</label><input id="signupWhatsapp" autocomplete="off" placeholder="Name used on WhatsApp" required></div>
 <div class="field"><label>Email</label><input id="signupEmail" type="email" autocomplete="email" required></div>
@@ -833,7 +853,18 @@ body:has(#authArea:not(.hidden)) .accountWrap .links a{color:#a53d64!important}
     <form id="profileEditForm" class="profileBox" style="margin-top:12px;padding:16px">
       <div class="sectionEyebrow" style="margin-bottom:10px">EDIT DETAILS</div>
       <div class="field"><label>Full Name</label><input id="profileEditName" required></div>
-      <div class="field"><label>Complete Address</label><textarea id="profileEditAddress" required style="width:100%;box-sizing:border-box;padding:13px;border:1px solid #e4d3df;border-radius:12px;min-height:82px;resize:vertical;outline:none"></textarea></div>
+      <div class="field phAddressGroup" data-ph-address="profileEdit">
+  <label>PHILIPPINE ADDRESS</label>
+  <div class="phAddressGrid">
+   <select id="profileEditRegion" required><option value="">Select Region</option></select>
+   <select id="profileEditProvince" disabled><option value="">Select Province</option></select>
+   <select id="profileEditCity" required disabled><option value="">Select City / Municipality</option></select>
+   <select id="profileEditBarangay" disabled><option value="">Select Barangay</option></select>
+   <input id="profileEditStreet" type="text" placeholder="House No. / Building / Street / Subdivision" autocomplete="street-address" required>
+  </div>
+  <small class="phAddressHint" id="profileEditAddressHint">Choose your region, province, city/municipality, and barangay.</small>
+  <textarea id="profileEditAddress" autocomplete="street-address" required hidden></textarea>
+ </div>
       <div class="field"><label>Contact Number</label><input id="profileEditContact" type="tel" required></div>
       <div class="field"><label>WhatsApp Name</label><input id="profileEditWhatsapp" required></div>
       <button class="btn" type="submit">SAVE DETAILS</button>

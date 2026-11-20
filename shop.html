@@ -4228,14 +4228,21 @@ body>button.pepFloatingLuxuryCart .pepCartBow:before{left:0!important;border-rad
 body>button.pepFloatingLuxuryCart .pepCartBow:after{right:0!important;border-radius:2px 9px 2px 7px!important;transform:rotate(-20deg)!important}
 @media(max-width:600px){body>button.pepFloatingLuxuryCart{right:15px!important;bottom:15px!important;width:60px!important;height:60px!important;min-width:60px!important;min-height:60px!important}}
 </style>
-<script id="pep-floating-cart-detach">
+<script id="pep-floating-cart-single-instance">
 (function(){
- function detachCart(){
-  var cart=document.querySelector('header .pepFloatingLuxuryCart');
-  if(cart && cart.parentElement!==document.body){document.body.appendChild(cart);}
+ function normalizeCart(){
+  var carts=Array.from(document.querySelectorAll('button.pepFloatingLuxuryCart, button.cart[onclick*="openCart"]'));
+  if(!carts.length)return;
+  // Keep the designed cart (crown + basket + bow); remove legacy duplicate cart controls.
+  var keep=carts.find(function(el){return el.querySelector('.pepCartCrown')&&el.querySelector('.pepCartBow')})||carts[0];
+  if(keep.parentElement!==document.body)document.body.appendChild(keep);
+  carts.forEach(function(el){if(el!==keep)el.remove();});
+  keep.classList.add('pepFloatingLuxuryCart');
+  keep.setAttribute('aria-label','Open shopping cart');
  }
- if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',detachCart,{once:true});}
- else{detachCart();}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',normalizeCart,{once:true});
+ else normalizeCart();
+ new MutationObserver(normalizeCart).observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script></body>
 </html>

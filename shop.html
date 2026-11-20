@@ -4147,6 +4147,10 @@ main.wrap{position:relative;z-index:3}
   }
   const gb=window.currentGB||null,open=!!(gb&&['OPEN','KIT_COMPLETION'].includes(String(gb.status||'').toUpperCase()));
   btn.hidden=!open;
+  // Force a high-contrast button inline so legacy theme rules cannot wash it out.
+  const styles={position:'absolute',right:'22px',bottom:'58px',zIndex:'30',display:'inline-flex',alignItems:'center',justifyContent:'center',minHeight:'42px',padding:'11px 23px',border:'2px solid #ffffff',borderRadius:'999px',background:'#ffffff',backgroundColor:'#ffffff',backgroundImage:'none',color:'#74183e',fontSize:'12px',fontWeight:'900',letterSpacing:'.06em',lineHeight:'1',textDecoration:'none',textShadow:'none',opacity:'1',visibility:'visible',filter:'none',boxShadow:'0 5px 0 rgba(83,12,42,.16),0 9px 22px rgba(48,8,28,.24)',cursor:'pointer',appearance:'none',WebkitAppearance:'none'};
+  Object.entries(styles).forEach(([k,v])=>btn.style.setProperty(k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase()),v,'important'));
+  btn.style.setProperty('-webkit-text-fill-color','#74183e','important');
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
  new MutationObserver(mount).observe(document.body,{childList:true,subtree:true});

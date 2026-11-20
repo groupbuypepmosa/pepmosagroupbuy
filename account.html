@@ -740,6 +740,23 @@ body:has(#authArea:not(.hidden)) .accountWrap .links a{color:#a53d64!important}
  body:has(#authArea:not(.hidden)) .accountWrap .btn{min-height:48px!important}
 }
 </style>
+<style id="pepmosa-verify-redesign">
+body:has(#verifyPanel.active) .accountWrap > .accountCard{padding-top:38px!important;padding-bottom:30px!important}
+.verifyIntro{display:flex;align-items:center;gap:14px;padding:17px 18px;margin:0 0 22px;border:1px solid #efd3df;border-radius:16px;background:linear-gradient(135deg,#fff7fa,#fffafd)}
+.verifyIcon{flex:0 0 42px;width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#f7e3ec;color:#9c3c61;font-size:21px}
+.verifyIntro strong{display:block;color:#713047;font-size:14px;letter-spacing:.01em}
+.verifyIntro p{margin:4px 0 0;color:#927585;font-size:11px;line-height:1.55;overflow-wrap:anywhere}
+.verifyIntro p b{color:#713047;font-weight:800}
+#verifyMessage{margin:0 0 16px;font-size:11px}
+#verifyForm .field{margin:0 0 17px!important}
+#verifyForm .field label{font-size:10px!important;letter-spacing:.13em!important}
+#verifyForm .field input{background:#fff!important;border:1px solid #e5b7cb!important;min-height:58px!important;font-size:18px!important;letter-spacing:.28em!important;text-align:center!important}
+#verifyForm .btn{margin-top:0!important}
+.verifyResend{display:block;margin:13px auto 0;padding:8px 12px;border:0;background:transparent;color:#9b7888;font-size:11px;cursor:pointer}
+.verifyResend b{color:#a53d64;font-weight:900}
+.verifyResend:disabled{opacity:.55;cursor:wait}
+@media(max-width:700px){.verifyIntro{padding:14px}.verifyIcon{width:38px;height:38px;flex-basis:38px}#verifyForm .field input{min-height:50px!important}}
+</style>
 <style id="pepmosa-ph-address-style">
 .phAddressGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .phAddressGrid select,.phAddressGrid input{width:100%;min-width:0;box-sizing:border-box;padding:12px 13px;border:1px solid #e9c8d7;border-radius:11px;background:#fffafd;color:#713047;font:inherit;font-size:13px;outline:none}
@@ -764,12 +781,13 @@ body:has(#authArea:not(.hidden)) .accountWrap .links a{color:#a53d64!important}
 <button class="btn" id="loginSubmit" type="submit">LOG IN</button>
 </form></section>
 <section id="verifyPanel" class="accountPanel">
-<div class="notice pending">We sent a 6-digit verification code to <b id="verifyEmail"></b>.</div>
+<div class="verifyIntro"><span class="verifyIcon">✉</span><div><strong>Check your inbox</strong><p>Enter the 6-digit code sent to <b id="verifyEmail"></b> to verify your email address.</p></div></div>
+<div id="verifyMessage" class="notice hidden" role="status" aria-live="polite"></div>
 <form id="verifyForm">
 <div class="field"><label>Verification Code</label><input id="verifyCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required></div>
 <button class="btn" type="submit">VERIFY EMAIL</button>
 </form>
-<button class="btn secondary" id="resendCode" type="button">RESEND CODE</button>
+<button class="verifyResend" id="resendCode" type="button">Didn’t receive it? <b>Resend code</b></button>
 </section>
 <section id="signupPanel" class="accountPanel">
 <form id="signupForm">

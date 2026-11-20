@@ -113,7 +113,7 @@
     }catch(e){
       console.error('PEPMOSA account gate',e);
       window.pepmosaCustomerApproved=false;
-      if(isHome())protectHomeProducts(false);
+      if(isHome())goAccount();
       else if(!isPublic())goAccount();
     }
   }

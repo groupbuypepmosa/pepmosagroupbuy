@@ -85,13 +85,13 @@
     try{
       const client=window.sb || (typeof initSupabase==='function'?initSupabase():null);
       if(!client){
-        if(isHome())protectHomeProducts(false); else if(!isPublic())goAccount();
+        if(isHome())goAccount(); else if(!isPublic())goAccount();
         return;
       }
       const {data:{user},error:userError}=await client.auth.getUser();
       if(userError||!user){
         window.pepmosaCustomerApproved=false;
-        if(isHome())protectHomeProducts(false);
+        if(isHome())goAccount();
         else if(!isPublic())goAccount();
         return;
       }
@@ -108,7 +108,7 @@
         document.querySelectorAll('.pepSideRail a[title="Home"]').forEach(a=>a.remove());
         return;
       }
-      if(isHome())protectHomeProducts(false);
+      if(isHome())goAccount();
       else if(!isPublic())goAccount();
     }catch(e){
       console.error('PEPMOSA account gate',e);

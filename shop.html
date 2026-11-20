@@ -1697,8 +1697,10 @@ main.wrap{width:100%!important;max-width:none!important;margin:0!important;paddi
     <a class="active" href="shop.html">HOME</a>
     <a href="#products">SHOP⌄</a>
     <a href="#currentGroupBuy">GROUP BUY⌄</a>
+    <a href="calculator.html">CALCULATOR</a>
     <a href="protocols.html">PROTOCOLS</a>
     <a href="coa.html">COA</a>
+    <a href="buyers-proof.html">BUYERS’ PROOF</a>
     <a href="track.html?v=20260913-global">TRACK ORDER</a>
   </nav>
   <div class="pepLuxuryActions">
@@ -4049,7 +4051,28 @@ main.wrap{position:relative;z-index:3}
  setTimeout(function(){observer.disconnect();},8000);
 })();
 </script>
-</body>
+<style id="pep-remove-info-tiles">
+.pepInfoTiles,.pepShopInfoTiles,.shopInfoCards,.pepTrustTiles{display:none!important}
+</style>
+<script id="pep-remove-shop-info-cards">
+(function(){
+ function removeInfoCards(){
+  const titles=["ORDER DETAILS","CLEAR PRICING","ORDER TRACKING"];
+  const nodes=[...document.querySelectorAll("body *")].filter(el=>el.children.length===0&&titles.includes((el.textContent||"").trim().toUpperCase()));
+  nodes.forEach(el=>{
+   let p=el;
+   for(let n=0;n<5&&p.parentElement;n++){
+    p=p.parentElement;
+    const t=(p.innerText||"").toUpperCase();
+    if(titles.every(x=>t.includes(x))){p.remove();break;}
+   }
+  });
+ }
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",removeInfoCards);else removeInfoCards();
+ new MutationObserver(removeInfoCards).observe(document.body,{childList:true,subtree:true});
+ setTimeout(()=>{},0);
+})();
+</script></body>
 </html>
 
 <style id="pep-picker-actual-popup-fix">

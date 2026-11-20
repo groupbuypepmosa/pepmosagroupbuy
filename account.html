@@ -1182,6 +1182,42 @@ body:has(#accountArea:not(.hidden)){
 }
 </style>
 
+
+<style id="pepmosa-wordmark-fix">
+/* Clean single-line PEPMOSA wordmark; no broken crown/letter wrap */
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome:before{
+ content:"PEPMOSA"!important;
+ position:absolute!important;z-index:0!important;
+ left:24px!important;right:auto!important;top:-24px!important;
+ display:block!important;width:auto!important;height:auto!important;
+ padding:0!important;margin:0!important;border:0!important;
+ background:none!important;white-space:nowrap!important;
+ color:rgba(255,239,246,.105)!important;
+ font:900 clamp(78px,10vw,142px)/1 Georgia,"Times New Roman",serif!important;
+ letter-spacing:-5px!important;text-align:left!important;
+ text-shadow:none!important;pointer-events:none!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome:after{
+ content:"♡"!important;
+ position:absolute!important;z-index:0!important;
+ left:auto!important;right:28px!important;top:4px!important;bottom:auto!important;
+ display:block!important;width:auto!important;height:auto!important;inset:4px 28px auto auto!important;
+ padding:0!important;margin:0!important;border:0!important;background:none!important;
+ color:rgba(255,239,246,.16)!important;
+ font:130px/1 Georgia,"Times New Roman",serif!important;
+ pointer-events:none!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome>*{position:relative;z-index:2}
+@media(max-width:700px){
+ .accountWrap:has(#accountArea:not(.hidden)) .accountWelcome:before{
+  left:12px!important;top:-8px!important;font-size:70px!important;letter-spacing:-3px!important;
+ }
+ .accountWrap:has(#accountArea:not(.hidden)) .accountWelcome:after{
+  right:10px!important;top:0!important;font-size:85px!important;
+ }
+}
+</style>
+
 </head>
 <body>
 <div class="accountWrap"><div class="accountCard">

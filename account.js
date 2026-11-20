@@ -13,9 +13,89 @@ function init(){
  if(tab==='signup')switchTab('signup'); else if(tab==='login')switchTab('login');
  refresh()
 }
+
+const PSGC_API='https://psgc.cloud/api';
+async function phAddressFetch(path){
+ const response=await fetch(PSGC_API+path);
+ if(!response.ok)throw new Error('Address list unavailable. Please try again.');
+ const data=await response.json();
+ return Array.isArray(data)?data:(Array.isArray(data.data)?data.data:[]);
+}
+function phAddressOptions(select,items,placeholder){
+ select.innerHTML='';
+ const first=document.createElement('option');first.value='';first.textContent=placeholder;select.appendChild(first);
+ items.sort((a,b)=>(a.name||'').localeCompare(b.name||'')).forEach(item=>{
+  const option=document.createElement('option');option.value=item.code;option.textContent=item.name;select.appendChild(option);
+ });
+ select.disabled=!items.length;
+}
+function phAddressReset(prefix,level){
+ const ids={region:['Province','City','Barangay'],province:['City','Barangay'],city:['Barangay']};
+ (ids[level]||[]).forEach(name=>{const el=$(prefix+name);if(el){el.innerHTML='<option value="">'+({Province:'Select Province',City:'Select City / Municipality',Barangay:'Select Barangay'}[name])+'</option>';el.disabled=true}});
+}
+async function initPhilippineAddress(prefix){
+ const region=$(prefix+'Region'),province=$(prefix+'Province'),city=$(prefix+'City'),barangay=$(prefix+'Barangay'),hint=$(prefix+'AddressHint');
+ if(!region||region.dataset.ready==='1')return;
+ region.dataset.ready='1';
+ const loadError=()=>{hint.textContent='Unable to load location list. Check your internet connection and try again.'};
+ try{
+  const regions=await phAddressFetch('/regions');
+  phAddressOptions(region,regions,'Select Region');
+ }catch(error){loadError();return}
+ region.addEventListener('change',async()=>{
+  phAddressReset(prefix,'region');province.disabled=true;city.disabled=true;barangay.disabled=true;
+  if(!region.value)return;
+  hint.textContent='Loading provinces and cities...';
+  try{
+   const provinces=await phAddressFetch('/regions/'+encodeURIComponent(region.value)+'/provinces');
+   if(provinces.length){
+    phAddressOptions(province,provinces,'Select Province');
+    city.disabled=true;hint.textContent='Now select your province.';
+   }else{
+    province.innerHTML='<option value="">Not applicable for this region</option>';province.disabled=true;
+    const cities=await phAddressFetch('/regions/'+encodeURIComponent(region.value)+'/cities-municipalities');
+    phAddressOptions(city,cities,'Select City / Municipality');
+    hint.textContent='Now select your city or municipality.';
+   }
+  }catch(error){loadError()}
+ });
+ province.addEventListener('change',async()=>{
+  phAddressReset(prefix,'province');city.disabled=true;barangay.disabled=true;
+  if(!province.value)return;
+  hint.textContent='Loading cities and municipalities...';
+  try{
+   const cities=await phAddressFetch('/provinces/'+encodeURIComponent(province.value)+'/cities-municipalities');
+   phAddressOptions(city,cities,'Select City / Municipality');
+   hint.textContent='Now select your city or municipality.';
+  }catch(error){loadError()}
+ });
+ city.addEventListener('change',async()=>{
+  phAddressReset(prefix,'city');barangay.disabled=true;
+  if(!city.value)return;
+  hint.textContent='Loading barangays...';
+  try{
+   const items=await phAddressFetch('/cities-municipalities/'+encodeURIComponent(city.value)+'/barangays');
+   phAddressOptions(barangay,items,'Select Barangay');
+   hint.textContent=items.length?'Select your barangay and enter your house number/street.':'No barangay list available. Enter your street details below.';
+  }catch(error){hint.textContent='Barangay list unavailable. You can still enter your street details below.'}
+ });
+}
+function composePhilippineAddress(prefix){
+ const val=id=>$(prefix+id)?.value?.trim()||'';
+ const region=$(prefix+'Region'),province=$(prefix+'Province'),city=$(prefix+'City'),barangay=$(prefix+'Barangay');
+ const regionName=region?.selectedOptions?.[0]?.textContent||'';
+ const provinceName=province?.value?province.selectedOptions[0].textContent:'';
+ const cityName=city?.value?city.selectedOptions[0].textContent:'';
+ const barangayName=barangay?.value?barangay.selectedOptions[0].textContent:'';
+ const street=val('Street');
+ if(!region?.value||!cityName)return '';
+ return [street,barangayName,cityName,provinceName,regionName,'Philippines'].filter(Boolean).join(', ');
+}
+
 function wire(){
  $('loginTab').onclick=()=>switchTab('login'); $('signupTab').onclick=()=>switchTab('signup');
  $('loginForm').onsubmit=login; $('signupForm').onsubmit=signup;
+ initPhilippineAddress('signup');initPhilippineAddress('profileEdit');
  $('toggleLoginPassword').onclick=()=>{const input=$('loginPassword'),btn=$('toggleLoginPassword');const showPassword=input.type==='password';input.type=showPassword?'text':'password';btn.textContent=showPassword?'HIDE':'SHOW';btn.setAttribute('aria-label',showPassword?'Hide password':'Show password')};
  $('verifyForm').onsubmit=verifyCode; $('resendCode').onclick=resendCode; $('profileEditForm').onsubmit=saveProfileDetails;
  $('forgot').onclick=async e=>{e.preventDefault();const email=$('loginEmail').value.trim();if(!email)return msg('Enter your email first.','error');const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/account.html'});msg(error?.message||'Password reset email sent. Check your inbox.','success')};
@@ -28,7 +108,7 @@ function switchTab(which){const login=which==='login';$('loginTab').classList.to
 function showVerify(email){$('verifyEmail').textContent=email;$('verifyCode').value='';$('verifyPanel').classList.add('active');$('loginPanel').classList.remove('active');$('signupPanel').classList.remove('active');$('loginTab').classList.remove('active');$('signupTab').classList.remove('active');show('message',false);setTimeout(()=>$('verifyCode').focus(),100)}
 async function verifyCode(e){e.preventDefault();const email=$('verifyEmail').textContent.trim(),token=$('verifyCode').value.trim();if(!/^\d{6}$/.test(token))return msg('Enter the 6-digit verification code.','error');const btn=$('verifyForm').querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='VERIFYING...';const {data,error}=await sb.auth.verifyOtp({email,token,type:'email'});btn.disabled=false;btn.textContent='VERIFY EMAIL';if(error)return msg(error.message,'error');await savePendingProfileDetails();msg('Email verified. Your account is now waiting for PEPMOSA admin approval.','success');await refresh()}
 async function resendCode(){const email=$('verifyEmail').textContent.trim(),btn=$('resendCode');btn.disabled=true;btn.textContent='SENDING...';const {error}=await sb.auth.resend({type:'signup',email});btn.disabled=false;btn.textContent='RESEND CODE';msg(error?.message||'A new verification code has been sent to your email.','success')}
-async function signup(e){e.preventDefault();const name=$('signupName').value.trim(),address=$('signupAddress').value.trim(),contact=$('signupContact').value.trim(),whatsapp=$('signupWhatsapp').value.trim(),email=$('signupEmail').value.trim(),p=$('signupPassword').value,p2=$('signupPassword2').value;if(!name||!address||!contact||!whatsapp)return msg('Please complete your name, address, contact number, and WhatsApp name.','error');if(p!==p2)return msg('Passwords do not match.','error');const submit=$('signupForm').querySelector('button[type="submit"]');submit.disabled=true;submit.textContent='CREATING...';sessionStorage.setItem('pepmosa_pending_profile',JSON.stringify({full_name:name,address,contact_number:contact,whatsapp_name:whatsapp}));const {data,error}=await sb.auth.signUp({email,password:p,options:{data:{full_name:name,address,contact_number:contact,whatsapp_name:whatsapp},emailRedirectTo:location.origin+'/account.html'}});submit.disabled=false;submit.textContent='CREATE ACCOUNT';if(error)return msg(error.message,'error');if(data.user&&!data.user.email_confirmed_at){const {error:resendError}=await sb.auth.resend({type:'signup',email});showVerify(email);if(resendError){const text=(resendError.message||'').toLowerCase();if(text.includes('already confirmed')||text.includes('already registered')||text.includes('confirmed'))msg('This email already has an account. Please use Log In instead.','error');else msg(resendError.message,'error')}else msg('A new 6-digit verification code has been sent to your email.','success');return}if(data.session){await savePendingProfileDetails();await refresh();return}msg('Account created. Please verify your email first.','success')}
+async function signup(e){e.preventDefault();const name=$('signupName').value.trim(),address=composePhilippineAddress('signup'),contact=$('signupContact').value.trim(),whatsapp=$('signupWhatsapp').value.trim(),email=$('signupEmail').value.trim(),p=$('signupPassword').value,p2=$('signupPassword2').value;if(!name||!address||!contact||!whatsapp)return msg('Please complete your name, address, contact number, and WhatsApp name.','error');if(p!==p2)return msg('Passwords do not match.','error');const submit=$('signupForm').querySelector('button[type="submit"]');submit.disabled=true;submit.textContent='CREATING...';sessionStorage.setItem('pepmosa_pending_profile',JSON.stringify({full_name:name,address,contact_number:contact,whatsapp_name:whatsapp}));const {data,error}=await sb.auth.signUp({email,password:p,options:{data:{full_name:name,address,contact_number:contact,whatsapp_name:whatsapp},emailRedirectTo:location.origin+'/account.html'}});submit.disabled=false;submit.textContent='CREATE ACCOUNT';if(error)return msg(error.message,'error');if(data.user&&!data.user.email_confirmed_at){const {error:resendError}=await sb.auth.resend({type:'signup',email});showVerify(email);if(resendError){const text=(resendError.message||'').toLowerCase();if(text.includes('already confirmed')||text.includes('already registered')||text.includes('confirmed'))msg('This email already has an account. Please use Log In instead.','error');else msg(resendError.message,'error')}else msg('A new 6-digit verification code has been sent to your email.','success');return}if(data.session){await savePendingProfileDetails();await refresh();return}msg('Account created. Please verify your email first.','success')}
 async function login(e){
  e.preventDefault();
  const email=$('loginEmail').value.trim(),password=$('loginPassword').value;
@@ -75,7 +155,7 @@ async function refresh(){
  accountMsg('Your email is verified. Your account is now waiting for PEPMOSA admin approval.','pending');setStatus('pending','WAITING FOR ADMIN APPROVAL');hideDashboardSections()
 }
 async function savePendingProfileDetails(){try{const raw=sessionStorage.getItem('pepmosa_pending_profile');if(!raw||!sb)return;const p=JSON.parse(raw);const r=await sb.rpc('update_customer_profile_details',{p_full_name:p.full_name||'',p_address:p.address||'',p_contact_number:p.contact_number||'',p_whatsapp_name:p.whatsapp_name||''});if(r.error)throw r.error;sessionStorage.removeItem('pepmosa_pending_profile')}catch(e){console.warn('PEPMOSA profile save',e)}}
-async function saveProfileDetails(e){e.preventDefault();const btn=$('profileEditForm').querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='SAVING...';const r=await sb.rpc('update_customer_profile_details',{p_full_name:$('profileEditName').value.trim(),p_address:$('profileEditAddress').value.trim(),p_contact_number:$('profileEditContact').value.trim(),p_whatsapp_name:$('profileEditWhatsapp').value.trim()});btn.disabled=false;btn.textContent='SAVE DETAILS';if(r.error)return accountMsg(r.error.message,'error');accountMsg('Your account details have been saved.','success');await refresh()}
+async function saveProfileDetails(e){e.preventDefault();const btn=$('profileEditForm').querySelector('button[type="submit"]');const address=composePhilippineAddress('profileEdit')||$('profileEditAddress').value.trim();btn.disabled=true;btn.textContent='SAVING...';const r=await sb.rpc('update_customer_profile_details',{p_full_name:$('profileEditName').value.trim(),p_address:address,p_contact_number:$('profileEditContact').value.trim(),p_whatsapp_name:$('profileEditWhatsapp').value.trim()});btn.disabled=false;btn.textContent='SAVE DETAILS';if(r.error)return accountMsg(r.error.message,'error');accountMsg('Your account details have been saved.','success');await refresh()}
 function setStatus(type,label){$('accountStatus').innerHTML='<span class="status '+type+'">'+esc(label)+'</span>'}
 
 function showDashboardSections(){document.querySelector('.accountQuickGrid').classList.remove('hidden');document.querySelectorAll('.accountSection').forEach(x=>x.classList.remove('hidden'));showAccountTab('orders')}

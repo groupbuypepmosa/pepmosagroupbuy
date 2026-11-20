@@ -1,55 +1,84 @@
-/* PEPMOSA editorial boutique refresh: espresso, ivory, champagne */
-:root{--pep-ink:#241c20;--pep-plum:#3b2632;--pep-gold:#c6a46b;--pep-cream:#fbf7f0;--pep-paper:#fffdf9;--pep-muted:#82747a;--pep-border:#e8ddd2}
-html,body{background:#f7f2eb!important;color:var(--pep-ink)!important;font-family:Inter,Arial,sans-serif!important}
-body:before{opacity:.12!important;background-image:radial-gradient(#9d8067 .7px,transparent .7px)!important;background-size:22px 22px!important}
-.pepAnnouncement{background:#2d2028!important;color:#f7eee5!important;border:0!important;min-height:34px!important;font-size:9px!important;letter-spacing:.13em!important}
-header{background:rgba(251,247,240,.97)!important;border-bottom:1px solid #e4d8cb!important;box-shadow:0 5px 24px rgba(45,32,40,.06)!important;padding:13px clamp(18px,4vw,58px)!important}
-header .brand,header .brand span{color:#3b2632!important;letter-spacing:.18em!important}
-header .pepAuthLogin{background:transparent!important;border:1px solid #c6a46b!important;color:#3b2632!important}
-header .pepAuthSignup,header .cart{background:#3b2632!important;border:1px solid #3b2632!important;color:#fffaf3!important;box-shadow:none!important}
-main.wrap.pepHomeRedesigned{max-width:1260px!important;width:calc(100% - 52px)!important;padding:34px 0 70px!important}
-.pepWelcomeHero{grid-template-columns:1.02fr .98fr!important;gap:clamp(22px,4vw,58px)!important;padding:clamp(22px,3vw,42px)!important;border-radius:8px!important;border:1px solid #e4d8cb!important;background:#fffdf9!important;box-shadow:0 22px 60px rgba(52,37,43,.08)!important}
-.pepWelcomeVisual{min-height:430px!important;border-radius:4px!important;background:linear-gradient(145deg,#eee5dc,#f8f3ec 55%,#e9dfd5)!important}
-.pepWelcomeVisual:after{inset:8%!important;border:1px solid rgba(151,119,84,.24)!important;border-radius:0!important;transform:none!important}
-.pepWelcomeBrand{color:#3b2632!important;font-family:Georgia,serif!important;letter-spacing:.2em!important}.pepCrown{color:#b18c58!important}
-.pepWelcomeLogo{filter:grayscale(.16) sepia(.12) drop-shadow(0 16px 22px rgba(52,37,43,.13))!important}
-.pepWelcomeTagline,.pepAccessKicker,.pepSectionEyebrow{color:#9b7749!important;letter-spacing:.2em!important}
-.pepWelcomeCopy,.pepAccessIntro{color:#756970!important}
-.pepWelcomePills span{border:1px solid #d9c8b5!important;background:rgba(255,253,249,.76)!important;color:#705b50!important;border-radius:3px!important}
-.pepWelcomeAccess h1{color:#34252d!important;font-family:Georgia,serif!important;font-weight:500!important;letter-spacing:-1.8px!important}
-.pepWelcomeAccess h1 em,.pepSectionHeading h2 em{color:#a47d4c!important}
-.pepAccessCard{border:1px solid #e4d8cb!important;border-radius:5px!important;background:#fbf7f0!important;box-shadow:none!important;backdrop-filter:none!important}
-.pepMiniCrown{border-radius:4px!important;background:#eee5d8!important;border:1px solid #d8c7b1!important;color:#98764b!important}
-.pepAccessCardTop b,.pepFeatureCard h3{color:#3b2632!important;font-family:Georgia,serif!important}
-.pepAccessPrimary{background:#3b2632!important;border-radius:4px!important;box-shadow:none!important;color:#fffaf3!important}
-.pepAccessSecondary{border:1px solid #c6a46b!important;border-radius:4px!important;background:transparent!important;color:#594239!important}
-.pepAccessQuick a{border-radius:4px!important;border-color:#e5d9cd!important;background:#fffdf9!important;color:#6d5548!important}
-.pepCurrentGB{border:1px solid #dfd0bd!important;border-radius:4px!important;background:#f2eadf!important;color:#604c43!important}
-.pepHomeSearch,.pepHomeWelcomeStrip,.pepHomeUpdate,.pepLatestProof,.pepHomeTrustLite,.pepHomeCommunityCTA{border:1px solid #e4d8cb!important;border-radius:6px!important;background:#fffdf9!important;box-shadow:0 12px 30px rgba(52,37,43,.045)!important}
-.pepHomeSearch{max-width:none!important;margin:20px 0!important}.pepHomeSearchLabel,.pepFeatureNo{color:#9b7749!important;letter-spacing:.18em!important}
-.pepHomeSearchForm input{border-radius:4px!important;background:#fbf7f0!important;border-color:#ded0c1!important}
-.pepHomeSearchForm button{border-radius:4px!important;background:#3b2632!important;color:#fffaf3!important}
-.pepStripIcon,.pepHomeUpdateIcon,.pepFeatureIcon{background:#eee5d8!important;color:#9b7749!important;border-radius:4px!important;border-color:#d9c8b5!important}
-.pepHomeWelcomeStrip b,.pepHomeUpdateText h2,.pepSectionHeading h2{color:#3b2632!important;font-family:Georgia,serif!important}
-.pepHomeWelcomeStrip>a,.pepHomeUpdate>a{color:#987448!important}
-.pepHomeFeatureGrid{gap:12px!important}
-.pepFeatureCard{min-height:225px!important;border:1px solid #e4d8cb!important;border-radius:5px!important;background:#fffdf9!important;box-shadow:none!important;color:#34252d!important}
-.pepFeatureCard:hover{border-color:#bca17b!important;box-shadow:0 15px 32px rgba(52,37,43,.08)!important}
-.pepFeatureShop{background:#eee5d8!important}.pepFeatureCard h3{font-size:22px!important}
-.pepFeatureCard p{color:#7d7074!important}.pepFeatureCard>b{border-color:#e8ddd2!important;color:#987448!important}
-#gbStatus{border:1px solid #dfd0bd!important;border-radius:5px!important;background:linear-gradient(110deg,#f7f0e7,#fffdf9)!important;box-shadow:none!important}
-#gbStatus:before{background:linear-gradient(180deg,#c6a46b,#8d7048)!important}
-#gbStatus>b,#gbStatus .gb-name{color:#3b2632!important}
-#gbStatus>b:before,#gbStatus .gb-name:before{color:#9b7749!important}
-#gbStatus .status.open{background:#e8dfd0!important;border:1px solid #cbb99d!important;color:#60482e!important}
-.pepHomeShopNow,.pepHomeShopNowWrap a{background:#3b2632!important;color:#fffaf3!important;border-radius:4px!important;box-shadow:none!important}
-#productGrid .pepStoreCard{border:1px solid #e4d8cb!important;border-radius:5px!important;background:#fffdf9!important;box-shadow:none!important}
-#productGrid .pepStoreCard .productImg{background:#f1e9df!important}
-#productGrid .pepStoreBody h3{color:#3b2632!important;font-family:Georgia,serif!important}
-#productGrid .pepStarting b{color:#987448!important}
-#productGrid .pepSelectVariant{background:#3b2632!important;color:#fffaf3!important;border-radius:4px!important;box-shadow:none!important}
-.pepSideRail{border:1px solid #dfd0bd!important;border-radius:5px!important;background:#fbf7f0!important;box-shadow:0 12px 30px rgba(52,37,43,.1)!important}
-.pepSideRail a{border-radius:3px!important;color:#65514a!important}.pepSideRail a:hover{background:#eee5d8!important;color:#3b2632!important}
-.pepHomeFooter{border-color:#e4d8cb!important;color:#897a78!important}.pepFooterBrand{color:#3b2632!important}
-@media(max-width:760px){main.wrap.pepHomeRedesigned{width:calc(100% - 22px)!important;padding:16px 0 90px!important}.pepWelcomeHero{grid-template-columns:1fr!important;padding:13px!important;border-radius:6px!important}.pepWelcomeVisual{min-height:280px!important}.pepWelcomeLogo{height:170px!important}.pepWelcomeAccess{padding:20px 8px 10px!important}.pepWelcomeAccess h1{font-size:43px!important}.pepHomeFeatureGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.pepFeatureCard{min-height:205px!important;padding:16px 13px!important}.pepFeatureCard h3{font-size:18px!important}}
-@media(max-width:420px){.pepHomeFeatureGrid{grid-template-columns:1fr!important}.pepFeatureCard{min-height:175px!important}}
+/* PEPMOSA SIGNATURE HOMEPAGE — burgundy satin / blush luxury */
+:root{--pm-wine:#4b102b;--pm-wine2:#761b43;--pm-berry:#ad315f;--pm-pink:#f7c7d9;--pm-blush:#fff0f5;--pm-cream:#fff9f5;--pm-gold:#d9b77b;--pm-ink:#42182d;--pm-muted:#8a6877;--pm-line:#f0cada}
+html,body{background:linear-gradient(180deg,#fff5f8 0%,#fce8f0 55%,#fff9fb 100%)!important;color:var(--pm-ink)!important;font-family:Inter,Arial,sans-serif!important}
+body:before{opacity:.18!important;background-image:radial-gradient(rgba(255,255,255,.95) 1.3px,transparent 1.3px)!important;background-size:34px 34px!important}
+.pepAnnouncement{min-height:30px!important;padding:7px 14px!important;background:#3d1027!important;color:#f9dce8!important;border:0!important;font-size:9px!important;letter-spacing:.12em!important}
+.pepAnnouncement b{color:#f5b7d0!important}
+header{min-height:66px!important;padding:10px clamp(15px,4vw,54px)!important;background:rgba(255,249,252,.96)!important;border-bottom:1px solid #f0d3df!important;box-shadow:0 8px 25px rgba(76,16,44,.07)!important;backdrop-filter:blur(14px)!important}
+header .brand,header .brand span{color:#50142f!important;letter-spacing:.16em!important}
+header .brand img{width:43px!important;height:39px!important;object-fit:contain!important}
+header a,header button{transition:.2s ease}
+header .pepAuthLogin{border:1px solid #e7b9cc!important;background:#fff7fa!important;color:#681b3d!important;border-radius:999px!important}
+header .pepAuthSignup,header .cart{background:linear-gradient(110deg,#8e1e4b,#c13e73)!important;color:white!important;border:0!important;border-radius:999px!important;box-shadow:0 7px 18px rgba(146,28,75,.2)!important}
+main.wrap.pepHomeRedesigned{width:min(1440px,calc(100% - 48px))!important;max-width:1440px!important;padding:26px 0 65px!important}
+.pepWelcomeHero{position:relative!important;isolation:isolate!important;overflow:hidden!important;display:grid!important;grid-template-columns:1.06fr .94fr!important;align-items:center!important;gap:20px!important;min-height:360px!important;padding:36px clamp(24px,4vw,62px)!important;border:1px solid rgba(255,255,255,.22)!important;border-radius:24px!important;background:radial-gradient(circle at 78% 12%,rgba(255,190,218,.45),transparent 26%),radial-gradient(circle at 90% 90%,rgba(230,89,143,.3),transparent 32%),linear-gradient(112deg,#3d1027 0%,#681638 46%,#a52b5b 100%)!important;box-shadow:0 24px 58px rgba(79,15,45,.23)!important}
+.pepWelcomeHero:before{content:"";position:absolute;inset:0;z-index:-1;opacity:.42;background:radial-gradient(ellipse at 100% 20%,rgba(255,225,238,.45),transparent 34%),linear-gradient(145deg,transparent 48%,rgba(255,210,228,.1) 49%,transparent 52%),linear-gradient(25deg,transparent 55%,rgba(255,255,255,.08) 56%,transparent 58%)!important}
+.pepWelcomeHero:after{content:"♡";position:absolute;right:34%;top:10px;z-index:-1;color:rgba(255,221,235,.10);font:220px/1 Georgia,serif;pointer-events:none}
+.pepWelcomeVisual{position:relative!important;z-index:1!important;min-height:280px!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;padding:12px!important;border:0!important;border-radius:0!important;background:transparent!important;overflow:visible!important}
+.pepWelcomeVisual:after{content:"";position:absolute!important;inset:8px 0 8px 0!important;border:1px solid rgba(241,199,215,.25)!important;border-radius:16px!important;pointer-events:none!important}
+.pepWelcomeBrand{position:relative!important;z-index:2!important;margin:0 0 2px 18px!important;color:#fff4f7!important;font:clamp(45px,6vw,82px)/.95 Georgia,"Times New Roman",serif!important;letter-spacing:.02em!important;text-shadow:0 6px 25px rgba(0,0,0,.12)!important}
+.pepCrown{color:var(--pm-gold)!important}
+.pepWelcomeLogo{position:relative!important;z-index:2!important;display:block!important;width:min(78%,470px)!important;height:140px!important;max-height:150px!important;object-fit:contain!important;object-position:left center!important;margin:0 0 8px 14px!important;mix-blend-mode:screen!important;filter:brightness(1.16) contrast(1.03) drop-shadow(0 14px 22px rgba(0,0,0,.18))!important}
+.pepWelcomeTagline{position:relative!important;z-index:2!important;margin:8px 0 0 18px!important;color:#f6c5d7!important;font-size:10px!important;letter-spacing:.32em!important;font-weight:900!important}
+.pepWelcomeCopy{position:relative!important;z-index:2!important;margin:10px 18px 0!important;max-width:480px!important;color:#f9e5ec!important;font-size:13px!important;line-height:1.65!important}
+.pepWelcomePills{position:relative!important;z-index:2!important;display:flex!important;flex-wrap:wrap!important;gap:8px!important;margin:17px 0 0 18px!important}
+.pepWelcomePills span{border:1px solid rgba(255,230,240,.28)!important;background:rgba(255,255,255,.08)!important;color:#fff1f6!important;border-radius:999px!important;padding:7px 10px!important;font-size:8px!important;letter-spacing:.1em!important}
+.pepWelcomeAccess{position:relative!important;z-index:2!important;padding:20px 8px 20px 22px!important}
+.pepAccessKicker{color:#f5bfd3!important;letter-spacing:.2em!important;font-size:9px!important}
+.pepLiveDot{background:#ff9fc3!important;box-shadow:0 0 0 5px rgba(255,159,195,.14)!important}
+.pepWelcomeAccess h1{color:#fff8fa!important;font:500 clamp(42px,5.2vw,70px)/.98 Georgia,"Times New Roman",serif!important;letter-spacing:-1.7px!important}
+.pepWelcomeAccess h1 em{color:#f7c4d8!important;font-style:italic!important}
+.pepAccessIntro{color:#f7dce6!important;font-size:13px!important;line-height:1.65!important}
+.pepAccessCard{padding:20px!important;border:1px solid rgba(255,238,245,.5)!important;border-radius:18px!important;background:rgba(255,248,251,.96)!important;box-shadow:0 16px 35px rgba(35,5,20,.2)!important;backdrop-filter:blur(14px)!important}
+.pepAccessCardTop b{color:#51152f!important;font:600 21px Georgia,serif!important}
+.pepAccessCardTop small{color:#906b7b!important}
+.pepMiniCrown{background:#f9e4ed!important;color:#a02d5d!important;border:1px solid #f0c7d8!important;border-radius:12px!important}
+.pepAccessPrimary{min-height:48px!important;border-radius:999px!important;background:linear-gradient(100deg,#7b163e,#bd3b70)!important;color:white!important;box-shadow:0 9px 22px rgba(128,20,62,.2)!important}
+.pepAccessSecondary{min-height:46px!important;border:1px solid #dca5bc!important;border-radius:999px!important;background:#fff!important;color:#6c1d3d!important}
+.pepAccessDivider small{color:#b37a91!important}
+.pepAccessQuick a{border:1px solid #f0d6e1!important;border-radius:12px!important;background:#fff9fb!important;color:#6c2442!important}
+#gbStatus{margin-top:15px!important;padding:17px 20px!important;border:1px solid rgba(255,239,246,.55)!important;border-radius:15px!important;background:linear-gradient(110deg,rgba(255,247,250,.97),rgba(255,224,237,.95))!important;box-shadow:0 12px 24px rgba(35,5,20,.15)!important}
+#gbStatus:before{background:linear-gradient(180deg,#e3b77d,#c99b62)!important}
+#gbStatus:after{color:rgba(167,37,88,.12)!important}
+#gbStatus>b,#gbStatus .gb-name{color:#54152f!important}
+#gbStatus>b:before,#gbStatus .gb-name:before{color:#a02e5b!important}
+#gbStatus .status.open{background:#fce4ed!important;color:#9c1f52!important;border-color:#e9b2c8!important}
+#gbStatus .status.closed{background:#f1e8ed!important;color:#765968!important;border-color:#dfcbd5!important}
+.pepHomeSearch,.pepHomeWelcomeStrip,.pepHomeUpdate,.pepLatestProof,.pepHomeTrustLite,.pepHomeCommunityCTA{border:1px solid #f0cddd!important;border-radius:18px!important;background:rgba(255,250,252,.94)!important;box-shadow:0 12px 30px rgba(103,25,60,.07)!important}
+.pepHomeSearch{max-width:none!important;margin:18px 0!important}
+.pepHomeSearchLabel,.pepSectionEyebrow{color:#a52f60!important;letter-spacing:.18em!important}
+.pepHomeSearchForm input{border:1px solid #e9c4d4!important;border-radius:999px!important;background:#fff!important}
+.pepHomeSearchForm button{border-radius:999px!important;background:linear-gradient(100deg,#8c1d49,#c33f76)!important}
+.pepHomeWelcomeStrip{margin:18px 0!important}
+.pepStripIcon,.pepHomeUpdateIcon{background:#f8dce7!important;color:#a62d5d!important;border-radius:50%!important}
+.pepHomeWelcomeStrip b,.pepHomeUpdateText h2{color:#581830!important;font-family:Georgia,serif!important}
+.pepHomeWelcomeStrip small,.pepHomeUpdateText p{color:#8c6d7b!important}
+.pepHomeWelcomeStrip>a,.pepHomeUpdate>a{color:#a52f60!important}
+.pepSectionHeading h2{color:#4d142d!important;font:500 clamp(32px,4vw,48px)/1.05 Georgia,serif!important}
+.pepSectionHeading h2 em{color:#bd4777!important}
+.pepHomeFeatureGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important}
+.pepFeatureCard{min-height:220px!important;border:1px solid #efcbd9!important;border-radius:18px!important;background:linear-gradient(150deg,#fffafd,#fcebf2)!important;box-shadow:0 12px 25px rgba(103,25,60,.06)!important;color:#54152f!important}
+.pepFeatureCard:hover{transform:translateY(-4px)!important;border-color:#d98aa9!important;box-shadow:0 18px 32px rgba(103,25,60,.12)!important}
+.pepFeatureShop{background:linear-gradient(145deg,#5b1734,#9b2857)!important;color:white!important}
+.pepFeatureNo{color:#d6a7b9!important}
+.pepFeatureIcon{width:52px!important;height:52px!important;border-radius:16px!important;background:#f8dce7!important;color:#9e2b5a!important;border:1px solid #efc5d6!important}
+.pepFeatureCard h3{color:#55162f!important;font:600 22px Georgia,serif!important}
+.pepFeatureCard p{color:#8b6c7a!important}
+.pepFeatureCard>b{color:#a32b5c!important;border-color:#f0cfdd!important}
+.pepFeatureShop h3,.pepFeatureShop p,.pepFeatureShop>b{color:#fff5f8!important}
+.pepFeatureShop .pepFeatureIcon{background:rgba(255,255,255,.14)!important;color:#ffe1ed!important;border-color:rgba(255,255,255,.22)!important}
+.pepLatestProofTop h2{color:#55162f!important;font-family:Georgia,serif!important}
+.pepLatestProofCard{border-radius:15px!important}
+.pepViewAllProof{background:#f9e3ec!important;color:#92224f!important;border-radius:999px!important}
+.pepHomeCommunityCTA{background:linear-gradient(110deg,#4b122c,#8d214d)!important;color:#fff!important}
+.pepHomeCommunityCTA h2,.pepHomeCommunityCTA p,.pepHomeCommunityCTA .eyebrow{color:#fff5f8!important}
+.pepHomeCommunityCTA>a{background:#fff0f5!important;color:#791a42!important;border-radius:999px!important;padding:13px 18px!important}
+.pepCommunitySeal{background:rgba(255,255,255,.13)!important;color:#ffe5ef!important}
+.pepSideRail{border:1px solid #edc5d6!important;border-radius:18px!important;background:rgba(255,249,252,.94)!important;box-shadow:0 14px 35px rgba(103,25,60,.12)!important}
+.pepSideRail a{color:#71203f!important;border-radius:12px!important}
+.pepSideRail a:hover{background:#f9e2eb!important;color:#a52d60!important}
+.pepHomeFooter{border-color:#eccbda!important;color:#987889!important}
+.pepFooterBrand{color:#601735!important}
+@media(max-width:900px){main.wrap.pepHomeRedesigned{width:calc(100% - 28px)!important}.pepWelcomeHero{grid-template-columns:1fr!important;gap:8px!important;padding:24px!important}.pepWelcomeVisual{min-height:230px!important}.pepWelcomeLogo{height:105px!important}.pepWelcomeAccess{padding:12px 8px!important}.pepHomeFeatureGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:600px){main.wrap.pepHomeRedesigned{width:calc(100% - 18px)!important;padding:13px 0 90px!important}.pepWelcomeHero{padding:16px!important;border-radius:18px!important}.pepWelcomeVisual{min-height:205px!important}.pepWelcomeBrand{font-size:46px!important}.pepWelcomeLogo{width:85%!important;height:85px!important;margin-left:8px!important}.pepWelcomeTagline,.pepWelcomeCopy,.pepWelcomePills{margin-left:9px!important}.pepWelcomeAccess{padding:12px 2px 4px!important}.pepWelcomeAccess h1{font-size:43px!important}.pepAccessCard{padding:15px!important}.pepHomeFeatureGrid{gap:9px!important}.pepFeatureCard{min-height:190px!important;padding:15px!important;border-radius:14px!important}.pepFeatureCard h3{font-size:18px!important}.pepHomeSearch,.pepHomeWelcomeStrip,.pepHomeUpdate,.pepLatestProof,.pepHomeCommunityCTA{border-radius:14px!important}.pepSideRail{bottom:10px!important}}
+@media(max-width:390px){.pepHomeFeatureGrid{grid-template-columns:1fr!important}.pepFeatureCard{min-height:160px!important}}

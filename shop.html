@@ -4074,7 +4074,53 @@ main.wrap{position:relative;z-index:3}
  new MutationObserver(removeInfoCards).observe(document.body,{childList:true,subtree:true});
  setTimeout(()=>{},0);
 })();
-</script></body>
+</script><script id="pep-moq-independent-loader">
+(function(){
+ const $=id=>document.getElementById(id);
+ const escHtml=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+ const money=v=>Number(v)>0?"₱"+Number(v).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2}):"PRICE ON REQUEST";
+ async function run(){
+  const grid=$("openForAllGrid");if(!grid)return;
+  const name=$("pepMoqRoundName"),target=$("pepMoqTarget");
+  try{
+   let db=window.sb;
+   if(!db&&typeof initSupabase==="function")db=initSupabase();
+   if(!db)throw new Error("Store connection is not initialized.");
+   const timeout=(p)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("The MOQ data request timed out. Please refresh.")),12000))]);
+   const settingsQ=await timeout(db.from("ofa_settings").select("active_gb_id,moq_name,moq_number,moq_target").eq("id",true).maybeSingle());
+   if(settingsQ.error)throw settingsQ.error;
+   const settings=settingsQ.data;
+   if(!settings){if(name)name.textContent="MOQ settings unavailable";if(target)target.textContent="—";grid.innerHTML='<div class="pepMoqEmpty">MOQ settings have not been configured yet.</div>';return;}
+   const groupsQ=await timeout(db.from("ofa_group_buys").select("gb_id,gb_number,customer_facing_name,status,moq_target,created_at").in("status",["OPEN"]).order("created_at",{ascending:false}));
+   if(groupsQ.error)throw groupsQ.error;
+   const groups=groupsQ.data||[];
+   const active=groups.find(g=>g.gb_id===settings.active_gb_id)||groups[0]||null;
+   if(name)name.textContent=active?.customer_facing_name||settings.moq_name||("MOQ ROUND "+(active?.gb_number||settings.moq_number||""));
+   const goal=active?.moq_target??settings.moq_target;
+   if(target)target.textContent=Number(goal)>0?Number(goal).toLocaleString("en-PH")+" VIALS":"OPEN MOQ";
+   const ids=groups.map(g=>g.gb_id);
+   if(!ids.length){grid.innerHTML='<div class="pepMoqEmpty">There are no open MOQ rounds right now.</div>';return;}
+   const productsQ=await timeout(db.from("ofa_products").select("id,gb_id,name,amount,moq,status,image_url,created_at").in("gb_id",ids).order("created_at",{ascending:false}));
+   if(productsQ.error)throw productsQ.error;
+   const products=productsQ.data||[];
+   if(!products.length){grid.innerHTML='<div class="pepMoqEmpty">No products have been added to the open MOQ rounds yet.</div>';return;}
+   const byId=new Map(groups.map(g=>[g.gb_id,g]));
+   grid.innerHTML=products.map(p=>{
+    const g=byId.get(p.gb_id),available=String(p.status||"").toUpperCase()==="AVAILABLE",minimum=Math.max(1,Number(p.moq||1));
+    return '<article class="pepMoqCard '+(available?'isAvailable':'isSoldOut')+'"><div class="pepMoqImage">'+(p.image_url?'<img loading="lazy" decoding="async" src="'+escHtml(p.image_url)+'" alt="'+escHtml(p.name)+'">':'<span>♙</span>')+'<span class="pepMoqStatus '+(available?'available':'soldout')+'">'+(available?'AVAILABLE':'SOLD OUT')+'</span></div><div class="pepMoqCardBody"><h3>'+escHtml(p.name)+'</h3><div class="pepMoqFacts"><span>MINIMUM ORDER</span><strong>'+minimum+' '+(minimum===1?'VIAL':'VIALS')+'</strong></div><div class="pepMoqPrice">'+money(p.amount)+'</div><div class="pepMoqFooter">'+escHtml(g?.customer_facing_name||('MOQ GB '+(g?.gb_number||'')))+' • '+(available?'No Admin Fee':'Currently sold out')+'</div></div></article>';
+   }).join("");
+  }catch(err){
+   console.error("PEPMOSA MOQ loader:",err);
+   if(name)name.textContent="Unable to load MOQ round";
+   if(target)target.textContent="—";
+   grid.innerHTML='<div class="pepMoqEmpty">Could not load MOQ data. '+escHtml(err?.message||"Please refresh the page.")+'</div>';
+  }
+ }
+ function boot(){run();}
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
+})();
+</script>
+</body>
 </html>
 
 <style id="pep-picker-actual-popup-fix">

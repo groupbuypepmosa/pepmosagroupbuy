@@ -3552,11 +3552,17 @@ load();
       var sb=window.sb;
       if(!sb) throw new Error('Database not ready');
       var gb=window.currentGB||null;
-      if(!gb||!gb.gb_number){
+      // Never allow Admin Fee payment for a CLOSED/expired Group Buy.
+      // Only resolve a fallback active GB when no GB has been loaded at all.
+      if(gb && !['OPEN','KIT_COMPLETION'].includes(String(gb.status||'').toUpperCase())){
+        throw new Error('This Group Buy is CLOSED. Admin Fee payment is no longer available for this round.');
+      }
+      if(!gb){
         var q=await sb.from('group_buys').select('*').in('status',['OPEN','KIT_COMPLETION']).order('created_at',{ascending:false}).limit(1).maybeSingle();
+        if(q.error) throw q.error;
         gb=q.data||null;
       }
-      if(!gb||!gb.gb_number) throw new Error('No active Group Buy');
+      if(!gb||!gb.gb_number||!['OPEN','KIT_COMPLETION'].includes(String(gb.status||'').toUpperCase())) throw new Error('No active Group Buy. Admin Fee payment is unavailable.');
       // Use a secure database function because public visitors cannot directly SELECT
       // rows from admin_fee_payments under RLS.
       var accessCheck=null;
@@ -4185,6 +4191,9 @@ main.wrap{position:relative;z-index:3}
   if(!btn){
    btn=document.createElement('button');btn.type='button';btn.className='pepAdminFeeCTA';btn.textContent='PAY ADMIN FEE';
    btn.addEventListener('click',async()=>{
+    const gb=window.currentGB||null;
+    const active=!!(gb&&['OPEN','KIT_COMPLETION'].includes(String(gb.status||'').toUpperCase()));
+    if(!active){btn.hidden=true;btn.style.setProperty('display','none','important');return;}
     if(btn.disabled)return;
     btn.disabled=true;const old=btn.textContent;btn.textContent='PLEASE WAIT…';
     try{
@@ -4198,10 +4207,16 @@ main.wrap{position:relative;z-index:3}
   }
   const gb=window.currentGB||null,open=!!(gb&&['OPEN','KIT_COMPLETION'].includes(String(gb.status||'').toUpperCase()));
   btn.hidden=!open;
-  // Force a high-contrast button inline so legacy theme rules cannot wash it out.
-  const styles={position:'absolute',right:'22px',bottom:'58px',zIndex:'30',display:'inline-flex',alignItems:'center',justifyContent:'center',minHeight:'42px',padding:'11px 23px',border:'2px solid #ffffff',borderRadius:'999px',background:'#ffffff',backgroundColor:'#ffffff',backgroundImage:'none',color:'#74183e',fontSize:'12px',fontWeight:'900',letterSpacing:'.06em',lineHeight:'1',textDecoration:'none',textShadow:'none',opacity:'1',visibility:'visible',filter:'none',boxShadow:'0 5px 0 rgba(83,12,42,.16),0 9px 22px rgba(48,8,28,.24)',cursor:'pointer',appearance:'none',WebkitAppearance:'none'};
-  Object.entries(styles).forEach(([k,v])=>btn.style.setProperty(k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase()),v,'important'));
-  btn.style.setProperty('-webkit-text-fill-color','#74183e','important');
+  if(open){
+   const styles={position:'absolute',right:'22px',bottom:'58px',zIndex:'30',display:'inline-flex',alignItems:'center',justifyContent:'center',minHeight:'42px',padding:'11px 23px',border:'2px solid #ffffff',borderRadius:'999px',background:'#ffffff',color:'#74183e',fontSize:'12px',fontWeight:'900',letterSpacing:'.06em',lineHeight:'1',boxShadow:'0 5px 0 rgba(83,12,42,.16),0 9px 22px rgba(48,8,28,.24)',cursor:'pointer'};
+   Object.entries(styles).forEach(([k,v])=>btn.style.setProperty(k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase()),v,'important'));
+   btn.style.setProperty('-webkit-text-fill-color','#74183e','important');
+   btn.style.removeProperty('display');
+  }else{
+   btn.style.setProperty('display','none','important');
+   btn.style.setProperty('visibility','hidden','important');
+   btn.style.setProperty('pointer-events','none','important');
+  }
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
  new MutationObserver(mount).observe(document.body,{childList:true,subtree:true});

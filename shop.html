@@ -4230,28 +4230,40 @@ body>button.pepFloatingLuxuryCart .pepCartBow:after{right:0!important;border-rad
 </style>
 <script id="pep-floating-cart-single-instance">
 (function(){
- function setup(){
-  var all=Array.from(document.querySelectorAll('button.pepFloatingLuxuryCart'));
-  if(!all.length)return;
-  var cart=all.find(function(el){return el.classList.contains('cart')&&el.getAttribute('onclick')&&el.getAttribute('onclick').indexOf('openCart')>=0})||all[0];
-  // Keep the original cart button and its native cart-modal action; remove only duplicate cart buttons.
-  all.forEach(function(el){if(el!==cart)el.remove();});
-  if(cart.parentElement!==document.body)document.body.appendChild(cart);
-  cart.style.cssText += ';position:fixed!important;right:18px!important;bottom:18px!important;top:auto!important;left:auto!important;z-index:2147483000!important;width:76px!important;height:76px!important;min-width:76px!important;min-height:76px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-direction:column!important;cursor:pointer!important;pointer-events:auto!important;touch-action:manipulation!important;transform:none!important;';
-  cart.setAttribute('aria-label','Open shopping cart');
-  if(!cart.dataset.pepClickBound){
-   cart.dataset.pepClickBound='1';
-   cart.addEventListener('click',function(ev){
-    ev.preventDefault();ev.stopImmediatePropagation();
-    if(typeof window.openCart==='function'){window.openCart();}
-    else{var modal=document.getElementById('cartModal');if(modal)modal.classList.add('show');}
-   },true);
-  }
-  var badge=cart.querySelector('#cartCount');
-  if(badge){badge.style.pointerEvents='none';}
-  cart.querySelectorAll('svg,i').forEach(function(el){el.style.pointerEvents='none';});
+ function normalize(){
+  var canonical=document.querySelector('button.pepFloatingLuxuryCart.cart[onclick*="openCart"]');
+  if(!canonical)return;
+  // Keep the real header cart (its native openCart handler and live cartCount) and move it to the corner.
+  if(canonical.parentElement!==document.body)document.body.appendChild(canonical);
+  canonical.style.setProperty('position','fixed','important');
+  canonical.style.setProperty('right','18px','important');
+  canonical.style.setProperty('bottom','18px','important');
+  canonical.style.setProperty('left','auto','important');
+  canonical.style.setProperty('top','auto','important');
+  canonical.style.setProperty('z-index','2147483000','important');
+  canonical.style.setProperty('width','72px','important');
+  canonical.style.setProperty('height','72px','important');
+  canonical.style.setProperty('min-width','72px','important');
+  canonical.style.setProperty('min-height','72px','important');
+  canonical.style.setProperty('cursor','pointer','important');
+  canonical.style.setProperty('pointer-events','auto','important');
+  canonical.style.setProperty('touch-action','manipulation','important');
+  // Remove every other fixed cart/basket button in the floating-corner area, regardless of its legacy class.
+  document.querySelectorAll('button').forEach(function(el){
+   if(el===canonical)return;
+   var sig=((el.id||'')+' '+(typeof el.className==='string'?el.className:'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.getAttribute('title')||'')+' '+(el.getAttribute('onclick')||'')).toLowerCase();
+   if(!/(cart|basket|shopping)/.test(sig))return;
+   var cs=getComputedStyle(el),r=el.getBoundingClientRect();
+   var fixed=cs.position==='fixed'||cs.position==='sticky';
+   var corner=r.width>25&&r.height>25&&r.right>innerWidth-240&&r.bottom>innerHeight-240;
+   if(fixed&&corner)el.remove();
+  });
  }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});else setup();
+ function start(){
+  normalize();
+  new MutationObserver(normalize).observe(document.documentElement,{childList:true,subtree:true});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 </script></body>
 </html>

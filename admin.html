@@ -1977,6 +1977,7 @@ async function setActiveGroupBuy(gb){
     const vialGB=$("vialTrackerGB");
     if(vialGB&&gb)vialGB.value=gb;
     await Promise.all([loadFees(),loadOrders(),loadOrdersCenter(),loadTrackingDashboard(),loadWaybillCenter(),loadVialTracker()]);
+    pepRenderAdminDashboard();
     showMessage("Now managing "+gb+". Other Group Buys are kept separate.","success");
   }catch(e){
     console.error("ACTIVE GB SWITCH ERROR:",e);

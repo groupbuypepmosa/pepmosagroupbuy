@@ -4124,7 +4124,39 @@ main.wrap{position:relative;z-index:3}
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
 </script>
-</body>
+<style id="pep-restore-admin-fee-cta">
+.pepAdminFeeCTA{position:absolute;right:24px;bottom:58px;z-index:5;display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:9px 18px;border:1px solid rgba(255,255,255,.65);border-radius:999px;background:linear-gradient(105deg,#fff8fb,#f7c7d9);color:#57142f;text-decoration:none;font-size:10px;font-weight:950;letter-spacing:.06em;box-shadow:0 6px 16px rgba(66,12,37,.18);cursor:pointer}
+.pepAdminFeeCTA:hover{transform:translateY(-1px);filter:brightness(1.03)}
+.pepAdminFeeCTA[disabled]{opacity:.48;cursor:not-allowed;transform:none}
+@media(max-width:760px){.pepAdminFeeCTA{right:12px;bottom:52px;padding:8px 11px;font-size:9px}}
+</style>
+<script id="pep-restore-admin-fee-cta-script">
+(function(){
+ function mount(){
+  const panel=document.querySelector('.pepGBFeature');if(!panel)return;
+  let btn=panel.querySelector('.pepAdminFeeCTA');
+  if(!btn){
+   btn=document.createElement('button');btn.type='button';btn.className='pepAdminFeeCTA';btn.textContent='PAY ADMIN FEE';
+   btn.addEventListener('click',async()=>{
+    if(btn.disabled)return;
+    btn.disabled=true;const old=btn.textContent;btn.textContent='PLEASE WAIT…';
+    try{
+     if(typeof window.pepRequireApprovedFee!=='function')throw new Error('Admin Fee payment form is still loading. Please try again in a moment.');
+     const approved=await window.pepRequireApprovedFee();
+     if(approved&&window.pepmosaPopup)window.pepmosaPopup('Your Admin Fee is already approved. You can proceed with your Group Buy order.','ADMIN FEE APPROVED','✓');
+    }catch(e){console.error('Admin Fee button:',e);if(window.pepmosaPopup)window.pepmosaPopup(e.message||'Unable to open Admin Fee payment.');else alert(e.message||'Unable to open Admin Fee payment.')}
+    finally{btn.disabled=false;btn.textContent=old;}
+   });
+   panel.appendChild(btn);
+  }
+  const gb=window.currentGB||null,open=!!(gb&&['OPEN','KIT_COMPLETION'].includes(String(gb.status||'').toUpperCase()));
+  btn.hidden=!open;
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+ new MutationObserver(mount).observe(document.body,{childList:true,subtree:true});
+ setInterval(mount,1500);
+})();
+</script></body>
 </html>
 
 <style id="pep-picker-actual-popup-fix">

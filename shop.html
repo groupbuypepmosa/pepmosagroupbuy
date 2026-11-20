@@ -1486,6 +1486,26 @@ main.wrap{width:100%!important;max-width:none!important;margin:0!important;paddi
 @media(max-width:760px){header.pepLuxuryHeader{height:auto!important;min-height:62px!important;padding:10px 15px!important;gap:10px!important;flex-wrap:wrap!important}.pepLuxuryBrand span:last-child{font-size:27px!important}.pepCrown{font-size:27px!important}.pepLuxuryNav{order:3;flex-basis:100%;overflow-x:auto;justify-content:flex-start!important;padding:7px 0 2px}.pepLuxuryNav a{font-size:10px!important}.pepLuxuryActions{margin-left:auto}.pepLuxuryActions>a:not(.pepAccountNav){display:none!important}.pepLuxuryActions .pepAccountNav{font-size:9px!important;padding:8px 10px!important}.pepLuxuryHero{min-height:460px!important;padding:30px 22px 210px!important;align-items:flex-start!important}.pepHeroCopy h1{font-size:58px!important}.pepHeroTagline{font-size:10px!important;letter-spacing:.25em!important}.pepHeroPerks{gap:9px;font-size:8px}.pepHeroShop{margin:20px 0 0 45px;padding:11px 26px}.pepVialShowcase{width:75vw!important;height:185px!important;right:10vw!important;bottom:12px!important}.pepVial{height:125px!important}.pepVial.v2{height:170px!important}.pepVial:before{top:-27px!important;height:29px!important}.pepVial strong{font-size:9px!important}.pepVial.v2 strong{font-size:11px!important}.pepFeaturePanels{width:calc(100% - 24px);grid-template-columns:1fr;gap:12px}.pepGBFeature,.pepOpenFeature{min-height:150px;padding:15px 18px}.pepCategoryRow{width:calc(100% - 24px);grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.pepCategoryRow a{min-height:78px;font-size:10px;border-radius:15px}.pepCategoryRow a span{font-size:25px}.pepFeaturedSection,.pepOpenItems{width:calc(100% - 24px)}.pepFeaturedGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.pepFeaturedCard{min-height:100px;padding:7px;gap:5px}.pepFeaturedCard img{width:55px;height:76px}.pepFeaturedInfo b{font-size:11px}.pepFeaturedInfo strong{font-size:16px}.pepFeaturedHeading h2{font-size:13px;letter-spacing:.12em}.pepFeaturedHeading>a{font-size:9px}.pepOpenGrid{grid-template-columns:1fr}#products{width:calc(100% - 24px)!important;padding:13px!important}}
 @media(max-width:390px){.pepLuxuryActions .pepAccountNav{display:none!important}.pepHeroCopy h1{font-size:49px!important}.pepHeroPerks{gap:6px;font-size:7px}.pepCategoryRow{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
+<style id="pepmosa-home-fixes">
+.pepFeaturePanels,.pepCategoryRow,.pepFeaturedSection,.pepOpenItems{width:calc(100% - 10vw)!important;max-width:1800px!important}
+.pepFeaturePanels{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:18px!important}
+.pepGBFeature{min-width:0!important;padding:20px 26px!important}
+.pepGBTitle{font:clamp(35px,4vw,58px)/1 Georgia,serif!important;max-width:55%!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.pepGBStatus{left:auto!important;right:25px!important;top:26px!important;max-width:46%!important;white-space:nowrap!important}
+.pepGBStatus.isClosed{background:#50112c!important;color:#fff!important}
+.pepGBStatus.isOpen{background:#fce6ed!important;color:#5c1735!important}
+.pepGBSub{max-width:58%!important;line-height:1.45!important}
+.pepPanelButton{left:auto!important;right:24px!important;bottom:17px!important}
+.pepFeaturedGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.pepFeaturedCard{position:relative!important;min-width:0!important;padding-right:45px!important}
+.pepFeaturedCard img{flex:0 0 90px!important}
+.pepFeaturedInfo small{font-size:9px;color:#987183}
+.pepFeaturedAdd{position:absolute;right:12px;bottom:12px;width:34px;height:34px;border:0;border-radius:50%;background:linear-gradient(110deg,#b52f61,#781b40);color:#fff;font-size:22px;cursor:pointer}
+.pepFeaturedImgFallback{width:70px;height:90px;display:grid;place-items:center;background:#f9e1ea;color:#b52f61;font-size:30px}
+.pepOpenGrid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))!important;align-items:stretch!important}
+.pepOpenGrid .card{min-width:0!important}
+@media(max-width:760px){.pepFeaturePanels,.pepCategoryRow,.pepFeaturedSection,.pepOpenItems{width:calc(100% - 24px)!important}.pepFeaturePanels{grid-template-columns:1fr!important}.pepGBTitle{font-size:38px!important;max-width:58%!important}.pepGBStatus{right:12px!important;top:22px!important;font-size:9px!important;padding:6px 10px!important}.pepGBSub{max-width:100%!important}.pepPanelButton{right:12px!important;bottom:12px!important;padding:8px 11px!important;font-size:9px!important}.pepFeaturedGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.pepFeaturedCard img{width:52px!important;flex-basis:52px!important;height:76px!important}}
+</style>
 </head>
 
 
@@ -1596,21 +1616,36 @@ main.wrap{width:100%!important;max-width:none!important;margin:0!important;paddi
 
 <script id="pepmosa-featured-home-script">
 (function(){
- function money(v){return "₱"+Number(v||0).toLocaleString("en-PH",{maximumFractionDigits:0})}
- window.pepRenderFeatured=function(){
-  const box=document.getElementById("pepFeaturedGrid"); if(!box)return;
-  const list=(Array.isArray(window.products)?window.products:[]).slice(0,4);
-  if(!list.length){box.innerHTML='<div class="pepFeaturedLoading">Browse the full collection below.</div>';return}
-  box.innerHTML=list.map(p=>'<article class="pepFeaturedCard">'+(p.image_url?'<img loading="lazy" src="'+String(p.image_url).replace(/"/g,'&quot;')+'" alt="">':'<div style="width:70px;text-align:center;font-size:38px">♙</div>')+'<div class="pepFeaturedInfo"><b>'+String(p.product_name||"Product").replace(/</g,"&lt;")+'</b><strong>'+money(p.price||p.selling_price||p.amount)+'</strong></div></article>').join("");
+ const escText=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+ const money=v=>"₱"+Number(v||0).toLocaleString("en-PH",{minimumFractionDigits:0,maximumFractionDigits:2});
+ window.pepUpdateHomeSections=function(){
+  const list=Array.isArray(products)?products:[];
+  const box=document.getElementById("pepFeaturedGrid");
+  if(box){
+   const featured=list.filter(p=>(p.product_variants||[]).some(v=>v.active!==false)).slice(0,4);
+   box.innerHTML=featured.length?featured.map(p=>{
+    const vs=(p.product_variants||[]).filter(v=>v.active!==false);
+    const price=vs.length?Math.min(...vs.map(v=>Number(v.price)||0)):null;
+    return '<article class="pepFeaturedCard">'+(p.image_url?'<img loading="lazy" decoding="async" src="'+escText(p.image_url)+'" alt="'+escText(p.product_name)+'">':'<div class="pepFeaturedImgFallback">♙</div>')+'<div class="pepFeaturedInfo"><b>'+escText(p.product_name)+'</b><strong>'+(price===null?'Price on request':money(price))+'</strong><small>Starting price</small></div><button type="button" class="pepFeaturedAdd" onclick="openProductPicker(\''+escText(p.product_id)+'\')">＋</button></article>';
+   }).join(""):'<div class="pepFeaturedLoading">No featured products available for this Group Buy.</div>';
+  }
+  const gb=typeof currentGB!=="undefined"?currentGB:null;
+  const name=gb?(gb.customer_facing_name||gb.gb_number||"CURRENT GROUP BUY"):"NO CURRENT GROUP BUY";
+  const status=gb?String(gb.status||"").toUpperCase():"CLOSED";
+  const title=document.querySelector(".pepGBTitle"),badge=document.querySelector(".pepGBStatus"),sub=document.querySelector(".pepGBSub"),link=document.querySelector(".pepPanelButton");
+  if(title)title.textContent=name;
+  if(badge){badge.textContent=status==="CLOSED"?"CLOSED • PRICELIST VIEW":status==="KIT_COMPLETION"?"KIT COMPLETION":"OPEN";badge.className="pepGBStatus "+(status==="CLOSED"?"isClosed":"isOpen")}
+  if(sub)sub.textContent=gb?(status==="CLOSED"?"Browsing is available. Ordering is currently closed.":"Group Buy is open. Check the pricelist and order details."):"There is no active Group Buy at the moment.";
+  if(link)link.href="#products";
+  const gbLabel=document.querySelector(".pepPanelLabel");if(gbLabel)gbLabel.textContent="♛ Current Group Buy";
  };
  document.addEventListener("click",function(e){
   const a=e.target.closest(".pepCategoryRow a");if(!a)return;
   const q=a.getAttribute("data-search")||"";
-  const input=document.getElementById("search");if(input){input.value=q;window.renderProducts&&window.renderProducts()}
+  const input=document.getElementById("search");if(input){input.value=q;input.dispatchEvent(new Event("input",{bubbles:true}));document.getElementById("products")?.scrollIntoView({behavior:"smooth"});if(typeof renderProducts==="function")renderProducts()}
  });
- const observer=new MutationObserver(()=>window.pepRenderFeatured&&window.pepRenderFeatured());
- const grid=document.getElementById("productGrid");if(grid)observer.observe(grid,{childList:true,subtree:true});
- setTimeout(()=>window.pepRenderFeatured&&window.pepRenderFeatured(),900);
+ document.addEventListener("DOMContentLoaded",()=>window.pepUpdateHomeSections());
+ setTimeout(()=>window.pepUpdateHomeSections(),1200);
 })();
 </script>
 <div class="footer">PEPMOSA • Shop</div>
@@ -2377,6 +2412,7 @@ function renderProducts(){
       )
       .join("");
 
+  if(window.pepUpdateHomeSections) window.pepUpdateHomeSections();
 }
 
 

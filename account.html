@@ -641,23 +641,9 @@ body:has(#authArea:not(.hidden)){display:block!important}
 /* Desktop proportions matched to the approved PEPMOSA visual reference */
 body:has(#authArea:not(.hidden)){
  display:block!important;min-height:100vh!important;margin:0!important;overflow-x:hidden!important;
- background:
- radial-gradient(circle at 13% 16%,rgba(255,255,255,.98),transparent 32%),
- radial-gradient(circle at 87% 12%,rgba(247,195,218,.72),transparent 34%),
- radial-gradient(circle at 50% 85%,rgba(255,255,255,.72),transparent 46%),
- linear-gradient(135deg,#fffdfd 0%,#fff1f6 46%,#f8dfeb 100%)!important;
+ background:#f9c4dd url("/pepmosa-login-bg.svg") center center / cover fixed no-repeat!important;
 }
-body:has(#authArea:not(.hidden))::before{
- content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4;
- background-image:radial-gradient(rgba(255,255,255,.98) .9px,transparent .9px);
- background-size:18px 18px;
-}
-body:has(#authArea:not(.hidden))::after{
- content:"✿　　　　　　　　　❀　　　　　　　　　✿　　　　　　　　　❀";
- position:fixed;top:7%;left:0;width:100%;z-index:0;pointer-events:none;
- text-align:center;white-space:nowrap;overflow:hidden;color:rgba(220,125,169,.22);
- font-size:48px;letter-spacing:8px;
-}
+body:has(#authArea:not(.hidden))::before,body:has(#authArea:not(.hidden))::after{display:none!important;content:none!important}
 body:has(#authArea:not(.hidden)) .accountWrap{
  display:block!important;position:relative!important;z-index:1!important;
  width:min(660px,calc(100% - 32px))!important;max-width:660px!important;

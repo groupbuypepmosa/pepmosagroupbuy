@@ -999,6 +999,189 @@ body:has(#accountArea:not(.hidden)){
 }
 </style>
 
+
+<style id="pepmosa-actual-reference-layout">
+/* Exact structural remake of the supplied signed-in dashboard reference */
+body:has(#accountArea:not(.hidden)){
+ min-height:100vh!important;
+ background:
+  radial-gradient(ellipse at 50% 42%,rgba(255,255,255,.96),transparent 65%),
+  linear-gradient(115deg,#fffafd 0%,#fff3f8 52%,#f8eaf1 100%)!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)){
+ width:min(1360px,calc(100% - 48px))!important;
+ max-width:none!important;margin:24px auto 48px!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountCard{
+ width:100%!important;max-width:none!important;box-sizing:border-box!important;
+ padding:18px!important;border:1px solid #efd9e3!important;border-radius:34px!important;
+ background:rgba(255,255,255,.88)!important;
+ box-shadow:0 24px 80px rgba(103,43,67,.12)!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome{
+ position:relative!important;isolation:isolate!important;overflow:hidden!important;
+ display:grid!important;
+ grid-template-columns:minmax(0, .95fr) minmax(0,1.05fr)!important;
+ grid-template-rows:auto auto auto!important;
+ grid-template-areas:"brand title" "tagline title" "meta meta"!important;
+ align-items:center!important;column-gap:26px!important;row-gap:0!important;
+ min-height:290px!important;padding:28px 42px 27px!important;margin:0 0 18px!important;
+ border:1px solid rgba(255,255,255,.22)!important;border-radius:30px!important;
+ background:
+  radial-gradient(ellipse at 89% 16%,rgba(255,220,235,.34),transparent 27%),
+  radial-gradient(ellipse at 63% 110%,rgba(244,139,178,.25),transparent 42%),
+  linear-gradient(110deg,#53182f 0%,#742b47 44%,#a74669 76%,#c35c83 100%)!important;
+ box-shadow:0 17px 40px rgba(92,29,55,.18)!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome:before{
+ content:"♛ P\A EPMOSA ♡";white-space:pre;grid-area:brand;align-self:end;
+ position:relative!important;inset:auto!important;display:block!important;
+ width:max-content;max-width:100%;padding:0 0 14px!important;
+ border:0!important;background:none!important;
+ color:#fff0f5!important;text-align:center;
+ font:500 clamp(29px,3.5vw,46px)/.94 Georgia,"Times New Roman",serif!important;
+ letter-spacing:1px!important;text-shadow:0 3px 15px rgba(20,0,10,.15);
+ pointer-events:none;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .welcomeEyebrow{
+ grid-area:tagline;position:relative!important;inset:auto!important;
+ align-self:start!important;margin:0 0 10px!important;
+ color:#ffe4ed!important;font-size:12px!important;letter-spacing:.22em!important;
+ font-weight:700!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome h1{
+ grid-area:title;position:relative!important;inset:auto!important;
+ align-self:center!important;margin:0!important;text-align:center!important;
+ color:#fff7fa!important;
+ font:500 clamp(36px,5vw,66px)/1.06 Georgia,"Times New Roman",serif!important;
+ letter-spacing:-1.8px!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome h1 span{color:#ffe1eb!important}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome>p{
+ grid-area:tagline;align-self:end!important;position:relative!important;
+ margin:0 0 43px!important;max-width:460px!important;
+ color:#fff0f5!important;font-size:clamp(12px,1.2vw,16px)!important;
+ line-height:1.55!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .welcomeMeta{
+ grid-area:meta;display:flex!important;position:relative!important;
+ flex-wrap:wrap!important;align-items:center!important;gap:12px!important;
+ margin:18px 0 0!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .welcomeMeta #accountStatus .status{
+ display:inline-flex!important;padding:12px 17px!important;border-radius:999px!important;
+ background:#fff0bd!important;color:#6f4500!important;border:0!important;
+ font-size:12px!important;font-weight:900!important;letter-spacing:.04em!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .welcomeMeta #accountEmail{
+ display:inline-flex!important;padding:11px 17px!important;border-radius:999px!important;
+ color:#fff!important;background:rgba(255,255,255,.12)!important;
+ border:1px solid rgba(255,255,255,.4)!important;font-size:12px!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountWelcome:after{
+ content:"";position:absolute!important;z-index:-1!important;inset:auto -2% -3px -2%!important;
+ height:43%!important;pointer-events:none!important;
+ background:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 220' preserveAspectRatio='none'%3E%3Cpath d='M0 150 C180 55 300 210 500 130 S820 65 1000 135 S1120 130 1200 45' fill='none' stroke='%23f9b7d0' stroke-opacity='.34' stroke-width='13'/%3E%3Cpath d='M0 180 C200 100 350 230 560 155 S850 100 1030 165 S1140 155 1200 95' fill='none' stroke='%23ffdbe8' stroke-opacity='.32' stroke-width='5'/%3E%3C/svg%3E") center bottom/100% 100% no-repeat!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) #accountMessage{
+ padding:15px 19px!important;border-radius:16px!important;margin:0 0 18px!important;
+ font-size:13px!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuickGrid{
+ grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:17px!important;
+ margin:0 0 24px!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuick{
+ display:grid!important;grid-template-columns:78px minmax(0,1fr) 20px!important;
+ grid-template-rows:auto auto!important;column-gap:19px!important;
+ min-height:120px!important;padding:18px 23px!important;
+ border:1px solid #efccdb!important;border-radius:26px!important;
+ background:linear-gradient(135deg,#fffafd,#fdf0f5)!important;
+ box-shadow:0 8px 22px rgba(105,38,68,.045)!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuick:after{
+ content:"›";grid-column:3;grid-row:1/3;align-self:center;
+ color:#8d1f47;font:38px/1 Georgia,serif;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuick>span{
+ grid-row:1/3!important;width:78px!important;height:78px!important;
+ border-radius:23px!important;background:linear-gradient(145deg,#f8d0df,#e68ead)!important;
+ color:#8b1f45!important;font-size:38px!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuick b{
+ align-self:end!important;color:#671b38!important;font-size:16px!important;
+ letter-spacing:.01em!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuick small{
+ align-self:start!important;margin-top:7px!important;color:#755b67!important;font-size:14px!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountQuick.active{
+ border-color:#e99ab9!important;background:linear-gradient(135deg,#fce8f0,#f9e1eb)!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountSection{
+ padding:27px!important;border:1px solid #efd4e0!important;border-radius:27px!important;
+ background:rgba(255,255,255,.91)!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .sectionTop{margin:0 0 21px!important}
+.accountWrap:has(#accountArea:not(.hidden)) .sectionEyebrow{
+ color:#c25c82!important;font-size:13px!important;letter-spacing:.14em!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .sectionTop h2{
+ color:#751d3d!important;font:500 clamp(32px,3.5vw,43px)/1.05 Georgia,serif!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .sectionAction{
+ padding:13px 20px!important;border-radius:999px!important;
+ color:white!important;background:linear-gradient(110deg,#781b3d,#b52d59)!important;
+ font-size:13px!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) .accountLoading,
+.accountWrap:has(#accountArea:not(.hidden)) .accountEmpty{
+ min-height:150px!important;border:1.5px dashed #e9a6bf!important;
+ border-radius:22px!important;background:#fff8fb!important;
+}
+.accountWrap:has(#accountArea:not(.hidden)) #logout{
+ width:min(260px,100%)!important;max-width:260px!important;min-height:58px!important;
+ border:1.5px solid #e994b2!important;border-radius:999px!important;
+ color:#951d48!important;background:linear-gradient(110deg,#fff,#fff0f6)!important;
+ font-size:15px!important;
+}
+@media(max-width:700px){
+ .accountWrap:has(#accountArea:not(.hidden)){width:calc(100% - 18px)!important;margin:10px auto 28px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountCard{padding:9px!important;border-radius:24px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountWelcome{
+  min-height:285px!important;padding:22px 18px 18px!important;
+  grid-template-columns:1fr!important;grid-template-rows:auto auto auto auto!important;
+  grid-template-areas:"brand" "title" "tagline" "meta"!important;gap:9px!important;
+  border-radius:22px!important;
+ }
+ .accountWrap:has(#accountArea:not(.hidden)) .accountWelcome:before{
+  font-size:30px!important;padding:0 0 8px!important;justify-self:start!important;
+ }
+ .accountWrap:has(#accountArea:not(.hidden)) .accountWelcome h1{
+  font-size:clamp(31px,8vw,43px)!important;text-align:left!important;
+ }
+ .accountWrap:has(#accountArea:not(.hidden)) .accountWelcome>p{
+  margin:0!important;align-self:start!important;font-size:12px!important;
+ }
+ .accountWrap:has(#accountArea:not(.hidden)) .welcomeEyebrow{font-size:9px!important;margin:0!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .welcomeMeta{margin:5px 0 0!important;gap:7px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .welcomeMeta #accountStatus .status,
+ .accountWrap:has(#accountArea:not(.hidden)) .welcomeMeta #accountEmail{font-size:9px!important;padding:8px 10px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountQuickGrid{grid-template-columns:1fr!important;gap:9px!important;margin-bottom:15px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountQuick{
+  min-height:82px!important;padding:11px 14px!important;
+  grid-template-columns:56px 1fr 16px!important;column-gap:13px!important;border-radius:19px!important;
+ }
+ .accountWrap:has(#accountArea:not(.hidden)) .accountQuick>span{width:56px!important;height:56px!important;border-radius:17px!important;font-size:26px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountQuick b{font-size:12px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountQuick small{font-size:10px!important;margin-top:3px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .accountSection{padding:17px 12px!important;border-radius:20px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .sectionTop h2{font-size:26px!important}
+ .accountWrap:has(#accountArea:not(.hidden)) .sectionAction{font-size:9px!important;padding:9px 11px!important}
+}
+</style>
+
 </head>
 <body>
 <div class="accountWrap"><div class="accountCard">

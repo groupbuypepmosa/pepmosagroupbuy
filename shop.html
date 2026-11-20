@@ -1289,7 +1289,8 @@ header{position:sticky!important;top:0;z-index:100!important;min-height:70px!imp
 #productGrid .pepSelectVariant:focus-visible{outline:3px solid #f0a5ca;outline-offset:3px}
 @media(max-width:900px){.pepSortWrap{justify-content:space-between}.pepSortWrap select{flex:1;max-width:none}}
 @media(max-width:620px){.pepSortWrap{width:100%;box-sizing:border-box}.pepSortWrap select{min-height:43px}.pepCatalogIntro{align-items:stretch;flex-direction:column}}
-</style>\n<style id="pepmosa-search-visibility-fix">
+</style>
+<style id="pepmosa-search-visibility-fix">
 /* Make the product search unmistakable and full-width, not hidden beside the title. */
 #products .sectionHead{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:13px!important;align-items:stretch!important;margin:28px 0 20px!important}
 #products .sectionHead>div:first-child{grid-column:1!important;grid-row:1!important}
@@ -2235,7 +2236,8 @@ async function renderOpenForAll(){
   if(targetEl)targetEl.textContent=Number(round?.moq_target??settingsRes.data?.moq_target??0)>0?Number(round?.moq_target??settingsRes.data?.moq_target).toLocaleString("en-PH")+" VIALS":"OPEN MOQ";
   if(!items.length){box.innerHTML='<div class="pepMoqEmpty">No products have been added to the open MOQ rounds yet.</div>';return;}
   box.innerHTML=items.map(x=>{
-   const productRound=roundById.get(x.gb_id);\n   const available=String(x.status||"").toUpperCase()==="AVAILABLE";
+   const productRound=roundById.get(x.gb_id);
+   const available=String(x.status||"").toUpperCase()==="AVAILABLE";
    return '<article class="pepMoqCard '+(available?'isAvailable':'isSoldOut')+'">'+
     '<div class="pepMoqImage">'+(x.image_url?'<img loading="lazy" decoding="async" src="'+esc(x.image_url)+'" alt="'+esc(x.name)+'">':'<span>♙</span>')+
     '<span class="pepMoqStatus '+(available?'available':'soldout')+'">'+(available?'AVAILABLE':'SOLD OUT')+'</span></div>'+

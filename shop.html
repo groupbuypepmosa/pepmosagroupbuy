@@ -4230,19 +4230,42 @@ body>button.pepFloatingLuxuryCart .pepCartBow:after{right:0!important;border-rad
 </style>
 <script id="pep-floating-cart-single-instance">
 (function(){
- function normalizeCart(){
-  var carts=Array.from(document.querySelectorAll('button.pepFloatingLuxuryCart, button.cart[onclick*="openCart"]'));
-  if(!carts.length)return;
-  // Keep the designed cart (crown + basket + bow); remove legacy duplicate cart controls.
-  var keep=carts.find(function(el){return el.querySelector('.pepCartCrown')&&el.querySelector('.pepCartBow')})||carts[0];
-  if(keep.parentElement!==document.body)document.body.appendChild(keep);
-  carts.forEach(function(el){if(el!==keep)el.remove();});
-  keep.classList.add('pepFloatingLuxuryCart');
-  keep.setAttribute('aria-label','Open shopping cart');
+ function cleanDuplicateCarts(){
+  var canonical=document.querySelector('button.pepFloatingLuxuryCart.cart[onclick*="openCart"],button.pepFloatingLuxuryCart[onclick*="openCart"]');
+  if(!canonical)return;
+  if(canonical.parentElement!==document.body)document.body.appendChild(canonical);
+  canonical.style.setProperty('position','fixed','important');
+  canonical.style.setProperty('right','18px','important');
+  canonical.style.setProperty('bottom','18px','important');
+  canonical.style.setProperty('top','auto','important');
+  canonical.style.setProperty('left','auto','important');
+  canonical.style.setProperty('z-index','2147483000','important');
+  canonical.style.setProperty('width','64px','important');
+  canonical.style.setProperty('height','64px','important');
+  canonical.style.setProperty('min-width','64px','important');
+  canonical.style.setProperty('min-height','64px','important');
+  canonical.style.setProperty('display','flex','important');
+  canonical.style.setProperty('align-items','center','important');
+  canonical.style.setProperty('justify-content','center','important');
+  canonical.style.setProperty('flex-direction','column','important');
+  canonical.style.setProperty('font-size','0','important');
+  canonical.style.setProperty('transform','none','important');
+  canonical.setAttribute('aria-label','Open shopping cart');
+  // Remove any second floating cart widget injected by older storefront scripts.
+  document.querySelectorAll('body *').forEach(function(el){
+   if(el===canonical||canonical.contains(el)||el.contains(canonical))return;
+   var signature=((el.id||'')+' '+(typeof el.className==='string'?el.className:'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.getAttribute('title')||'')).toLowerCase();
+   if(!/(cart|basket)/.test(signature))return;
+   var st=getComputedStyle(el);
+   if(st.position!=='fixed'&&st.position!=='sticky')return;
+   var r=el.getBoundingClientRect();
+   if(r.width<24||r.height<24||r.right<innerWidth-220||r.bottom<innerHeight-220)return;
+   el.remove();
+  });
  }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',normalizeCart,{once:true});
- else normalizeCart();
- new MutationObserver(normalizeCart).observe(document.documentElement,{childList:true,subtree:true});
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',cleanDuplicateCarts,{once:true});
+ else cleanDuplicateCarts();
+ new MutationObserver(cleanDuplicateCarts).observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script></body>
 </html>

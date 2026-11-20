@@ -1680,6 +1680,10 @@ main.wrap{width:100%!important;max-width:none!important;margin:0!important;paddi
 .pepMoqEmpty{grid-column:1/-1!important;padding:28px 15px!important;border:1px dashed #e7b8cb!important;border-radius:14px!important;background:#fff9fb!important;color:#967486!important;text-align:center!important;font-size:12px!important}
 @media(max-width:1000px){.pepOpenGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:650px){.pepOpenItems{width:calc(100% - 22px)!important;padding:13px!important;margin:20px auto!important;border-radius:17px!important}.pepOpenItems .pepFeaturedHeading{align-items:flex-start!important}.pepOpenItems .pepFeaturedHeading>a{font-size:8px!important;padding:8px 10px!important}.pepMoqIntro{font-size:9px!important}.pepMoqRoundBar{padding:10px 12px!important}.pepMoqRoundBar strong{font-size:12px!important}.pepOpenGrid{grid-template-columns:1fr!important;gap:9px!important}.pepMoqCard{grid-template-columns:104px minmax(0,1fr)!important;gap:10px!important;padding:9px!important}.pepMoqImage,.pepMoqImage img{min-height:116px!important}.pepMoqCardBody h3{font-size:14px!important}.pepMoqPrice{font-size:18px!important}}
+</style><style id="pep-moq-clickable-cards">
+#openForAllGrid .pepMoqCard{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
+#openForAllGrid .pepMoqCard:hover,#openForAllGrid .pepMoqCard:focus-visible{transform:translateY(-3px);box-shadow:0 14px 30px rgba(139,35,85,.16);outline:2px solid #d65b91;outline-offset:2px}
+#openForAllSection .pepFeaturedHeading a{cursor:pointer}
 </style></head>
 
 
@@ -1761,7 +1765,7 @@ main.wrap{width:100%!important;max-width:none!important;margin:0!important;paddi
   <div class="pepFeaturedHeading"><h2>FEATURED PRODUCTS</h2><a href="#products">VIEW ALL PRODUCTS →</a></div>
   <div class="pepFeaturedGrid" id="pepFeaturedGrid"><div class="pepFeaturedLoading">Loading featured products…</div></div>
 </section>
-<section class="pepOpenItems" id="openForAllSection"><div class="pepFeaturedHeading"><div><h2>WHAT’S OPEN FOR MOQ?</h2><p class="pepMoqIntro">Open for All • On-Hand • Minimum Order Quantity</p></div><a href="#products">VIEW MOQ DETAILS →</a></div><div class="pepMoqRoundBar"><div><small>CURRENT MOQ ROUND</small><strong id="pepMoqRoundName">Loading…</strong></div><div class="pepMoqTarget"><small>ROUND TARGET</small><strong id="pepMoqTarget">—</strong></div></div><div id="openForAllGrid" class="pepOpenGrid"><div class="pepMoqEmpty">Loading MOQ products…</div></div></section>
+<section class="pepOpenItems" id="openForAllSection"><div class="pepFeaturedHeading"><div><h2>WHAT’S OPEN FOR MOQ?</h2><p class="pepMoqIntro">Open for All • On-Hand • Minimum Order Quantity</p></div><a href="/open-for-all.html">VIEW MOQ DETAILS →</a></div><div class="pepMoqRoundBar"><div><small>CURRENT MOQ ROUND</small><strong id="pepMoqRoundName">Loading…</strong></div><div class="pepMoqTarget"><small>ROUND TARGET</small><strong id="pepMoqTarget">—</strong></div></div><div id="openForAllGrid" class="pepOpenGrid"><div class="pepMoqEmpty">Loading MOQ products…</div></div></section>
 
 
 <style id="pep-search-above-products-style">
@@ -4107,7 +4111,7 @@ main.wrap{position:relative;z-index:3}
    const byId=new Map(groups.map(g=>[g.gb_id,g]));
    grid.innerHTML=products.map(p=>{
     const g=byId.get(p.gb_id),available=String(p.status||"").toUpperCase()==="AVAILABLE",minimum=Math.max(1,Number(p.moq||1));
-    return '<article class="pepMoqCard '+(available?'isAvailable':'isSoldOut')+'"><div class="pepMoqImage">'+(p.image_url?'<img loading="lazy" decoding="async" src="'+escHtml(p.image_url)+'" alt="'+escHtml(p.name)+'">':'<span>♙</span>')+'<span class="pepMoqStatus '+(available?'available':'soldout')+'">'+(available?'AVAILABLE':'SOLD OUT')+'</span></div><div class="pepMoqCardBody"><h3>'+escHtml(p.name)+'</h3><div class="pepMoqFacts"><span>MINIMUM ORDER</span><strong>'+minimum+' '+(minimum===1?'VIAL':'VIALS')+'</strong></div><div class="pepMoqPrice">'+money(p.amount)+'</div><div class="pepMoqFooter">'+escHtml(g?.customer_facing_name||('MOQ GB '+(g?.gb_number||'')))+' • '+(available?'No Admin Fee':'Currently sold out')+'</div></div></article>';
+    return '<article class="pepMoqCard '+(available?'isAvailable':'isSoldOut')+'" role="link" tabindex="0" aria-label="Open '+escHtml(p.name)+' in Open for All shop" onclick="window.location.href=\'/open-for-all.html\'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.location.href=\'/open-for-all.html\'}"><div class="pepMoqImage">'+(p.image_url?'<img loading="lazy" decoding="async" src="'+escHtml(p.image_url)+'" alt="'+escHtml(p.name)+'">':'<span>♙</span>')+'<span class="pepMoqStatus '+(available?'available':'soldout')+'">'+(available?'AVAILABLE':'SOLD OUT')+'</span></div><div class="pepMoqCardBody"><h3>'+escHtml(p.name)+'</h3><div class="pepMoqFacts"><span>MINIMUM ORDER</span><strong>'+minimum+' '+(minimum===1?'VIAL':'VIALS')+'</strong></div><div class="pepMoqPrice">'+money(p.amount)+'</div><div class="pepMoqFooter">'+escHtml(g?.customer_facing_name||('MOQ GB '+(g?.gb_number||'')))+' • '+(available?'No Admin Fee':'Currently sold out')+'</div></div></article>';
    }).join("");
   }catch(err){
    console.error("PEPMOSA MOQ loader:",err);

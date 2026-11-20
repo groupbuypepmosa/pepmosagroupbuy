@@ -1684,6 +1684,33 @@ main.wrap{width:100%!important;max-width:none!important;margin:0!important;paddi
 #openForAllGrid .pepMoqCard{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
 #openForAllGrid .pepMoqCard:hover,#openForAllGrid .pepMoqCard:focus-visible{transform:translateY(-3px);box-shadow:0 14px 30px rgba(139,35,85,.16);outline:2px solid #d65b91;outline-offset:2px}
 #openForAllSection .pepFeaturedHeading a{cursor:pointer}
+</style><style id="pep-floating-cart-royal-redesign">
+/* Floating PEPMOSA cart — royal burgundy, rose-gold and satin bow */
+header .pepLuxuryActions .pepFloatingLuxuryCart,
+header .pepFloatingLuxuryCart{
+ position:fixed!important;right:24px!important;bottom:24px!important;top:auto!important;left:auto!important;
+ z-index:100000!important;width:74px!important;height:74px!important;min-width:74px!important;min-height:74px!important;
+ padding:13px 10px 10px!important;margin:0!important;display:flex!important;flex-direction:column!important;
+ align-items:center!important;justify-content:center!important;gap:1px!important;overflow:visible!important;
+ border:2px solid #e9a9bd!important;border-radius:25px!important;
+ background:radial-gradient(circle at 28% 18%,#a83b63 0%,#741634 48%,#43091f 100%)!important;
+ color:#fff8fb!important;-webkit-text-fill-color:#fff8fb!important;
+ box-shadow:inset 0 2px 5px rgba(255,255,255,.36),inset 0 -5px 10px rgba(36,0,15,.32),0 10px 28px rgba(75,10,38,.34)!important;
+ cursor:pointer!important;isolation:isolate!important;transition:transform .2s ease,box-shadow .2s ease!important;
+}
+header .pepFloatingLuxuryCart:hover{transform:translateY(-3px)!important;box-shadow:inset 0 2px 5px rgba(255,255,255,.4),0 15px 32px rgba(75,10,38,.4)!important}
+.pepFloatingLuxuryCart .pepCartCrown{display:block!important;width:22px!important;height:14px!important;margin:0 0 -1px!important;color:#f8c7d6!important;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
+.pepFloatingLuxuryCart .pepCartBasket{display:block!important;width:34px!important;height:34px!important;color:#fff!important;overflow:visible!important}
+.pepFloatingLuxuryCart #cartCount{position:absolute!important;top:-9px!important;right:-8px!important;z-index:3!important;display:flex!important;align-items:center!important;justify-content:center!important;
+ min-width:27px!important;height:27px!important;padding:0 6px!important;box-sizing:border-box!important;
+ border:2px solid #fff!important;border-radius:50%!important;background:linear-gradient(145deg,#fff7fa,#f4b8ce)!important;
+ color:#741634!important;-webkit-text-fill-color:#741634!important;font-size:12px!important;font-weight:950!important;line-height:1!important;
+ box-shadow:0 3px 10px rgba(60,8,30,.2)!important}
+.pepFloatingLuxuryCart .pepCartBow{position:absolute!important;bottom:-7px!important;left:50%!important;width:24px!important;height:13px!important;transform:translateX(-50%)!important;z-index:2!important}
+.pepFloatingLuxuryCart .pepCartBow:before,.pepFloatingLuxuryCart .pepCartBow:after{content:""!important;position:absolute!important;top:0!important;width:12px!important;height:9px!important;border:1.5px solid #ffe0e9!important;background:linear-gradient(135deg,#ffdce7,#dc7898)!important;box-shadow:0 1px 3px rgba(55,0,20,.22)!important}
+.pepFloatingLuxuryCart .pepCartBow:before{left:0!important;border-radius:10px 2px 8px 3px!important;transform:rotate(22deg)!important}
+.pepFloatingLuxuryCart .pepCartBow:after{right:0!important;border-radius:2px 10px 3px 8px!important;transform:rotate(-22deg)!important}
+@media(max-width:600px){header .pepFloatingLuxuryCart{right:16px!important;bottom:16px!important;width:64px!important;height:64px!important;min-width:64px!important;min-height:64px!important;border-radius:22px!important}.pepFloatingLuxuryCart .pepCartBasket{width:30px!important;height:30px!important}}
 </style></head>
 
 
@@ -1711,7 +1738,7 @@ main.wrap{width:100%!important;max-width:none!important;margin:0!important;paddi
   <div class="pepLuxuryActions">
     <a href="#productSearch" aria-label="Search">⌕</a>
     <a href="buyers-proof.html" aria-label="Buyers proof">♡</a>
-    <button class="cart" onclick="openCart()" aria-label="Open cart">♧ <span id="cartCount">0</span></button>
+    <button class="cart pepFloatingLuxuryCart" type="button" onclick="openCart()" aria-label="Open shopping cart"><svg class="pepCartCrown" viewBox="0 0 40 26" aria-hidden="true"><path d="M3 7l8 7 9-12 9 12 8-7-4 16H7L3 7Z" fill="currentColor"/><circle cx="3" cy="5" r="2.5" fill="currentColor"/><circle cx="20" cy="2.5" r="2.5" fill="currentColor"/><circle cx="37" cy="5" r="2.5" fill="currentColor"/></svg><svg class="pepCartBasket" viewBox="0 0 48 48" aria-hidden="true"><path d="M7 17h34l-4.1 21H15.1L7 17Z" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linejoin="round"/><path d="m16 17 7-10M32 17l-7-10M5 10h7l4 23M19 43h.1M34 43h.1" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"/><circle cx="19" cy="43" r="2.7" fill="currentColor"/><circle cx="34" cy="43" r="2.7" fill="currentColor"/></svg><span id="cartCount">0</span><i class="pepCartBow" aria-hidden="true"></i></button>
     <a class="pepAccountNav" id="pepTopAccount" href="account.html">MY ACCOUNT⌄</a>
   </div>
   <a href="account.html" class="pepMobileAccount" id="pepMobileAccount" aria-label="My Account"><span>♡</span><b>ACCOUNT</b></a>

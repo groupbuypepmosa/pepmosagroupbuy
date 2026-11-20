@@ -4185,15 +4185,20 @@ main.wrap{position:relative;z-index:3}
 </style>
 <script id="pep-restore-admin-fee-cta-script">
 (function(){
+ function getGB(){
+  // currentGB is declared with top-level let in the main shop script, so it is not always on window.
+  try{if(typeof currentGB!=='undefined'&&currentGB)return currentGB;}catch(_){}
+  return window.currentGB||null;
+ }
+ function isOpen(gb){return !!(gb&&['OPEN','KIT_COMPLETION'].includes(String(gb.status||'').trim().toUpperCase()));}
  function mount(){
   const panel=document.querySelector('.pepGBFeature');if(!panel)return;
   let btn=panel.querySelector('.pepAdminFeeCTA');
   if(!btn){
    btn=document.createElement('button');btn.type='button';btn.className='pepAdminFeeCTA';btn.textContent='PAY ADMIN FEE';
    btn.addEventListener('click',async()=>{
-    const gb=window.currentGB||null;
-    const active=!!(gb&&['OPEN','KIT_COMPLETION'].includes(String(gb.status||'').toUpperCase()));
-    if(!active){btn.hidden=true;btn.style.setProperty('display','none','important');return;}
+    const gb=getGB();
+    if(!isOpen(gb)){btn.hidden=true;btn.style.setProperty('display','none','important');return;}
     if(btn.disabled)return;
     btn.disabled=true;const old=btn.textContent;btn.textContent='PLEASE WAIT…';
     try{
@@ -4201,26 +4206,23 @@ main.wrap{position:relative;z-index:3}
      const approved=await window.pepRequireApprovedFee();
      if(approved&&window.pepmosaPopup)window.pepmosaPopup('Your Admin Fee is already approved. You can proceed with your Group Buy order.','ADMIN FEE APPROVED','✓');
     }catch(e){console.error('Admin Fee button:',e);if(window.pepmosaPopup)window.pepmosaPopup(e.message||'Unable to open Admin Fee payment.');else alert(e.message||'Unable to open Admin Fee payment.')}
-    finally{btn.disabled=false;btn.textContent=old;}
+    finally{btn.disabled=false;btn.textContent=old;mount();}
    });
    panel.appendChild(btn);
   }
-  const gb=window.currentGB||null,open=!!(gb&&['OPEN','KIT_COMPLETION'].includes(String(gb.status||'').toUpperCase()));
-  btn.hidden=!open;
+  const open=isOpen(getGB());
   if(open){
+   btn.hidden=false;btn.style.removeProperty('display');btn.style.removeProperty('visibility');btn.style.removeProperty('pointer-events');
    const styles={position:'absolute',right:'22px',bottom:'58px',zIndex:'30',display:'inline-flex',alignItems:'center',justifyContent:'center',minHeight:'42px',padding:'11px 23px',border:'2px solid #ffffff',borderRadius:'999px',background:'#ffffff',color:'#74183e',fontSize:'12px',fontWeight:'900',letterSpacing:'.06em',lineHeight:'1',boxShadow:'0 5px 0 rgba(83,12,42,.16),0 9px 22px rgba(48,8,28,.24)',cursor:'pointer'};
    Object.entries(styles).forEach(([k,v])=>btn.style.setProperty(k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase()),v,'important'));
    btn.style.setProperty('-webkit-text-fill-color','#74183e','important');
-   btn.style.removeProperty('display');
   }else{
-   btn.style.setProperty('display','none','important');
-   btn.style.setProperty('visibility','hidden','important');
-   btn.style.setProperty('pointer-events','none','important');
+   btn.hidden=true;btn.style.setProperty('display','none','important');btn.style.setProperty('visibility','hidden','important');btn.style.setProperty('pointer-events','none','important');
   }
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
  new MutationObserver(mount).observe(document.body,{childList:true,subtree:true});
- setInterval(mount,1500);
+ setInterval(mount,700);
 })();
 </script><style id="pep-floating-cart-detached-fix">
 body>button.pepFloatingLuxuryCart{

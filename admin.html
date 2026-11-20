@@ -236,7 +236,50 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.adminPage{width
 @media(max-width:1050px){.adminNav{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.adminNav{grid-template-columns:1fr;gap:9px}.adminNavGroup{padding:11px 12px}.adminNavHeading{margin-bottom:7px}.adminNav .tab{min-height:34px}}
 </style>
-</head>
+<style id="pep-admin-royal-dashboard-v1">
+:root{--royal:#5b102f;--wine:#741b43;--berry:#a92c65;--rose:#d65b91;--blush:#fff0f6;--line:#f0cbdc;--ink:#351b2a;--muted:#98788a;--gold:#d8ad76}
+body{background:radial-gradient(ellipse at 78% 0%,rgba(244,190,215,.45),transparent 34%),linear-gradient(135deg,#fff8fb 0%,#fff0f6 48%,#f8edf5 100%)!important;color:var(--ink)!important}
+body>header{height:76px;padding:0 clamp(16px,3vw,42px)!important;background:linear-gradient(105deg,#39091f 0%,#671638 55%,#3d0a24 100%)!important;border-bottom:1px solid rgba(255,224,238,.28)!important;box-shadow:0 8px 28px rgba(65,8,34,.22)!important}
+body>header .brand{color:#fff!important;font-family:Georgia,serif!important;font-size:26px!important;letter-spacing:.1em!important}
+body>header .logoMark{background:linear-gradient(145deg,#ffe5ef,#d47a9f)!important;color:#661334!important;border:1px solid #f5c6d8!important;box-shadow:0 0 18px rgba(255,200,222,.35)!important}
+body>header .nav{gap:8px!important}
+body>header .nav a{color:#ffeaf2!important;border:1px solid transparent!important;border-radius:999px!important;padding:9px 13px!important;font-size:11px!important;font-weight:850!important;letter-spacing:.07em!important}
+body>header .nav a:hover{background:rgba(255,255,255,.12)!important;border-color:rgba(255,220,235,.25)!important}
+.adminPage{width:min(1580px,96%)!important;margin:26px auto 70px!important}
+.adminHeader{position:relative;overflow:hidden;min-height:116px;padding:24px 28px!important;border:1px solid #eabbd0!important;border-radius:25px!important;background:linear-gradient(110deg,#5b102f 0%,#8e2452 52%,#d66c9a 100%)!important;box-shadow:0 18px 42px rgba(101,17,57,.2)!important;color:white!important}
+.adminHeader:after{content:"♛";position:absolute;right:32px;top:-22px;font:150px/1 Georgia,serif;color:rgba(255,230,240,.13);pointer-events:none}
+.adminTitle{position:relative;z-index:1}.adminTitle .eyebrow{color:#ffd6e6!important;letter-spacing:.2em!important;font-size:10px!important;font-weight:950!important}
+.adminTitle h1{color:#fff!important;font:700 clamp(27px,3vw,38px)/1.1 Georgia,serif!important;letter-spacing:.01em!important}
+.adminTitle p{color:#ffe5ef!important;font-size:13px!important}
+.adminHeader>.btn{position:relative;z-index:1;border:1px solid rgba(255,255,255,.5)!important;background:rgba(48,5,27,.35)!important;color:#fff!important;border-radius:999px!important;padding:12px 19px!important}
+#activeGroupBuyCard{position:relative;overflow:hidden;border:1px solid #e8b7ce!important;border-radius:21px!important;background:linear-gradient(110deg,#fff 0%,#fff0f6 62%,#f9dce9 100%)!important;box-shadow:0 12px 30px rgba(119,37,76,.09)!important;padding:18px 22px!important}
+#activeGroupBuyCard:before{content:"♛";position:absolute;right:22px;top:-14px;font:76px Georgia,serif;color:rgba(181,54,109,.1);pointer-events:none}
+#activeGroupBuyCard>div{position:relative;z-index:1}
+#activeGroupBuyCard>div>div:first-child{color:#7e1c49!important;font-size:11px!important;font-weight:950!important;letter-spacing:.16em!important}
+#activeGroupBuy{background:#fff!important;border:1px solid #e7b7cd!important;border-radius:12px!important;color:#54132f!important;font-weight:850!important;max-width:100%}
+.adminNav{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important;margin:16px 0 22px!important;padding:0!important}
+.adminNavGroup{min-width:0!important;padding:15px!important;border:1px solid #edcbdc!important;border-radius:19px!important;background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(255,242,248,.94))!important;box-shadow:0 9px 24px rgba(112,39,77,.07)!important}
+.adminNavHeading{display:flex!important;align-items:center!important;gap:8px!important;margin:0 0 10px!important;color:#741b43!important;font-size:10px!important;font-weight:1000!important;letter-spacing:.13em!important}
+.adminNavHeading span{display:grid!important;place-items:center!important;width:25px!important;height:25px!important;border-radius:8px!important;background:linear-gradient(145deg,#f9d9e7,#efb7d0)!important;color:#7c1a47!important;font-size:10px!important}
+.adminNav .tab{display:flex!important;align-items:center!important;width:100%!important;min-height:39px!important;margin:5px 0!important;padding:9px 11px!important;border:1px solid transparent!important;border-radius:11px!important;background:transparent!important;color:#745366!important;text-align:left!important;text-decoration:none!important;font-size:11px!important;font-weight:850!important;box-shadow:none!important;white-space:normal!important}
+.adminNav .tab:hover{background:#fff0f6!important;border-color:#f0cadd!important;color:#9f245e!important;transform:translateX(2px)!important}
+.adminNav .tab.active{background:linear-gradient(100deg,#75183f,#b73570)!important;border-color:#8c2451!important;color:#fff!important;box-shadow:0 7px 16px rgba(116,24,63,.2)!important}
+.panel.active{animation:pepPanelIn .2s ease both}
+@keyframes pepPanelIn{from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:none}}
+.panel>.card,.panel .card{border:1px solid #edccdc!important;border-radius:21px!important;background:rgba(255,255,255,.96)!important;box-shadow:0 12px 32px rgba(110,36,73,.07)!important}
+.panel .card>h2,.panel .card h3{color:#601536!important}
+.btn{border-radius:11px!important;transition:transform .16s ease,box-shadow .16s ease!important}
+.btn.primary{background:linear-gradient(105deg,#8a1d4d,#ce4f88)!important;color:#fff!important;box-shadow:0 7px 16px rgba(151,32,84,.18)!important}
+.btn.primary:hover{transform:translateY(-1px)!important;box-shadow:0 10px 20px rgba(151,32,84,.24)!important}
+.btn.dark{background:#4d102b!important;color:#fff!important}
+.field input,.field select,.field textarea,.search{border-color:#e8cbd9!important;border-radius:11px!important}
+.field input:focus,.field select:focus,.field textarea:focus,.search:focus{border-color:#c64b83!important;box-shadow:0 0 0 3px rgba(198,75,131,.11)!important}
+.summaryCard{border-color:#edc9da!important;border-radius:17px!important;background:linear-gradient(145deg,#fff,#fff0f6)!important;box-shadow:0 7px 18px rgba(114,36,74,.06)!important}
+.summaryCard .summaryValue{color:#5a1735!important}.summaryCard.pink .summaryValue{color:#b72e6c!important}
+.trackerTable th{background:#fff0f6!important;color:#7a1c46!important}
+@media(max-width:1100px){.adminNav{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:650px){body>header{height:auto;min-height:66px;flex-wrap:wrap;padding:12px 15px!important}body>header .brand{font-size:21px!important}body>header .nav{width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}body>header .nav a{white-space:nowrap}.adminPage{width:calc(100% - 22px)!important;margin:14px auto 45px!important}.adminHeader{padding:19px!important;min-height:100px}.adminHeader:after{right:4px;font-size:90px}.adminNav{grid-template-columns:1fr!important;gap:9px!important}.adminNavGroup{padding:13px!important}.adminNav .tab{min-height:42px!important}#activeGroupBuyCard>div{align-items:stretch!important}#activeGroupBuy{min-width:0!important;width:100%!important}}
+</style></head>
 <body>
 <header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a><nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a><a href="coa.html">COA</a></nav></header>
 <section id="loginScreen" class="loginScreen"><div class="loginBox"><div class="loginLogo"><span>PEPMOSA</span></div><div class="loginSubtitle">Administrator Login</div><div id="loginMsg"></div><div class="field"><label>Email</label><input id="loginEmail" type="email" autocomplete="username" placeholder="Admin email"></div><br><div class="field"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password" onkeydown="if(event.key==='Enter')login()"></div><div class="actions"><button class="btn primary" style="width:100%" type="button" onclick="login()">LOGIN</button></div></div></section>

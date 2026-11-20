@@ -581,6 +581,61 @@ body:has(#authArea:not(.hidden))::after{
  .accountWrap:has(#authArea:not(.hidden)) .logo img{width:132px!important;height:100px!important}
  .accountWrap:has(#authArea:not(.hidden))>.accountCard>.title{font-size:27px!important}
 }
+
+/* FINAL OVERRIDE: single centered login card, matching reference image */
+body:has(#authArea:not(.hidden)){display:block!important}
+.accountWrap:has(#authArea:not(.hidden)){
+ display:block!important;position:relative!important;z-index:1!important;
+ width:min(440px,calc(100% - 28px))!important;margin:46px auto 38px!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .accountCard{
+ display:block!important;position:relative!important;isolation:isolate!important;
+ width:100%!important;max-width:440px!important;min-width:0!important;
+ box-sizing:border-box!important;grid-template-columns:none!important;
+ grid-template-rows:none!important;column-gap:0!important;row-gap:0!important;
+ align-items:initial!important;overflow:visible!important;
+ padding:36px 38px 34px!important;border:1px solid #efcbd9!important;
+ border-radius:24px!important;background:rgba(255,253,254,.94)!important;
+ box-shadow:0 22px 65px rgba(124,54,82,.10)!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .accountCard:before,
+.accountWrap:has(#authArea:not(.hidden)) .accountCard:after{display:none!important;content:none!important}
+.accountWrap:has(#authArea:not(.hidden)) .logo,
+.accountWrap:has(#authArea:not(.hidden))>.accountCard>.title,
+.accountWrap:has(#authArea:not(.hidden))>.accountCard>.sub,
+.accountWrap:has(#authArea:not(.hidden)) #authArea,
+.accountWrap:has(#authArea:not(.hidden)) .links{
+ display:block!important;grid-column:auto!important;grid-row:auto!important;
+ width:100%!important;max-width:none!important;float:none!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .logo{margin:0 auto 10px!important;text-align:center!important}
+.accountWrap:has(#authArea:not(.hidden)) .logo img{
+ display:block!important;width:145px!important;height:112px!important;
+ max-width:100%!important;margin:0 auto!important;object-fit:contain!important;
+ object-position:center!important;
+}
+.accountWrap:has(#authArea:not(.hidden))>.accountCard>.title{
+ text-align:center!important;margin:8px 0 5px!important;
+ font:700 30px/1.12 Georgia,"Times New Roman",serif!important;
+ letter-spacing:-.45px!important;color:#713047!important;
+}
+.accountWrap:has(#authArea:not(.hidden))>.accountCard>.title:after{display:none!important;content:none!important}
+.accountWrap:has(#authArea:not(.hidden))>.accountCard>.sub{
+ text-align:center!important;margin:0 0 23px!important;
+ color:#9b7888!important;font:11px/1.6 Arial,sans-serif!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) #authArea:before{
+ content:"PEPMOSA MEMBER ACCESS"!important;display:block!important;
+ text-align:center!important;margin:0 0 14px!important;
+ color:#c23d72!important;font-size:8px!important;font-weight:950!important;letter-spacing:.22em!important;
+}
+@media(max-width:560px){
+ .accountWrap:has(#authArea:not(.hidden)){width:calc(100% - 24px)!important;margin:22px auto 28px!important}
+ .accountWrap:has(#authArea:not(.hidden)) .accountCard{padding:29px 22px 27px!important}
+ .accountWrap:has(#authArea:not(.hidden)) .logo img{width:132px!important;height:100px!important}
+ .accountWrap:has(#authArea:not(.hidden))>.accountCard>.title{font-size:27px!important}
+}
+
 </style>
 </style>
 </head>

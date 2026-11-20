@@ -1711,6 +1711,30 @@ header .pepFloatingLuxuryCart:hover{transform:translateY(-3px)!important;box-sha
 .pepFloatingLuxuryCart .pepCartBow:before{left:0!important;border-radius:10px 2px 8px 3px!important;transform:rotate(22deg)!important}
 .pepFloatingLuxuryCart .pepCartBow:after{right:0!important;border-radius:2px 10px 3px 8px!important;transform:rotate(-22deg)!important}
 @media(max-width:600px){header .pepFloatingLuxuryCart{right:16px!important;bottom:16px!important;width:64px!important;height:64px!important;min-width:64px!important;min-height:64px!important;border-radius:22px!important}.pepFloatingLuxuryCart .pepCartBasket{width:30px!important;height:30px!important}}
+</style><style id="pep-floating-cart-final-override">
+/* Final override: the cart is relocated outside header by the page script */
+button.pepFloatingLuxuryCart,
+.pepFloatingLuxuryCart{
+ position:fixed!important;right:24px!important;bottom:24px!important;left:auto!important;top:auto!important;
+ z-index:2147483000!important;display:flex!important;flex-direction:column!important;
+ align-items:center!important;justify-content:center!important;gap:0!important;
+ box-sizing:border-box!important;width:76px!important;height:76px!important;min-width:76px!important;min-height:76px!important;
+ padding:11px 9px 9px!important;margin:0!important;overflow:visible!important;
+ border:2px solid #f0b5ca!important;border-radius:25px!important;
+ background:linear-gradient(145deg,#a83c65 0%,#741633 54%,#480c25 100%)!important;
+ color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:0!important;line-height:1!important;
+ box-shadow:inset 0 2px 5px rgba(255,255,255,.42),inset 0 -6px 12px rgba(38,0,16,.3),0 12px 30px rgba(73,9,36,.36)!important;
+ text-shadow:none!important;filter:none!important;opacity:1!important;visibility:visible!important;
+}
+button.pepFloatingLuxuryCart:hover,.pepFloatingLuxuryCart:hover{transform:translateY(-3px)!important}
+.pepFloatingLuxuryCart .pepCartCrown{display:block!important;flex:none!important;width:24px!important;height:15px!important;margin:0 0 -1px!important;color:#ffd8e6!important}
+.pepFloatingLuxuryCart .pepCartBasket{display:block!important;flex:none!important;width:37px!important;height:37px!important;color:#fff!important;overflow:visible!important}
+.pepFloatingLuxuryCart #cartCount{position:absolute!important;top:-10px!important;right:-9px!important;z-index:5!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;min-width:29px!important;height:29px!important;padding:0 6px!important;border:2px solid #fff!important;border-radius:50%!important;background:linear-gradient(145deg,#fff9fc,#f4b5ce)!important;color:#741633!important;-webkit-text-fill-color:#741633!important;font:900 12px/1 Arial,sans-serif!important;box-shadow:0 3px 10px rgba(60,8,30,.22)!important}
+.pepFloatingLuxuryCart .pepCartBow{position:absolute!important;display:block!important;bottom:-9px!important;left:50%!important;width:29px!important;height:16px!important;transform:translateX(-50%)!important;z-index:4!important;pointer-events:none!important}
+.pepFloatingLuxuryCart .pepCartBow:before,.pepFloatingLuxuryCart .pepCartBow:after{content:""!important;position:absolute!important;top:0!important;width:15px!important;height:11px!important;border:1.5px solid #ffe5ed!important;background:linear-gradient(135deg,#ffe1eb,#d86f94)!important;box-shadow:0 1px 4px rgba(55,0,20,.25)!important}
+.pepFloatingLuxuryCart .pepCartBow:before{left:0!important;border-radius:12px 3px 9px 3px!important;transform:rotate(22deg)!important}
+.pepFloatingLuxuryCart .pepCartBow:after{right:0!important;border-radius:3px 12px 3px 9px!important;transform:rotate(-22deg)!important}
+@media(max-width:600px){button.pepFloatingLuxuryCart,.pepFloatingLuxuryCart{right:16px!important;bottom:16px!important;width:68px!important;height:68px!important;min-width:68px!important;min-height:68px!important;border-radius:22px!important}.pepFloatingLuxuryCart .pepCartBasket{width:33px!important;height:33px!important}}
 </style></head>
 
 

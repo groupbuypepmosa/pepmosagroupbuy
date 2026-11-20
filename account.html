@@ -784,7 +784,7 @@ body:has(#authArea:not(.hidden)) .accountWrap .links a{color:#a53d64!important}
    <input id="signupStreet" type="text" placeholder="House No. / Building / Street / Subdivision" autocomplete="street-address" required>
   </div>
   <small class="phAddressHint" id="signupAddressHint">Choose your region, province, city/municipality, and barangay.</small>
-  <textarea id="signupAddress" autocomplete="street-address" required hidden></textarea>
+  <textarea id="signupAddress" autocomplete="street-address" hidden></textarea>
  </div>
 <div class="field"><label>Contact Number</label><input id="signupContact" type="tel" autocomplete="tel" required></div>
 <div class="field"><label>WhatsApp Name</label><input id="signupWhatsapp" autocomplete="off" placeholder="Name used on WhatsApp" required></div>
@@ -856,14 +856,14 @@ body:has(#authArea:not(.hidden)) .accountWrap .links a{color:#a53d64!important}
       <div class="field phAddressGroup" data-ph-address="profileEdit">
   <label>PHILIPPINE ADDRESS</label>
   <div class="phAddressGrid">
-   <select id="profileEditRegion" required><option value="">Select Region</option></select>
+   <select id="profileEditRegion"><option value="">Select Region</option></select>
    <select id="profileEditProvince" disabled><option value="">Select Province</option></select>
-   <select id="profileEditCity" required disabled><option value="">Select City / Municipality</option></select>
+   <select id="profileEditCity" disabled><option value="">Select City / Municipality</option></select>
    <select id="profileEditBarangay" disabled><option value="">Select Barangay</option></select>
-   <input id="profileEditStreet" type="text" placeholder="House No. / Building / Street / Subdivision" autocomplete="street-address" required>
+   <input id="profileEditStreet" type="text" placeholder="House No. / Building / Street / Subdivision" autocomplete="street-address">
   </div>
   <small class="phAddressHint" id="profileEditAddressHint">Choose your region, province, city/municipality, and barangay.</small>
-  <textarea id="profileEditAddress" autocomplete="street-address" required hidden></textarea>
+  <textarea id="profileEditAddress" autocomplete="street-address" hidden></textarea>
  </div>
       <div class="field"><label>Contact Number</label><input id="profileEditContact" type="tel" required></div>
       <div class="field"><label>WhatsApp Name</label><input id="profileEditWhatsapp" required></div>

@@ -4207,6 +4207,36 @@ main.wrap{position:relative;z-index:3}
  new MutationObserver(mount).observe(document.body,{childList:true,subtree:true});
  setInterval(mount,1500);
 })();
+</script><style id="pep-floating-cart-detached-fix">
+body>button.pepFloatingLuxuryCart{
+ position:fixed!important;right:22px!important;bottom:22px!important;top:auto!important;left:auto!important;
+ z-index:2147483000!important;width:66px!important;height:66px!important;min-width:66px!important;min-height:66px!important;
+ display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+ gap:0!important;padding:8px!important;margin:0!important;box-sizing:border-box!important;
+ border:2px solid #edb1c5!important;border-radius:22px!important;
+ background:linear-gradient(145deg,#b64c77 0%,#831d48 58%,#57102f 100%)!important;
+ color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:0!important;line-height:1!important;
+ box-shadow:inset 0 2px 4px rgba(255,255,255,.4),0 9px 24px rgba(75,10,38,.3)!important;
+ transform:none!important;overflow:visible!important;
+}
+body>button.pepFloatingLuxuryCart .pepCartCrown{width:20px!important;height:13px!important;display:block!important;color:#ffe0eb!important}
+body>button.pepFloatingLuxuryCart .pepCartBasket{width:34px!important;height:34px!important;display:block!important;color:#fff!important}
+body>button.pepFloatingLuxuryCart #cartCount{position:absolute!important;top:-8px!important;right:-8px!important;min-width:25px!important;height:25px!important;display:flex!important;align-items:center!important;justify-content:center!important;border:2px solid white!important;border-radius:50%!important;background:#fff5fa!important;color:#78183f!important;-webkit-text-fill-color:#78183f!important;font:900 11px/1 Arial,sans-serif!important}
+body>button.pepFloatingLuxuryCart .pepCartBow{position:absolute!important;bottom:-7px!important;left:50%!important;transform:translateX(-50%)!important;width:23px!important;height:12px!important;display:block!important}
+body>button.pepFloatingLuxuryCart .pepCartBow:before,body>button.pepFloatingLuxuryCart .pepCartBow:after{content:""!important;position:absolute!important;top:0!important;width:12px!important;height:9px!important;border:1px solid #ffe4ed!important;background:linear-gradient(135deg,#ffe1eb,#d97899)!important}
+body>button.pepFloatingLuxuryCart .pepCartBow:before{left:0!important;border-radius:9px 2px 7px 2px!important;transform:rotate(20deg)!important}
+body>button.pepFloatingLuxuryCart .pepCartBow:after{right:0!important;border-radius:2px 9px 2px 7px!important;transform:rotate(-20deg)!important}
+@media(max-width:600px){body>button.pepFloatingLuxuryCart{right:15px!important;bottom:15px!important;width:60px!important;height:60px!important;min-width:60px!important;min-height:60px!important}}
+</style>
+<script id="pep-floating-cart-detach">
+(function(){
+ function detachCart(){
+  var cart=document.querySelector('header .pepFloatingLuxuryCart');
+  if(cart && cart.parentElement!==document.body){document.body.appendChild(cart);}
+ }
+ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',detachCart,{once:true});}
+ else{detachCart();}
+})();
 </script></body>
 </html>
 

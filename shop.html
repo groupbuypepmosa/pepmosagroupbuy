@@ -2239,7 +2239,7 @@ async function renderOpenForAll(){
     '<span class="pepMoqStatus '+(available?'available':'soldout')+'">'+(available?'AVAILABLE':'SOLD OUT')+'</span></div>'+
     '<div class="pepMoqCardBody"><h3>'+esc(x.name)+'</h3><div class="pepMoqFacts"><span>MINIMUM ORDER</span><strong>'+Math.max(1,Number(x.moq||1))+' '+(Number(x.moq||1)===1?'VIAL':'VIALS')+'</strong></div>'+
     '<div class="pepMoqPrice">'+(Number(x.amount)>0?'₱'+Number(x.amount).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2}):'PRICE ON REQUEST')+'</div>'+
-    '<div class="pepMoqFooter">'+(available?'Open for All • No Admin Fee':'This item is currently sold out')+'</div></div></article>';
+    '<div class="pepMoqFooter">'+esc(productRound?.customer_facing_name||('MOQ GB '+(productRound?.gb_number||'')))+' • '+(available?'No Admin Fee':'Currently sold out')+'</div></div></article>';
   }).join("");
  }catch(e){console.error("MOQ products load error",e);box.innerHTML='<div class="pepMoqEmpty">Unable to load MOQ products right now. Please refresh the page.</div>';}
 }

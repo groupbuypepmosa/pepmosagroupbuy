@@ -1758,7 +1758,7 @@ main.wrap{width:100%!important;max-width:none!important;margin:0!important;paddi
   <div class="pepFeaturedHeading"><h2>FEATURED PRODUCTS</h2><a href="#products">VIEW ALL PRODUCTS →</a></div>
   <div class="pepFeaturedGrid" id="pepFeaturedGrid"><div class="pepFeaturedLoading">Loading featured products…</div></div>
 </section>
-<section class="pepOpenItems" id="openForAllSection"><div class="pepFeaturedHeading"><div><h2>WHAT’S OPEN FOR MOQ?</h2><p class="pepMoqIntro">Open for All • On-Hand • Minimum Order Quantity</p></div><a href="open-for-all.html">VIEW MOQ DETAILS →</a></div><div class="pepMoqRoundBar"><div><small>CURRENT MOQ ROUND</small><strong id="pepMoqRoundName">Loading…</strong></div><div class="pepMoqTarget"><small>ROUND TARGET</small><strong id="pepMoqTarget">—</strong></div></div><div id="openForAllGrid" class="pepOpenGrid"><div class="pepMoqEmpty">Loading MOQ products…</div></div></section>
+<section class="pepOpenItems" id="openForAllSection"><div class="pepFeaturedHeading"><div><h2>WHAT’S OPEN FOR MOQ?</h2><p class="pepMoqIntro">Open for All • On-Hand • Minimum Order Quantity</p></div><a href="#products">VIEW MOQ DETAILS →</a></div><div class="pepMoqRoundBar"><div><small>CURRENT MOQ ROUND</small><strong id="pepMoqRoundName">Loading…</strong></div><div class="pepMoqTarget"><small>ROUND TARGET</small><strong id="pepMoqTarget">—</strong></div></div><div id="openForAllGrid" class="pepOpenGrid"><div class="pepMoqEmpty">Loading MOQ products…</div></div></section>
 
 
 <style id="pep-search-above-products-style">
@@ -2222,17 +2222,18 @@ async function renderOpenForAll(){
   if(settingsRes.error)throw settingsRes.error;
   const activeId=settingsRes.data?.active_gb_id;
   if(!activeId){if(nameEl)nameEl.textContent="No active MOQ round";if(targetEl)targetEl.textContent="—";box.innerHTML='<div class="pepMoqEmpty">There is no active MOQ round at the moment.</div>';return;}
-  const [gbRes,productsRes]=await Promise.all([
-   client.from("ofa_group_buys").select("gb_id,gb_number,customer_facing_name,status,moq_target").eq("gb_id",activeId).maybeSingle(),
-   client.from("ofa_products").select("id,gb_id,name,amount,moq,status,image_url,created_at").eq("gb_id",activeId).order("created_at",{ascending:false})
-  ]);
-  if(gbRes.error)throw gbRes.error;if(productsRes.error)throw productsRes.error;
-  const round=gbRes.data,items=productsRes.data||[];
+  const roundsRes=await client.from("ofa_group_buys").select("gb_id,gb_number,customer_facing_name,status,moq_target").eq("status","OPEN").order("created_at",{ascending:false});
+  if(roundsRes.error)throw roundsRes.error;
+  const rounds=roundsRes.data||[],round=rounds.find(g=>g.gb_id===activeId)||rounds[0];
+  const roundIds=rounds.map(g=>g.gb_id);
+  const productsRes=roundIds.length?await client.from("ofa_products").select("id,gb_id,name,amount,moq,status,image_url,created_at").in("gb_id",roundIds).order("created_at",{ascending:false}):{data:[],error:null};
+  if(productsRes.error)throw productsRes.error;
+  const items=productsRes.data||[],roundById=new Map(rounds.map(g=>[g.gb_id,g]));
   if(nameEl)nameEl.textContent=round?.customer_facing_name||settingsRes.data?.moq_name||("MOQ ROUND "+(round?.gb_number||settingsRes.data?.moq_number||""));
   if(targetEl)targetEl.textContent=Number(round?.moq_target??settingsRes.data?.moq_target??0)>0?Number(round?.moq_target??settingsRes.data?.moq_target).toLocaleString("en-PH")+" VIALS":"OPEN MOQ";
-  if(!items.length){box.innerHTML='<div class="pepMoqEmpty">No products have been added to this MOQ round yet.</div>';return;}
+  if(!items.length){box.innerHTML='<div class="pepMoqEmpty">No products have been added to the open MOQ rounds yet.</div>';return;}
   box.innerHTML=items.map(x=>{
-   const available=String(x.status||"").toUpperCase()==="AVAILABLE";
+   const productRound=roundById.get(x.gb_id);\n   const available=String(x.status||"").toUpperCase()==="AVAILABLE";
    return '<article class="pepMoqCard '+(available?'isAvailable':'isSoldOut')+'">'+
     '<div class="pepMoqImage">'+(x.image_url?'<img loading="lazy" decoding="async" src="'+esc(x.image_url)+'" alt="'+esc(x.name)+'">':'<span>♙</span>')+
     '<span class="pepMoqStatus '+(available?'available':'soldout')+'">'+(available?'AVAILABLE':'SOLD OUT')+'</span></div>'+

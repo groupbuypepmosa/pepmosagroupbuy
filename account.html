@@ -408,11 +408,80 @@ body{background:radial-gradient(circle at 10% 10%,rgba(233,165,191,.18),transpar
 .accountWrap input:focus,.accountWrap select:focus,.accountWrap textarea:focus{border-color:#c45b83!important;box-shadow:0 0 0 3px rgba(196,91,131,.13)!important}
 .accountWrap .notice{border-color:#ead0dc!important}
 </style>
+
+<style id="pepmosa-new-luxury-login">
+/* New PEPMOSA login landing — uses the official repository logo */
+body:has(#authArea:not(.hidden)){
+ min-height:100vh!important;
+ background:
+  radial-gradient(ellipse at 12% 8%,rgba(255,255,255,.88),transparent 30%),
+  radial-gradient(ellipse at 88% 90%,rgba(224,119,165,.20),transparent 34%),
+  linear-gradient(135deg,#fff8fc 0%,#fce8f1 48%,#f8eaf4 100%)!important;
+}
+body:has(#authArea:not(.hidden))::before{
+ content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.38;
+ background-image:radial-gradient(rgba(255,255,255,.95) 1.3px,transparent 1.3px);
+ background-size:34px 34px;
+}
+.accountWrap:has(#authArea:not(.hidden)){
+ position:relative;z-index:1;width:min(560px,calc(100% - 28px))!important;
+ margin:clamp(22px,6vh,64px) auto!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .accountCard{
+ display:block!important;width:100%!important;max-width:560px!important;box-sizing:border-box!important;
+ padding:clamp(24px,5vw,48px)!important;border:1px solid rgba(218,159,185,.55)!important;
+ border-radius:30px!important;
+ background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(255,247,251,.91))!important;
+ box-shadow:0 25px 75px rgba(116,48,71,.14),inset 0 1px 0 #fff!important;
+ backdrop-filter:blur(16px)!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .accountCard:before{display:none!important}
+.accountWrap:has(#authArea:not(.hidden)) .logo{
+ display:flex!important;justify-content:center!important;align-items:center!important;
+ margin:0 auto 16px!important;text-align:center!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .logo img{
+ display:block!important;width:min(270px,76%)!important;height:auto!important;max-height:145px!important;
+ object-fit:contain!important;object-position:center!important;
+ filter:drop-shadow(0 9px 16px rgba(112,48,75,.10))!important;
+}
+.accountWrap:has(#authArea:not(.hidden))>.accountCard>.title{
+ display:block!important;text-align:center!important;margin:8px 0 7px!important;
+ max-width:none!important;font-family:Georgia,"Times New Roman",serif!important;
+ font-size:clamp(27px,5vw,37px)!important;line-height:1.12!important;
+ letter-spacing:-.7px!important;font-weight:600!important;color:#743047!important;
+}
+.accountWrap:has(#authArea:not(.hidden))>.accountCard>.title:after{display:none!important}
+.accountWrap:has(#authArea:not(.hidden))>.accountCard>.sub{
+ display:block!important;text-align:center!important;max-width:none!important;
+ margin:0 0 27px!important;font-family:inherit!important;font-size:12px!important;
+ line-height:1.6!important;color:#967483!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) #authArea{
+ display:block!important;width:100%!important;box-sizing:border-box!important;
+ padding:0!important;min-width:0!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) #authArea:before{
+ display:block!important;text-align:center!important;margin:0 0 16px!important;
+ color:#b44b70!important;font-size:9px!important;letter-spacing:.2em!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) #authArea:after{display:none!important}
+.accountWrap:has(#authArea:not(.hidden)) .tabs{margin-bottom:20px!important}
+.accountWrap:has(#authArea:not(.hidden)) .field input{min-height:52px!important}
+.accountWrap:has(#authArea:not(.hidden)) .btn{min-height:53px!important;font-size:11px!important}
+.accountWrap:has(#authArea:not(.hidden)) .links{margin-top:22px!important;text-align:center!important}
+@media(max-width:560px){
+ .accountWrap:has(#authArea:not(.hidden)){margin:18px auto 28px!important}
+ .accountWrap:has(#authArea:not(.hidden)) .accountCard{padding:25px 20px!important;border-radius:25px!important}
+ .accountWrap:has(#authArea:not(.hidden)) .logo img{width:min(235px,78%)!important;max-height:120px!important}
+ .accountWrap:has(#authArea:not(.hidden))>.accountCard>.title{font-size:29px!important}
+}
+</style>
 </head>
 <body>
 <div class="accountWrap"><div class="accountCard">
-<div class="logo"><img src="pepmosa-no-name.png" alt="PEPMOSA"></div>
-<div class="title">My Account</div><div class="sub">Your PEPMOSA customer account</div>
+<div class="logo"><img src="pepmosa-logo.png" alt="PEPMOSA official logo"></div>
+<div class="title">Log In to Your Account</div><div class="sub">Welcome back to PEPMOSA Group Buy</div>
 <div id="authArea">
 <div class="tabs"><button class="tab active" id="loginTab">Log In</button><button class="tab" id="signupTab">Create Account</button></div>
 <div id="message" class="notice hidden"></div>

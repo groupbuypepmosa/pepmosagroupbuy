@@ -1218,6 +1218,131 @@ body:has(#accountArea:not(.hidden)){
 }
 </style>
 
+
+<style id="pepmosa-glossy-satin-login-2026">
+/* PEPMOSA glossy satin login — presentation only; auth logic remains unchanged */
+@media (min-width:701px){
+ body:has(#authArea:not(.hidden)){
+  min-height:100vh!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  padding:34px 18px!important;box-sizing:border-box!important;
+  background:#f8c1dc url("/pepmosa-login-bg.svg") center center/cover fixed no-repeat!important;
+ }
+}
+body:has(#authArea:not(.hidden)){
+ min-height:100vh!important;overflow-x:hidden!important;
+ background:#f8c1dc url("/pepmosa-login-bg.svg") center center/cover fixed no-repeat!important;
+}
+body:has(#authArea:not(.hidden))::before,
+body:has(#authArea:not(.hidden))::after{display:none!important;content:none!important}
+.accountWrap:has(#authArea:not(.hidden)){
+ position:relative!important;z-index:2!important;width:min(790px,calc(100% - 28px))!important;
+ max-width:790px!important;margin:26px auto 38px!important;padding:0!important;
+}
+.accountWrap:has(#authArea:not(.hidden))>.accountCard{
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ width:100%!important;max-width:none!important;box-sizing:border-box!important;
+ padding:24px clamp(18px,4vw,48px) 34px!important;margin:0!important;
+ border:0!important;border-radius:0!important;background:transparent!important;
+ box-shadow:none!important;backdrop-filter:none!important;overflow:visible!important;
+}
+.accountWrap:has(#authArea:not(.hidden))>.accountCard::before,
+.accountWrap:has(#authArea:not(.hidden))>.accountCard::after{display:none!important;content:none!important}
+.accountWrap:has(#authArea:not(.hidden)) .logo{
+ display:flex!important;justify-content:center!important;align-items:center!important;
+ width:100%!important;margin:0 auto 8px!important;text-align:center!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .logo img{
+ display:block!important;width:min(350px,78vw)!important;height:220px!important;
+ max-width:100%!important;max-height:220px!important;object-fit:contain!important;
+ object-position:center!important;filter:drop-shadow(0 10px 18px rgba(112,35,75,.18))!important;
+}
+.accountWrap:has(#authArea:not(.hidden))>.accountCard>.title{
+ display:block!important;width:100%!important;margin:0 0 6px!important;
+ text-align:center!important;font:600 clamp(25px,4vw,34px)/1.15 Georgia,"Times New Roman",serif!important;
+ letter-spacing:-.5px!important;color:#86143f!important;
+}
+.accountWrap:has(#authArea:not(.hidden))>.accountCard>.sub{
+ display:block!important;width:100%!important;margin:0 0 20px!important;
+ text-align:center!important;color:#8b536b!important;font-size:13px!important;line-height:1.55!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) #authArea{
+ display:block!important;width:min(650px,100%)!important;max-width:650px!important;
+ box-sizing:border-box!important;padding:28px clamp(18px,4vw,42px) 24px!important;
+ border:1px solid rgba(255,255,255,.88)!important;border-radius:30px!important;
+ background:linear-gradient(145deg,rgba(255,255,255,.79),rgba(255,239,247,.72))!important;
+ box-shadow:0 24px 70px rgba(130,36,81,.20),inset 0 1px 0 rgba(255,255,255,.95)!important;
+ backdrop-filter:blur(18px) saturate(1.25)!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) #authArea::before{
+ content:"♡  MEMBER LOGIN  ♡"!important;display:block!important;text-align:center!important;
+ margin:0 0 18px!important;color:#941344!important;font-size:12px!important;
+ font-weight:950!important;letter-spacing:.19em!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .tabs{
+ display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;
+ padding:5px!important;margin:0 0 20px!important;border-radius:16px!important;
+ background:rgba(255,255,255,.55)!important;border:1px solid rgba(211,126,164,.28)!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .tab{
+ padding:13px 10px!important;border:0!important;border-radius:12px!important;
+ color:#873e5e!important;background:transparent!important;font-size:12px!important;font-weight:900!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .tab.active{
+ color:#fff!important;background:linear-gradient(110deg,#8e1749,#c12d70)!important;
+ box-shadow:0 8px 18px rgba(142,23,73,.22)!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .field{margin:13px 0!important}
+.accountWrap:has(#authArea:not(.hidden)) .field label{
+ color:#7e294b!important;font-size:10px!important;font-weight:900!important;letter-spacing:.12em!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .field input,
+.accountWrap:has(#authArea:not(.hidden)) .field textarea{
+ min-height:54px!important;padding:14px 16px!important;box-sizing:border-box!important;
+ border:1px solid #efbfd4!important;border-radius:14px!important;
+ background:rgba(255,255,255,.82)!important;color:#4c2638!important;font-size:13px!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .field input:focus,
+.accountWrap:has(#authArea:not(.hidden)) .field textarea:focus{
+ border-color:#d44c87!important;box-shadow:0 0 0 4px rgba(212,76,135,.12)!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .passwordRow a{color:#a11b55!important;font-size:11px!important}
+.accountWrap:has(#authArea:not(.hidden)) .passwordToggle{
+ background:#fde4ef!important;color:#97164c!important;border:1px solid #f4c3d8!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .btn{
+ min-height:56px!important;border:0!important;border-radius:15px!important;
+ background:linear-gradient(110deg,#8c1245,#c21e68 58%,#df4b91)!important;
+ box-shadow:0 12px 24px rgba(142,23,73,.24)!important;
+ color:#fff!important;font-size:12px!important;font-weight:950!important;letter-spacing:.12em!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .btn:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.accountWrap:has(#authArea:not(.hidden)) .btn.secondary{
+ background:rgba(255,255,255,.78)!important;color:#95164c!important;
+ border:1px solid #edbfd2!important;box-shadow:none!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .notice{border-radius:14px!important}
+.accountWrap:has(#authArea:not(.hidden)) .links{
+ width:100%!important;margin:18px 0 0!important;padding:14px 0 0!important;
+ border-top:1px solid rgba(255,255,255,.55)!important;text-align:center!important;
+ color:#8b536b!important;font-size:11px!important;
+}
+.accountWrap:has(#authArea:not(.hidden)) .links a{color:#941344!important}
+@media(max-width:700px){
+ body:has(#authArea:not(.hidden)){display:block!important;padding:0!important;background-attachment:scroll!important}
+ .accountWrap:has(#authArea:not(.hidden)){width:calc(100% - 22px)!important;margin:16px auto 26px!important}
+ .accountWrap:has(#authArea:not(.hidden))>.accountCard{padding:12px 0 22px!important}
+ .accountWrap:has(#authArea:not(.hidden)) .logo img{width:min(270px,78vw)!important;height:170px!important;max-height:170px!important}
+ .accountWrap:has(#authArea:not(.hidden))>.accountCard>.title{font-size:27px!important}
+ .accountWrap:has(#authArea:not(.hidden))>.accountCard>.sub{font-size:12px!important;margin-bottom:16px!important}
+ .accountWrap:has(#authArea:not(.hidden)) #authArea{padding:21px 17px 19px!important;border-radius:23px!important}
+ .accountWrap:has(#authArea:not(.hidden)) .field input{min-height:49px!important}
+ .accountWrap:has(#authArea:not(.hidden)) .btn{min-height:50px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .accountWrap:has(#authArea:not(.hidden)) *{transition:none!important;animation:none!important}
+}
+</style>
+
 </head>
 <body>
 <div class="accountWrap"><div class="accountCard">

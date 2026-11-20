@@ -4029,6 +4029,26 @@ main.wrap{position:relative;z-index:3}
 })();
 </script>
 
+<script id="pepmosa-remove-legacy-moq-duplicate">
+(function(){
+ const cleanLegacyMoq=function(){
+  document.querySelectorAll("body *").forEach(function(el){
+   if(el.id==="openForAllSection"||el.closest("#openForAllSection"))return;
+   if(el.children.length>8)return;
+   const t=(el.innerText||"").replace(/\\s+/g," ").toUpperCase();
+   if(t.includes("OPEN FOR ALL")&&t.includes("SOLD OUT ITEMS ALSO SHOWN")){
+    const target=el.closest("section,article")||el;
+    if(target.id!=="openForAllSection"&&!target.closest("#openForAllSection"))target.remove();
+   }
+  });
+ };
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",cleanLegacyMoq);
+ else cleanLegacyMoq();
+ const observer=new MutationObserver(cleanLegacyMoq);
+ observer.observe(document.documentElement,{childList:true,subtree:true});
+ setTimeout(function(){observer.disconnect();},8000);
+})();
+</script>
 </body>
 </html>
 

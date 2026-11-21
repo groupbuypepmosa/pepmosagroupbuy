@@ -2416,6 +2416,8 @@ async function load(){
       (!isOrderOpen
         ? '<div class="muted" style="margin-top:8px">Browsing is available. Ordering is currently closed.</div>'
         : '');
+    // Append the schedule only after replacing the GB card HTML, otherwise innerHTML clears it.
+    if(window.pepRenderPublicGBSchedule)window.pepRenderPublicGBSchedule(gb);
     if(window.pepRenderPublicGBSchedule)window.pepRenderPublicGBSchedule(gb);
 
 

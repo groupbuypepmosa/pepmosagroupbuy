@@ -4638,6 +4638,28 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opa
 <style id="pep-hide-legacy-duplicate-gb">
   .pepGBFeature { display:none!important; }
 </style>
+
+<!-- Definitively remove dynamically re-inserted legacy GB card. The new #currentGroupBuy remains untouched. -->
+<style id="pep-remove-legacy-gb-final">
+  html body .pepGBFeature, html body [data-pep-legacy-gb="1"] { display:none!important; }
+</style>
+<script id="pep-remove-legacy-gb-final-script">
+(function(){
+  function removeLegacy(){
+    document.querySelectorAll('.pepGBFeature').forEach(el=>{
+      el.setAttribute('data-pep-legacy-gb','1');
+      el.remove();
+    });
+    document.querySelectorAll('.pepFeaturePanels').forEach(w=>{
+      if(!w.querySelector('.pepOpenFeature,.pepOpenItems,.pepCategoryRow') && !w.textContent.trim()) w.remove();
+    });
+  }
+  removeLegacy();
+  const observer=new MutationObserver(removeLegacy);
+  if(document.documentElement)observer.observe(document.documentElement,{childList:true,subtree:true});
+  document.addEventListener('DOMContentLoaded',removeLegacy,{once:true});
+})();
+</script>
 </body>
 </html>
 

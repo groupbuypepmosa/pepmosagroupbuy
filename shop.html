@@ -3406,6 +3406,8 @@ load();
         el.style.display='';
         el.innerHTML='<b class="gb-name">'+esc(gbName)+'</b> <span class="status open">KIT COMPLETION</span>';
       }
+      // This final sync replaces gbStatus.innerHTML, so re-attach the schedule AFTER it.
+      if(window.pepRenderPublicGBSchedule)window.pepRenderPublicGBSchedule(gb);
     }catch(e){console.warn('Final GB status sync:',e)}
   }
   window.pepmosaSyncPublicGBStatus=syncPublicGBStatus;

@@ -352,6 +352,82 @@ body:has(#loginScreen:not([style*="display:none"])){
  #loginScreen .loginLogo{top:-195px!important}
 }
 </style>
+
+/* PEPMOSA luxury login refresh — visual-only; authentication and admin scripts remain untouched */
+<style id="pepmosa-luxury-login-theme">
+body:has(#loginScreen:not([style*="display: none"])) {
+  min-height:100vh!important; overflow-x:hidden;
+  background:
+    radial-gradient(ellipse at 82% 12%,rgba(255,183,222,.78),transparent 34%),
+    radial-gradient(ellipse at 8% 88%,rgba(128,20,76,.88),transparent 42%),
+    radial-gradient(ellipse at 50% 48%,rgba(220,93,151,.46),transparent 55%),
+    linear-gradient(135deg,#3a0924 0%,#74163f 35%,#bd4b7e 68%,#4a0c31 100%)!important;
+  color:#fff4fa;
+}
+body:has(#loginScreen:not([style*="display: none"])):before,
+body:has(#loginScreen:not([style*="display: none"])):after{
+  content:"";position:fixed;pointer-events:none;z-index:0;inset:-12%;
+  background:
+    linear-gradient(125deg,transparent 0 16%,rgba(255,213,235,.22) 17%,rgba(255,255,255,.05) 20%,transparent 28%),
+    linear-gradient(145deg,transparent 0 68%,rgba(255,198,225,.20) 70%,rgba(255,255,255,.04) 74%,transparent 82%);
+  filter:blur(2px);transform:rotate(-4deg);
+}
+body:has(#loginScreen:not([style*="display: none"])):after{
+  inset:auto -8% -18% 22%;height:40vh;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,192,224,.24),rgba(255,192,224,.06) 45%,transparent 72%);
+  filter:blur(22px);
+}
+body:has(#loginScreen:not([style*="display: none"]))>header{display:none!important}
+#loginScreen{
+  position:relative;z-index:1;min-height:100vh!important;width:100%;
+  padding:44px 18px!important;display:flex;align-items:center;justify-content:center;
+}
+#loginScreen .loginBox{
+  position:relative;width:min(520px,100%)!important;padding:54px 42px 42px!important;
+  border:1px solid rgba(255,220,239,.76)!important;border-radius:30px!important;
+  background:linear-gradient(145deg,rgba(255,235,246,.22),rgba(76,12,45,.42))!important;
+  box-shadow:0 28px 90px rgba(32,0,20,.42),inset 0 1px 0 rgba(255,255,255,.4),0 0 34px rgba(255,154,205,.28)!important;
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  overflow:visible;
+}
+#loginScreen .loginBox:before{
+  content:"♛";position:absolute;top:-43px;left:50%;transform:translateX(-50%);
+  width:82px;height:82px;display:grid;place-items:center;border-radius:50%;
+  color:#fff0f8;font:50px Georgia,serif;text-shadow:0 0 18px #ff9bc9,0 3px 14px #8f164f;
+  background:linear-gradient(145deg,rgba(255,230,244,.35),rgba(148,35,89,.62));
+  border:1px solid rgba(255,222,240,.72);box-shadow:0 8px 30px rgba(35,0,22,.35),0 0 24px rgba(255,160,208,.45);
+}
+#loginScreen .loginLogo{margin:14px 0 4px!important;color:#fff4fa!important;font-family:Georgia,serif!important;
+  font-size:clamp(35px,7vw,49px)!important;font-weight:500!important;letter-spacing:.11em!important;
+  text-shadow:0 2px 18px rgba(255,177,218,.5)}
+#loginScreen .loginLogo span{color:#fff4fa!important}
+#loginScreen .loginSubtitle{margin:0 0 34px!important;color:#ffd9eb!important;font-size:12px!important;
+  font-weight:800;letter-spacing:.38em;text-transform:uppercase}
+#loginScreen .field{gap:9px!important;margin-top:17px}
+#loginScreen .field label{color:#ffe4f1!important;font-size:10px!important;letter-spacing:.16em}
+#loginScreen .field input{
+  min-height:56px!important;padding:14px 17px!important;border-radius:14px!important;
+  color:#fff!important;background:rgba(255,255,255,.11)!important;
+  border:1px solid rgba(255,221,238,.52)!important;box-shadow:inset 0 1px 8px rgba(40,0,20,.12);
+}
+#loginScreen .field input::placeholder{color:rgba(255,238,247,.68)!important}
+#loginScreen .field input:focus{border-color:#ffc1df!important;box-shadow:0 0 0 3px rgba(255,174,213,.18),0 0 22px rgba(255,164,207,.18)!important}
+#loginScreen .actions{margin-top:27px!important}
+#loginScreen .btn.primary{
+  min-height:58px;border-radius:999px!important;border:1px solid rgba(255,231,244,.78)!important;
+  background:linear-gradient(100deg,#9d245d,#ed78ad 48%,#a82b67)!important;
+  color:#fff!important;font-size:13px!important;letter-spacing:.24em;
+  box-shadow:0 12px 30px rgba(42,0,25,.32),inset 0 1px 0 rgba(255,255,255,.42),0 0 22px rgba(255,150,202,.34);
+  transition:transform .2s,filter .2s;
+}
+#loginScreen .btn.primary:hover{transform:translateY(-2px);filter:brightness(1.1)}
+#loginScreen #loginMsg{color:#ffe4ef}
+@media(max-width:600px){
+ #loginScreen{padding:58px 16px 28px!important}
+ #loginScreen .loginBox{padding:50px 24px 30px!important;border-radius:25px!important}
+ #loginScreen .loginLogo{font-size:36px!important}
+}
+</style>
 </head>
 <body>
 <header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a><nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a><a href="coa.html">COA</a></nav></header>

@@ -857,6 +857,7 @@ async function optimizeAsset(file){
 async function uploadAsset(file,folder){if(!file)return null;const optimized=await optimizeAsset(file),ext=optimized.name.split(".").pop().toLowerCase(),name=folder+"/"+crypto.randomUUID()+"."+ext;const{error}=await sb.storage.from("pepmosa-assets").upload(name,optimized,{upsert:false,contentType:optimized.type,cacheControl:"31536000"});if(error)throw error;return sb.storage.from("pepmosa-assets").getPublicUrl(name).data.publicUrl}
 async function saveGroupBuy(){
   try{
+    const adminCheck=await sb.rpc("is_admin");if(adminCheck.error)throw adminCheck.error;if(adminCheck.data!==true)throw new Error("Your current session is not recognized as an admin. Please log out and log in again before saving the GB schedule.");
     const n=$("gbNumber").value.trim();
     if(!n)return showMessage("GB Number is required.","error");
     const selectedCategories=getSelectedGBCategories();
@@ -899,6 +900,11 @@ async function saveGroupBuy(){
     }
 
     if(!saved||saved.gb_number!==n)throw new Error("Group Buy was not saved correctly. No categories were changed.");
+    const {data:verified,error:verifyError}=await sb.from("group_buys").select("gb_number,status,order_deadline_at,gb_schedule,kit_completion_status").eq("gb_number",n).single();
+    if(verifyError)throw verifyError;
+    const savedSchedule=verified.gb_schedule||{};
+    const expectedDeadline=p.order_deadline_at||null;
+    if((savedSchedule.open_at||null)!==(scheduleValue.open_at||null)||(savedSchedule.kit_completion_at||null)!==(scheduleValue.kit_completion_at||null)||(verified.order_deadline_at||null)!==expectedDeadline||verified.kit_completion_status!==p.kit_completion_status){throw new Error("Supabase did not confirm the GB schedule. Please check admin access; the dates were not confirmed saved.");}
 
     // FUTURE-GB ONLY: assign queued Admin Orders only when a NEW GB is created.
     // Editing the current GB never consumes the Admin Order queue.

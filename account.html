@@ -1318,22 +1318,34 @@ body:has(#authArea:not(.hidden)){
 </style>
 
 <style id="pepmosa-login-final-background-fix">
-/* Final override: avoid :has() dependency so the approved image always appears. */
+/* Highest-specificity final override for the signed-out login view.
+   Earlier account redesign rules used body:has(...) and !important,
+   so this intentionally matches and overrides those selectors. */
 html, body { min-height:100% !important; }
-body {
-  background: #f9e4ee url("/pepmosa-customer-login-bg.svg?v=20261121")
-    center center / cover fixed no-repeat !important;
+body:has(#authArea:not(.hidden)) {
+  background-color:#f9e4ee !important;
+  background-image:url("/pepmosa-customer-login-bg.svg?v=20261121") !important;
+  background-position:center center !important;
+  background-size:cover !important;
+  background-repeat:no-repeat !important;
+  background-attachment:fixed !important;
 }
-.field input, .field textarea {
-  background-color: #fff7fa !important;
-  border-color: #e9cbd8 !important;
+body:has(#authArea:not(.hidden)) .accountWrap .field input,
+body:has(#authArea:not(.hidden)) .accountWrap .field textarea {
+  background:#fff7fa !important;
+  border:1px solid #e9cbd8 !important;
+  color:#4b2939 !important;
 }
-.field input:focus, .field textarea:focus {
-  background-color: #fffafd !important;
-  border-color: #bd4c73 !important;
+body:has(#authArea:not(.hidden)) .accountWrap .field input:focus,
+body:has(#authArea:not(.hidden)) .accountWrap .field textarea:focus {
+  background:#fffafd !important;
+  border-color:#bd4c73 !important;
 }
-@media (max-width:760px) {
-  body { background-attachment:scroll !important; background-position:center center !important; }
+@media(max-width:760px) {
+  body:has(#authArea:not(.hidden)) {
+    background-position:center center !important;
+    background-attachment:scroll !important;
+  }
 }
 </style>
 

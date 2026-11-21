@@ -1780,66 +1780,119 @@ button.pepFloatingLuxuryCart:hover,.pepFloatingLuxuryCart:hover{transform:transl
   <a href="coa.html" title="COA"><span>✓</span><b>COA</b></a>
   <a href="buyers-proof.html" title="Buyers' Proof"><span>♥</span><b>PROOF</b></a>
 </nav>
-<main class="wrap">
-<!-- Legacy JS compatibility target; visible GB status is rendered in #pepGBStatus. -->
+<main class="wrap pepReferenceShop">
+<!-- Compatibility target retained for existing legacy scripts. -->
 <div id="gbStatus" aria-hidden="true" style="display:none!important"></div>
-<style id="pep-shop-hero-refresh">
-.pepShopHero{min-height:310px!important;margin:18px 0 24px!important;padding:24px 30px!important;grid-template-columns:minmax(250px,38%) minmax(0,62%)!important;gap:12px!important;border-radius:28px!important;background:radial-gradient(circle at 10% 20%,rgba(255,186,220,.25),transparent 32%),linear-gradient(125deg,#fff 0%,#fff6fb 62%,#f8f0ff 100%)!important;border:1px solid #f0d2e2!important;box-shadow:0 18px 48px rgba(130,60,105,.08)!important}
-.pepShopHero .heroLogo{min-height:245px!important;padding:0 10px!important}
-.pepShopHero .heroLogo img{width:min(100%,250px)!important;max-height:245px!important;filter:drop-shadow(0 12px 18px rgba(120,50,100,.12))!important}
-.pepShopHero .gbPanel{padding:18px 20px!important}
-.pepShopEyebrow{display:inline-flex;align-items:center;gap:7px;margin-bottom:9px;color:#b34c82;font-size:10px;font-weight:950;letter-spacing:.16em;text-transform:uppercase}
-.pepShopEyebrow span{color:#e13a9b;font-size:14px}
-.pepShopHero .gbPanel h1{font-size:clamp(36px,4.2vw,54px)!important;line-height:1.02!important;letter-spacing:-1.8px!important;margin:0 0 12px!important}
-.pepShopHero .gbPanel .muted{max-width:500px;font-size:13px!important;line-height:1.7!important}
-.pepShopHero #gbStatus{margin-top:18px!important;border-radius:20px!important}
-@media(max-width:900px){.pepShopHero{grid-template-columns:minmax(0,1fr)!important;padding:20px!important;gap:0!important}.pepShopHero .heroLogo{min-height:150px!important;height:150px!important}.pepShopHero .heroLogo img{max-height:150px!important;width:auto!important;max-width:170px!important}.pepShopHero .gbPanel{padding:12px 8px 8px!important}.pepShopHero .gbPanel h1{font-size:clamp(34px,8vw,46px)!important}}
-@media(max-width:560px){.pepShopHero{padding:15px!important;margin:12px 0 18px!important;border-radius:22px!important}.pepShopHero .heroLogo{min-height:125px!important;height:125px!important}.pepShopHero .heroLogo img{max-height:125px!important;max-width:140px!important}.pepShopHero .gbPanel{padding:10px 4px 4px!important}.pepShopHero .gbPanel h1{font-size:34px!important;letter-spacing:-1.2px!important}.pepShopHero .gbPanel .muted{font-size:12px!important}}
-</style>
-<section class="pepLuxuryHero">
-  <div class="pepHeroCurtain"></div>
-  <div class="pepHeroCopy">
-    <div class="pepHeroWelcome"><span>♛</span> W E L C O M E&nbsp; T O</div>
+
+<section class="pepRefHero" aria-label="PEPMOSA premium shop">
+  <div class="pepRefHeroCopy">
+    <div class="pepRefCrown">♛</div>
     <h1>PEPMOSA<span>♡</span></h1>
-    <p class="pepHeroTagline">YOUR TRUSTED PEPTIDE SHOP</p>
-    <div class="pepHeroPerks"><span>♢ AUTHENTIC<br>SOURCES</span><i></i><span>♧ GROUP BUY<br>& MOQ</span><i></i><span>◇ SECURE<br>ORDERS</span><i></i><span>♧ SUPPORT<br>& GUIDES</span></div>
-    <a class="pepHeroShop" href="#products">SHOP NOW <b>→</b></a>
+    <div class="pepRefTagline">YOUR TRUSTED PEPTIDE SHOP</div>
+    <p>Premium Peptides <b>•</b> Group Buy <b>•</b> On-Hand Store</p>
+    <div class="pepRefPerks">
+      <span>♧ <small>Authentic<br>Sources</small></span><i></i>
+      <span>◇ <small>Secure<br>Orders</small></span><i></i>
+      <span>♧ <small>Support<br>& Guides</small></span>
+    </div>
+    <a href="#products" class="pepRefShopNow">SHOP NOW <b>→</b></a>
   </div>
-  <div class="pepVialShowcase" aria-hidden="true"><div class="pepVial v1"><i></i><b>♛</b><strong>PEPMOSA♡</strong></div><div class="pepVial v2"><i></i><b>♛</b><strong>PEPMOSA♡</strong></div><div class="pepVial v3"><i></i><b>♛</b><strong>PEPMOSA♡</strong></div></div>
+  <div class="pepRefVials" aria-hidden="true">
+    <div class="pepRefVial small"><i></i><b>♛</b><strong>PEPMOSA♡</strong></div>
+    <div class="pepRefVial large"><i></i><b>♛</b><strong>PEPMOSA♡</strong></div>
+    <div class="pepRefVial small"><i></i><b>♛</b><strong>PEPMOSA♡</strong></div>
+    <div class="pepRefPearl pearlOne"></div><div class="pepRefPearl pearlTwo"></div>
+    <div class="pepRefGem">◇</div>
+  </div>
 </section>
-<section class="pepFeaturePanels">
-  <article class="pepGBFeature" id="currentGroupBuy"><div class="pepPanelCrown">♛</div><div class="pepPanelLabel">Current Group Buy</div><div class="pepGBTitle">GROUP BUY</div><div class="pepGBStatus" id="pepGBStatus">VIEW CURRENT GB</div><div id="pepGBStatusText" class="pepGBSub">Check the latest Group Buy details and pricing</div><a href="#products" class="pepPanelButton">VIEW PRICELIST →</a><span class="pepDNA">♧</span></article>
-  <article class="pepOpenFeature"><div class="pepOpenIcon">♧</div><h2>WHAT’S OPEN NOW?</h2><p class="pepOpenTypes">MOQ&nbsp; • &nbsp;On-Hand&nbsp; • &nbsp;Next Group Buy</p><p>See available products, minimum order, and upcoming GB schedule.</p><a href="#openForAllSection">VIEW OPEN ITEMS →</a><span class="pepCalendar">▣</span></article>
-</section>
-<section class="pepCategoryRow" aria-label="Shop categories">
-  <a href="#products" data-search=""><span>♙</span>All Products</a><a href="#products" data-search="injectable"><span>♧</span>Injectables</a><a href="#products" data-search="skin"><span>✧</span>Skin & Glow</a><a href="#products" data-search="weight"><span>♨</span>Weight Loss</a><a href="#products" data-search="performance"><span>♧</span>Performance</a><a href="#products" data-search="recovery"><span>✚</span>Recovery</a><a href="#products" data-search="supplement"><span>♙</span>Supplements</a><a href="#products" data-search="supply"><span>◇</span>Supply & Accessories</a>
-</section>
-<section class="pepOpenItems" id="openForAllSection"><div class="pepFeaturedHeading"><div><h2>WHAT’S OPEN FOR MOQ?</h2><p class="pepMoqIntro">Open for All • On-Hand • Minimum Order Quantity</p></div><a href="/open-for-all.html">VIEW MOQ DETAILS →</a></div><div class="pepMoqRoundBar"><div><small>CURRENT MOQ ROUND</small><strong id="pepMoqRoundName">Loading…</strong></div><div class="pepMoqTarget"><small>ROUND TARGET</small><strong id="pepMoqTarget">—</strong></div></div><div id="openForAllGrid" class="pepOpenGrid"><div class="pepMoqEmpty">Loading MOQ products…</div></div></section>
 
+<section class="pepRefGBSection" id="currentGroupBuy">
+  <div class="pepRefSectionIntro"><span>GROUP BUY</span><h2>Current Group Buys</h2><p>Join our Group Buy to get the best peptide prices with complete batches.</p></div>
+  <article class="pepRefGBCard current">
+    <div class="pepRefCardTop"><h3 class="pepGBTitle">CURRENT GROUP BUY</h3><span class="pepGBStatus">LOADING</span></div>
+    <p class="pepGBSub">Check the latest Group Buy details and pricing.</p>
+    <a href="#products" class="pepRefOutlineBtn">VIEW PRICELIST <b>→</b></a>
+  </article>
+  <article class="pepRefGBCard">
+    <div class="pepRefCardTop"><h3>UPCOMING GROUP BUY</h3><span class="pepRefStatus neutral">UPCOMING</span></div>
+    <p>See the next Group Buy schedule and order announcements.</p>
+    <a href="#pepRefSchedule" class="pepRefOutlineBtn">VIEW GB SCHEDULE <b>→</b></a>
+  </article>
+  <article class="pepRefGBCard">
+    <div class="pepRefCardTop"><h3>MOQ GB</h3><span class="pepRefStatus open">OPEN ITEMS</span></div>
+    <p>Open for All. Minimum Order Quantity.</p>
+    <a href="#openForAllSection" class="pepRefOutlineBtn">VIEW MOQ ITEMS <b>→</b></a>
+  </article>
+  <article class="pepRefGBCard">
+    <div class="pepRefCardTop"><h3>ON-HAND STORE</h3><span class="pepRefStatus ready">SHOP NOW</span></div>
+    <p>No Admin Fee. Limited stocks available.</p>
+    <a href="#products" class="pepRefSolidBtn">SHOP ON-HAND <b>→</b></a>
+  </article>
+</section>
 
-<style id="pep-search-above-products-style">
-.pepSearchAboveProducts{display:block!important;visibility:visible!important;opacity:1!important;position:relative;z-index:5;width:min(100%,900px);margin:24px auto 22px;padding:20px 22px;box-sizing:border-box;border:1px solid #efc9dd;border-radius:22px;background:linear-gradient(120deg,#fff 0%,#fff3f9 68%,#f8f0ff 100%);box-shadow:0 12px 30px rgba(143,61,106,.09)}
-.pepSearchAboveLabel{font-size:11px;font-weight:900;letter-spacing:.16em;color:#a84d7a;margin:0 0 10px 2px}
-.pepSearchAboveProducts .pepSearchWrap{display:flex!important;visibility:visible!important;opacity:1!important;width:100%;max-width:none;min-width:0;box-sizing:border-box}
-.pepSearchAboveProducts #search{display:block!important;visibility:visible!important;opacity:1!important;flex:1;min-width:0;width:100%;height:52px;box-sizing:border-box;font-size:16px}
-@media(max-width:620px){.pepSearchAboveProducts{margin:18px 0;padding:15px 13px;border-radius:17px}.pepSearchAboveProducts #search{height:48px}}
-</style>
-<section id="products">
+<section class="pepRefCategories">
+  <div class="pepRefSectionIntro"><span>SHOP BY CATEGORY</span><h2>Browse Products</h2><p>Discover our peptide selection<br>for your health, beauty, and wellness goals.</p></div>
+  <div class="pepCategoryRow" aria-label="Shop categories">
+    <a href="#products" data-search="injectable"><span>♧</span>Injectables</a>
+    <a href="#products" data-search="skin"><span>✧</span>Skin & Glow</a>
+    <a href="#products" data-search="weight"><span>♧</span>Weight Loss</a>
+    <a href="#products" data-search="performance"><span>♡</span>Performance</a>
+    <a href="#products" data-search="recovery"><span>✚</span>Recovery</a>
+    <a href="#products" data-search="supplement"><span>◇</span>Supplements</a>
+    <a href="#products" data-search="supply"><span>▣</span>Supply & Accessories</a>
+    <a href="#products" data-search=""><span>▦</span>All Products</a>
+  </div>
+</section>
+
+<section class="pepRefUtilityGrid" id="pepRefSchedule">
+  <article class="pepRefSchedule">
+    <div class="pepRefUtilityTitle"><span>▦</span><h2>GB SCHEDULE</h2></div>
+    <p class="pepRefUtilitySub">Follow the latest Group Buy announcements and payment timeline.</p>
+    <div class="pepRefScheduleLine"><b>01</b><span>GB OPENS</span><i>View announcement</i></div>
+    <div class="pepRefScheduleLine"><b>02</b><span>ADMIN FEE PAYMENT</span><i>Check schedule</i></div>
+    <div class="pepRefScheduleLine"><b>03</b><span>ORDER PLACEMENT</span><i>Check schedule</i></div>
+    <div class="pepRefScheduleLine"><b>04</b><span>FINAL PAYMENT</span><i>Check schedule</i></div>
+    <div class="pepRefScheduleLine"><b>05</b><span>ORDER PLACED</span><i>Follow updates</i></div>
+    <a href="#currentGroupBuy" class="pepRefScheduleLink">VIEW GROUP BUY DETAILS →</a>
+  </article>
+  <article class="pepRefQuickLinks">
+    <a href="calculator.html"><span>▤</span><div><b>CALCULATOR</b><small>Reconstitution & Dosing Calculator</small></div><strong>→</strong></a>
+    <a href="protocols.html"><span>⚗</span><div><b>PROTOCOLS</b><small>Complete Usage & Dosing Guides</small></div><strong>→</strong></a>
+    <a href="coa.html"><span>♧</span><div><b>COA LIBRARY</b><small>Certificates of Analysis per Batch</small></div><strong>→</strong></a>
+  </article>
+  <article class="pepRefProof">
+    <div class="pepRefUtilityTitle"><span>▧</span><h2>BUYERS’ PROOF</h2></div>
+    <p>Real orders. Real customers.</p>
+    <div class="pepRefProofVisual"><span>PEPMOSA</span><b>♡</b><small>BUYERS’ COMMUNITY</small></div>
+    <a href="buyers-proof.html" class="pepRefProofLink">VIEW BUYERS’ PROOF →</a>
+  </article>
+  <article class="pepRefTrack">
+    <div class="pepRefUtilityTitle"><span>♧</span><h2>TRACK ORDER</h2></div>
+    <p>Check your order and shipping status in real time.</p>
+    <a href="track.html?v=20260913-global" class="pepRefTrackButton">TRACK MY ORDER <b>→</b></a>
+  </article>
+</section>
+
+<section class="pepRefTrust">
+  <div><span>♧</span><b>100% Authentic<br>& Quality Sourced</b></div>
+  <i></i><div><span>◇</span><b>Secure & Verified<br>Payments</b></div>
+  <i></i><div><span>♧</span><b>Reliable Shipping<br>(J&T / Lalamove)</b></div>
+  <i></i><div><span>♧</span><b>Responsive<br>Customer Support</b></div>
+  <i></i><div><span>♡</span><b>Trusted by<br>Hundreds of Clients</b></div>
+</section>
+
+<section class="pepOpenItems" id="openForAllSection">
+  <div class="pepFeaturedHeading"><div><span class="pepRefEyebrow">OPEN FOR ALL</span><h2>WHAT’S OPEN FOR MOQ?</h2><p class="pepMoqIntro">Open for All • On-Hand • Minimum Order Quantity</p></div><a href="/open-for-all.html">VIEW MOQ DETAILS →</a></div>
+  <div class="pepMoqRoundBar"><div><small>CURRENT MOQ ROUND</small><strong id="pepMoqRoundName">Loading…</strong></div><div class="pepMoqTarget"><small>ROUND TARGET</small><strong id="pepMoqTarget">—</strong></div></div>
+  <div id="openForAllGrid" class="pepOpenGrid"><div class="pepMoqEmpty">Loading MOQ products…</div></div>
+</section>
+
+<section id="products" class="pepRefProducts">
   <div class="pepSearchAboveProducts">
     <div class="pepSearchAboveLabel" id="productSearch">FIND YOUR PRODUCT</div>
-    <div class="pepSearchWrap">
-      <span class="pepSearchIcon">⌕</span>
-      <input id="search" class="search" placeholder="Search products…" oninput="window.renderProducts();pepSyncSearchClear()">
-      <button id="pepSearchClear" class="pepSearchClear" type="button" onclick="document.getElementById('search').value='';window.renderProducts();pepSyncSearchClear()" aria-label="Clear search">×</button>
-    </div>
+    <div class="pepSearchWrap"><span class="pepSearchIcon">⌕</span><input id="search" class="search" placeholder="Search products…" oninput="window.renderProducts();pepSyncSearchClear()"><button id="pepSearchClear" class="pepSearchClear" type="button" onclick="document.getElementById('search').value='';window.renderProducts();pepSyncSearchClear()" aria-label="Clear search">×</button></div>
   </div>
-  <div class="sectionHead">
-    <div>
-      <div class="eyebrow">AVAILABLE NOW</div>
-      <h2>PRODUCTS</h2>
-    </div>
-    <label class="pepSortWrap"><span>SORT BY</span><select id="pepProductSort" aria-label="Sort products" onchange="window.renderProducts()"><option value="featured">Featured</option><option value="name">Name A–Z</option><option value="price-low">Price: Low to high</option><option value="price-high">Price: High to low</option></select></label>
-  </div>
+  <div class="sectionHead"><div><div class="eyebrow">AVAILABLE NOW</div><h2>PRODUCTS</h2></div><label class="pepSortWrap"><span>SORT BY</span><select id="pepProductSort" aria-label="Sort products" onchange="window.renderProducts()"><option value="featured">Featured</option><option value="name">Name A–Z</option><option value="price-low">Price: Low to high</option><option value="price-high">Price: High to low</option></select></label></div>
   <div id="productGrid" class="grid"><div class="card">Loading…</div></div>
 </section>
 
@@ -4368,6 +4421,135 @@ body>button.pepFloatingLuxuryCart{background:linear-gradient(145deg,#a94570,#5a1
  .pepSearchAboveProducts{padding:14px!important}
  .sectionHead{gap:10px!important;align-items:center!important}
  #productGrid .card{border-radius:16px!important}
+}
+</style>
+<style id="pep-reference-shop-design">
+:root{--pr-wine:#58132f;--pr-dark:#39091f;--pr-rose:#a72d60;--pr-pink:#f7d4e2;--pr-line:#f0bfd1;--pr-ink:#51152e}
+body{background:linear-gradient(135deg,#fff8fb 0%,#fdebf2 48%,#fff8fb 100%)!important;color:var(--pr-ink)!important}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.2;background-image:radial-gradient(#e9a6c0 1px,transparent 1px);background-size:26px 26px}
+.pepAnnouncement{background:#400b24!important;color:#ffeaf2!important}
+.pepLuxuryHeader{background:linear-gradient(100deg,#3b091f,#641633 65%,#4a0d28)!important;color:#fff!important;min-height:62px!important;box-shadow:0 5px 22px #4b102b30!important}
+.pepLuxuryBrand{color:#fff!important;font-family:Georgia,serif!important;font-size:clamp(23px,2.5vw,34px)!important}
+.pepCrown{color:#f4c7d8!important}
+.pepLuxuryNav a,.pepLuxuryActions a,.pepAccountNav{color:#fff!important}
+.pepLuxuryNav a.active{background:#f7dce7!important;color:#54122f!important;border-radius:999px!important}
+.pepWelcomeBanner{display:none!important}
+.pepSideRail{display:none!important}
+.wrap.pepReferenceShop{width:100%!important;max-width:none!important;padding:0 clamp(14px,2.3vw,38px) 0!important;margin:0 auto!important;box-sizing:border-box!important}
+.pepRefHero{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:1fr 1.05fr;align-items:center;min-height:315px;margin:0 calc(clamp(14px,2.3vw,38px)*-1) 20px;padding:28px clamp(28px,5vw,84px);background:radial-gradient(ellipse at 80% 50%,#f4b5cc 0,transparent 45%),linear-gradient(110deg,#f8dce7 0%,#fff3f7 48%,#f3b9cf 100%);border-bottom:1px solid #eeb5ca;box-shadow:inset 0 0 60px #fff8;
+}
+.pepRefHero:before,.pepRefHero:after{content:"";position:absolute;z-index:-1;inset:-40%;pointer-events:none;background:linear-gradient(115deg,transparent 34%,#fff8 42%,#fff1 48%,transparent 58%);transform:rotate(-12deg)}
+.pepRefHero:after{background:linear-gradient(72deg,transparent 40%,#fff7 49%,transparent 59%);transform:rotate(15deg);opacity:.65}
+.pepRefHeroCopy{position:relative;z-index:2;max-width:590px}
+.pepRefCrown{font-size:47px;line-height:.8;color:#9b214e;margin-left:120px;text-shadow:0 4px 8px #8e234333}
+.pepRefHero h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(58px,6.3vw,94px);line-height:.94;letter-spacing:-.055em;color:#56122e;margin:4px 0 8px;text-shadow:0 3px 0 #fff8}
+.pepRefHero h1 span{color:#a52959}
+.pepRefTagline{font-size:clamp(10px,1.1vw,14px);letter-spacing:.43em;font-weight:900;color:#671a37;margin:0 0 17px 18px}
+.pepRefHeroCopy>p{font-size:clamp(13px,1.2vw,17px);font-weight:750;font-style:italic;color:#641632;margin:0 0 17px 18px}
+.pepRefHeroCopy>p b{padding:0 9px;color:#a12c5b}
+.pepRefPerks{display:flex;align-items:center;gap:20px;margin:0 0 20px 28px;color:#7d1b43}
+.pepRefPerks span{display:flex;align-items:center;gap:9px;font-size:23px}
+.pepRefPerks small{font-size:11px;line-height:1.25;color:#4e1b30}
+.pepRefPerks i{height:30px;width:1px;background:#d98eaa}
+.pepRefShopNow,.pepRefSolidBtn{display:inline-flex;align-items:center;justify-content:center;gap:14px;padding:12px 34px;border-radius:999px;background:linear-gradient(100deg,#5b102f,#a3295b);color:#fff!important;text-decoration:none;font-weight:950;box-shadow:0 9px 18px #66173530;margin-left:18px}
+.pepRefVials{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:12px;min-height:275px;padding-top:25px}
+.pepRefVial{position:relative;width:23%;height:150px;border:3px solid #f7d5e2;border-radius:25px 25px 15px 15px;background:linear-gradient(90deg,#bd607f,#fff0f5 24%,#eaa4bc 50%,#fff3f6 75%,#a84266);box-shadow:inset 0 0 18px #fff9,0 16px 24px #6e163c35;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#681333}
+.pepRefVial:before{content:"";position:absolute;top:-26px;left:17%;width:66%;height:28px;border-radius:9px 9px 3px 3px;background:linear-gradient(90deg,#6d1232,#edb2c6,#6d1232);border:2px solid #f7d9e5;box-shadow:0 3px 6px #6c123344}
+.pepRefVial:after{content:"";position:absolute;top:-37px;left:23%;width:54%;height:12px;border-radius:7px 7px 2px 2px;background:linear-gradient(90deg,#7b1639,#f5c8d7,#8d1c46)}
+.pepRefVial b{font-size:27px}.pepRefVial strong{font-family:Georgia,serif;font-size:clamp(10px,1.1vw,15px);margin-top:5px}
+.pepRefVial.large{width:27%;height:190px;z-index:2}.pepRefVial.large:before{height:35px;top:-33px}.pepRefVial.large:after{top:-46px;height:15px}
+.pepRefVial.small{margin-bottom:8px}
+.pepRefPearl{position:absolute;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#fff 0 8%,#fff9 10%,#eab3c7 35%,#b55a7c 70%,#fff 100%);box-shadow:0 10px 20px #8c2a4c35}
+.pearlOne{left:4%;bottom:10px}.pearlTwo{right:2%;top:45px;width:36px;height:36px}
+.pepRefGem{position:absolute;right:0;bottom:15px;font-size:65px;color:#fff9;text-shadow:0 0 12px #fff}
+.pepRefGBSection{display:grid;grid-template-columns:1.25fr repeat(4,minmax(0,1fr));gap:10px;align-items:stretch;padding:0 0 15px;border-bottom:1px solid #f0c9d8}
+.pepRefSectionIntro{padding:7px 14px 6px 18px;align-self:center;border-left:4px solid #b62b61}
+.pepRefSectionIntro>span,.pepRefEyebrow{font-size:11px;letter-spacing:.25em;font-weight:950;color:#d12c68}
+.pepRefSectionIntro h2{font:700 clamp(23px,2.1vw,32px)/1.05 Georgia,serif;color:#58132f;margin:6px 0}
+.pepRefSectionIntro p{font-size:13px;line-height:1.5;color:#755464;margin:7px 0}
+.pepRefGBCard{min-width:0;padding:14px 15px 12px;border:1px solid #efbfd1;border-radius:17px;background:linear-gradient(145deg,#fffafd,#fce8f0);box-shadow:0 6px 13px #8c31501a;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
+.pepRefGBCard.current{border-color:#d64a7d}
+.pepRefCardTop{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.pepRefGBCard h3{font:700 clamp(17px,1.7vw,25px)/1 Georgia,serif;color:#58132f;margin:0}
+.pepRefStatus,.pepGBStatus{display:inline-flex;align-items:center;justify-content:center;padding:6px 13px;border-radius:999px;background:#dcebd5;color:#28602e;font-size:10px;font-weight:950;white-space:nowrap}
+.pepRefStatus.neutral{background:#eee6e9;color:#6c5861}.pepRefStatus.ready{background:#dcebd5;color:#28602e}
+.pepRefGBCard p{font-size:11px;line-height:1.45;color:#553c48;margin:4px 0}
+.pepRefGBCard .pepGBSub{font-size:11px;line-height:1.45;color:#553c48;margin:4px 0}
+.pepRefGBCard .pepGBStatus{background:#e6e1e4;color:#5b4b52}
+.pepRefGBCard .pepGBStatus.isOpen{background:#dcebd5;color:#28602e}
+.pepRefGBCard .pepGBStatus.isClosed{background:#e9e2e5;color:#5e5056}
+.pepRefOutlineBtn,.pepRefGBCard .pepRefSolidBtn{align-self:center;text-align:center;text-decoration:none;border:1px solid #d94a7c;border-radius:999px;padding:8px 12px;color:#a51f51;font-size:10px;font-weight:950;width:100%;box-sizing:border-box;margin:0;background:#fff7fa}
+.pepRefGBCard .pepRefSolidBtn{background:linear-gradient(100deg,#59102e,#a72a5b);color:#fff!important;border:0}
+.pepRefCategories{display:grid;grid-template-columns:1.25fr repeat(1,minmax(0,3fr));gap:14px;align-items:center;padding:14px 0 17px;border-bottom:1px solid #f0c9d8}
+.pepCategoryRow{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;margin:0!important}
+.pepCategoryRow a{min-width:0;min-height:85px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 4px;border:1px solid #efc6d6;border-radius:16px;background:linear-gradient(145deg,#fff,#f9dfe9);box-shadow:0 5px 10px #81284714;color:#53142f;text-align:center;text-decoration:none;font-size:11px;font-weight:850}
+.pepCategoryRow a span{font-size:30px;line-height:1.15;color:#b32459}
+.pepRefUtilityGrid{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:14px;padding:16px 0 18px}
+.pepRefSchedule,.pepRefQuickLinks,.pepRefProof,.pepRefTrack{min-width:0;min-height:180px;padding:15px 17px;border:1px solid #edc3d3;border-radius:20px;background:linear-gradient(145deg,#fffafd,#fce9f1);box-shadow:0 8px 20px #74213e14}
+.pepRefSchedule{background:radial-gradient(circle at 88% 10%,#ffffff26,transparent 25%),linear-gradient(130deg,#54102e,#9b2d5b);color:#fff;border:0}
+.pepRefUtilityTitle{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.pepRefUtilityTitle>span{font-size:29px;color:inherit}
+.pepRefUtilityTitle h2{font-size:17px;font-weight:950;color:inherit;margin:0}
+.pepRefSchedule .pepRefUtilitySub{font-size:11px;line-height:1.4;color:#f8dce6;margin:0 0 8px}
+.pepRefScheduleLine{display:grid;grid-template-columns:27px 1fr auto;align-items:center;gap:7px;padding:4px 0;font-size:10px}
+.pepRefScheduleLine b{width:21px;height:21px;display:grid;place-items:center;border-radius:50%;background:#f7d7e3;color:#681638}
+.pepRefScheduleLine i{font-style:normal;color:#f5cad9;font-size:9px}
+.pepRefScheduleLink{display:block;margin-top:8px;color:#fff!important;font-size:10px;font-weight:950;text-decoration:none}
+.pepRefQuickLinks{display:flex;flex-direction:column;gap:8px;padding:12px}
+.pepRefQuickLinks a{display:flex;align-items:center;gap:10px;min-height:45px;padding:8px 10px;border-radius:14px;border:1px solid #f0c6d7;background:#fff2f7;color:#641633;text-decoration:none}
+.pepRefQuickLinks a>span{font-size:25px;color:#a82357}.pepRefQuickLinks a div{flex:1;min-width:0}.pepRefQuickLinks b{display:block;font-size:13px}.pepRefQuickLinks small{display:block;font-size:9px;color:#765363}.pepRefQuickLinks strong{font-size:22px;color:#c12e68}
+.pepRefProof p,.pepRefTrack p{font-size:12px;color:#644b57;line-height:1.45;margin:5px 0 12px}
+.pepRefProofVisual{height:86px;border-radius:14px;background:linear-gradient(135deg,#f5d4e1,#fff8fb 50%,#d88da9);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#671637;box-shadow:inset 0 0 20px #fff9}
+.pepRefProofVisual span{font:700 21px Georgia,serif;letter-spacing:.08em}.pepRefProofVisual b{font-size:18px}.pepRefProofVisual small{font-size:8px;letter-spacing:.25em}
+.pepRefProofLink{display:block;text-align:center;margin-top:7px;color:#a52358;font-size:10px;font-weight:950;text-decoration:none}
+.pepRefTrackButton{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-radius:12px;background:linear-gradient(100deg,#59102e,#a72a5b);color:#fff!important;text-decoration:none;font-size:12px;font-weight:950}
+.pepRefTrust{display:flex;align-items:center;justify-content:space-around;gap:10px;margin:0 calc(clamp(14px,2.3vw,38px)*-1);padding:17px clamp(20px,4vw,60px);background:linear-gradient(100deg,#430b25,#72183e,#4b0d2a);color:#fff}
+.pepRefTrust div{display:flex;align-items:center;gap:10px}.pepRefTrust span{font-size:30px;color:#f8d4e2}.pepRefTrust b{font-size:11px;line-height:1.35}.pepRefTrust>i{width:1px;height:35px;background:#f5ccdc88}
+.pepOpenItems{margin:18px 0;padding:20px;border:1px solid #edc3d3;border-radius:20px;background:#fff9fc}
+.pepRefProducts{padding:16px 0 30px}
+.pepSearchAboveProducts{display:block!important;visibility:visible!important;opacity:1!important;position:relative;z-index:5;width:min(100%,900px);margin:24px auto 22px;padding:20px 22px;box-sizing:border-box;border:1px solid #efc9dd;border-radius:22px;background:linear-gradient(120deg,#fff 0%,#fff3f9 68%,#f8f0ff 100%);box-shadow:0 12px 30px #8f3d6a17}
+.pepSearchAboveLabel{font-size:11px;font-weight:900;letter-spacing:.16em;color:#a84d7a;margin:0 0 10px 2px}
+.pepSearchAboveProducts .pepSearchWrap{display:flex!important;width:100%;max-width:none}
+.pepSearchAboveProducts #search{display:block!important;flex:1;min-width:0;width:100%;height:50px;box-sizing:border-box;font-size:15px;border:1px solid #edc4d5;border-radius:13px;padding:10px 14px;background:#fff}
+#productGrid .card{border:1px solid #efc5d6!important;border-radius:18px!important;background:linear-gradient(145deg,#fff,#fff7fa)!important;box-shadow:0 8px 22px #74213e13!important;overflow:hidden}
+#productGrid .card button,#productGrid .card .btn{border-radius:999px!important}
+.pepFeaturedHeading h2,.sectionHead h2{font-family:Georgia,serif!important;color:#59142f!important}
+.pepOpenItems .pepFeaturedHeading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pepOpenItems .pepFeaturedHeading>a{border-radius:999px;background:#741b43;color:white;padding:10px 16px;text-decoration:none;font-size:10px;font-weight:900}
+.footer{background:#4b0d2a!important;color:#fff!important}
+@media(max-width:1100px){
+ .pepRefGBSection{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .pepRefSectionIntro{grid-column:1/-1}
+ .pepRefUtilityGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .pepRefCategories{grid-template-columns:1fr}
+ .pepRefCategories>.pepRefSectionIntro{padding-bottom:0}
+}
+@media(max-width:700px){
+ .pepLuxuryHeader{padding:9px 12px!important}.pepLuxuryNav{display:none!important}
+ .pepRefHero{grid-template-columns:1fr;min-height:unset;padding:25px 22px 14px;text-align:center}
+ .pepRefHeroCopy{margin:auto}.pepRefCrown{margin:0;font-size:37px}
+ .pepRefHero h1{font-size:clamp(52px,13vw,74px)}
+ .pepRefTagline{margin-left:0;letter-spacing:.28em}
+ .pepRefHeroCopy>p{margin-left:0;font-size:12px}
+ .pepRefPerks{justify-content:center;gap:10px;margin:0 0 16px}
+ .pepRefPerks span{gap:4px;font-size:18px}.pepRefPerks small{font-size:9px}
+ .pepRefShopNow{margin:0 auto}
+ .pepRefVials{min-height:185px;max-width:430px;width:100%;margin:12px auto 0;gap:9px}
+ .pepRefVial{height:112px}.pepRefVial.large{height:143px}
+ .pepRefGBSection{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .pepRefSectionIntro{grid-column:1/-1}
+ .pepRefGBCard{padding:12px 10px}.pepRefGBCard h3{font-size:17px}
+ .pepRefCategories{padding:12px 0}
+ .pepCategoryRow{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+ .pepCategoryRow a{min-height:76px;font-size:9px;border-radius:13px}
+ .pepCategoryRow a span{font-size:24px}
+ .pepRefUtilityGrid{grid-template-columns:1fr;gap:10px}
+ .pepRefSchedule,.pepRefQuickLinks,.pepRefProof,.pepRefTrack{min-height:unset}
+ .pepRefTrust{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:17px 20px}
+ .pepRefTrust>i{display:none}.pepRefTrust span{font-size:24px}.pepRefTrust b{font-size:9px}
+ .pepOpenItems{padding:14px 11px}.pepOpenItems .pepFeaturedHeading{align-items:flex-start;flex-direction:column}
+ .pepSearchAboveProducts{margin:15px 0;padding:14px}
+ .pepRefProducts .sectionHead{align-items:center;gap:8px}
 }
 </style>
 </body>

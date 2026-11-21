@@ -4660,6 +4660,34 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opa
   document.addEventListener('DOMContentLoaded',removeLegacy,{once:true});
 })();
 </script>
+
+<!-- Final duplicate GB cleanup: target the retired card by its unique legacy copy, not only its class. -->
+<script id="pep-remove-duplicate-gb-by-copy">
+(function(){
+ const legacyCopy='BROWSE THE PRICELIST. ORDERING FOR THIS GROUP BUY IS CLOSED.';
+ function clean(){
+   document.querySelectorAll('body *').forEach(el=>{
+     if(el.children.length>8)return;
+     const t=(el.innerText||el.textContent||'').replace(/\\s+/g,' ').trim().toUpperCase();
+     if(!t.includes(legacyCopy))return;
+     let card=el;
+     while(card.parentElement && card.parentElement!==document.body && card.parentElement!==document.querySelector('main')) {
+       const p=card.parentElement;
+       if(p.matches('.pepGBFeature,.pepFeaturePanels,[class*="GBFeature"],[class*="groupBuyFeature"]')){card=p;break;}
+       if(p.children.length>3)break;
+       card=p;
+     }
+     if(card && card!==document.querySelector('#currentGroupBuy'))card.remove();
+   });
+   document.querySelectorAll('.pepGBFeature,[class*="GBFeature"]').forEach(el=>{
+     if(!el.closest('#currentGroupBuy'))el.remove();
+   });
+ }
+ clean();
+ new MutationObserver(clean).observe(document.documentElement,{childList:true,subtree:true,characterData:true});
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',clean,{once:true});
+})();
+</script>
 </body>
 </html>
 

@@ -1,0 +1,166 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Open for All Admin</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script><style>
+:root{--pink:#cc2d88;--dark:#2d2730;--soft:#fff8fb;--line:#edd8e5}*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#fff8fb,#f6effa);margin:0;color:var(--dark)}.w{max-width:1180px;margin:auto;padding:28px 18px}.hero{background:linear-gradient(135deg,#d92f8d,#a843bd);color:#fff;border-radius:26px;padding:26px 30px;box-shadow:0 15px 40px #b62b7b33}.hero h1{margin:0 0 6px}.hero p{margin:0;opacity:.9}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}.stat,.card{background:#fff;border:1px solid var(--line);border-radius:20px}.stat{padding:18px}.stat .num{font-size:28px;font-weight:900;color:var(--pink);margin-top:7px}.card{padding:20px;margin:15px 0}.card h2{margin:0 0 15px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.f{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:13px}.f input,.f textarea,.f select{width:100%;padding:12px;border:1px solid #e2cbd8;border-radius:11px;font:inherit;background:#fff}.btn{background:var(--pink);color:#fff;border:0;border-radius:11px;padding:11px 14px;font-weight:800;cursor:pointer}.btn.alt{background:#fff;color:var(--pink);border:1px solid var(--pink)}.row{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:14px 0;border-bottom:1px solid #f0e6ec}.empty{padding:22px;text-align:center;color:#8a7b84;background:#fff8fb;border-radius:12px}.preview{width:110px;height:110px;object-fit:contain;border:1px dashed #e0b8cf;border-radius:12px;padding:5px;margin-top:8px}.actions{display:flex;gap:8px;flex-wrap:wrap}.small{font-size:12px;color:#8a7b84}.tag{display:inline-block;background:#fff0f7;color:var(--pink);padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.row{align-items:flex-start;flex-direction:column}}
+</style></head><body><div class="w">
+<div class="hero"><h1>🌐 Open for All Admin</h1><p>Completely separate from Group Buy — Products • Payments • Waybills • Totals</p><div id="moqRoundBadge" style="display:inline-block;margin-top:12px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.18);font-weight:900">CURRENT: MOQ</div><select id="gbSelect" style="margin-left:8px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:#fff;color:#7d2459;font-weight:800"></select></div>
+<div class="card"><h2>🏷️ MOQ Name & Number</h2><p class="small">Each NEW GB is completely separate. It gets its own products, prices, buyers, payments, shipping status and waybills. Creating a new GB does not mix with previous GBs.</p><div class="grid"><label class="f">MOQ NAME<input id="moqName" placeholder="e.g. FUAN"></label><label class="f">MOQ NUMBER / ROUND<input id="moqNumber" type="text" value="1" placeholder="e.g. RAWND 3"></label><label class="f">MOQ TARGET #<input id="moqTarget" type="number" min="1" placeholder="e.g. 50"></label></div><p class="small">Example: enter <b>50</b> and the customer-facing progress will show <b>33 / 50</b>.</p><div class="actions" style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button id="saveMoqRoundBtn" type="button" class="btn">SAVE MOQ NAME & NUMBER</button><button id="addNewMoqBtn" type="button" class="btn">➕ ADD NEW MOQ</button></div><div id="moqRoundStatus" class="small" style="margin-top:10px"></div></div>
+<div id="stats" class="stats"></div>
+<div class="card"><h2>➕ Add Product</h2><div class="grid"><label class="f">Product Name<input id="pn" placeholder="e.g. Tirzepatide 15mg"></label><label class="f">Amount<input id="pa" type="number" placeholder="0"></label><label class="f">MOQ<input id="pm" type="number" value="1"></label><label class="f">Product Photo<input id="pi" type="file" accept="image/png,image/jpeg,image/webp"></label></div><img id="pprev" class="preview" style="display:none"><br><button id="addProductBtn" type="button" class="btn">ADD PRODUCT</button><div id="saveStatus" class="small" style="margin-top:10px"></div><div id="plist"></div></div>
+<div class="card"><h2>💳 Payments / Approval</h2><div id="payments"></div></div>
+<div class="card"><h2>📦 Update Tracking for All</h2><p class="small">Choose a shipment status from the tracking list and apply it to all current Open for All orders. Individual tracking/waybill numbers stay unchanged.</p><button class="btn" type="button" onclick="openOfaBulkTracking()">✦ UPDATE TRACKING FOR ALL</button></div>
+<div id="ofaBulkTrackingModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;padding:18px;overflow:auto"><div class="card" style="max-width:560px;margin:8vh auto;background:#fff"><h2 style="margin-top:0">📦 Update Tracking for All</h2><p class="small">Apply one shipment status to all current Open for All orders.</p><div id="ofaBulkTrackingCount" class="small" style="padding:10px;border-radius:10px;background:#fff5fa;margin:12px 0"></div><label class="f">NEW STATUS<select id="ofaBulkTrackingStatus"></select></label><label class="f">COURIER (OPTIONAL)<select id="ofaBulkTrackingCourier"><option value="">Keep current courier</option><option value="J&T">J&T</option><option value="Lalamove">Lalamove</option><option value="Other">Other</option></select></label><div class="actions" style="margin-top:16px"><button class="btn" type="button" onclick="saveOfaBulkTracking()">UPDATE ALL ORDERS</button><button class="btn alt" type="button" onclick="closeOfaBulkTracking()">CANCEL</button></div></div></div>
+<div class="card"><h2>🚚 Consolidated Waybills</h2><p class="small">Same-email orders are consolidated here for MOQ/Open for All only.</p><div id="ways"></div></div>
+<div class="card"><h2>📱 Separate QR & Shipping</h2><div class="grid"><label class="f">Payment QR Image<input id="qrfile" type="file" accept="image/png,image/jpeg,image/webp"></label><label class="f">Payment Name<input id="pay" placeholder="Account / payment name"></label><label class="f">Luzon Shipping<input id="lu" type="number"></label><label class="f">Visayas Shipping<input id="vi" type="number"></label><label class="f">Mindanao Shipping<input id="mi" type="number"></label><label class="f">Lalamove Shipping<input id="la" type="number" placeholder="0"></label></div><img id="qrprev" class="preview" style="display:none"><label class="f" style="margin-top:12px">Instructions<textarea id="ins" placeholder="Payment instructions"></textarea></label><br><button id="saveSettingsBtn" type="button" class="btn">SAVE SETTINGS</button></div>
+</div><script>
+let s,settings={},ACTIVE_GB=null;
+let moqRound={name:'',number:'1',target:0};
+function moqLabel(){const n=String(moqRound.number||'1').trim()||'1';return (moqRound.name?moqRound.name+' ':'')+'MOQ '+n;}
+function renderMoqRound(){const label=moqLabel();const badge=document.getElementById('moqRoundBadge');if(badge)badge.textContent='CURRENT: '+label;const n=document.getElementById('moqName'),no=document.getElementById('moqNumber'),t=document.getElementById('moqTarget');if(n)n.value=moqRound.name||'';if(no)no.value=String(moqRound.number||'1').trim()||'1';if(t)t.value=Number(moqRound.target||0)||'';document.title=label+' • Open for All Admin';}
+async function loadMoqRound(){
+  try{
+    const st=await s.from('ofa_settings').select('active_gb_id').eq('id',true).single();
+    if(st.error)throw st.error;
+    const all=await s.from('ofa_group_buys').select('*').order('created_at',{ascending:false});
+    if(all.error)throw all.error;
+    const sel=document.getElementById('gbSelect');
+    if(sel){sel.innerHTML=(all.data||[]).map(g=>'<option value="'+g.gb_id+'">'+(g.customer_facing_name||'MOQ')+' • GB '+g.gb_number+'</option>').join('');sel.value=st.data?.active_gb_id||'';sel.onchange=()=>switchGB(sel.value);}
+    const g=await s.from('ofa_group_buys').select('*').eq('gb_id',st.data?.active_gb_id).single();
+    if(g.error)throw g.error;
+    ACTIVE_GB=g.data;
+    moqRound={name:(ACTIVE_GB.customer_facing_name||'').trim(),number:String(ACTIVE_GB.gb_number||'1').trim()||'1',target:Number(ACTIVE_GB.moq_target||0)||0};
+    renderMoqRound();
+  }catch(e){console.error(e);renderMoqRound();}
+}
+async function saveMoqRound(){
+ if(!ACTIVE_GB)return alert('No active GB.');
+ const name=document.getElementById('moqName').value.trim(), number=document.getElementById('moqNumber').value.trim(), target=Math.max(0,Number(document.getElementById('moqTarget').value)||0);
+ if(!name||!number)return alert('Please enter MOQ name and number.');
+ const r=await s.from('ofa_group_buys').update({customer_facing_name:name,gb_number:number,moq_target:target,updated_at:new Date().toISOString()}).eq('gb_id',ACTIVE_GB.gb_id).select().single();
+ if(r.error)return alert('Could not save MOQ: '+r.error.message);
+ ACTIVE_GB=r.data; moqRound={name,number,target}; renderMoqRound(); document.getElementById('moqRoundStatus').textContent='Saved to this GB.'; await load();
+}
+async function addNewMoq(){
+ const name=prompt('NEW GB name (example: FUAN):'); if(name===null||!name.trim())return;
+ const number=prompt('NEW GB number / round:'); if(number===null||!number.trim())return;
+ const targetRaw=prompt('MOQ target (example: 50):','50'); if(targetRaw===null)return;
+ const r=await s.rpc('ofa_admin_create_group_buy',{p_name:name.trim(),p_number:number.trim(),p_target:Math.max(0,Number(targetRaw)||0)});
+ if(r.error)return alert('Could not create new GB: '+r.error.message);
+ const g=Array.isArray(r.data)?r.data[0]:r.data;
+ if(!g?.gb_id)return alert('New GB was not returned by database.');
+ ACTIVE_GB=g; moqRound={name:g.customer_facing_name||name.trim(),number:String(g.gb_number||number.trim()),target:Number(g.moq_target||0)||0};
+ renderMoqRound(); await loadMoqRound(); await load(); alert('New GB created. It starts empty and is completely separate from previous GBs.');
+}
+async function switchGB(id){
+  if(!id)return;
+  const r=await s.from('ofa_settings').update({active_gb_id:id,updated_at:new Date().toISOString()}).eq('id',true);
+  if(r.error)return alert('Could not switch GB: '+r.error.message);
+  await loadMoqRound(); await load();
+}
+const ofaPeso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2});
+const empty=t=>'<div class="empty">'+t+'</div>';
+async function boot(){s=initSupabase();await requireAdmin();await loadMoqRound();document.getElementById('saveMoqRoundBtn').onclick=saveMoqRound;document.getElementById('addNewMoqBtn').onclick=addNewMoq;const statusEl=document.getElementById('saveStatus');if(statusEl)statusEl.textContent='Ready to save to MOQ database.';await load()}
+async function load(){const results=await Promise.all([s.from('ofa_orders').select('*').eq('gb_id',ACTIVE_GB.gb_id).order('created_at',{ascending:false}),s.from('ofa_products').select('*').eq('gb_id',ACTIVE_GB.gb_id).order('created_at',{ascending:false}),s.from('ofa_waybills').select('*').order('created_at',{ascending:false}),s.from('ofa_group_buys').select('*').eq('gb_id',ACTIVE_GB.gb_id).single(),s.from('ofa_order_items').select('*')]);const o=results[0],p=results[1],wayRes=results[2],st=results[3],it=results[4];if(o.error||p.error||wayRes.error)console.error(o.error||p.error||wayRes.error);let O=o.data||[],sales=O.filter(x=>x.payment_status==='PAID').reduce((a,x)=>a+(+x.total||0),0),pending=O.filter(x=>x.payment_status==='SUBMITTED').length,paid=O.filter(x=>x.payment_status==='PAID').length;settings=st.data||ACTIVE_GB||{};stats.innerHTML='<div class="stat"><div class="small">TOTAL ORDERS</div><div class="num">'+O.length+'</div></div><div class="stat"><div class="small">PAID SALES</div><div class="num">'+ofaPeso(sales)+'</div></div><div class="stat"><div class="small">PENDING PAYMENTS</div><div class="num">'+pending+'</div></div><div class="stat"><div class="small">PAID ORDERS</div><div class="num">'+paid+'</div></div>';
+plist.innerHTML=(p.data||[]).map(x=>`<div class="row"><span>${x.image_url?'<img class="preview" style="width:60px;height:60px;vertical-align:middle;margin-right:10px" src="'+x.image_url+'">':''}<b>${x.name}</b><br><span class="small">${ofaPeso(x.amount)} • MOQ ${x.moq} • <span class="tag">${x.status}</span></span></span><div class="actions"><button class="btn alt" onclick="editProduct(&quot;${x.id}&quot;)">EDIT</button><button class="btn alt" onclick="toggle('${x.id}','${x.status}')">${x.status==='AVAILABLE'?'SOLD OUT':'MAKE AVAILABLE'}</button><button class="btn alt" style="color:#b42318;border-color:#b42318" onclick="deleteProduct('${x.id}')">DELETE</button></div></div>`).join('')||empty('No Open for All products yet.');
+payments.innerHTML=O.map(x=>{const approved=x.payment_status==='PAID';const rejected=x.payment_status==='REJECTED';const statusText=approved?'APPROVED ✓':rejected?'REJECTED':'PENDING APPROVAL';const actionButtons=approved?'<span class="tag" style="background:#dcfce7;color:#166534">✓ APPROVED</span>':rejected?'<button class="btn" onclick="stat(\''+x.order_id+'\',\'PAID\')">RE-APPROVE</button>':'<button class="btn" onclick="stat(\''+x.order_id+'\',\'PAID\')">APPROVE</button><button class="btn alt" onclick="stat(\''+x.order_id+'\',\'REJECTED\')">REJECT</button>';return `<div class="row"><span><b>${x.order_id}</b><br>${x.customer_name} • ${x.email}<br><span class="tag">Delivery: ${esc(x.shipping_method||'N/A')}</span><br><b>${ofaPeso(x.total)}</b> • <span class="tag">${statusText}</span><br>${x.payment_proof_url?'<a target="_blank" href="'+x.payment_proof_url+'">View payment proof</a>':'No payment proof'}</span><div class="actions">${actionButtons}<button class="btn alt" style="color:#b42318;border-color:#b42318" onclick="deleteOrder('${x.order_id}')">DELETE ORDER</button></div></div>`;}).join('')||empty('No payments yet.');
+const waybillRows=wayRes.data||[];
+const items=it.data||[];
+
+// Build consolidated Open for All groups by email.
+// This stays completely separate from the regular Group Buy system.
+const groups={};
+O.forEach(order=>{
+  const key=(order.email||order.order_id||'unknown').trim().toLowerCase();
+  if(!groups[key]) groups[key]={email:order.email||'No email',orders:[],items:[],waybills:[]};
+  groups[key].orders.push(order);
+});
+items.forEach(item=>{
+  const order=O.find(x=>x.order_id===item.order_id);
+  if(!order) return;
+  const key=(order.email||order.order_id||'unknown').trim().toLowerCase();
+  if(groups[key]) groups[key].items.push(item);
+});
+waybillRows.forEach(row=>{
+  const order=O.find(x=>x.order_id===row.order_id);
+  if(!order) return;
+  const key=(order.email||order.order_id||'unknown').trim().toLowerCase();
+  if(groups[key]) groups[key].waybills.push(row);
+});
+
+ways.innerHTML=Object.values(groups).map(g=>{const first=g.orders[0],qty=g.items.reduce((a,z)=>a+(+z.qty||0),0),products={};g.items.forEach(z=>products[z.product_name]=(products[z.product_name]||0)+(+z.qty||0));const productText=Object.entries(products).map(([n,q])=>n+' × '+q).join(' • ')||'No items';return '<div class="row"><span><b>'+g.email+'</b><br>'+first.customer_name+' • '+(first.contact||'No contact')+'<br><span class="small">'+first.address+'</span><br><span class="tag">'+g.orders.length+' ORDER(S)</span> <span class="tag">'+qty+' TOTAL QTY</span><br><span class="small">'+productText+'</span></span><div class="actions"><button class="btn" onclick="printConsolidated(\''+g.email+'\')">PRINT CONSOLIDATED</button><button class="btn alt" onclick="editConsolidatedWaybill(\''+g.email+'\')">SET WAYBILL</button></div></div>';}).join('')||empty('No Open for All orders yet.');
+pay.value=settings.payment_name||'';ins.value=settings.payment_instructions||'';lu.value=settings.luzon_fee??100;vi.value=settings.visayas_fee??150;mi.value=settings.mindanao_fee??180;la.value=settings.lalamove_fee??0;if(settings.payment_qr_url){qrprev.src=settings.payment_qr_url;qrprev.style.display='block'}}
+async function upload(file,folder){if(!file)return null;let ext=(file.name.split('.').pop()||'jpg').replace(/[^a-z0-9]/gi,''),path=folder+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext,r=await s.storage.from('ofa-assets').upload(path,file,{contentType:file.type,upsert:false});if(r.error)throw r.error;return s.storage.from('ofa-assets').getPublicUrl(path).data.publicUrl}
+async function addP(){const pnEl=document.getElementById('pn'),paEl=document.getElementById('pa'),pmEl=document.getElementById('pm'),piEl=document.getElementById('pi'),pp=document.getElementById('pprev'),b=document.getElementById('addProductBtn'),statusEl=document.getElementById('saveStatus');statusEl.textContent='Starting save...';if(!pnEl.value.trim()||!paEl.value){statusEl.textContent='Please enter Product Name and Amount.';return alert('Please enter Product Name and Amount.');}b.disabled=true;b.textContent='SAVING...';statusEl.textContent='Saving product to database...';try{let r=await s.rpc('ofa_admin_add_product',{p_name:pnEl.value.trim(),p_amount:Number(paEl.value),p_moq:Math.max(1,Number(pmEl.value||1)),p_status:'AVAILABLE',p_gb_id:ACTIVE_GB.gb_id});if(r.error)throw r.error;let saved=Array.isArray(r.data)?r.data[0]:r.data;if(!saved||!saved.id)throw new Error('Product save returned no ID');let photoWarning='';if(piEl.files[0]){try{let url=await upload(piEl.files[0],'products');if(url){let u=await s.from('ofa_products').update({image_url:url}).eq('id',saved.id);if(u.error)throw u.error}}catch(e){console.error('Photo upload failed',e);photoWarning=' Product was saved, but the photo did not upload: '+(e.message||'unknown error')}}pnEl.value=paEl.value='';pmEl.value=1;piEl.value='';pp.style.display='none';statusEl.textContent='Product saved successfully.';alert('Product saved!'+photoWarning);await load()}catch(e){console.error(e);statusEl.textContent='ERROR: '+(e.message||JSON.stringify(e));alert('Could not add product: '+(e.message||JSON.stringify(e)))}finally{b.disabled=false;b.textContent='ADD PRODUCT'}}
+async function editProduct(id){
+ const x=(await s.from('ofa_products').select('*').eq('id',id).eq('gb_id',ACTIVE_GB.gb_id).single());
+ if(x.error||!x.data)return alert('Product not found in this GB.');
+ const p=x.data;
+ const name=prompt('Product name:',p.name); if(name===null)return;
+ const amountRaw=prompt('Price / amount:',String(p.amount)); if(amountRaw===null)return;
+ const moqRaw=prompt('MOQ:',String(p.moq)); if(moqRaw===null)return;
+ const u=await s.from('ofa_products').update({name:name.trim(),amount:Number(amountRaw),moq:Math.max(1,Number(moqRaw)||1)}).eq('id',id).eq('gb_id',ACTIVE_GB.gb_id);
+ if(u.error)return alert('Could not update product: '+u.error.message);
+ await load();
+}
+async function toggle(id,st){let r=await s.from('ofa_products').update({status:st==='AVAILABLE'?'SOLD_OUT':'AVAILABLE'}).eq('id',id);if(r.error)alert(r.error.message);else load()}
+async function deleteProduct(id){if(!confirm('Delete this Open for All product? This is for trial only. Products already used in an order cannot be deleted.'))return;let r=await s.from('ofa_products').delete().eq('id',id);if(r.error)alert('Could not delete product: '+r.error.message);else load()}
+async function deleteOrder(orderId){
+  if(!confirm('Move Open for All order '+orderId+' to TRASH? You can restore it later.'))return;
+  try{
+    const r=await s.rpc('ofa_soft_delete_order_admin',{p_order_id:orderId});
+    if(r.error)throw r.error;
+    alert('Order moved to Trash. It was NOT permanently deleted.');
+    await load();
+  }catch(e){
+    console.error(e);
+    alert('Could not move order to Trash: '+(e.message||JSON.stringify(e)));
+  }
+}
+async function stat(id,v){
+  const label=v==='PAID'?'approve this payment':'mark this payment as rejected';
+  if(!confirm('Are you sure you want to '+label+'?'))return;
+  try{
+    const r=await s.rpc('ofa_set_payment_status_admin',{p_order_id:id,p_status:v});
+    if(r.error)throw r.error;
+    alert(v==='PAID'?'Payment approved successfully.':'Payment marked as rejected.');
+    await load();
+  }catch(e){
+    console.error(e);
+    alert('Could not update payment: '+(e.message||JSON.stringify(e)));
+  }
+}
+async function openOfaBulkTracking(){
+  const modal=document.getElementById('ofaBulkTrackingModal');
+  const count=document.getElementById('ofaBulkTrackingCount');
+  const sel=document.getElementById('ofaBulkTrackingStatus');
+  modal.style.display='block';
+  const statuses=['ORDER RECEIVED','PAYMENT CONFIRMED','ORDER PROCESSING','IN TRANSIT TO THE PHILIPPINES','ARRIVED IN THE PHILIPPINES','RECEIVED AT WAREHOUSE','PACKING & LABELLING','HANDED OVER TO LOCAL COURIER','DELIVERED'];
+  sel.innerHTML='<option value="">Select new status</option>'+statuses.map(x=>'<option value="'+x+'">'+x+'</option>').join('');
+  try{
+    const q=await s.from('ofa_orders').select('order_id').eq('gb_id',ACTIVE_GB.gb_id);
+    if(q.error)throw q.error;
+    count.textContent=(q.data||[]).length+' Open for All order(s) will be updated. Individual tracking/waybill numbers will stay unchanged.';
+  }catch(e){count.textContent='Unable to load current Open for All orders.';console.error(e);}
+}
+function closeOfaBulkTracking(){document.getElementById('ofaBulkTrackingModal').style.display='none'}
+async function saveOfaBulkTracking(){
+  const status=document.getElementById('ofaBulkTrackingStatus').value;
+  const courier=document.getElementById('ofaBulkTrackingCourier').value;
+  if(!status){alert('Please select a status.');return;}
+  if(!confirm('Set the GLOBAL Open for All tracking status to "'+status+'"? This is what customers will see.'))return;
+  try{
+    const payload={global_tracking_status:status,updated_at:new Date().toISOString()};
+    if(courier)payload.global_tracking_notes='Courier: '+courier;
+    const u=await s.from('ofa_group_buys').update(payload).eq('gb_id',ACTIVE_GB.gb_id);
+    if(u.error)throw u.error;
+    closeOfaBulkTracking();
+    alert('Global tracking updated to '+status+'. Customers will now see this status.');
+    await load();
+  }catch(e){console.error(e);alert('Could not update tracking: '+(e.message||JSON.stringify(e)));}
+}
+async function wb(id){let v=prompt('Waybill / tracking number');if(v===null)return;let r=await s.from('ofa_waybills').update({waybill_number:v,tracking_number:v,status:v?'WAYBILL READY':'WAITING FOR WAYBILL',updated_at:new Date().toISOString()}).eq('id',id);if(r.error)alert(r.error.message);else load()}
+async function editConsolidatedWaybill(email){const ords=(await s.from('ofa_orders').select('order_id').eq('gb_id',ACTIVE_GB.gb_id).eq('email',email)).data||[];if(!ords.length)return;const v=prompt('Waybill / tracking number for ALL consolidated orders of '+email);if(v===null)return;for(const o of ords){let r=await s.from('ofa_waybills').update({waybill_number:v,tracking_number:v,status:v?'WAYBILL READY':'WAITING FOR WAYBILL',updated_at:new Date().toISOString()}).eq('order_id',o.order_id);if(r.error)console.error(r.error)}await load()}
+async function printConsolidated(email){const [or,ir]=await Promise.all([s.from('ofa_orders').select('*').eq('gb_id',ACTIVE_GB.gb_id).eq('email',email).order('created_at',{ascending:true}),s.from('ofa_order_items').select('*')]);const O2=or.data||[],all=ir.data||[],items=all.filter(x=>O2.some(o=>o.order_id===x.order_id));if(!O2.length)return;const products={};items.forEach(x=>products[x.product_name]=(products[x.product_name]||0)+(+x.qty||0));const qty=items.reduce((a,x)=>a+(+x.qty||0),0),first=O2[0],printWin=window.open('','_blank','width=850,height=700');printWin.document.write('<!doctype html><html><head><title>PEPMOSA MOQ Waybill</title><style>body{font-family:Arial;padding:28px;color:#302530}.box{border:2px solid #e83f9b;border-radius:18px;padding:24px;max-width:760px;margin:auto}h1{color:#d92f8d;margin:0}.top{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding-bottom:16px}.row{padding:10px 0;border-bottom:1px dashed #ddd}.qty{font-size:28px;font-weight:900;color:#d92f8d}.small{font-size:12px;color:#777}</style></head><body><div class="box"><div class="top"><div><h1>PEPMOSA</h1><b>MOQ / OPEN FOR ALL • CONSOLIDATED WAYBILL</b></div><div class="qty">'+qty+' TOTAL ITEMS</div></div><div class="row"><b>TO:</b><br>'+first.customer_name+'<br>'+first.contact+'<br>'+first.address+'</div><div class="row"><b>EMAIL:</b> '+email+'<br><span class="small">Consolidated from '+O2.length+' MOQ/Open for All checkout(s)</span></div><div class="row"><b>CONTENTS / TOTAL QUANTITY</b><br>'+Object.entries(products).map(([n,q])=>n+' × <b>'+q+'</b>').join('<br>')+'</div><div class="row"><b>ORDER IDS</b><br>'+O2.map(x=>x.order_id).join('<br>')+'</div><p class="small">Only MOQ/Open for All orders are included.</p></div><script>window.onload=function(){window.print()}<\/script></body></html>');printWin.document.close()}
+async function save(){const b=document.getElementById('saveSettingsBtn');b.disabled=true;b.textContent='SAVING...';try{let data={payment_name:pay.value.trim()||null,payment_instructions:ins.value.trim()||null,luzon_fee:+lu.value||0,visayas_fee:+vi.value||0,mindanao_fee:+mi.value||0,lalamove_fee:+la.value||0,updated_at:new Date().toISOString()};let r=await s.from('ofa_group_buys').update(data).eq('gb_id',ACTIVE_GB.gb_id).select().single();if(r.error)throw r.error;let photoWarning='';if(qrfile.files[0]){try{let url=await upload(qrfile.files[0],'qr');let u=await s.from('ofa_group_buys').update({payment_qr_url:url,updated_at:new Date().toISOString()}).eq('gb_id',ACTIVE_GB.gb_id);if(u.error)throw u.error}catch(e){console.error('QR upload failed',e);photoWarning=' Settings were saved, but the QR image did not upload: '+(e.message||'unknown error')}}alert('MOQ settings saved!'+photoWarning);await load()}catch(e){console.error(e);alert('Could not save settings: '+(e.message||JSON.stringify(e)))}finally{b.disabled=false;b.textContent='SAVE SETTINGS'}}
+document.getElementById('addProductBtn').onclick=addP;document.getElementById('saveSettingsBtn').addEventListener('click',save);
+document.getElementById('pi').addEventListener('change',()=>{let f=document.getElementById('pi').files[0];if(f){document.getElementById('pprev').src=URL.createObjectURL(f);document.getElementById('pprev').style.display='block'}});qrfile.addEventListener('change',()=>{let f=qrfile.files[0];if(f){qrprev.src=URL.createObjectURL(f);qrprev.style.display='block'}});
+boot().catch(e=>document.body.innerHTML='<div class="w"><div class="card"><h2>Admin error</h2><p>'+e.message+'</p></div></div>')
+</script></body></html>

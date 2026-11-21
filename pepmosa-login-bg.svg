@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1672 941" preserveAspectRatio="xMidYMid slice">
+<defs>
+ <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#f7a6cb"/><stop offset=".48" stop-color="#ffd9e9"/><stop offset="1" stop-color="#ee78b1"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#fff8fc" stop-opacity=".98"/><stop offset=".7" stop-color="#ffd8e9" stop-opacity=".8"/><stop offset="1" stop-color="#f7a0c9" stop-opacity="0"/></radialGradient>
+ <linearGradient id="silk" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0f8"/><stop offset=".2" stop-color="#f879b5"/><stop offset=".48" stop-color="#ffcae3"/><stop offset=".72" stop-color="#e94e9b"/><stop offset="1" stop-color="#fff4fa"/></linearGradient>
+ <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff4c7"/><stop offset=".45" stop-color="#d99b57"/><stop offset="1" stop-color="#fff0bd"/></linearGradient>
+ <filter id="blur"><feGaussianBlur stdDeviation="22"/></filter>
+ <filter id="shine"><feGaussianBlur stdDeviation="3"/></filter>
+</defs>
+<rect width="1672" height="941" fill="url(#bg)"/>
+<rect width="1672" height="941" fill="url(#glow)"/>
+<ellipse cx="836" cy="470" rx="700" ry="440" fill="#fff4fa" opacity=".45" filter="url(#blur)"/>
+<!-- upper left satin sweep -->
+<path d="M-80 -40 C160 -50 150 60 250 95 C360 135 430 55 510 -50 L600 -60 C470 110 360 205 225 180 C100 157 90 70 -80 100Z" fill="url(#silk)" stroke="url(#gold)" stroke-width="3"/>
+<path d="M-30 15 C130 5 170 75 245 105 C350 150 425 85 500 0" fill="none" stroke="#fff5fb" stroke-width="9" opacity=".8" filter="url(#shine)"/>
+<!-- upper right sweep -->
+<path d="M1100 -70 C1210 70 1300 150 1410 120 C1520 92 1550 -5 1730 -35 L1740 120 C1550 160 1510 270 1370 275 C1220 280 1170 160 1050 55Z" fill="url(#silk)" stroke="url(#gold)" stroke-width="3"/>
+<path d="M1120 -10 C1250 130 1320 190 1420 160 C1540 125 1580 40 1700 20" fill="none" stroke="#fff4fa" stroke-width="10" opacity=".82"/>
+<!-- lower flowing satin -->
+<path d="M-80 710 C120 590 235 600 400 705 C560 810 680 920 860 865 C1040 810 1160 850 1300 760 C1430 675 1510 610 1740 630 L1740 1010 L-80 1010Z" fill="url(#silk)" stroke="url(#gold)" stroke-width="4"/>
+<path d="M-60 800 C130 670 245 680 410 785 C580 895 710 980 875 920 C1060 855 1160 910 1320 820 C1480 725 1570 670 1730 700" fill="none" stroke="#fff5fb" stroke-width="15" opacity=".9"/>
+<path d="M-70 900 C120 760 260 770 430 870 C590 965 720 1030 900 970 C1090 900 1190 960 1360 870 C1510 790 1610 740 1740 760" fill="none" stroke="#f65da8" stroke-width="26" opacity=".34"/>
+<!-- soft satin side drapes -->
+<path d="M-50 330 C90 270 140 180 205 90 C250 30 300 -10 380 -30 C310 100 290 220 180 300 C100 355 30 360 -50 390Z" fill="url(#silk)" opacity=".85"/>
+<path d="M1720 340 C1580 280 1530 190 1470 90 C1430 25 1380 -10 1300 -35 C1370 100 1390 225 1500 305 C1580 360 1650 370 1720 400Z" fill="url(#silk)" opacity=".85"/>
+<!-- tiny glints -->
+<g fill="#fff" opacity=".96">
+ <path d="M255 245 l7 22 22 7 -22 7 -7 22 -7 -22 -22 -7 22 -7Z"/><circle cx="255" cy="274" r="24" opacity=".15"/>
+ <path d="M1375 355 l8 26 26 8 -26 8 -8 26 -8 -26 -26 -8 26 -8Z"/>
+ <path d="M345 650 l5 17 17 5 -17 5 -5 17 -5 -17 -17 -5 17 -5Z"/>
+ <path d="M1320 710 l6 20 20 6 -20 6 -6 20 -6 -20 -20 -6 20 -6Z"/>
+ <path d="M150 360 l4 13 13 4 -13 4 -4 13 -4 -13 -13 -4 13 -4Z"/>
+ <path d="M1550 575 l4 13 13 4 -13 4 -4 13 -4 -13 -13 -4 13 -4Z"/>
+ <circle cx="175" cy="520" r="3"/><circle cx="1490" cy="480" r="3"/><circle cx="480" cy="320" r="2"/><circle cx="1180" cy="250" r="3"/><circle cx="920" cy="820" r="3"/>
+</g>
+</svg>

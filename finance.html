@@ -1,0 +1,264 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEPMOSA Finance</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f7f7f9;margin:0;color:#222}header{background:#222;color:#fff;padding:18px 24px}main{max-width:1200px;margin:auto;padding:22px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:18px;box-shadow:0 2px 10px #0001}.stat b{font-size:28px;display:block;margin-top:8px}input,select,textarea{width:100%;box-sizing:border-box;padding:10px;margin:5px 0 12px;border:1px solid #ddd;border-radius:8px}button{padding:10px 14px;border:0;border-radius:8px;background:#222;color:#fff;cursor:pointer}.danger{background:#a33}.muted{color:#777;font-size:13px}.toolbar{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.toolbar>div{min-width:220px;flex:1}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}@media(max-width:700px){table{font-size:12px}main{padding:12px}}
+.profit-highlight{background:linear-gradient(135deg,#fff1f8,#ffe4f2)!important;border:2px solid #d63384!important;box-shadow:0 10px 28px rgba(214,51,132,.18)!important}.profit-highlight span{color:#a61e68!important;font-weight:800!important}.profit-highlight b{color:#c2257a!important;font-size:2rem!important}.profit-highlight .muted{color:#8a4b6c!important;font-weight:600}</style></head><body><a href="admin.html" aria-label="Back to Admin" id="backToAdminBtn" title="Return to Admin" style="position:fixed;top:16px;left:16px;z-index:9999;background:#fff;color:#5a2445;border:1px solid #e5d5e1;border-radius:10px;padding:10px 14px;text-decoration:none;font-weight:900;box-shadow:0 4px 14px rgba(0,0,0,.08)">← BACK TO ADMIN</a>
+<header><b>PEPMOSA • FINANCE</b><span class="muted" style="color:#ccc">Separate Revenue & Expenses Dashboard</span></header>
+<main>
+<div class="card"><div class="toolbar"><div><label><b>View finance for</b></label><select id="scope" onchange="loadSales()"><option value="ALL">All Group Buys + Open for All</option><option value="OFA">Open for All only</option></select></div><div><span class="muted">Manufacturer prices are global and reusable for future Group Buys.</span></div></div></div>
+<div class="grid">
+<div class="card stat"><span>ADMIN FEE COLLECTED</span><b id="adminFeeCollected">₱0.00</b><div class="muted">Approved admin fees</div></div>
+<div class="card stat"><span id="shippingTitle">SHIPPING FEE FOR 0 CUSTOMERS</span><b id="shipping">₱0.00</b><div class="muted">Approved customer shipping fees</div></div>
+<div class="card stat"><span>PRODUCT PAYMENT COLLECTED</span><b id="productCollected">₱0.00</b><div class="muted">Approved product payments • excludes shipping</div></div>
+<div class="card stat"><span>TOTAL AMOUNT COLLECTED</span><b id="totalCollected">₱0.00</b><div class="muted">Admin Fee + Shipping Fee + Product Payment</div></div>
+<div class="card stat"><span>REFUNDED TOTAL</span><b id="refundedTotal">₱0.00</b><div class="muted">REFUNDED kits only</div></div>
+<div class="card stat"><span>REVENUE</span><b id="rev">₱0.00</b><div class="muted">Approved product sales</div></div>
+<div class="card stat"><span>MANUFACTURER COST (REFERENCE)</span><b id="cost">₱0.00</b><div class="muted">Reference only • not automatically deducted</div></div>
+<div class="card stat"><span>ADMIN ORDERS TOTAL</span><b id="adminOrdersTotal">₱0.00</b><div class="muted">Admin/manufacturer value for selected Finance view</div></div>
+<div class="card stat"><span>EXPENSES PAID</span><b id="exp">₱0.00</b><div class="muted">Only expenses manually recorded for this view</div></div>
+<div class="card stat profit-highlight"><span>NET PROFIT ✦</span><b id="profit">₱0.00</b><div class="muted">Revenue − manually recorded expenses</div></div>
+</div>
+
+<details class="card" style="padding:0;overflow:hidden"><summary style="padding:18px;cursor:pointer;font-weight:bold;font-size:20px;list-style:none">🏭 Manufacturer Pricelist <span class="muted" style="font-size:13px;font-weight:normal">Click to open / close</span></summary><div style="padding:0 18px 18px"><p class="muted">All products from your catalog are available here. Prices are saved globally for future Group Buys.</p>
+<div class="grid"><select id="pname"><option value="">Loading all products…</option></select><select id="variant"><option value="">Select product first</option></select><input id="pprice" type="number" step="0.01" placeholder="Manufacturer price"></div>
+<button onclick="savePrice()">ADD / UPDATE PRICE</button><div id="prices"></div></div></details>
+
+<div class="card"><h2>📦 Manufacturer Order Tally</h2><div id="manufTally"></div></div>
+<div class="card"><h2>👑 Admin Orders — Separate from Customer Sales</h2><p class="muted">Admin Orders are tied to their selected Group Buy and use their own admin/manufacturer pricing. They are shown separately and are not added to customer revenue.</p><div id="adminOrdersFinance"></div></div><div class="card"><h2>💸 Expenses</h2><p class="muted">Expenses are filtered by the selected Finance view. General expenses appear in every view; Group Buy expenses stay with their assigned GB.</p>
+<div class="grid"><input id="edate" type="date"><select id="escope"><option value="GENERAL">General</option><option value="OFA">Open for All</option></select><select id="ecat"><option>Shipping</option><option>Supplier</option><option>Packaging</option><option>Customs</option><option>Operational</option><option>Other</option></select><input id="eamount" type="number" step="0.01" placeholder="Amount"></div>
+<textarea id="edesc" placeholder="Description / notes"></textarea><button onclick="saveExpense()">ADD EXPENSE</button><div id="expenses"></div></div>
+
+<div class="card"><h2>📊 Sales & Product Profit</h2><p class="muted">Filter above to see All, Open for All, or any specific Group Buy. New Group Buys automatically appear in the dropdown.</p><div id="sales">Loading…</div></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script>
+<script>
+document.getElementById('backToAdminBtn')?.addEventListener('click',async function(event){
+  event.preventDefault();
+  try{
+    localStorage.setItem('pepmosa_admin_return','1');
+    if(typeof sb!=='undefined'&&sb?.auth){
+      const {data}=await sb.auth.getSession();
+      const session=data?.session;
+      if(session?.access_token&&session?.refresh_token){
+        sessionStorage.setItem('pepmosa_admin_session_backup',JSON.stringify({access_token:session.access_token,refresh_token:session.refresh_token}));
+      }
+    }
+  }catch(e){console.warn('Admin return backup failed',e)}
+  window['history']['go'](-1);
+});
+(async()=>{
+try{initSupabase();await requireAdmin();}catch(e){document.body.innerHTML='<main style="padding:30px;font-family:Arial"><h2>Admin access required</h2><p>Please log in as PEPMOSA admin.</p></main>';return;}
+const $=id=>document.getElementById(id);const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let catalog=[],prices=[],expenses=[],regularItems=[],ofaItems=[],orders=[],groupBuys=[],manufacturerAssignments=[],cancelledKits=[],adminOrders=[];
+$('edate').value=new Date().toISOString().slice(0,10);
+
+async function init(){
+ const rs=await Promise.all([
+  sb.from('products').select('product_id,product_name,active').order('product_name'),
+  sb.from('product_variants').select('variant_id,product_id,strength,active').order('strength'),
+  sb.from('ofa_products').select('id,name,status').order('name'),
+  sb.from('group_buys').select('gb_number,customer_facing_name,status').order('created_at',{ascending:false}),
+  sb.from('finance_manufacturer_prices').select('*').order('product_name'),
+  sb.from('finance_expenses').select('*').order('expense_date',{ascending:false}),
+  sb.from('finance_manufacturer_orders').select('*'),
+  sb.from('orders').select('order_id,gb_number,payment_status,total,shipping_fee'),
+  sb.from('order_items').select('product_id,variant_id,product_name,strength,qty,unit_price,order_id'),
+  sb.from('ofa_order_items').select('product_id,product_name,qty,unit_price,order_id'),
+  sb.from('ofa_orders').select('order_id,total,subtotal,shipping_fee,payment_status'),
+  sb.from('admin_fee_payments').select('amount,status,gb_number'),
+  sb.from('cancelled_kits').select('id,gb_number,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status,refunded_at'),
+  sb.from('admin_orders').select('id,gb_number,admin_index,product_id,variant_id,product_name,variant,qty,manufacturer_price,created_at').order('created_at',{ascending:false})
+ ]);
+ for(const x of rs)if(x.error)throw x.error;
+ const [prods,vars,ofap,gbs,pr,ex,assignments,ord,items,ofi,ofaOrders,adminFees,cancelled,adminOrd]=rs;
+ const varMap=new Map();(vars.data||[]).forEach(v=>{if(!varMap.has(v.product_id))varMap.set(v.product_id,[]);varMap.get(v.product_id).push(v);});
+ window.ofaOrdersCache=ofaOrders.data||[];window.adminFeesCache=adminFees.data||[];catalog=(prods.data||[]).map(p=>({product_id:p.product_id,product_name:p.product_name,variants:varMap.get(p.product_id)||[],source:'GB'}))
+ .concat((ofap.data||[]).map(p=>({product_id:'OFA:'+p.id,raw_id:p.id,product_name:p.name,variants:[],source:'OFA'})));
+ catalog.sort((a,b)=>a.product_name.localeCompare(b.product_name));
+ prices=pr.data||[];expenses=ex.data||[];manufacturerAssignments=assignments.data||[];orders=ord.data||[];regularItems=items.data||[];ofaItems=ofi.data||[];groupBuys=gbs.data||[];cancelledKits=cancelled.data||[];adminOrders=adminOrd.data||[];
+ renderScopes();renderCatalog();renderPrices();renderExpenses();renderAdminOrdersFinance();loadSales();
+}
+function renderScopes(){
+ const s=$('scope'),e=$('escope'),old=s.value,oldE=e.value;
+ const seen=new Set();const all=[...groupBuys.map(g=>g.gb_number),...orders.map(o=>o.gb_number)].filter(Boolean);
+ all.forEach(g=>seen.add(String(g)));
+ const list=[...seen].sort((a,b)=>Number(b)-Number(a));
+ s.innerHTML='<option value="ALL">All Group Buys + Open for All</option><option value="OFA">Open for All only</option>'+list.map(g=>'<option value="GB:'+esc(g)+'">Group Buy '+esc(g)+'</option>').join('');
+ e.innerHTML='<option value="GENERAL">General</option><option value="OFA">Open for All</option>'+list.map(g=>'<option value="GB:'+esc(g)+'">Group Buy '+esc(g)+'</option>').join('');
+ if([...s.options].some(o=>o.value===old))s.value=old;if([...e.options].some(o=>o.value===oldE))e.value=oldE;
+}
+function renderCatalog(){
+ const p=$('pname'),old=p.value;p.innerHTML='<option value="">Select product</option>'+catalog.map(x=>'<option value="'+esc(x.product_id)+'">'+esc(x.product_name)+(x.source==='OFA'?' (Open for All)':'')+'</option>').join('');if(catalog.some(x=>x.product_id===old))p.value=old;updateVariants();
+}
+function updateVariants(){
+ const id=$('pname').value,c=catalog.find(x=>x.product_id===id),v=$('variant');
+ const vars=c?.variants||[];
+ v.innerHTML='<option value="">'+(vars.length?'Select variant / strength':'No variant needed')+'</option>'+vars.map(x=>'<option value="'+esc(x.variant_id)+'">'+esc(x.strength)+'</option>').join('');
+ if(!vars.length)v.value='';
+}
+$('pname').addEventListener('change',updateVariants);
+
+function renderPrices(){
+ $('prices').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Manuf. Price</th><th>Action</th></tr>'+prices.map(x=>'<tr><td>'+esc(x.product_name)+'</td><td>'+esc(x.variant||'—')+'</td><td>'+peso(x.manufacturer_price)+'</td><td><button onclick="editPrice(\''+x.id+'\')">Edit</button> <button class="danger" onclick="delPrice(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>';
+}
+function renderAdminOrdersFinance(){
+ const scope=$('scope')?.value||'ALL';
+ const rows=adminOrders.filter(o=>scope==='ALL'||(scope!=='OFA'&&String(o.gb_number)===String(scope.replace('GB:',''))));
+ const total=rows.reduce((s,o)=>s+Number(o.qty||0)*Number(o.manufacturer_price||0),0);
+ $('adminOrdersFinance').innerHTML=rows.length?
+ '<div class="muted" style="margin-bottom:10px">Admin Orders: '+rows.length+' lines • Total admin/manufacturer value: '+peso(total)+'</div>'+
+ '<table><tr><th>GB</th><th>Admin</th><th>Product</th><th>Qty</th><th>Admin Price</th><th>Total</th></tr>'+
+ rows.map(o=>'<tr><td>GB '+esc(o.gb_number||'—')+'</td><td>'+esc(['VICKY','JOYCE','RHEA','ANNE'][Number(o.admin_index)]||'Admin')+'</td><td>'+esc(o.product_name||'')+'<br><span class="muted">'+esc(o.variant||'—')+'</span></td><td>'+Number(o.qty||0)+'</td><td>'+peso(o.manufacturer_price||0)+'</td><td>'+peso(Number(o.qty||0)*Number(o.manufacturer_price||0))+'</td></tr>').join('')+'</table>'
+ :'<div class="muted" style="padding:12px 0">No Admin Orders for this Finance view.</div>';
+}
+function renderExpenses(){
+ const scope=$('scope')?.value||'ALL';
+ const visible=expenses.filter(x=>{
+   const s=String(x.scope||'GENERAL');
+   if(scope==='ALL')return true;
+   if(scope==='OFA')return s==='OFA'||s==='GENERAL';
+   // A selected Group Buy must show ONLY that GB's expenses plus General.
+   // Never allow another GB's expense to bleed into the selected GB view.
+   return s===scope||s==='GENERAL';
+ });
+ $('expenses').innerHTML='<table><tr><th>Date</th><th>Scope</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr>'+visible.map(x=>'<tr><td>'+x.expense_date+'</td><td><b>'+esc(x.scope||'GENERAL')+'</b></td><td>'+esc(x.category)+'</td><td>'+esc(x.description||'')+'</td><td>'+peso(x.amount)+'</td><td><button class="danger" onclick="delExpense(\''+x.id+'\')">Delete</button></td></tr>').join('')+'</table>'+(visible.length?'':'<div class="muted" style="padding:12px 0">No expenses for this Finance view.</div>');
+}
+function renderManufTally(rows,scope){
+ const box=$('manufTally'); if(!box)return;
+ const priced=rows.filter(r=>r.hasPrice);
+ const assigned={};
+ manufacturerAssignments.filter(a=>String(a.scope)===String(scope)).forEach(a=>{assigned[String(a.product_id)+'||'+String(a.variant_id||'')]=a.manufacturer;});
+ const key=r=>String(r.product_id||r.name)+'||'+String(r.variant_id||r.variant||'');
+ const money=n=>peso(n);
+ const tableFor=(manuf)=>{
+   const list=priced.filter(r=>assigned[key(r)]===manuf);
+   const total=list.reduce((s,r)=>s+Number(r.pc||0),0);
+   return '<div class="card" style="margin:0"><h3>🏭 '+manuf+'</h3><div class="muted">'+(manuf==='BBG'?'MANUF 1':'MANUF 2')+'</div>'+
+   (list.length?'<table><tr><th>Product</th><th>Qty Ordered</th><th>Manuf Price</th><th>Subtotal</th><th></th></tr>'+
+   list.map(r=>'<tr><td>'+esc(r.name)+'<br><span class="muted">'+esc(r.variant||'—')+'</span></td><td>'+r.qty+'</td><td>'+money(Number(r.pc||0)/Number(r.qty||1))+'</td><td>'+money(r.pc)+'</td><td><button class="danger" onclick="unassignManuf(\''+encodeURIComponent(key(r))+'\')">Remove</button></td></tr>').join('')+'</table>':'<div class="muted" style="padding:14px 0">No products assigned yet.</div>')+
+   '<div style="margin-top:14px;font-weight:bold">TOTAL TO PAY '+manuf+': <span style="font-size:22px">'+money(total)+'</span></div></div>';
+ };
+ const unassigned=priced.filter(r=>!assigned[key(r)]);
+ box.innerHTML='<div class="grid">'+tableFor('BBG')+tableFor('KERUN')+'</div>'+
+ '<div class="card" style="margin-top:16px"><h3>📋 Ordered Products — Choose Manufacturer</h3><p class="muted">Only products with actual approved orders are listed. Manufacturer price is taken from the Manufacturer Pricelist above.</p>'+
+ (unassigned.length?'<table><tr><th>Product</th><th>Qty Ordered</th><th>Manuf Price</th><th>Subtotal</th><th>Order From</th></tr>'+
+ unassigned.map(r=>'<tr><td>'+esc(r.name)+'<br><span class="muted">'+esc(r.variant||'—')+'</span></td><td>'+r.qty+'</td><td>'+money(Number(r.pc||0)/Number(r.qty||1))+'</td><td>'+money(r.pc)+'</td><td><select onchange="assignManuf(\''+encodeURIComponent(key(r))+'\',this.value)"><option value="">🔽 Select</option><option value="BBG">MANUF 1 — BBG</option><option value="KERUN">MANUF 2 — KERUN</option></select></td></tr>').join('')+'</table>':'<div class="muted" style="padding:12px 0">All ordered products have been assigned to a manufacturer.</div>')+'</div>'+
+ (!priced.length?'<div class="muted" style="padding:12px;color:#a33">No approved ordered products with manufacturer prices were found for this view.</div>':'');
+ window.assignManuf=async function(encoded,m){
+   if(!m)return;
+   const raw=decodeURIComponent(encoded),parts=raw.split('||'),product_id=parts[0],variant_id=parts.slice(1).join('||');
+   const payload={scope,product_id,variant_id:variant_id||'',manufacturer:m,updated_at:new Date().toISOString()};
+   let existing=manufacturerAssignments.find(a=>String(a.scope)===String(scope)&&String(a.product_id)===String(product_id)&&String(a.variant_id||'')===String(variant_id||''));
+   let rr;
+   // The database enforces one assignment per scope + product + variant.
+   // Use the unique key for an atomic update-or-insert so a stale frontend
+   // cache can never create a duplicate-key error.
+   rr=await sb.from('finance_manufacturer_orders').upsert(payload,{onConflict:'scope,product_id,variant_id'});
+   if(rr.error){console.error(rr.error);alert('Could not save manufacturer assignment: '+rr.error.message);return;}
+   existing={...(existing||{}),...payload};
+   if(existing.id){manufacturerAssignments=manufacturerAssignments.map(a=>a.id===existing.id?existing:a);}else{await refreshFinance();return;}
+   renderManufTally(rows,scope);
+ };
+ window.unassignManuf=async function(encoded){
+   const raw=decodeURIComponent(encoded),parts=raw.split('||'),product_id=parts[0],variant_id=parts.slice(1).join('||');
+   const rr=await sb.from('finance_manufacturer_orders').delete().eq('scope',scope).eq('product_id',product_id).eq('variant_id',variant_id||'');
+   if(rr.error){alert('Could not remove assignment: '+rr.error.message);return;}
+   await refreshFinance();
+ };
+}
+
+window.loadSales=function(){
+ const scope=$('scope').value;
+ const approvedStatus=s=>['PAID','PAYMENT APPROVED','APPROVED'].includes(String(s||'').toUpperCase());
+ const valid=new Map(orders.filter(o=>approvedStatus(o.payment_status)).map(o=>[o.order_id,o]));
+ const validOfa=new Set((window.ofaOrdersCache||[]).filter(o=>approvedStatus(o.payment_status)).map(o=>o.order_id));
+ const refundedRows=(cancelledKits||[]).filter(r=>String(r.status||'').toUpperCase()==='REFUNDED');
+ const refundKey=r=>String(r.order_id||'')+'||'+String(r.product_id||'')+'||'+String(r.variant_id||'');
+ const refundedKeys=new Set(refundedRows.map(refundKey));
+ let items=[];
+ if(scope!=='OFA'){
+  items=regularItems.filter(i=>{
+    const o=valid.get(i.order_id);if(!o)return false;
+    if(!(scope==='ALL'||String(o.gb_number)===String(scope.replace('GB:',''))))return false;
+    return !refundedKeys.has(String(i.order_id||'')+'||'+String(i.product_id||'')+'||'+String(i.variant_id||''));
+  }).map(i=>({...i,scope:'GB:'+valid.get(i.order_id).gb_number}));
+ }
+ if(scope==='ALL'||scope==='OFA')items=items.concat(ofaItems.filter(i=>validOfa.has(i.order_id)).map(i=>({...i,product_id:'OFA:'+i.product_id,variant_id:'',strength:'',scope:'OFA'})));
+ const map=new Map();items.forEach(i=>{const key=(i.product_id||i.product_name)+'||'+(i.variant_id||'');const row=map.get(key)||{product_id:i.product_id||'',variant_id:i.variant_id||'',name:i.product_name||'',variant:i.strength||'',qty:0,revenue:0};row.qty+=Number(i.qty||0);row.revenue+=Number(i.qty||0)*Number(i.unit_price||0);map.set(key,row);});
+ let revenue=0,cost=0;const rows=[...map.values()].map(row=>{revenue+=row.revenue;const p=prices.find(x=>String(x.product_id||'')===String(row.product_id||'')&&String(x.variant_id||'')===String(row.variant_id||''))||prices.find(x=>String(x.product_name||'').toLowerCase()===String(row.name||'').toLowerCase()&&String(x.variant||'').toLowerCase()===String(row.variant||'').toLowerCase());const pc=p?Number(p.manufacturer_price||0)*row.qty:0;cost+=pc;return {...row,pc,profit:row.revenue-pc,hasPrice:!!p};});
+ const relevantExp=expenses.filter(x=>scope==='ALL'?true:(scope==='OFA'?(x.scope==='OFA'||x.scope==='GENERAL'):(x.scope===scope||x.scope==='GENERAL')));
+ const exp=relevantExp.reduce((s,x)=>s+Number(x.amount||0),0);
+ // Admin's Amount Collected = approved regular checkout totals + approved admin fees.
+ // This deliberately excludes Open for All because the current Admin payment center does not include OFA.
+ const approvedRegular=(orders||[]).filter(o=>approvedStatus(o.payment_status)&&(scope==='ALL'||(scope!=='OFA'&&String(o.gb_number)===String(scope.replace('GB:','')))));
+ const approvedOfa=(window.ofaOrdersCache||[]).filter(o=>approvedStatus(o.payment_status));
+ const selectedOfa=scope==='ALL'||scope==='OFA'?approvedOfa:[];
+ // Finance collection breakdown:
+ // Product payment = approved checkout total minus shipping.
+ // Shipping is shown separately with the number of customers who paid shipping.
+ const checkoutOrders=scope==='OFA'?approvedOfa:(scope==='ALL'?approvedRegular:approvedRegular);
+ const productPayment=checkoutOrders.reduce((s,o)=>s+Number(o.total||0)-Number(o.shipping_fee||0),0);
+ const shippingCollected=checkoutOrders.reduce((s,o)=>s+Number(o.shipping_fee||0),0);
+ const shippingCustomers=checkoutOrders.filter(o=>Number(o.shipping_fee||0)>0).length;
+ // Admin fees are global in the current database, so they are shown in the overall/all view only.
+ const selectedGb=scope.startsWith('GB:')?scope.slice(3):null;
+ const adminFeeCollected=(window.adminFeesCache||[]).filter(f=>approvedStatus(f.status)&&(scope==='ALL'||(selectedGb!==null&&String(f.gb_number)===String(selectedGb)))).reduce((s,f)=>s+Number(f.amount||0),0);
+ const refundedAmount=refundedRows.filter(r=>scope==='ALL'||(scope!=='OFA'&&String(r.gb_number)===String(scope.replace('GB:','')))).reduce((s,r)=>s+Number(r.refund_amount||0),0);
+ const adjustedProductPayment=Math.max(0,productPayment-refundedAmount);
+ const totalAmountCollected=adminFeeCollected+shippingCollected+adjustedProductPayment;
+ $('adminFeeCollected').textContent=peso(adminFeeCollected);
+ $('shipping').textContent=peso(shippingCollected);
+ $('shippingTitle').textContent='SHIPPING FEE FOR '+shippingCustomers+' CUSTOMER'+(shippingCustomers===1?'':'S');
+ $('productCollected').textContent=peso(adjustedProductPayment);
+ $('totalCollected').textContent=peso(totalAmountCollected);
+ $('refundedTotal').textContent=peso(refundedAmount);
+ $('rev').textContent=peso(revenue);
+ $('cost').textContent=peso(cost);
+ $('exp').textContent=peso(exp);
+ // Manufacturer Pricelist is reference only. It is NOT automatically deducted.
+ // Net profit changes only when you manually record an actual expense/payment.
+ $('profit').textContent=peso(revenue-exp);
+ const adminScopeRows=adminOrders.filter(o=>scope==='ALL'||(scope!=='OFA'&&String(o.gb_number)===String(scope.replace('GB:',''))));
+ const adminOrdersTotal=adminScopeRows.reduce((s,o)=>s+Number(o.qty||0)*Number(o.manufacturer_price||0),0);
+ $('adminOrdersTotal').textContent=peso(adminOrdersTotal);
+ renderExpenses();renderAdminOrdersFinance();
+ $('sales').innerHTML='<table><tr><th>Product</th><th>Variant</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+(x.hasPrice?'':' <span class="muted">No manuf. price</span>')+'</td><td>'+esc(x.variant||'—')+'</td><td>'+x.qty+'</td><td>'+peso(x.revenue)+'</td><td>'+peso(x.pc)+'</td><td>'+peso(x.profit)+'</td></tr>').join('')+'</table>'+(refundedAmount?'<div class="muted" style="margin-top:10px">💸 Refunded cancellations deducted: '+peso(refundedAmount)+'</div>':'');renderManufTally(rows,scope);
+};
+window.editPrice=function(id){
+ const x=prices.find(p=>String(p.id)===String(id));if(!x)return;
+ $('pname').value=x.product_id||'';
+ updateVariants();
+ if(x.variant_id)$('variant').value=x.variant_id;
+ $('pprice').value=x.manufacturer_price??'';
+ $('pprice').scrollIntoView({behavior:'smooth',block:'center'});
+ $('pprice').focus();
+};
+window.savePrice=async function(){
+ const product_id=$('pname').value,variant_id=$('variant').value,manufacturer_price=Number($('pprice').value),c=catalog.find(x=>x.product_id===product_id);
+ if(!c||Number.isNaN(manufacturer_price))return alert('Select product and enter manufacturer price.');
+ if(c.variants.length&&!variant_id)return alert('Please select the variant / strength.');
+ const vv=(c.variants||[]).find(x=>x.variant_id===variant_id);
+ const product_name=c.product_name,variant=vv?.strength||'';
+ const existing=prices.find(x=>String(x.product_id||'')===String(product_id)&&String(x.variant_id||'')===String(variant_id||''));
+ const payload={product_id,variant_id:variant_id||null,product_name,variant,manufacturer_price,updated_at:new Date().toISOString()};
+ const q=existing?sb.from('finance_manufacturer_prices').update(payload).eq('id',existing.id):sb.from('finance_manufacturer_prices').insert(payload);
+ const rr=await q;if(rr.error)return alert(rr.error.message);$('pprice').value='';await refreshFinance();
+};
+window.saveExpense=async function(){const amount=Number($('eamount').value);if(!amount)return alert('Enter expense amount.');const rr=await sb.from('finance_expenses').insert({expense_date:$('edate').value,scope:$('escope').value,category:$('ecat').value,description:$('edesc').value.trim(),amount});if(rr.error)return alert(rr.error.message);$('eamount').value=$('edesc').value='';await refreshFinance();};
+window.delPrice=async function(id){if(confirm('Delete this manufacturer price?')){const rr=await sb.from('finance_manufacturer_prices').delete().eq('id',id);if(rr.error)alert(rr.error.message);else await refreshFinance();}};
+window.delExpense=async function(id){if(confirm('Delete this expense?')){const rr=await sb.from('finance_expenses').delete().eq('id',id);if(rr.error)alert(rr.error.message);else await refreshFinance();}};
+async function refreshFinance(){
+ const [p,e,a,cx,ao]=await Promise.all([
+  sb.from('finance_manufacturer_prices').select('*').order('product_name'),
+  sb.from('finance_expenses').select('*').order('expense_date',{ascending:false}),
+  sb.from('finance_manufacturer_orders').select('*'),
+  sb.from('cancelled_kits').select('id,gb_number,order_id,email,product_id,variant_id,product_name,strength,qty,refund_amount,status,refunded_at'),
+  sb.from('admin_orders').select('id,gb_number,admin_index,product_id,variant_id,product_name,variant,qty,manufacturer_price,created_at').order('created_at',{ascending:false})
+ ]);
+ if(p.error)alert(p.error.message);if(e.error)alert(e.error.message);if(a.error)alert(a.error.message);if(cx.error)alert(cx.error.message);
+ prices=p.data||[];expenses=e.data||[];manufacturerAssignments=a.data||[];cancelledKits=cx.data||[];adminOrders=ao.data||[];
+ renderPrices();renderExpenses();renderAdminOrdersFinance();loadSales();
+}
+try{await init();}catch(e){console.error(e);$('sales').innerHTML='<div style="color:#a33;padding:12px">Finance error: '+esc(e.message||String(e))+'</div>';}}
+)();
+</script></body></html>

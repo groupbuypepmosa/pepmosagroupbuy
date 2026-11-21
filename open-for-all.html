@@ -1,0 +1,256 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Open for All</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase.js"></script><style>
+<style>
+:root{--pink:#e83f9b;--pink2:#ff79bc;--purple:#b35ad6;--dark:#3b2633;--soft:#fff7fb;--line:#f2c9df;--muted:#8d7180;--cream:#fff1f8}
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;background:radial-gradient(circle at 8% 4%,#ffd9ec 0,transparent 25%),radial-gradient(circle at 92% 8%,#eadcff 0,transparent 28%),linear-gradient(180deg,#fff9fc,#fff3f8);color:var(--dark);min-height:100vh}body:before{content:"♡ ✦ ♡";position:fixed;inset:auto 5% 8% auto;color:#f5b4d2;font-size:48px;letter-spacing:18px;opacity:.3;pointer-events:none}
+.w{max-width:1050px;margin:auto;padding:28px 18px 120px}.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#f34aa5 0%,#d93b94 42%,#a84bc5 100%);color:#fff;border-radius:30px;padding:32px;box-shadow:0 20px 50px #df3c972d}.hero:before{content:"✦  ♡  ✦";position:absolute;right:28px;top:18px;font-size:24px;letter-spacing:8px;opacity:.4}.hero:after{content:"♡";position:absolute;right:28px;bottom:-32px;font-size:145px;opacity:.13}.brand{font-size:11px;font-weight:900;letter-spacing:2.5px;opacity:.9}.hero h1{margin:10px 0 8px;font-size:42px;letter-spacing:-1px}.hero p{margin:0;font-size:16px;opacity:.95}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.chip{background:#ffffff24;border:1px solid #ffffff55;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:800}
+.section-head{display:flex;justify-content:space-between;align-items:end;margin:28px 0 13px}.section-kicker{font-size:11px;letter-spacing:2px;font-weight:900;color:var(--pink)}.section-head h2{margin:5px 0 0;font-size:29px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:17px}
+.card{position:relative;background:linear-gradient(180deg,#fff,#fff9fc);border:1px solid var(--line);border-radius:24px;padding:15px;box-shadow:0 12px 28px #d76d9c18;transition:.2s}.card:hover{transform:translateY(-3px);box-shadow:0 18px 35px #d84a9424}.pic{width:100%;height:190px;object-fit:contain;background:linear-gradient(135deg,#fff2f8,#f8efff);border-radius:18px}.placeholder{height:190px;border-radius:18px;background:linear-gradient(135deg,#fff0f7,#f4ecff);display:grid;place-items:center;font-size:58px}.product-name{font-size:20px;margin:14px 0 8px}.meta{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px}.badge{background:#ffe4f1;color:#c72f83;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:900}.order-count{position:relative;overflow:hidden;margin:18px 0 14px;padding:16px 20px;display:flex;align-items:center;gap:15px;width:100%;max-width:520px;box-sizing:border-box;border-radius:22px;background:linear-gradient(135deg,#fff5fa 0%,#ffe5f1 48%,#f6e9ff 100%);border:2px solid #f3a3cc;box-shadow:0 12px 28px #d4378a24;color:#8d245e}.order-count:before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;background:linear-gradient(#f0449c,#a64cc2)}.order-count:after{content:"♡";position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:48px;font-weight:900;color:#df5aa61c}.order-count .count-icon{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:16px;background:linear-gradient(135deg,#f0449c,#b449bb);color:#fff;font-size:24px;box-shadow:0 8px 18px #d4378a36;z-index:1}.order-count .count-num{font-size:40px;line-height:.9;font-weight:1000;color:#d92f8d;letter-spacing:-2px;min-width:48px;z-index:1}.order-count .count-copy{display:flex;flex-direction:column;line-height:1.05;z-index:1}.order-count .count-label{font-size:13px;font-weight:1000;letter-spacing:1.5px;color:#a42d6b}.order-count .count-sub{font-size:14px;font-weight:900;margin-top:6px;color:#6f405b}.order-count .count-sub b{color:#d92f8d}@media(max-width:520px){.order-count{max-width:100%;padding:15px 16px;gap:12px;border-radius:19px}.order-count .count-icon{width:42px;height:42px;flex-basis:42px;font-size:21px}.order-count .count-num{font-size:34px}.order-count .count-label{font-size:11px}.order-count .count-sub{font-size:12px}}.saved-details{margin:14px 0;padding:14px 16px;border-radius:17px;background:linear-gradient(135deg,#fff0f7,#f8f0ff);border:1px solid #efc8df;color:#75435d;line-height:1.6;font-size:13px}.price{font-size:25px;font-weight:900;color:#d92f8d;margin:14px 0}.qtyrow{display:flex;gap:8px}.qtyrow input{width:78px;border:1px solid var(--line);border-radius:13px;padding:10px;font-weight:800;background:#fffafd}.btn{background:linear-gradient(135deg,#ee479f,#c24ebc);color:#fff;border:0;border-radius:13px;padding:12px 16px;font-weight:900;cursor:pointer;letter-spacing:.4px;box-shadow:0 8px 18px #d4378a30}.btn:hover{filter:brightness(1.05);transform:translateY(-1px)}.qtyrow .btn{flex:1}
+.bar{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;width:min(1014px,calc(100% - 28px));background:linear-gradient(135deg,#3a2b34,#4a3040);color:#fff;padding:14px 16px;border-radius:20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 16px 40px #0004;z-index:10;border:1px solid #ffffff16}.cart-label{display:flex;flex-direction:column;gap:3px}.cart-label small{opacity:.65;font-weight:800;letter-spacing:1px}
+.modal{display:none;position:fixed;inset:0;background:#2c1824b8;padding:15px;overflow:auto;z-index:30;backdrop-filter:blur(5px)}.modal.show{display:block}.box{max-width:700px;background:linear-gradient(180deg,#fff,#fff8fc);border:1px solid #f3cce0;border-radius:28px;padding:24px;margin:24px auto;box-shadow:0 25px 70px #35131f55}.box h2{margin:0 0 16px;color:#c82f83}.box h2:after{content:"  ♡";color:#ef6cac}.f{margin:13px 0;font-size:13px;font-weight:900;letter-spacing:.3px;color:#593847}.f input,.f textarea,.f select{width:100%;box-sizing:border-box;padding:13px;border:1px solid var(--line);border-radius:14px;margin-top:7px;font:inherit;background:#fff;outline:none;transition:.15s}.f input:focus,.f textarea:focus,.f select:focus{border-color:#ea58a8;box-shadow:0 0 0 3px #f8c7df55}.line{display:flex;justify-content:space-between;gap:15px;padding:12px 0;border-bottom:1px dashed #efcfdf}.payment-card{margin:16px 0;padding:16px;background:linear-gradient(135deg,#fff0f7,#faf1ff);border:1px dashed #e7a7cb;border-radius:20px}.notice{margin:12px 0;padding:12px 14px;border-radius:14px;background:linear-gradient(135deg,#fff0f7,#fff7e9);color:#8a4666;font-size:13px;border:1px solid #f0c6d8}.ship-choice{margin:12px 0;padding:13px;border-radius:16px;background:#fff6fb;border:1px solid #f3cde0;color:#8d4d6b;font-size:13px}.qrwrap{text-align:center}.qrwrap .pic{max-width:330px;height:220px;margin:auto;display:block;background:#fff;border:1px solid #f0d6e3}
+.pop{display:none;position:fixed;inset:0;z-index:100;background:#2c182499;backdrop-filter:blur(6px);padding:20px;align-items:center;justify-content:center}.pop.show{display:flex}.popcard{width:min(420px,100%);background:linear-gradient(180deg,#fff,#fff4fa);border:1px solid #f3c8dd;border-radius:28px;padding:26px;text-align:center;box-shadow:0 28px 80px #35131f66}.popicon{width:68px;height:68px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#ffb6da,#e24a9d);color:#fff;font-size:31px;box-shadow:0 12px 25px #dd4a9b45}.popcard h3{margin:4px 0 10px;font-size:24px;color:#c92f83}.popcard p{margin:0 0 18px;color:#795568;line-height:1.5}.popcard .btn{min-width:120px}
+.tracker{margin:30px 0 10px;padding:22px;border-radius:24px;background:linear-gradient(135deg,#fff,#fff2f8 55%,#f6ecff);border:1px solid #efc7dc;box-shadow:0 14px 32px #d4378a16}.tracker-top{display:flex;justify-content:space-between;gap:14px;align-items:center}.tracker-kicker{font-size:11px;letter-spacing:2px;font-weight:1000;color:#c82f83}.tracker h3{margin:5px 0 0;font-size:24px}.tracker p{margin:7px 0 0;color:#7d6170;font-size:13px}.tracker-row{display:flex;gap:9px;margin-top:16px}.tracker-row input{flex:1;padding:13px;border:1px solid var(--line);border-radius:14px;background:#fff}.tracker-result{margin-top:14px}.track-card{padding:16px;border:1px solid #efd0df;border-radius:18px;background:#fff;margin-top:10px}.track-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.track-id{font-weight:1000;color:#a42d6b}.track-status{padding:6px 10px;border-radius:999px;background:#ffe5f1;color:#b72f78;font-size:10px;font-weight:1000}.track-items{margin-top:10px;color:#654757;font-size:13px;line-height:1.6}.track-waybill{margin-top:10px;padding:12px;border-radius:14px;background:#fff3f8;color:#7a4860;font-size:12px}.track-empty{padding:14px;border-radius:14px;background:#fff8fb;color:#8a6475;font-size:13px}.ofa-track-now{margin-top:12px;padding:18px;border:1px solid #edbfd5;border-radius:20px;background:linear-gradient(135deg,#fff6fb,#fff);display:flex;gap:13px;align-items:center}.ofa-track-icon{width:52px;height:52px;flex:0 0 52px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,#ef5ba9,#b73da3);color:#fff;font-size:24px;box-shadow:0 10px 22px #d4378a30}.ofa-track-now small{display:block;color:#a15b7e;font-size:10px;font-weight:950;letter-spacing:.12em}.ofa-track-now h4{margin:5px 0 0;font-size:20px;color:#3b2d35}.ofa-track-now p{margin:5px 0 0;color:#786d75;font-size:12px;line-height:1.45}.ofa-timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.ofa-phase{min-height:100px;padding:12px 7px;border-radius:16px;background:linear-gradient(145deg,#faf8f9,#f0edef);border:1px solid #e8e1e5;color:#8e838a;text-align:center;font-size:9px;font-weight:950;line-height:1.25;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px}.ofa-phase.active{background:linear-gradient(135deg,#e94497,#bc2a91 58%,#a92d9e);color:#fff;border-color:transparent;box-shadow:0 12px 24px #d4378a30}.ofa-phase.done{background:linear-gradient(145deg,#eff9f4,#e3f3eb);color:#33795e;border-color:#d1e7da}.ofa-phase-dot{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:#fff;color:#b8afb4;font-size:15px;box-shadow:0 6px 14px #3c1e2d18}.ofa-phase.active .ofa-phase-dot{color:#ca2d86}.ofa-phase.done .ofa-phase-dot{background:linear-gradient(145deg,#54a881,#3d8f6c);color:#fff;border-color:transparent}.ofa-track-note{margin-top:12px;padding:12px 14px;border-radius:14px;background:#fff4fa;border:1px solid #efcce0;color:#6b4a5b;font-size:12px;line-height:1.5}@media(max-width:600px){.ofa-track-now{align-items:flex-start}.ofa-timeline{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ofa-phase{min-height:94px}}@media(max-width:600px){.tracker{padding:18px;border-radius:20px}.tracker-top{align-items:flex-start}.tracker-row{flex-direction:column}.tracker-row .btn{width:100%}.track-head{align-items:flex-start;flex-direction:column}}@media(max-width:600px){.w{padding:16px 13px 110px}.hero{padding:25px 20px;border-radius:24px}.hero h1{font-size:32px}.section-head h2{font-size:24px}.bar{bottom:10px;width:calc(100% - 20px);border-radius:16px}.bar .btn{padding:12px}.box{padding:18px;margin:8px auto;border-radius:23px}.pic,.placeholder{height:170px}.chips{gap:6px}.chip{font-size:11px}.popcard{padding:22px}}
+</style></head><body><div class="w"><div class="hero"><div class="brand">PEPMOSA • DIRECT SHOP</div><h1>🌐 OPEN FOR ALL</h1><p>Shop separately from Group Buy — no Admin Fee, with separate payment and waybill.</p><div class="chips"><span class="chip">✓ No Admin Fee</span><span class="chip">✓ Separate Orders</span><span class="chip">✓ MOQ Available</span><span class="chip">✓ Smart Shipping Status</span></div></div><div class="section-head"><div><div class="section-kicker">AVAILABLE NOW</div><h2>Shop Products</h2></div></div><div id="list" class="grid"></div><div class="bar"><div class="cart-label"><small>YOUR CART</small><span id="sum">0 item(s) • ₱0.00</span></div><button class="btn" onclick="checkout()">CHECKOUT →</button></div></div><div id="gate" class="modal show"><div class="box"><h2>Welcome to MOQ ♡</h2><div class="notice">Please enter your email before shopping. We use it to keep your MOQ/Open for All orders together and to check whether your shipping fee has already been paid.</div><div class="f">Email*<input id="gateEmail" type="email" placeholder="your@email.com" autocomplete="email"></div><button id="gateBtn" class="btn" onclick="continueWithEmail()">CONTINUE SHOPPING ♡</button></div></div><div id="m" class="modal"><div id="box" class="box"></div></div><div id="pop" class="pop"><div class="popcard"><div id="popicon" class="popicon">♡</div><h3 id="poptitle">PEPMOSA</h3><p id="popmsg"></p><button class="btn" onclick="closePop()">OK ♡</button></div></div><script>
+const S=()=>window.sb||initSupabase(),ofaPeso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2});
+let P=[],C=[],SET={},EMAIL='',SHIP={status:'NONE',shipping_method:null,shipping_fee:0},PROFILE={},ACTIVE_GB=null;
+
+async function refreshShippingStatus(){
+  if(!EMAIL){SHIP={status:'NONE',shipping_method:null,shipping_fee:0};return SHIP;}
+  try{
+    const r=await S().rpc('ofa_get_shipping_status',{p_email:EMAIL,p_gb_id:ACTIVE_GB?.gb_id||null});
+    if(r.error) throw r.error;
+    const x=(r.data||[])[0]||{status:'NONE',shipping_method:null,shipping_fee:0};
+    SHIP={status:x.status||'NONE',shipping_method:x.shipping_method||null,shipping_fee:+x.shipping_fee||0};
+  }catch(err){
+    console.error('Shipping status error:',err);
+    SHIP={status:'NONE',shipping_method:null,shipping_fee:0};
+  }
+  return SHIP;
+}
+
+async function refreshCustomerProfile(){
+  PROFILE={};
+  if(!EMAIL) return PROFILE;
+  try{
+    const r=await S().rpc('ofa_get_customer_profile',{p_email:EMAIL});
+    if(r.error) throw r.error;
+    PROFILE=(r.data||[])[0]||{};
+  }catch(err){ console.error('Customer profile error:',err); PROFILE={}; }
+  return PROFILE;
+}
+
+async function continueWithEmail(){
+  const input=document.getElementById('gateEmail');
+  const email=(input?.value||'').trim().toLowerCase();
+  if(!/^\S+@\S+\.\S+$/.test(email)){popup('Please enter a valid email','We use this email only for your separate MOQ/Open for All orders and shipping status.','♡');return;}
+  EMAIL=email;
+  localStorage.setItem('ofa_email',EMAIL);
+  const btn=document.getElementById('gateBtn');
+  if(btn){btn.disabled=true;btn.textContent='CHECKING...';}
+  await Promise.all([refreshShippingStatus(),refreshCustomerProfile()]);
+  document.getElementById('gate').classList.remove('show');
+  if(btn){btn.disabled=false;btn.textContent='CONTINUE SHOPPING ♡';}
+  load();
+}
+
+async function load(){
+  try{
+    const s=S();
+    const settingsRes=await s.from('ofa_settings').select('active_gb_id').eq('id',true).single();
+    if(settingsRes.error) throw settingsRes.error;
+    const activeId=settingsRes.data?.active_gb_id;
+    const g=await s.from('ofa_group_buys').select('*').eq('gb_id',activeId).single();
+    if(g.error) throw g.error;
+    ACTIVE_GB=g.data;
+    const [a,b,t]=await Promise.all([
+      s.from('ofa_products').select('*').eq('gb_id',ACTIVE_GB.gb_id).in('status',['AVAILABLE','SOLD OUT','SOLD_OUT']),
+      Promise.resolve({data:ACTIVE_GB,error:null}),
+      s.rpc('ofa_public_product_totals',{p_gb_id:ACTIVE_GB.gb_id})
+    ]);
+    if(a.error) throw a.error;
+    P=(a.data||[]).sort((x,y)=>{
+      const xs=String(x.status||'').toUpperCase().replace('_',' ')==='SOLD OUT';
+      const ys=String(y.status||'').toUpperCase().replace('_',' ')==='SOLD OUT';
+      return Number(xs)-Number(ys);
+    });
+    SET=b.data||{};
+    document.title=(ACTIVE_GB.customer_facing_name||'MOQ')+' MOQ '+(ACTIVE_GB.gb_number||'')+' • Open for All';
+    const totalsById=new Map((t.data||[]).map(x=>[x.product_id,+x.total_qty||0]));
+    const list=document.getElementById('list');
+    list.innerHTML=P.length
+      ? P.map(x=>{
+        const sold=String(x.status||'').toUpperCase().replace('_',' ')==='SOLD OUT';
+        return `<div class="card" style="${sold?'opacity:.9':''}">${x.image_url?`<img class="pic" src="${x.image_url}" style="${sold?'filter:grayscale(.15);opacity:.78':''}">`:'<div class="placeholder">🧪</div>'}<h3 class="product-name">${x.name}</h3><div class="meta"><span class="badge">MOQ ${x.moq}</span><span style="${sold?'color:#a15b7e;font-weight:900':'color:#3b8a68;font-weight:900'}">${sold?'SOLD OUT':'Available Now'}</span></div>${sold?'<div class="notice" style="margin-top:12px;text-align:center;font-weight:900">SOLD OUT • FOR REFERENCE ONLY</div>':'<div class="order-count" title="Total quantity ordered across all Open for All checkouts"><span class="count-icon">📦</span><span class="count-num">'+(totalsById.get(x.id)||0)+'</span><span class="count-copy"><span class="count-label">TOTAL UNITS ORDERED</span><span class="count-sub"><b>All customer checkouts combined</b> ♡</span></span></div><div class="price">'+ofaPeso(x.amount)+'</div><div class="qtyrow"><input id="q'+x.id+'" type="number" min="'+x.moq+'" value="'+x.moq+'"><button class="btn" onclick="add(\''+x.id+'\')">ADD TO CART</button></div>'}</div>`;
+      }).join('')
+      : '<div class="card" style="grid-column:1/-1;text-align:center;padding:30px"><h3>No products available yet</h3><p>Please check back soon.</p></div>';
+    draw();
+  }catch(err){
+    console.error('Open for All load error:',err);
+    document.getElementById('list').innerHTML='<div class="card" style="grid-column:1/-1;text-align:center;padding:30px"><h3>Unable to load products</h3><p>'+String(err.message||err)+'</p><button class="btn" onclick="load()">TRY AGAIN</button></div>';
+  }
+}
+function add(id){let x=P.find(a=>a.id===id),q=Math.max(x.moq,+document.getElementById('q'+id).value||x.moq),z=C.find(a=>a.id===id);z?z.qty+=q:C.push({...x,qty:q});draw()}
+function draw(){let sub=C.reduce((a,x)=>a+x.amount*x.qty,0);sum.textContent=C.reduce((a,x)=>a+x.qty,0)+' item(s) • '+ofaPeso(sub)}
+function popup(title,msg,icon='♡'){poptitle.textContent=title;popmsg.textContent=msg;popicon.textContent=icon;pop.classList.add('show')}
+function closePop(){pop.classList.remove('show')}
+
+async function checkout(){
+  if(!EMAIL){document.getElementById('gate').classList.add('show');return;}
+  if(!C.length){popup('Your cart is empty','Add a product first before checking out.','🛍️');return;}
+  await Promise.all([refreshShippingStatus(),refreshCustomerProfile()]);
+  OFA_SUBMITTING=false;
+  const hasSaved=!!(PROFILE.customer_name&&PROFILE.address&&(SHIP.status==='PAID'||SHIP.status==='SUBMITTED'));
+  const savedMethod=PROFILE.shipping_method||SHIP.shipping_method||'JT_LUZON';
+  m.classList.add('show');
+  box.innerHTML='<h2>Checkout ♡</h2>'+
+    '<div class="notice">💌 <b>'+EMAIL+'</b><br>'+(hasSaved?(SHIP.status==='PAID'?'💗 Shipping is already paid for this email. Your saved delivery details will be used.':'💌 Your shipping payment is already submitted and pending approval. No duplicate shipping fee will be added.'):'We use this email to keep your MOQ/Open for All orders together and check your shipping status.')+'</div>'+
+    C.map(x=>'<div class="line"><span>'+x.name+' × '+x.qty+'</span><b>'+ofaPeso(x.amount*x.qty)+'</b></div>').join('')+
+    (hasSaved
+      ? '<div class="saved-details"><b>Saved delivery details ♡</b><br>'+PROFILE.customer_name+' • '+(PROFILE.contact||'No contact')+'<br>'+PROFILE.address+'</div><input id="sm" type="hidden" value="'+savedMethod+'">'
+      : '<div class="f">Name*<input id="n" placeholder="Full name"></div><div class="f">Contact<input id="c" placeholder="09XXXXXXXXX"></div><div class="f">Address*<textarea id="a" placeholder="Complete delivery address"></textarea></div><div class="f">Shipping Method<select id="sm" onchange="shippingChange()"><option value="JT_LUZON">J&T Luzon</option><option value="JT_VISAYAS">J&T Visayas</option><option value="JT_MINDANAO">J&T Mindanao</option><option value="LALAMOVE">Lalamove</option></select></div>'
+    )+'<div class="ship-choice" id="shipNote"></div><div id="tot"></div>'+
+    (SET.payment_qr_url?'<div class="payment-card qrwrap"><h3>💗 Payment QR</h3><img class="pic" src="'+SET.payment_qr_url+'"><p><b>'+(SET.payment_name||'PEPMOSA')+'</b></p><p>'+(SET.payment_instructions||'')+'</p></div>':'')+
+    '<div class="f">Proof of payment*<input id="proof" type="file" accept="image/*"></div><button class="btn" onclick="submit()">SUBMIT ORDER ♡</button>';
+  total();
+}
+function shippingChange(){total()}
+function fee(){
+  if(SHIP.status==='PAID'||SHIP.status==='SUBMITTED') return 0;
+  let sm=document.getElementById('sm').value;
+  if(sm==='LALAMOVE')return +SET.lalamove_fee||0;
+  if(sm==='JT_VISAYAS')return +SET.visayas_fee||0;
+  if(sm==='JT_MINDANAO')return +SET.mindanao_fee||0;
+  return +SET.luzon_fee||0;
+}
+function total(){
+  let sub=C.reduce((a,x)=>a+x.amount*x.qty,0),f=fee(),sm=document.getElementById('sm').value;
+  let labels={JT_LUZON:'J&T Luzon',JT_VISAYAS:'J&T Visayas',JT_MINDANAO:'J&T Mindanao',LALAMOVE:'Lalamove'};
+  let statusMsg='';
+  if(SHIP.status==='PAID') statusMsg='💗 <b>Shipping already paid ♡</b> No additional shipping fee is added for this email.';
+  else if(SHIP.status==='SUBMITTED') statusMsg='💌 <b>Shipping payment pending approval.</b> No duplicate shipping fee is added while your first shipping payment is being reviewed.';
+  else statusMsg='💗 <b>'+labels[sm]+'</b> selected. This shipping fee is charged once for this email.';
+  shipNote.innerHTML=statusMsg;
+  tot.innerHTML='<div class="line"><span>Shipping'+(SHIP.status==='PAID'?' (ALREADY PAID)':SHIP.status==='SUBMITTED'?' (PENDING APPROVAL)':'')+'</span><b>'+ofaPeso(f)+'</b></div><div class="line"><b>TOTAL ♡</b><b>'+ofaPeso(sub+f)+'</b></div>';
+}
+const OFA_TRACK_STATUSES=['ORDER RECEIVED','PAYMENT CONFIRMED','ORDER PROCESSING','IN TRANSIT TO THE PHILIPPINES','ARRIVED IN THE PHILIPPINES','RECEIVED AT WAREHOUSE','PACKING & LABELLING','HANDED OVER TO LOCAL COURIER','DELIVERED'];
+function ofaTrackPhaseIndex(status){const i=OFA_TRACK_STATUSES.indexOf(status);if(i<=1)return 0;if(i<=4)return 1;if(i<=7)return 2;return 3;}
+function ofaTrackMessage(status){const m={'ORDER RECEIVED':'Your order has been received and is waiting for the next update.','PAYMENT CONFIRMED':'Your payment has been confirmed.','ORDER PROCESSING':'Your order is being processed.','IN TRANSIT TO THE PHILIPPINES':'Your shipment is currently on its way to the Philippines.','ARRIVED IN THE PHILIPPINES':'Your shipment has arrived in the Philippines.','RECEIVED AT WAREHOUSE':'Your shipment has been received at the warehouse.','PACKING & LABELLING':'Your items are currently being packed and labelled.','HANDED OVER TO LOCAL COURIER':'Your package has been handed over to the local courier.','DELIVERED':'Your order has been delivered.'};return m[status]||'Your latest shipment update is shown below.';}
+function ofaTimeline(status){const current=ofaTrackPhaseIndex(status),ph=[['ORDER CONFIRMED','✓'],['IN TRANSIT','✈'],['PACKING','▣'],['DELIVERED','⌂']];return '<div class="ofa-timeline">'+ph.map((p,i)=>'<div class="ofa-phase '+(i<current?'done':i===current?'active':'')+'"><span class="ofa-phase-dot">'+(i<current?'✓':p[1])+'</span><span>'+p[0]+'</span></div>').join('')+'</div>';}
+function ofaEsc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+async function trackOFA(){
+  const input=document.getElementById('trackEmail'),out=document.getElementById('trackResult');
+  const email=(input?.value||EMAIL||'').trim().toLowerCase();
+  if(!/^\S+@\S+\.\S+$/.test(email)){
+    out.innerHTML='<div class="track-empty">Please enter the email used for your MOQ/Open for All checkout.</div>';
+    return;
+  }
+  out.innerHTML='<div class="track-empty">Checking your MOQ orders…</div>';
+  try{
+    // IMPORTANT: tracking is intentionally NOT scoped to ACTIVE_GB.
+    // A customer must be able to see older MOQ/GB orders (e.g. FUAN GB3)
+    // even when a newer MOQ (e.g. LAENNEC GB2) is currently open.
+    // Pass p_gb_id explicitly as null so PostgREST never applies the active-GB filter.
+    const r=await S().rpc('ofa_get_customer_tracking',{p_email:email,p_gb_id:null});
+    if(r.error) throw r.error;
+
+    const data=(r.data&&typeof r.data==='object')?r.data:{};
+    const orders=Array.isArray(data.orders)?data.orders:[];
+    const items=Array.isArray(data.items)?data.items:[];
+    const waybills=Array.isArray(data.waybills)?data.waybills:[];
+    if(!orders.length){
+      out.innerHTML='<div class="track-empty">No MOQ/Open for All orders found for this email yet.</div>';
+      return;
+    }
+
+    const byOrder={};
+    waybills.forEach(w=>{ if(w && w.order_id) byOrder[w.order_id]=w; });
+
+    const groups={};
+    orders.forEach(o=>{
+      const key=o.gb_id||o.gb_number||'unknown';
+      if(!groups[key]) groups[key]={gb_id:o.gb_id,gb_number:o.gb_number,gb_name:o.gb_name,global_status:o.global_tracking_status||'ORDER RECEIVED',global_notes:o.global_tracking_notes||'',orders:[]};
+      groups[key].orders.push(o);
+    });
+
+    const html=Object.values(groups).map(g=>{
+      const orderIds=new Set(g.orders.map(o=>o.order_id));
+      const groupItems={};
+      items.filter(i=>orderIds.has(i.order_id)).forEach(i=>{
+        groupItems[i.product_name]=(groupItems[i.product_name]||0)+Number(i.qty||0);
+      });
+
+      const latestWaybill=g.orders.map(o=>byOrder[o.order_id]).find(Boolean);
+      const status=(latestWaybill?.status)||g.global_status||'ORDER RECEIVED';
+      const notes=(latestWaybill?.notes)||g.global_notes||'';
+      const courier=(latestWaybill?.courier)||'';
+      const tracking=(latestWaybill?.tracking_number)||latestWaybill?.waybill_number||'';
+      const itemText=Object.entries(groupItems).map(([name,qty])=>'<div>• '+ofaEsc(name)+' × <b>'+qty+'</b></div>').join('')||'<div>Items are being prepared.</div>';
+      const orderText=g.orders.map(o=>'<span class="track-id" style="margin-right:6px">'+ofaEsc(o.order_id)+'</span>').join('');
+      const gbLabel=(g.gb_name||g.gb_number)?ofaEsc([g.gb_number?('GB '+g.gb_number):'',g.gb_name||''].filter(Boolean).join(' • ')):'Open for All / MOQ';
+
+      return '<div class="track-card" style="border:2px solid #efb5d2">'+
+        '<div class="track-head"><div><div class="small" style="font-weight:900;color:#cc2d88">MOQ / OPEN FOR ALL</div><h3 style="margin:5px 0">♡ '+gbLabel+'</h3></div><span class="track-status">'+ofaEsc(status)+'</span></div>'+
+        '<div class="ofa-track-now"><div class="ofa-track-icon">📦</div><div><small>CURRENT UPDATE</small><h4>'+ofaEsc(status)+'</h4><p>'+ofaEsc(ofaTrackMessage(status))+'</p></div></div>'+
+        ofaTimeline(status)+
+        (notes?'<div class="ofa-track-note"><b>Latest note</b><br>'+ofaEsc(notes)+'</div>':'')+
+        ((courier||tracking)?'<div class="track-waybill"><b>Shipping</b><br>'+(courier?ofaEsc(courier):'Courier pending')+(tracking?' • '+ofaEsc(tracking):'')+'</div>':'')+
+        '<div class="track-items"><b>Your orders in this MOQ</b><div style="margin-top:8px">'+itemText+'</div></div>'+
+        '<div style="margin-top:12px"><div class="small">Your checkout references</div>'+orderText+'</div>'+
+      '</div>';
+    }).join('');
+
+    out.innerHTML='<div class="track-card" style="border:2px solid #e9b4d1;background:linear-gradient(135deg,#fff7fb,#fff)">'+
+      '<div class="track-head"><div><div class="small" style="font-weight:900;color:#cc2d88">YOUR MOQ HISTORY</div><h3 style="margin:5px 0">All your Open for All orders ♡</h3></div><span class="track-status">'+Object.keys(groups).length+' MOQ'+(Object.keys(groups).length===1?'':'s')+'</span></div>'+
+      '<div class="track-empty" style="margin-top:12px">Your tracking is not limited to the currently open MOQ. Older MOQ/GB orders stay visible here even after a new GB is opened.</div>'+
+      html+
+    '</div>';
+  }catch(err){
+    console.error('MOQ tracking error:',err);
+    out.innerHTML='<div class="track-empty">Unable to load your tracking right now. Please try again.</div>';
+  }
+}
+window.trackOFA=trackOFA;
+
+let OFA_SUBMITTING=false;
+async function submit(){
+  if(OFA_SUBMITTING)return;
+  OFA_SUBMITTING=true;
+  const submitBtn=document.querySelector('#box .btn[onclick="submit()"]');
+  if(submitBtn){submitBtn.disabled=true;submitBtn.textContent='SUBMITTING... ♡';}
+  const hasSaved=!!(PROFILE.customer_name&&PROFILE.address&&(SHIP.status==='PAID'||SHIP.status==='SUBMITTED'));
+  let name=hasSaved?PROFILE.customer_name:(document.getElementById('n')?.value||'').trim();
+  let contact=hasSaved?(PROFILE.contact||''):(document.getElementById('c')?.value||'').trim();
+  let address=hasSaved?PROFILE.address:(document.getElementById('a')?.value||'').trim();
+  let file=proof.files[0];
+  if(!EMAIL||!name||!address||!file){popup('Almost there!','Please complete all required fields and upload your proof of payment.','♡');return;}
+  let id='OFA-'+Date.now(),s=S();
+  try{
+    let ext=(file.name.split('.').pop()||'jpg').replace(/[^a-z0-9]/gi,''),path='open-for-all/'+id+'.'+ext,up=await s.storage.from('payment-proofs').upload(path,file,{contentType:file.type});
+    if(up.error)throw up.error;
+    let proofUrl=s.storage.from('payment-proofs').getPublicUrl(path).data.publicUrl,sub=C.reduce((a,x)=>a+x.amount*x.qty,0),f=fee(),sm=document.getElementById('sm').value;
+    let o=await s.from('ofa_orders').insert({order_id:id,gb_id:ACTIVE_GB?.gb_id||null,email:EMAIL,customer_name:name,contact:contact,address,region:(sm==='JT_VISAYAS'?'VISAYAS':sm==='JT_MINDANAO'?'MINDANAO':'LUZON'),shipping_method:sm,subtotal:sub,shipping_fee:f,total:sub+f,payment_status:'SUBMITTED',payment_reference:null,payment_proof_url:proofUrl});
+    if(o.error)throw o.error;
+    let it=await s.from('ofa_order_items').insert(C.map(x=>({order_id:id,product_id:x.id,product_name:x.name,qty:x.qty,unit_price:x.amount,line_total:x.amount*x.qty})));
+    if(it.error)throw it.error;
+    const courierMap={JT_LUZON:'J&T Luzon',JT_VISAYAS:'J&T Visayas',JT_MINDANAO:'J&T Mindanao',LALAMOVE:'Lalamove'};
+    const wb=await s.from('ofa_waybills').insert({order_id:id,status:'ORDER RECEIVED',courier:courierMap[sm]||null,updated_at:new Date().toISOString()});
+    if(wb.error)throw wb.error;
+    await refreshShippingStatus();
+    m.classList.remove('show');C=[];draw();
+    popup('Order Submitted! ♡','Your order '+id+' was submitted successfully and is now waiting for payment approval.','✓');
+    OFA_SUBMITTING=false;
+  }catch(err){console.error(err);popup('Something went wrong',err.message||'Please try again.','!');OFA_SUBMITTING=false;if(submitBtn){submitBtn.disabled=false;submitBtn.textContent='SUBMIT ORDER ♡';}}
+}
+
+(async function initPage(){
+  const saved=(localStorage.getItem('ofa_email')||'').trim().toLowerCase();
+  if(saved&&/^\S+@\S+\.\S+$/.test(saved)){
+    EMAIL=saved;
+    const ge=document.getElementById('gateEmail'); if(ge) ge.value=EMAIL;
+    await Promise.all([refreshShippingStatus(),refreshCustomerProfile()]);
+    document.getElementById('gate').classList.remove('show');
+    load();
+  }else{
+    document.getElementById('gate').classList.add('show');
+  }
+})();
+</script></body></html>

@@ -4688,6 +4688,33 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opa
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',clean,{once:true});
 })();
 </script>
+
+<!-- Remove any second GB panel by its shared GB title/status/sub structure. -->
+<script id="pep-single-gb-panel-enforcer">
+(function(){
+  function removeExtraGB(){
+    document.querySelectorAll('.pepGBTitle').forEach(title=>{
+      if(title.closest('#currentGroupBuy'))return;
+      let node=title;
+      for(let i=0;i<8 && node && node!==document.body;i++,node=node.parentElement){
+        if(node.querySelector('.pepGBStatus') && node.querySelector('.pepGBSub')){
+          node.remove();
+          return;
+        }
+      }
+      const legacy=title.closest('.pepGBFeature');
+      if(legacy)legacy.remove();
+    });
+    document.querySelectorAll('.pepGBFeature').forEach(el=>{
+      if(!el.closest('#currentGroupBuy'))el.remove();
+    });
+  }
+  removeExtraGB();
+  const observer=new MutationObserver(removeExtraGB);
+  observer.observe(document.documentElement,{childList:true,subtree:true});
+  document.addEventListener('DOMContentLoaded',removeExtraGB,{once:true});
+})();
+</script>
 </body>
 </html>
 

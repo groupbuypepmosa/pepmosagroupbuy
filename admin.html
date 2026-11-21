@@ -513,6 +513,89 @@ body:has(#loginScreen:not([style*="display: none"])):before{
  #loginScreen .btn.primary{height:52px!important;min-height:52px!important}
 }
 </style>
+
+<style id="pepmosa-exact-generated-art">
+/* Use the exact generated PEPMOSA artwork as the login screen. Only the controls remain live. */
+body:has(#loginScreen:not([style*="display: none"])) {
+  background-color:#5a1036!important;
+  background-image:url('/pepmosa-login-bg.webp'),linear-gradient(110deg,#3e0924 0%,#76123f 45%,#d46a9c 100%)!important;
+  background-repeat:no-repeat,no-repeat!important;
+  background-position:center center,center center!important;
+  background-size:auto 100vh,cover!important;
+  background-attachment:fixed,fixed!important;
+}
+body:has(#loginScreen:not([style*="display: none"])):before,
+body:has(#loginScreen:not([style*="display: none"])):after{display:none!important;content:none!important}
+body:has(#loginScreen:not([style*="display: none"]))>header{display:none!important}
+#loginScreen{
+ position:fixed!important;inset:0!important;z-index:999!important;
+ width:100vw!important;height:100vh!important;min-height:100vh!important;
+ margin:0!important;padding:0!important;display:block!important;
+ background:transparent!important;overflow:hidden!important;
+}
+#loginScreen .loginBox{
+ position:absolute!important;left:50%!important;top:0!important;
+ transform:translateX(-50%)!important;
+ width:min(83.571vh,100vw)!important;height:100vh!important;
+ margin:0!important;padding:0!important;box-sizing:border-box!important;
+ border:0!important;border-radius:0!important;background:transparent!important;
+ box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ overflow:visible!important;
+}
+#loginScreen .loginBox:before{display:none!important;content:none!important}
+#loginScreen .loginLogo,#loginScreen .loginSubtitle,
+#loginScreen .loginBox>br,#loginScreen .field label{display:none!important}
+#loginScreen .field{
+ position:absolute!important;left:19.23%!important;width:61.54%!important;
+ height:5.72%!important;margin:0!important;padding:0!important;
+}
+#loginScreen .field:has(#loginEmail){top:44.79%!important}
+#loginScreen .field:has(#loginPassword){top:52.29%!important}
+#loginScreen .field input{
+ position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+ min-height:0!important;box-sizing:border-box!important;
+ padding:0 8% 0 16%!important;margin:0!important;
+ border:0!important;border-radius:0!important;outline:0!important;
+ background:transparent!important;box-shadow:none!important;
+ color:#fff7fb!important;-webkit-text-fill-color:#fff7fb!important;
+ font:500 clamp(11px,1.35vh,16px)/1.2 Arial,sans-serif!important;
+ caret-color:#fff!important;
+}
+#loginScreen .field input::placeholder{color:transparent!important;opacity:0!important}
+#loginScreen .field input:focus{outline:0!important;border:0!important;box-shadow:none!important}
+#loginScreen .actions{
+ position:absolute!important;left:18.38%!important;top:61.14%!important;
+ width:63.25%!important;height:6.72%!important;margin:0!important;padding:0!important;
+}
+#loginScreen .btn.primary{
+ display:block!important;width:100%!important;height:100%!important;min-height:0!important;
+ margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
+ background:transparent!important;box-shadow:none!important;outline:0!important;
+ color:transparent!important;font-size:0!important;letter-spacing:0!important;
+ transform:none!important;filter:none!important;cursor:pointer!important;
+}
+#loginScreen .btn.primary:after{content:none!important;display:none!important}
+#loginScreen .btn.primary:hover,#loginScreen .btn.primary:focus{
+ background:transparent!important;box-shadow:none!important;filter:none!important;transform:none!important
+}
+#loginScreen #loginMsg{
+ position:absolute!important;left:12%!important;top:69.5%!important;width:76%!important;
+ margin:0!important;text-align:center!important;color:#fff!important;
+ font-size:clamp(10px,1.2vh,14px)!important;text-shadow:0 1px 5px #71133d;
+}
+@media(max-width:650px){
+ body:has(#loginScreen:not([style*="display: none"])){
+  background-size:100vw auto,cover!important;background-position:center center,center center!important;
+ }
+ #loginScreen .loginBox{
+  width:100vw!important;height:119.658vw!important;max-height:100vh!important;
+  top:50%!important;transform:translate(-50%,-50%)!important;
+ }
+ #loginScreen .field{height:5.72%!important}
+ #loginScreen .field input{font-size:clamp(9px,2.8vw,13px)!important}
+ #loginScreen #loginMsg{font-size:10px!important}
+}
+</style>
 </head>
 <body>
 <header><a class="brand" href="index.html"><span class="logoMark">P</span>PEPMOSA</a><nav class="nav"><a href="index.html">HOME</a><a href="calculator.html">CALCULATOR</a><a href="protocols.html">PROTOCOLS</a><a href="track.html">TRACK</a><a href="coa.html">COA</a></nav></header>

@@ -1301,6 +1301,21 @@ body:has(#accountArea:not(.hidden)){
  .accountWrap:has(#authArea:not(.hidden)) .field input{background:#e8f0ff!important}
 }
 </style>
+<style id="pepmosa-login-background-force">
+/* Explicit page background asset; keep login card and auth behavior untouched. */
+html,body{min-height:100%!important}
+body:has(#authArea:not(.hidden)){
+ background-color:#fff0f6!important;
+ background-image:url("/pepmosa-login-ribbon-bg.svg")!important;
+ background-position:center center!important;
+ background-size:cover!important;
+ background-repeat:no-repeat!important;
+ background-attachment:fixed!important;
+}
+@media(max-width:760px){
+ body:has(#authArea:not(.hidden)){background-position:center center!important;background-attachment:scroll!important}
+}
+</style>
 </head>
 <body>
 <div class="accountWrap"><div class="accountCard">

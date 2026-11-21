@@ -4180,7 +4180,7 @@ main.wrap{position:relative;z-index:3}
 })();
 </script>
 <style id="pep-restore-admin-fee-cta">
-.pepGBFeature .pepAdminFeeCTA{position:absolute!important;right:22px!important;bottom:58px!important;z-index:20!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:40px!important;padding:10px 22px!important;border:2px solid #fff!important;border-radius:999px!important;background:#fff!important;background-image:none!important;color:#74183e!important;-webkit-text-fill-color:#74183e!important;text-decoration:none!important;font-size:12px!important;font-weight:1000!important;letter-spacing:.075em!important;line-height:1!important;box-shadow:0 5px 0 rgba(83,12,42,.16),0 9px 22px rgba(48,8,28,.24)!important;cursor:pointer!important;opacity:1!important;visibility:visible!important}
+.pepGBFeature .pepAdminFeeCTA{position:absolute!important;right:22px!important;left:auto!important;bottom:58px!important;z-index:20!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;width:auto!important;min-width:0!important;max-width:max-content!important;min-height:38px!important;height:auto!important;padding:9px 18px!important;white-space:nowrap!important;flex:0 0 auto!important;box-sizing:border-box!important;border:2px solid #fff!important;border-radius:999px!important;background:#fff!important;background-image:none!important;color:#74183e!important;-webkit-text-fill-color:#74183e!important;text-decoration:none!important;font-size:11px!important;font-weight:1000!important;letter-spacing:.06em!important;line-height:1!important;box-shadow:0 5px 0 rgba(83,12,42,.16),0 9px 22px rgba(48,8,28,.24)!important;cursor:pointer!important;opacity:1!important;visibility:visible!important}
 .pepGBFeature .pepAdminFeeCTA:hover{transform:translateY(-2px)!important;background:#fff5f9!important;box-shadow:0 7px 0 rgba(83,12,42,.14),0 12px 25px rgba(48,8,28,.27)!important}
 .pepGBFeature .pepAdminFeeCTA[disabled]{opacity:.72!important;cursor:wait!important;transform:none!important}
 @media(max-width:760px){.pepGBFeature .pepAdminFeeCTA{right:12px!important;bottom:52px!important;padding:9px 13px!important;min-height:36px!important;font-size:10px!important}}
@@ -4192,7 +4192,7 @@ main.wrap{position:relative;z-index:3}
   try{if(typeof currentGB!=='undefined'&&currentGB)return currentGB;}catch(_){}
   return window.currentGB||null;
  }
- function isOpen(gb){return !!(gb&&['OPEN','KIT_COMPLETION'].includes(String(gb.status||'').trim().toUpperCase()));}
+ function isOpen(gb){const status=String(gb?.status||'').trim().toUpperCase();const badge=(document.querySelector('.pepGBFeature .pepGBStatus')?.textContent||'').toUpperCase();const detail=(document.querySelector('.pepGBFeature #pepGBStatusText')?.textContent||document.querySelector('.pepGBFeature .pepGBSub')?.textContent||'').toUpperCase();if(/CLOSED|PRICELIST VIEW|ORDERING CLOSED/.test(badge+' '+detail))return false;return !!(gb&&['OPEN','KIT_COMPLETION'].includes(status));}
  function mount(){
   const panel=document.querySelector('.pepGBFeature');if(!panel)return;
   let btn=panel.querySelector('.pepAdminFeeCTA');

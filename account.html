@@ -410,13 +410,7 @@ body{background:radial-gradient(circle at 10% 10%,rgba(233,165,191,.18),transpar
 
 <style id="pepmosa-new-luxury-login">
 /* New PEPMOSA login landing — uses the official repository logo */
-body:has(#authArea:not(.hidden)){
- min-height:100vh!important;
- background:
-  radial-gradient(ellipse at 12% 8%,rgba(255,255,255,.88),transparent 30%),
-  radial-gradient(ellipse at 88% 90%,rgba(224,119,165,.20),transparent 34%),
-  linear-gradient(135deg,#fff8fc 0%,#fce8f1 48%,#f8eaf4 100%)!important;
-}
+body:has(#authArea:not(.hidden))
 .accountWrap:has(#authArea:not(.hidden)){
  position:relative;z-index:1;width:min(560px,calc(100% - 28px))!important;
  margin:clamp(22px,6vh,64px) auto!important;
@@ -473,12 +467,7 @@ body:has(#authArea:not(.hidden)){
 
 <style id="pepmosa-reference-login-match">
 /* Match the supplied PEPMOSA login reference */
-body:has(#authArea:not(.hidden)){
- min-height:100vh!important;overflow-x:hidden!important;
- background:
-  radial-gradient(ellipse at 50% 38%,rgba(255,255,255,.98) 0%,rgba(255,248,251,.88) 35%,transparent 68%),
-  linear-gradient(115deg,#fffdfd 0%,#fff4f8 40%,#fbe5ef 100%)!important;
-}
+body:has(#authArea:not(.hidden))
 body:has(#authArea:not(.hidden))::after{
  content:"✿　　　　　　　　　❀　　　　　　　　　✿　　　　　　　　　❀";
  position:fixed;z-index:0;pointer-events:none;top:6.5%;left:0;width:100%;
@@ -628,10 +617,7 @@ body:has(#authArea:not(.hidden)){display:block!important}
 </style>
 <style id="pepmosa-login-reference-final">
 /* Desktop proportions matched to the approved PEPMOSA visual reference */
-body:has(#authArea:not(.hidden)){
- display:block!important;min-height:100vh!important;margin:0!important;overflow-x:hidden!important;
- background:#f9c4dd url("/pepmosa-login-bg.svg") center center / cover fixed no-repeat!important;
-}
+body:has(#authArea:not(.hidden))
 body:has(#authArea:not(.hidden))::before,body:has(#authArea:not(.hidden))::after{display:none!important;content:none!important}
 body:has(#authArea:not(.hidden)) .accountWrap{
  display:block!important;position:relative!important;z-index:1!important;
@@ -1251,22 +1237,14 @@ body:has(#accountArea:not(.hidden)){
 
 /* Canonical signed-out login background — paint both document canvas and page. */
 html:has(#authArea:not(.hidden)),
-body:has(#authArea:not(.hidden)){
- min-height:100vh!important;
- background-color:#f9e4ee!important;
- background-image:url("/pepmosa-customer-login-bg.svg?v=20261121")!important;
- background-position:center center!important;
- background-size:cover!important;
- background-repeat:no-repeat!important;
- background-attachment:fixed!important;
-}
+body:has(#authArea:not(.hidden))
 @media(max-width:760px){
  html:has(#authArea:not(.hidden)),
  body:has(#authArea:not(.hidden)){background-attachment:scroll!important}
 }
 </style>
 </head>
-<body>
+<body style="min-height:100vh !important; background-color:#f7dce7 !important; background-image:url('/pepmosa-customer-login-bg.svg?v=20261121-final') !important; background-position:center center !important; background-size:cover !important; background-repeat:no-repeat !important; background-attachment:fixed !important;">
 <div class="accountWrap"><div class="accountCard">
 <div class="logo"><img src="pepmosa-logo.png" alt="PEPMOSA official logo"></div>
 <div class="title">Log In to Your Account</div><div class="sub">Welcome back to PEPMOSA Group Buy</div>

@@ -6,6 +6,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
+<!-- Prevent the protected homepage from flashing before the customer access check redirects. -->
+<script id="pep-preauth-hide-home">
+  document.documentElement.classList.add('pepmosa-auth-checking');
+</script>
+<style id="pep-preauth-hide-home-style">
+  html.pepmosa-auth-checking body { visibility:hidden !important; }
+  html.pepmosa-auth-checking { background:#f8e8ef !important; }
+</style>
+
+
 <title>PEPMOSA • Group Buy</title>
 
 <link rel="stylesheet" href="style.css">\n<link rel="stylesheet" href="pepmosa-luxury-home.css?v=20261015">

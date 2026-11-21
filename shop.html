@@ -1777,9 +1777,6 @@ button.pepFloatingLuxuryCart:hover,.pepFloatingLuxuryCart:hover{transform:transl
   <a href="buyers-proof.html" title="Buyers' Proof"><span>♥</span><b>PROOF</b></a>
 </nav>
 <main class="wrap pepReferenceShop">
-<!-- Compatibility target retained for existing legacy scripts. -->
-<div id="gbStatus" aria-hidden="true" style="display:none!important"></div>
-
 <section class="pepLiveHero" aria-label="PEPMOSA premium shop">
   <div class="pepLiveHeroCopy">
     <div class="pepLiveEyebrow">A REFINED SHOPPING EXPERIENCE</div>
@@ -1795,7 +1792,17 @@ button.pepFloatingLuxuryCart:hover,.pepFloatingLuxuryCart:hover{transform:transl
   </aside>
 </section>
 
-<!-- Top duplicate Group Buy card removed as requested. Legacy Group Buy card below Welcome remains. -->
+<!-- Live Group Buy card and customer-facing schedule directly under the Welcome banner. -->
+<div id="gbStatus" class="pepPublicGBCard" style="display:none"></div>
+<section id="pepPublicGBSchedule" class="pepPublicGBSchedule" aria-live="polite" style="display:none">
+  <div class="pepPublicScheduleHead"><span>PEPMOSA GROUP BUY</span><h2>GB SCHEDULE</h2><p>Keep track of important dates and your ordering countdown.</p></div>
+  <div class="pepPublicScheduleGrid">
+    <div class="pepPublicScheduleItem"><small>GB OPENS</small><strong id="pepPublicOpenDate">—</strong></div>
+    <div class="pepPublicScheduleItem"><small>ORDERING UNTIL</small><strong id="pepPublicOrderDate">—</strong></div>
+    <div class="pepPublicScheduleItem"><small>KIT COMPLETION</small><strong id="pepPublicKitDate">—</strong></div>
+  </div>
+  <div class="pepPublicCountdown" id="pepPublicCountdown" hidden></div>
+</section>
 
 <section class="pepRefCategories">
   <div class="pepRefSectionIntro"><span>SHOP BY CATEGORY</span><h2>Browse Products</h2><p>Discover our peptide selection<br>for your health, beauty, and wellness goals.</p></div>
@@ -1859,7 +1866,30 @@ button.pepFloatingLuxuryCart:hover,.pepFloatingLuxuryCart:hover{transform:transl
   }
   if(sub)sub.textContent=gb?(String(gb.status).toUpperCase()==="CLOSED"?"Browse the pricelist. Ordering for this Group Buy is closed.":"This Group Buy is accepting orders. View the pricelist for available products."):"There is no current Group Buy available.";
  };
+ 
+ window.pepRenderPublicGBSchedule=function(gb){
+  const panel=document.getElementById("pepPublicGBSchedule");if(!panel)return;
+  if(!gb){panel.style.display="none";return}
+  const sc=gb.gb_schedule||{};
+  const open=sc.open_at,order=gb.order_deadline_at,kit=sc.kit_completion_at;
+  const fmt=v=>{if(!v)return"Not set";const d=new Date(v);if(!Number.isFinite(d.getTime()))return"Not set";return d.toLocaleString("en-PH",{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"})};
+  document.getElementById("pepPublicOpenDate").textContent=fmt(open);
+  document.getElementById("pepPublicOrderDate").textContent=fmt(order);
+  document.getElementById("pepPublicKitDate").textContent=fmt(kit);
+  panel.style.display=(open||order||kit)?"block":"none";
+  const timer=document.getElementById("pepPublicCountdown");
+  const tick=()=>{
+   const end=order?new Date(order).getTime():NaN;
+   if(String(gb.status||"").toUpperCase()!=="OPEN"||!Number.isFinite(end)){timer.hidden=true;return}
+   const ms=end-Date.now();
+   if(ms<=0){timer.hidden=false;timer.textContent="ORDERING DEADLINE REACHED";return}
+   const d=Math.floor(ms/86400000),h=Math.floor(ms%86400000/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000);
+   timer.hidden=false;timer.textContent="♡ TIME LEFT TO ORDER  •  "+d+"D "+h+"H "+m+"M "+s+"S";
+  };
+  tick();if(window.__pepPublicGBTimer)clearInterval(window.__pepPublicGBTimer);window.__pepPublicGBTimer=setInterval(tick,1000);
+ };
  window.addEventListener("pep-products-loaded",window.pepUpdateHomeSections);
+
  window.addEventListener("pep-open-for-all-updated",window.pepUpdateHomeSections);
  document.addEventListener("click",function(e){
   const a=e.target.closest(".pepCategoryRow a");if(!a)return;
@@ -2339,6 +2369,7 @@ async function load(){
     };
 
     currentGB = gb;
+    if(window.pepRenderPublicGBSchedule)window.pepRenderPublicGBSchedule(gb);
     syncOrderingControls();
 
     // Tracking is explicitly tied to this exact Group Buy.
@@ -4708,6 +4739,22 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opa
   document.addEventListener('DOMContentLoaded',removeExtraGB,{once:true});
 })();
 </script>
+
+<style id="pep-public-gb-schedule-style">
+#gbStatus.pepPublicGBCard{margin:18px 0 10px!important;padding:25px 30px!important;border:1px solid #e8b7ce!important;border-radius:22px!important;background:radial-gradient(circle at 92% 10%,#f9dce9 0,transparent 27%),linear-gradient(120deg,#fffafd,#fff 55%,#fdebf3)!important;box-shadow:0 14px 32px rgba(91,22,53,.11)!important;min-height:0!important}
+#gbStatus.pepPublicGBCard:before{width:7px!important}
+#gbStatus.pepPublicGBCard .gb-name{font-family:Georgia,serif!important;font-size:clamp(30px,4vw,43px)!important;color:#50132e!important}
+#gbStatus.pepPublicGBCard .status{margin-right:8px}
+.pepPublicGBSchedule{margin:0 0 25px;padding:20px 24px;border:1px solid #edc4d6;border-radius:21px;background:linear-gradient(135deg,#fffafd,#fbe8f1);box-shadow:0 10px 24px #64163812}
+.pepPublicScheduleHead{margin-bottom:14px}.pepPublicScheduleHead>span{font-size:9px;font-weight:950;letter-spacing:.2em;color:#c12d70}.pepPublicScheduleHead h2{font:700 23px Georgia,serif;color:#55132f;margin:4px 0}.pepPublicScheduleHead p{font-size:11px;color:#765b68;margin:0}
+.pepPublicScheduleGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pepPublicScheduleItem{padding:13px 15px;border:1px solid #f0ccdc;border-radius:14px;background:#fff9fc;min-width:0}
+.pepPublicScheduleItem small{display:block;color:#b12a68;font-size:9px;font-weight:950;letter-spacing:.1em;margin-bottom:6px}
+.pepPublicScheduleItem strong{display:block;color:#4e1831;font-size:13px;line-height:1.35}
+.pepPublicCountdown{margin-top:12px;padding:12px 15px;border-radius:13px;background:linear-gradient(100deg,#51132e,#9c285c);color:#fff;font-size:12px;font-weight:900;letter-spacing:.04em;text-align:center}
+.pepPublicCountdown[hidden]{display:none!important}
+@media(max-width:650px){#gbStatus.pepPublicGBCard{padding:21px 20px!important;margin-top:14px!important}.pepPublicGBSchedule{padding:17px 15px}.pepPublicScheduleGrid{grid-template-columns:1fr}.pepPublicScheduleItem{padding:11px 13px}}
+</style>
 </body>
 </html>
 

@@ -7,10 +7,41 @@ function msg(text,type=''){const target=$('verifyPanel')?.classList.contains('ac
 function accountMsg(text,type=''){const el=$('accountMessage');if(el){el.textContent=text;el.className='notice '+type}}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function peso(v){return '₱'+Number(v||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+async function loadLoginGBSchedule(){
+ const box=$('pepLoginGBSchedule');if(!box||!sb)return;
+ const dateText=value=>{
+  if(!value)return '';
+  const d=new Date(value);if(Number.isNaN(d.getTime()))return '';
+  return d.toLocaleString('en-PH',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+ };
+ try{
+  const {data,error}=await sb.from('group_buys').select('gb_number,customer_facing_name,status,gb_schedule,created_at').in('status',['OPEN','KIT_COMPLETION','CLOSED']).order('created_at',{ascending:false}).limit(20);
+  if(error)throw error;
+  const rows=data||[];
+  const gb=rows.find(x=>['OPEN','KIT_COMPLETION'].includes(x.status))||rows.find(x=>x.status==='CLOSED')||null;
+  if(!gb){
+   box.innerHTML='<div class="pep-login-schedule-head"><div><span class="pep-login-schedule-kicker">PEPMOSA GROUP BUY</span><b class="pep-login-schedule-name">GB Schedule</b></div></div><div class="pep-login-schedule-empty">No current Group Buy schedule is available right now.</div>';
+   return;
+  }
+  const schedule=gb.gb_schedule||{};
+  const items=[['GB OPENS',schedule.open_at],['ADMIN FEE PAYMENT',schedule.admin_fee_at],['ORDER PLACEMENT',schedule.order_at],['FINAL PAYMENT',schedule.final_payment_at],['ORDER PLACED',schedule.order_placed_at]].filter(x=>x[1]);
+  const status=gb.status==='OPEN'?'OPEN':gb.status==='KIT_COMPLETION'?'KIT COMPLETION':'CLOSED';
+  const statusClass=gb.status==='OPEN'?'open':gb.status==='KIT_COMPLETION'?'kit':'';
+  box.innerHTML='<div class="pep-login-schedule-head"><div><span class="pep-login-schedule-kicker">CURRENT GROUP BUY SCHEDULE</span><b class="pep-login-schedule-name">'+esc(gb.customer_facing_name||gb.gb_number)+'</b></div><span class="pep-login-schedule-status '+statusClass+'">'+status+'</span></div>'+
+   (items.length?'<div class="pep-login-schedule-grid">'+items.map(x=>'<div class="pep-login-schedule-row"><span>'+x[0]+'</span><b>'+esc(dateText(x[1]))+'</b></div>').join('')+'</div>':'<div class="pep-login-schedule-empty">Schedule dates will be announced here. Please check back for updates.</div>')+
+   (schedule.delivery_eta?'<div class="pep-login-schedule-eta">ESTIMATED DELIVERY ETA<b>'+esc(schedule.delivery_eta)+'</b></div>':'');
+ }catch(error){
+  console.warn('PEPMOSA login GB schedule unavailable',error);
+  box.innerHTML='<div class="pep-login-schedule-head"><div><span class="pep-login-schedule-kicker">PEPMOSA GROUP BUY</span><b class="pep-login-schedule-name">GB Schedule</b></div></div><div class="pep-login-schedule-empty">Schedule is temporarily unavailable. Please refresh to try again.</div>';
+ }
+}
+
 function init(){
  sb=initSupabase();wire();
  const tab=new URLSearchParams(location.search).get('tab');
  if(tab==='signup')switchTab('signup'); else if(tab==='login')switchTab('login');
+ loadLoginGBSchedule();
  refresh()
 }
 

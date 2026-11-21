@@ -1249,7 +1249,8 @@ body:has(#accountArea:not(.hidden)){
  .accountWrap:has(#authArea:not(.hidden)) .field input{background:#fff7fa!important}
 }
 
-/* Canonical signed-out login background — approved PEPMOSA satin artwork. */
+/* Canonical signed-out login background — paint both document canvas and page. */
+html:has(#authArea:not(.hidden)),
 body:has(#authArea:not(.hidden)){
  min-height:100vh!important;
  background-color:#f9e4ee!important;
@@ -1259,7 +1260,10 @@ body:has(#authArea:not(.hidden)){
  background-repeat:no-repeat!important;
  background-attachment:fixed!important;
 }
-@media(max-width:760px){body:has(#authArea:not(.hidden)){background-attachment:scroll!important}}
+@media(max-width:760px){
+ html:has(#authArea:not(.hidden)),
+ body:has(#authArea:not(.hidden)){background-attachment:scroll!important}
+}
 </style>
 </head>
 <body>

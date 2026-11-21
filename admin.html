@@ -903,8 +903,8 @@ async function saveGroupBuy(){
     const {data:verified,error:verifyError}=await sb.from("group_buys").select("gb_number,status,order_deadline_at,gb_schedule,kit_completion_status").eq("gb_number",n).single();
     if(verifyError)throw verifyError;
     const savedSchedule=verified.gb_schedule||{};
-    const expectedDeadline=p.order_deadline_at||null;
-    if((savedSchedule.open_at||null)!==(scheduleValue.open_at||null)||(savedSchedule.kit_completion_at||null)!==(scheduleValue.kit_completion_at||null)||(verified.order_deadline_at||null)!==expectedDeadline||verified.kit_completion_status!==p.kit_completion_status){throw new Error("Supabase did not confirm the GB schedule. Please check admin access; the dates were not confirmed saved.");}
+    const sameDate=(a,b)=>{if(!a&&!b)return true;if(!a||!b)return false;const ta=new Date(a).getTime(),tb=new Date(b).getTime();return Number.isFinite(ta)&&Number.isFinite(tb)&&ta===tb;};
+    if(!sameDate(savedSchedule.open_at,scheduleValue.open_at)||!sameDate(savedSchedule.kit_completion_at,scheduleValue.kit_completion_at)||!sameDate(verified.order_deadline_at,p.order_deadline_at)||verified.kit_completion_status!==p.kit_completion_status){throw new Error("The saved GB schedule does not match the dates entered. Please review the dates and save again.");}
 
     // FUTURE-GB ONLY: assign queued Admin Orders only when a NEW GB is created.
     // Editing the current GB never consumes the Admin Order queue.

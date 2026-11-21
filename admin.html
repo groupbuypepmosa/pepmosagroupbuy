@@ -343,6 +343,14 @@ body:has(#loginScreen:not([style*="display:none"])){
  #loginScreen .btn.primary{height:62px!important}
  #loginScreen .btn.primary:after{font-size:24px!important}
 }
+
+/* Position the circular crest above the glass login panel, as in the reference. */
+#loginScreen .loginBox{position:relative!important;margin-top:185px!important;padding-top:38px!important}
+#loginScreen .loginLogo{position:absolute!important;left:50%!important;top:-390px!important;transform:translateX(-50%)!important;margin:0!important;flex:none!important}
+@media(max-width:650px){
+ #loginScreen .loginBox{margin-top:95px!important;padding-top:26px!important}
+ #loginScreen .loginLogo{top:-195px!important}
+}
 </style>
 </head>
 <body>

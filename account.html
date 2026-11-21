@@ -1316,6 +1316,27 @@ body:has(#authArea:not(.hidden)){
  body:has(#authArea:not(.hidden)){background-position:center center!important;background-attachment:scroll!important}
 }
 </style>
+
+<style id="pepmosa-login-final-background-fix">
+/* Final override: avoid :has() dependency so the approved image always appears. */
+html, body { min-height:100% !important; }
+body {
+  background: #f9e4ee url("/pepmosa-customer-login-bg.svg?v=20261121")
+    center center / cover fixed no-repeat !important;
+}
+.field input, .field textarea {
+  background-color: #fff7fa !important;
+  border-color: #e9cbd8 !important;
+}
+.field input:focus, .field textarea:focus {
+  background-color: #fffafd !important;
+  border-color: #bd4c73 !important;
+}
+@media (max-width:760px) {
+  body { background-attachment:scroll !important; background-position:center center !important; }
+}
+</style>
+
 </head>
 <body>
 <div class="accountWrap"><div class="accountCard">

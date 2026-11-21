@@ -4592,6 +4592,47 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opa
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load,{once:true});else load();
 })();
 </script>
+
+<!-- PEPMOSA CLOSED-GB ADMIN FEE VISIBILITY + CLICK GUARD -->
+<style id="pep-closed-gb-fee-guard">
+  body.pep-gb-closed [data-pep-admin-fee-cta],
+  body.pep-gb-closed .pepAdminFeeCTA,
+  body.pep-gb-closed button.pepAdminFeeCTA,
+  body.pep-gb-closed a.pepAdminFeeCTA { display:none!important; visibility:hidden!important; pointer-events:none!important; }
+</style>
+<script id="pep-closed-gb-fee-guard-script">
+(function(){
+  const isClosed=()=>{
+    let gb=null;
+    try{if(typeof currentGB!=='undefined')gb=currentGB;}catch(_){}
+    gb=gb||window.currentGB||window.pepCurrentGB||null;
+    const status=String(gb?.status||'').trim().toUpperCase();
+    const badge=(document.querySelector('#currentGroupBuy .pepGBStatus')?.textContent||document.querySelector('.pepGBStatus')?.textContent||'').toUpperCase();
+    const copy=(document.querySelector('#currentGroupBuy .pepGBSub')?.textContent||'').toUpperCase();
+    if(status) return !['OPEN','KIT_COMPLETION'].includes(status);
+    return /CLOSED|PRICELIST VIEW|ORDERING CLOSED/.test(badge+' '+copy);
+  };
+  function sync(){
+    const closed=isClosed();
+    document.body.classList.toggle('pep-gb-closed',closed);
+    document.querySelectorAll('button,a,[role="button"]').forEach(el=>{
+      if(!/PAY\s+ADMIN\s+FEE/i.test((el.innerText||el.textContent||'').trim()))return;
+      el.dataset.pepAdminFeeCta='1';
+      if(closed){el.hidden=true;el.setAttribute('aria-hidden','true');el.style.setProperty('display','none','important');el.style.setProperty('pointer-events','none','important');}
+      else {el.hidden=false;el.removeAttribute('aria-hidden');el.style.removeProperty('display');el.style.removeProperty('pointer-events');}
+    });
+  }
+  document.addEventListener('click',function(e){
+    const el=e.target.closest('button,a,[role="button"]');
+    if(el&&/PAY\s+ADMIN\s+FEE/i.test((el.innerText||el.textContent||'').trim())&&isClosed()){
+      e.preventDefault();e.stopImmediatePropagation();sync();
+    }
+  },true);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',sync,{once:true});else sync();
+  new MutationObserver(sync).observe(document.documentElement,{childList:true,subtree:true,characterData:true});
+  setInterval(sync,500);
+})();
+</script>
 </body>
 </html>
 

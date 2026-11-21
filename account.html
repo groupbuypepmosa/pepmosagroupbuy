@@ -1235,20 +1235,81 @@ body:has(#accountArea:not(.hidden)){
  .accountWrap:has(#authArea:not(.hidden)) .field input{background:#fff7fa!important}
 }
 
-/* Canonical signed-out login background — paint both document canvas and page. */
-html:has(#authArea:not(.hidden)),
-body:has(#authArea:not(.hidden))
-@media(max-width:760px){
- html:has(#authArea:not(.hidden)),
- body:has(#authArea:not(.hidden)){background-attachment:scroll!important}
-}
+</style>
+<style id="pep-auth-editorial-layout">
+:root{color-scheme:light}
+body{margin:0!important;min-height:100vh!important;background:#fff5f9!important;color:#42172f!important}
+.pep-auth-shell{width:min(1256px,calc(100% - 44px));min-height:min(720px,calc(100vh - 44px));margin:22px auto;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(460px,.92fr);border-radius:24px;overflow:hidden;background:#fffafd;box-shadow:0 28px 90px rgba(77,17,49,.19);border:1px solid rgba(150,57,101,.16)}
+.pep-auth-brand{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:690px;padding:54px 46px;background:radial-gradient(circle at 88% 10%,rgba(255,164,205,.42),transparent 26%),radial-gradient(circle at 16% 88%,rgba(255,125,180,.12),transparent 30%),linear-gradient(145deg,#350d25 0%,#651638 52%,#a52e65 100%);color:#fff6fa}
+.pep-auth-brand:before{content:"";position:absolute;inset:0;z-index:-1;opacity:.22;background:repeating-linear-gradient(28deg,transparent 0 130px,rgba(255,255,255,.11) 132px,transparent 134px 260px)}
+.pep-auth-brand:after{content:"";position:absolute;z-index:-1;width:520px;height:520px;right:-240px;bottom:-280px;border:1px solid rgba(255,220,236,.2);border-radius:50%;box-shadow:0 0 0 38px rgba(255,220,236,.025),0 0 0 86px rgba(255,220,236,.025)}
+.pep-auth-brand-inner{width:min(100%,560px);position:relative;z-index:1}
+.pep-auth-wordmark{display:flex;align-items:center;gap:14px;font:clamp(44px,5.5vw,76px)/1 Georgia,serif;letter-spacing:-2px;color:#fff4f8;text-shadow:0 8px 24px rgba(0,0,0,.14)}
+.pep-auth-crown{font:34px Georgia,serif;color:#f7c4d7}
+.pep-auth-logo{display:block;width:150px;height:150px;object-fit:contain;margin:10px 0 28px 16px;filter:drop-shadow(0 12px 24px rgba(0,0,0,.25))}
+.pep-auth-kicker{font-size:10px;font-weight:950;letter-spacing:.25em;color:#f6bfd4}
+.pep-auth-brand p{max-width:510px;font:16px/1.7 Georgia,serif;color:#ffeaf2;margin:12px 0 22px}
+.pep-auth-pills{display:flex;flex-wrap:wrap;gap:8px}
+.pep-auth-pills span{padding:8px 12px;border:1px solid rgba(255,225,239,.35);border-radius:999px;background:rgba(255,255,255,.08);font-size:9px;font-weight:950;letter-spacing:.06em}
+.pep-auth-heart,.pep-auth-spark{position:absolute;color:rgba(255,157,199,.58);pointer-events:none}
+.pep-auth-heart-one{right:15%;top:28%;font-size:38px;transform:rotate(-13deg)}
+.pep-auth-heart-two{left:17%;bottom:18%;font-size:45px}
+.pep-auth-spark{right:22%;bottom:17%;font-size:28px}
+.pep-auth-main{display:flex;flex-direction:column;justify-content:center;gap:24px;padding:44px clamp(28px,4.5vw,64px);background:linear-gradient(180deg,#fffafd,#fff3f8)}
+.pep-auth-heading{max-width:520px;margin:0 auto;width:100%}
+.pep-auth-eyebrow{display:flex;align-items:center;gap:9px;color:#b33b70;font-size:9px;font-weight:950;letter-spacing:.2em}
+.pep-auth-eyebrow span{width:9px;height:9px;border-radius:50%;background:#df6d9d;box-shadow:0 0 0 5px rgba(223,109,157,.13)}
+.pep-auth-heading h1{font:clamp(38px,4.4vw,60px)/.98 Georgia,serif;letter-spacing:-1.8px;color:#55162f;margin:18px 0 14px}
+.pep-auth-heading h1 em{font-weight:400;color:#b84979}
+.pep-auth-heading p{margin:0;color:#866a78;font-size:12px;line-height:1.6}
+.pep-auth-main .accountWrap{width:100%!important;max-width:520px!important;margin:0 auto!important}
+.pep-auth-main .accountCard{width:100%!important;max-width:520px!important;box-sizing:border-box!important;margin:0!important;padding:24px!important;border:1px solid #f0d5e2!important;border-radius:22px!important;background:rgba(255,255,255,.92)!important;box-shadow:0 18px 48px rgba(91,30,60,.10)!important}
+.pep-auth-main .accountCard>.logo,.pep-auth-main .accountCard>.title,.pep-auth-main .accountCard>.sub{display:none!important}
+.pep-auth-card-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.pep-auth-card-head>span{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;background:#fbe8f0;border:1px solid #f3c9db;color:#b94e7b;font-size:21px}
+.pep-auth-card-head b{display:block;font:700 20px Georgia,serif;color:#55162f}
+.pep-auth-card-head small{display:block;margin-top:3px;font-size:10px;color:#987d8a}
+.pep-auth-main .tabs{background:#f9eaf1!important;border:1px solid #f1dce6!important;border-radius:13px!important}
+.pep-auth-main .tab{color:#8c6577!important}
+.pep-auth-main .tab.active{background:linear-gradient(110deg,#791b45,#c13d78)!important;color:#fff!important;box-shadow:0 5px 14px rgba(126,30,75,.2)!important}
+.pep-auth-main .field label{color:#704456!important}
+.pep-auth-main .field input,.pep-auth-main .field select,.pep-auth-main .field textarea{background:#fff9fc!important;border:1px solid #ead4df!important;border-radius:11px!important;color:#4c293a!important}
+.pep-auth-main .field input:focus,.pep-auth-main .field select:focus,.pep-auth-main .field textarea:focus{border-color:#ca6c96!important;box-shadow:0 0 0 3px rgba(202,108,150,.12)!important}
+.pep-auth-main .btn{background:linear-gradient(110deg,#78183f,#c13c78)!important;border-radius:12px!important;box-shadow:0 8px 18px rgba(126,30,75,.16)!important}
+.pep-auth-main .btn.secondary{background:#fff!important;color:#9c315f!important;border:1px solid #e9cbd9!important;box-shadow:none!important}
+.pep-auth-main .links{margin-top:15px!important}
+.pep-auth-main .links a{color:#a63b69!important}
+.pep-auth-shell:has(#accountArea:not(.hidden)){grid-template-columns:1fr;min-height:0}
+.pep-auth-shell:has(#accountArea:not(.hidden)) .pep-auth-brand,.pep-auth-shell:has(#accountArea:not(.hidden)) .pep-auth-heading{display:none}
+.pep-auth-shell:has(#accountArea:not(.hidden)) .pep-auth-main{padding:26px}
+.pep-auth-shell:has(#accountArea:not(.hidden)) .accountWrap{max-width:1120px!important}
+.pep-auth-shell:has(#accountArea:not(.hidden)) .accountCard{max-width:1120px!important}
+@media(max-width:900px){.pep-auth-shell{grid-template-columns:1fr;width:min(700px,calc(100% - 28px));margin:14px auto}.pep-auth-brand{min-height:330px;padding:34px 30px}.pep-auth-wordmark{font-size:52px}.pep-auth-logo{width:105px;height:105px;margin:8px 0 17px 10px}.pep-auth-brand p{font-size:14px;margin:8px 0 15px}.pep-auth-main{padding:30px 22px;gap:18px}}
+@media(max-width:560px){.pep-auth-shell{width:100%;min-height:100vh;margin:0;border-radius:0;border:0}.pep-auth-brand{min-height:250px;padding:27px 23px}.pep-auth-wordmark{font-size:43px}.pep-auth-logo{width:78px;height:78px;margin:5px 0 12px 8px}.pep-auth-kicker{font-size:8px}.pep-auth-brand p{font-size:12px;line-height:1.5}.pep-auth-pills span{font-size:7px;padding:6px 8px}.pep-auth-main{padding:25px 16px 32px;gap:16px}.pep-auth-heading h1{font-size:39px;margin:12px 0 9px}.pep-auth-main .accountCard{padding:19px!important}.pep-auth-shell:has(#accountArea:not(.hidden)) .pep-auth-main{padding:12px}}
 </style>
 </head>
-<body style="min-height:100vh !important; background-color:#f7dce7 !important; background-image:url('/pepmosa-customer-login-bg.svg?v=20261121-final') !important; background-position:center center !important; background-size:cover !important; background-repeat:no-repeat !important; background-attachment:fixed !important;">
+<body>
+<main class="pep-auth-shell" id="pepAuthShell">
+  <section class="pep-auth-brand" aria-label="PEPMOSA community">
+    <div class="pep-auth-brand-inner">
+      <div class="pep-auth-wordmark"><span class="pep-auth-crown">♛</span> PEPMOSA</div>
+      <img class="pep-auth-logo" src="pepmosa-logo.png" alt="PEPMOSA logo">
+      <div class="pep-auth-kicker">YOUR GROUP BUY COMMUNITY</div>
+      <p>A more beautiful way to stay connected with your orders, updates, and community.</p>
+      <div class="pep-auth-pills"><span>✦ PRODUCT UPDATES</span><span>♡ COMMUNITY</span><span>→ ORDER TRACKING</span></div>
+    </div>
+    <span class="pep-auth-heart pep-auth-heart-one">♥</span><span class="pep-auth-heart pep-auth-heart-two">♡</span><span class="pep-auth-spark">✦</span>
+  </section>
+  <section class="pep-auth-main">
+    <header class="pep-auth-heading">
+      <div class="pep-auth-eyebrow"><span></span> WELCOME TO YOUR PEPMOSA SPACE</div>
+      <h1>Your favorites.<br><em>Your community.</em></h1>
+      <p>Sign in to access your account, or create an account to get started.</p>
+    </header>
 <div class="accountWrap"><div class="accountCard">
 <div class="logo"><img src="pepmosa-logo.png" alt="PEPMOSA official logo"></div>
 <div class="title">Log In to Your Account</div><div class="sub">Welcome back to PEPMOSA Group Buy</div>
-<div id="authArea">
+<div id="authArea"><div class="pep-auth-card-head"><span>♛</span><div><b>Welcome back</b><small>Your PEPMOSA journey starts here.</small></div></div>
 <div class="tabs"><button class="tab active" id="loginTab">Log In</button><button class="tab" id="signupTab">Create Account</button></div>
 <div id="message" class="notice hidden"></div>
 <section id="loginPanel" class="accountPanel active">
@@ -1370,6 +1431,8 @@ body:has(#authArea:not(.hidden))
 </div>
 <div class="links"><a href="/">← Back to PEPMOSA</a></div>
 </div></div>
+  </section>
+</main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script><script src="supabase.js"></script><script src="account.js"></script>
 <script src="site-activity.js"></script>

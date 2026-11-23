@@ -2782,6 +2782,12 @@ function openProductPicker(pid, productOverride){
       `
         <div class="pepPickerBox">
 
+          <div class="pepBrandMark" aria-label="PEPMOSA Group Buy">
+            <span class="pepBrandCrown" aria-hidden="true">♛</span>
+            <strong>PEPMOSA</strong>
+            <span class="pepBrandSub"><i></i> GROUP BUY <i></i></span>
+          </div>
+
           <button
             class="pepPickerClose"
             type="button"
@@ -2805,6 +2811,11 @@ function openProductPicker(pid, productOverride){
               <p class="muted">
                 ${esc(product.description || "Choose your preferred variant and quantity.")}
               </p>
+              <div class="pepBenefitRow" aria-label="Research categories">
+                <span><b aria-hidden="true">ϟ</b> Metabolism Support</span>
+                <span><b aria-hidden="true">♨</b> Energy &amp; Stamina</span>
+                <span><b aria-hidden="true">⌁</b> Body Composition</span>
+              </div>
             </div>
 
           </div>
@@ -4761,6 +4772,77 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opa
 .pepPublicCountdown[hidden]{display:none!important}
 @media(max-width:650px){#gbStatus.pepPublicGBCard{padding:21px 20px!important;margin-top:14px!important}.pepPublicGBSchedule{padding:17px 15px}.pepPublicScheduleGrid{grid-template-columns:1fr}.pepPublicScheduleItem{padding:11px 13px}}
 </style>
+
+<style id="pep-exact-product-popup-redesign">
+/* PEPMOSA product popup — visual redesign only; existing product/cart logic stays intact. */
+#pepProductPicker{background:rgba(74,25,52,.58)!important;backdrop-filter:blur(10px)!important;padding:22px!important}
+#pepProductPicker .pepPickerBox{width:min(1240px,100%)!important;max-height:94vh!important;overflow:auto!important;padding:36px 46px 32px!important;border:2px solid rgba(255,255,255,.92)!important;border-radius:34px!important;background:radial-gradient(ellipse at 10% 8%,#ffe0ed 0,transparent 29%),radial-gradient(ellipse at 100% 80%,#f8d8ea 0,transparent 27%),linear-gradient(135deg,#fff 0%,#fff9fc 54%,#fff0f8 100%)!important;box-shadow:0 32px 100px rgba(65,14,43,.34),inset 0 0 0 1px #f5d9e7!important}
+#pepProductPicker .pepBrandMark{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;margin:0 auto 24px;color:#c51d69;text-align:center;line-height:1}
+#pepProductPicker .pepBrandCrown{font-size:37px;line-height:.8;margin-bottom:5px;text-shadow:0 4px 12px rgba(197,29,105,.18)}
+#pepProductPicker .pepBrandMark strong{font-family:Georgia,'Times New Roman',serif;font-size:clamp(30px,4vw,48px);font-weight:700;letter-spacing:.035em;color:#a91655}
+#pepProductPicker .pepBrandSub{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:13px;font-weight:900;letter-spacing:.28em;color:#c52c70}
+#pepProductPicker .pepBrandSub i{display:block;width:58px;height:1.5px;background:#d82f7b}
+#pepProductPicker .pepPickerClose{right:22px!important;top:20px!important;width:56px!important;height:56px!important;border:0!important;background:linear-gradient(145deg,#e95a9b,#bf397b)!important;color:#fff!important;font-size:30px!important;box-shadow:0 8px 22px rgba(179,42,108,.25)!important}
+#pepProductPicker .pepPickerHead{grid-template-columns:minmax(250px,320px) minmax(0,1fr)!important;gap:34px!important;align-items:center!important;padding:0 0 4px!important}
+#pepProductPicker .pepPickerImage{height:350px!important;border-radius:30px!important;background:linear-gradient(145deg,#ffe5f0,#fff7fb)!important;border:2px solid #f7d6e5!important;box-shadow:0 12px 28px rgba(139,55,96,.13)!important}
+#pepProductPicker .pepPickerImage img{object-fit:contain!important;padding:8px!important}
+#pepProductPicker .pepPickerHead .eyebrow{font-size:12px!important;letter-spacing:.2em!important;font-weight:950!important;color:#d13c82!important}
+#pepProductPicker .pepPickerHead h2{font-size:clamp(34px,4.5vw,54px)!important;line-height:1.05!important;letter-spacing:-.035em!important;color:#76183f!important;margin:12px 0 14px!important}
+#pepProductPicker .pepPickerHead p.muted{font-size:17px!important;line-height:1.55!important;color:#79616e!important;margin:0!important;max-width:760px!important}
+#pepProductPicker .pepBenefitRow{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+#pepProductPicker .pepBenefitRow span{display:inline-flex;align-items:center;gap:9px;padding:12px 16px;border-radius:999px;background:linear-gradient(135deg,#ffe2ef,#fbd0e4);color:#a31c58;font-size:13px;font-weight:850;line-height:1.2}
+#pepProductPicker .pepBenefitRow b{font-size:19px;color:#d52d7a}
+#pepProductPicker .pepPickerLabel{margin:24px 0 12px!important;font-size:13px!important;letter-spacing:.16em!important;color:#a91e5c!important}
+#pepProductPicker .pepVariantChoices{gap:12px!important}
+#pepProductPicker .pepVariantChoice{position:relative!important;min-height:112px!important;padding:18px 28px 18px 34px!important;border:1.5px solid #efd2e0!important;border-radius:23px!important;background:rgba(255,255,255,.88)!important;box-shadow:0 5px 14px rgba(113,44,77,.035)!important;color:#3b2932!important}
+#pepProductPicker .pepVariantChoice.selected{border:3px solid #d72c7a!important;background:linear-gradient(110deg,#fff0f7,#fff9fc)!important;box-shadow:0 7px 18px rgba(208,42,119,.12)!important}
+#pepProductPicker .pepVariantChoice span{gap:7px!important}
+#pepProductPicker .pepVariantChoice span b{font-size:28px!important;line-height:1.1!important;color:#3e2934!important}
+#pepProductPicker .pepVariantChoice span small{display:inline-flex!important;align-self:flex-start!important;padding:7px 14px!important;border-radius:999px!important;background:#f9dce9!important;color:#b31e65!important;font-size:11px!important;font-weight:950!important;letter-spacing:.045em!important}
+#pepProductPicker .pepVariantChoice.selected span small{background:#ce2d78!important;color:#fff!important}
+#pepProductPicker .pepVariantChoice strong{min-width:190px!important;border-left:1px solid #efc4d7!important;padding-left:24px!important;text-align:right!important;font-size:23px!important;color:#3c2933!important}
+#pepProductPicker .pepQuantityRow{margin-top:20px!important;padding:18px 22px!important;min-height:84px!important;border:1.5px solid #efd7e3!important;border-radius:22px!important;background:rgba(255,255,255,.9)!important}
+#pepProductPicker .pepPickerLabel.small{margin:0 0 5px!important;font-size:12px!important}
+#pepProductPicker .pepQuantityRow .muted{font-size:14px!important;color:#8b7580!important}
+#pepProductPicker .pepStepper{grid-template-columns:52px 76px 52px!important}
+#pepProductPicker .pepStepper button{height:48px!important;border:0!important;background:linear-gradient(145deg,#dc5792,#b83d79)!important;color:#fff!important;font-size:25px!important;box-shadow:0 6px 16px rgba(168,46,101,.18)!important}
+#pepProductPicker .pepStepper button:first-child{border-radius:0!important}
+#pepProductPicker .pepStepper button:last-child{border-radius:0!important}
+#pepProductPicker .pepStepper input{height:48px!important;border:1px solid #e8c5d6!important;border-radius:13px!important;background:#fff!important;color:#4a2b3a!important;font-size:18px!important}
+#pepProductPicker .pepPickerTotal{margin-top:22px!important;padding:20px 2px!important;border-top:1px solid #edcfdd!important;color:#742040!important;font-size:17px!important}
+#pepProductPicker .pepPickerTotal b{font-size:30px!important;color:#c72575!important}
+#pepProductPicker .pepPickerAdd{min-height:76px!important;margin-top:8px!important;border:0!important;border-radius:999px!important;background:linear-gradient(100deg,#c42b78,#d46d9c)!important;color:#fff!important;font-size:19px!important;font-weight:950!important;letter-spacing:.015em!important;box-shadow:0 12px 24px rgba(185,42,109,.2)!important}
+@media(max-width:760px){
+ #pepProductPicker{align-items:center!important;padding:9px!important}
+ #pepProductPicker .pepPickerBox{padding:22px 18px 18px!important;border-radius:25px!important;max-height:96vh!important}
+ #pepProductPicker .pepBrandMark{margin-bottom:16px!important}
+ #pepProductPicker .pepBrandCrown{font-size:27px!important}
+ #pepProductPicker .pepBrandMark strong{font-size:31px!important}
+ #pepProductPicker .pepBrandSub{font-size:9px!important;letter-spacing:.22em!important}
+ #pepProductPicker .pepBrandSub i{width:34px!important}
+ #pepProductPicker .pepPickerClose{right:10px!important;top:10px!important;width:38px!important;height:38px!important;font-size:22px!important}
+ #pepProductPicker .pepPickerHead{grid-template-columns:108px minmax(0,1fr)!important;gap:14px!important;padding-right:0!important}
+ #pepProductPicker .pepPickerImage{height:128px!important;border-radius:18px!important}
+ #pepProductPicker .pepPickerHead h2{font-size:23px!important;margin:5px 0 7px!important}
+ #pepProductPicker .pepPickerHead p.muted{font-size:11px!important;line-height:1.4!important}
+ #pepProductPicker .pepBenefitRow{gap:5px;margin-top:10px!important}
+ #pepProductPicker .pepBenefitRow span{font-size:8px!important;padding:7px 8px!important;gap:4px!important}
+ #pepProductPicker .pepBenefitRow b{font-size:12px!important}
+ #pepProductPicker .pepPickerLabel{margin:18px 0 9px!important;font-size:10px!important}
+ #pepProductPicker .pepVariantChoice{min-height:78px!important;padding:12px 12px 12px 18px!important;border-radius:16px!important}
+ #pepProductPicker .pepVariantChoice span b{font-size:20px!important}
+ #pepProductPicker .pepVariantChoice span small{font-size:8px!important;padding:5px 8px!important}
+ #pepProductPicker .pepVariantChoice strong{min-width:88px!important;padding-left:10px!important;font-size:15px!important}
+ #pepProductPicker .pepQuantityRow{flex-direction:row!important;align-items:center!important;padding:12px!important;gap:8px!important;min-height:66px!important}
+ #pepProductPicker .pepQuantityRow .muted{font-size:11px!important}
+ #pepProductPicker .pepStepper{grid-template-columns:38px 56px 38px!important}
+ #pepProductPicker .pepStepper button,#pepProductPicker .pepStepper input{height:40px!important}
+ #pepProductPicker .pepPickerTotal{padding:14px 2px!important;font-size:14px!important}
+ #pepProductPicker .pepPickerTotal b{font-size:22px!important}
+ #pepProductPicker .pepPickerAdd{min-height:54px!important;font-size:15px!important}
+}
+</style>
+
 </body>
 </html>
 
